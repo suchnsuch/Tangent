@@ -1,0 +1,12 @@
+// SYNTAX TEST "source.tangentquery"
+Notes with "My text"
+// <~- keyword.other.form
+//    ^^^^ keyword.other.clause
+//         ^^^^^^^^^ string.quoted.double
+
+Notes with 'some text' or /regex/ and "test"
+//         ^^^^^^^^^^^ string.quoted.single
+//                     ^^ keyword.operator.join.or
+//                        ^^^^^^^ string regexp
+//                                ^^^ keyword.operator.join.and
+//                                    ^^^^^^ string.quoted.double

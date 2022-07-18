@@ -1,0 +1,25 @@
+{
+	"$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
+	"scopeName": "source.tangentquery",
+	"name": "TangentQuery",
+	"patterns": [
+		{
+			"begin": "//",
+			"beginCaptures": {
+				"0": {
+					"name": "punctuation.definition.comment.tangentquery"
+				}
+			},
+			"end": "\\n",
+			"name": "comment.line.double-slash.tangentquery"
+		},
+		{
+			"match": "\\b(?i:and)\\b",
+			"name": "keyword.operator.join.and"
+		},
+		{
+			"match": "\\b(?i:or)\\b",
+			"name": "keyword.operator.join.or"
+		}
+	]
+}

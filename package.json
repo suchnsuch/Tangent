@@ -1,0 +1,35 @@
+{
+  "name": "@such-n-such/tangent-query-parser",
+  "version": "0.1.0",
+  "description": "A package for parsing the Tangent query syntax into a structure that can be used to filter files and folders and their contents.",
+  "main": "index.js",
+  "scripts": {
+    "test-grammar": "npx vscode-tmgrammar-test 'tests/**/*.test.tqr'",
+    "test": "test"
+  },
+  "author": "Taylor Hadden",
+  "license": "MIT",
+  "devDependencies": {
+    "typescript": "^4.7.4",
+    "vscode-oniguruma": "^1.6.2",
+    "vscode-textmate": "^7.0.1",
+    "vscode-tmgrammar-test": "^0.1.1"
+  },
+  "contributes": {
+    "languages": [
+      {
+        "id": "tangentquery",
+        "extensions": [
+          ".tqr"
+        ]
+      }
+    ],
+    "grammars": [
+      {
+        "language": "tangentquery",
+        "scopeName": "source.tangentquery",
+        "path": "./syntaxes/tangentquery.tmLanguage.json"
+      }
+    ]
+  }
+}
