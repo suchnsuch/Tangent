@@ -2,11 +2,22 @@
 Notes with "My text"
 // <~- keyword.other.form
 //    ^^^^ keyword.other.clause
-//         ^^^^^^^^^ string.quoted.double
+//         ^^^^^^^^^ string.quoted.double.tangentquery
 
 Notes with 'some text' or /regex/ and "test"
-//         ^^^^^^^^^^^ string.quoted.single
+//         ^^^^^^^^^^^ string.quoted.single.tangentquery
 //                     ^^ keyword.operator.join.or
-//                        ^^^^^^^ string regexp
+//                        ^^^^^^^ string.regexp.tangentquery
 //                                ^^^ keyword.operator.join.and
-//                                    ^^^^^^ string.quoted.double
+//                                    ^^^^^^ string.quoted.double.tangentquery
+
+Folders in [[My Folder]]
+// <~- keyword.other.form
+//      ^^ keyword.other.clause
+//         ^^^^^^^^^^^^^ string.other.wikilink.tangentquery
+
+Files in {Notes with "this text"}
+//       ^^^^^^^^^^^^^^^^^^^^^^^^ meta.subquery
+//        ^^^^^ keyword.other.form
+//              ^^^^ keyword.other.clause
+//                   ^^^^^^^^^^^ string.quoted.double.tangentquery

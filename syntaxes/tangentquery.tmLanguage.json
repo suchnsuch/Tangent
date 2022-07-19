@@ -4,6 +4,7 @@
 	"name": "TangentQuery",
 	"patterns": [
 		{
+			"comment": "Not expected to be used much. Primarily for testing purposes.",
 			"begin": "//",
 			"beginCaptures": {
 				"0": {
@@ -14,12 +15,107 @@
 			"name": "comment.line.double-slash.tangentquery"
 		},
 		{
+			"match": "\\b(?i:Files|Notes|Images|Sets|Folders|Queries)\\b",
+			"name": "keyword.other.form"
+		},
+		{
+			"match": "\\b(?i:in|with|named|linked from)\\b",
+			"name": "keyword.other.clause"
+		},
+		{
 			"match": "\\b(?i:and)\\b",
 			"name": "keyword.operator.join.and"
 		},
 		{
 			"match": "\\b(?i:or)\\b",
 			"name": "keyword.operator.join.or"
+		},
+		{
+			"match": ",",
+			"name": "keyword.operator.join.comma"
+		},
+		{
+			"begin": "'",
+			"end": "'",
+			"beginCaptures": {
+				"0": {
+					"name": "punctuation.definition.string.begin.tangentquery"
+				}
+			},
+			"endCaptures": {
+				"0": {
+					"name": "punctuation.definition.string.end.tangentquery"
+				}
+			},
+			"name": "string.quoted.single.tangentquery",
+			"patterns": [
+				{
+					"match": "\\\\(x\\h{2}|[0-2][0-7]{,2}|3[0-6][0-7]|37[0-7]?|[4-7][0-7]?|.)",
+					"name": "constant.character.escape.tangentquery"
+				}
+			]
+		},
+		{
+			"begin": "\"",
+			"beginCaptures": {
+				"0": {
+					"name": "punctuation.definition.string.begin.tangentquery"
+				}
+			},
+			"end": "\"",
+			"endCaptures": {
+				"0": {
+					"name": "punctuation.definition.string.end.tangentquery"
+				}
+			},
+			"name": "string.quoted.double.tangentquery",
+			"patterns": [
+				{
+					"match": "\\\\(x\\h{2}|[0-2][0-7]{,2}|3[0-6][0-7]|37[0-7]?|[4-7][0-7]?|.)",
+					"name": "constant.character.escape.tangentquery"
+				}
+			]
+		},
+		{
+			"begin": "(/)(?![/*+{}?])",
+			"beginCaptures": {
+				"1": {
+					"name": "punctuation.definition.string.begin.tangentquery"
+				}
+			},
+			"end": "(/)([igm]*)",
+			"endCaptures": {
+				"1": {
+					"name": "punctuation.definition.string.end.tangentquery"
+				},
+				"2": {
+					"name": "string.regexp.args.tangentquery"
+				}
+			},
+			"name": "string.regexp.tangentquery"
+		},
+		{
+			"begin": "\\[\\[",
+			"beginCaptures": {
+				"0": {
+					"name": "punctuation.definition.string.begin.tangentquery"
+				}
+			},
+			"end": "\\]\\]",
+			"endCaptures": {
+				"0": {
+					"name": "punctuation.definition.string.end.tangentquery"
+				}
+			},
+			"name": "string.other.wikilink.tangentquery"
+		},
+		{
+			"begin": "{",
+			"end": "}",
+			"patterns": [
+				{ "include": "$self" }
+			],
+			"name": "meta.subquery"
 		}
 	]
 }
