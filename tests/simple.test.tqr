@@ -21,3 +21,10 @@ Files in {Notes with "this text"}
 //        ^^^^^ keyword.other.form
 //              ^^^^ keyword.other.clause
 //                   ^^^^^^^^^^^ string.quoted.double.tangentquery
+
+Notes with "test" and (in [[Place]] or (with /foo/ or in [[Location]]))
+//                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ meta.group
+//                                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ meta.group
+
+Notes not in [[Place]]
+//    ^^^ keyword.other.negate
