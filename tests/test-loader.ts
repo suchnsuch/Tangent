@@ -1,7 +1,7 @@
 import fs from 'fs'
-import path from 'path'
 import { Registry, parseRawGrammar } from 'vscode-textmate'
 import { loadWASM, createOnigScanner, createOnigString } from 'vscode-oniguruma'
+import { parseQueryText } from '../src'
 
 async function loadVSCodeOnigurumaLib() {
 	const wasmPath = './node_modules/vscode-oniguruma/release/onig.wasm'
@@ -36,4 +36,8 @@ export { registry }
 
 export async function getTQGrammar() {
 	return registry.loadGrammar('source.tangentquery')
+}
+
+export async function parse(text: string) {
+	return parseQueryText(text, await getTQGrammar())
 }

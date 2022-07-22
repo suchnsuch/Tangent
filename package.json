@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "description": "A package for parsing the Tangent query syntax into a structure that can be used to filter files and folders and their contents.",
   "main": "index.js",
+  "type": "module",
   "scripts": {
     "test-grammar": "npx vscode-tmgrammar-test 'tests/**/*.test.tqr'",
     "test": "test"
@@ -34,5 +35,8 @@
         "path": "./syntaxes/tangentquery.tmLanguage.json"
       }
     ]
+  },
+  "dependencies": {
+    "@such-n-such/core": "^0.1.2"
   }
 }
