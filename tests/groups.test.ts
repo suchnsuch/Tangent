@@ -119,3 +119,86 @@ describe('Explicit Groups', () => {
 		})
 	})
 })
+
+describe('Implicit groups', () => {
+	test('Itra-group and & or', async () => {
+		const result = await parse('Notes with "foo" and "boo" or "goo"')
+		expect(result.query).toEqual({
+			forms: ['Notes'],
+			join: 'or',
+			clauses: [
+				{
+					join: 'and',
+					clauses: [
+						{
+							type: ClauseType.With,
+							text: 'foo'
+						},
+						{
+							type: ClauseType.With,
+							text: 'boo'
+						}
+					]
+				},
+				{
+					type: ClauseType.With,
+					text: 'goo'
+				}
+			]
+		})
+	})
+
+	test('Inter group and & or', async () => {
+		const result = await parse('Notes with "foo" and in [[boo]] or with "goo"')
+		expect(result.query).toEqual({
+			forms: ['Notes'],
+			join: 'or',
+			clauses: [
+				{
+					join: 'and',
+					clauses: [
+						{
+							type: ClauseType.With,
+							text: 'foo'
+						},
+						{
+							type: ClauseType.In,
+							reference: 'boo'
+						}
+					]
+				},
+				{
+					type: ClauseType.With,
+					text: 'goo'
+				}
+			]
+		})
+	})
+
+	test('Mixed inter & intra', async () => {
+		const result = await parse('Notes with "foo" or "goo" and in [[boo]]')
+		expect(result.query).toEqual({
+			forms: ['Notes'],
+			join: 'and',
+			clauses: [
+				{
+					join: 'or',
+					clauses: [
+						{
+							type: ClauseType.With,
+							text: 'foo'
+						},
+						{
+							type: ClauseType.With,
+							reference: 'goo'
+						}
+					]
+				},
+				{
+					type: ClauseType.In,
+					reference: 'boo'
+				}
+			]
+		})
+	})
+})

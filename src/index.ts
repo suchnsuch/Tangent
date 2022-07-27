@@ -167,7 +167,6 @@ export function parseQueryText(queryText: string, grammar: IGrammar): QueryParse
 		})
 	}
 
-	let ruleStack = INITIAL
 	const groupStack: ClauseGroup[] = [query]
 
 	let expect = [KEYWORD.FORM]
