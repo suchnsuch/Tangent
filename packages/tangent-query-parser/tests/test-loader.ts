@@ -1,10 +1,15 @@
 import fs from 'fs'
+import path from 'path'
 import { Registry, parseRawGrammar } from 'vscode-textmate'
 import { loadWASM, createOnigScanner, createOnigString } from 'vscode-oniguruma'
 import { parseQueryText } from '../src'
 
+function getNodePath(partial: string) {
+	return path.resolve(__dirname, '../../../node_modules', partial)
+}
+
 async function loadVSCodeOnigurumaLib() {
-	const wasmPath = './node_modules/vscode-oniguruma/release/onig.wasm'
+	const wasmPath = getNodePath('vscode-oniguruma/release/onig.wasm')
 	const wasmBin = (await fs.promises.readFile(wasmPath)).buffer
 
 	await loadWASM(wasmBin)
@@ -21,7 +26,7 @@ const registry = new Registry({
 	onigLib,
 	async loadGrammar(scopeName: string) {
 		if (scopeName === 'source.tangentquery') {
-			const grammarPath = './syntaxes/tangentquery.tmLanguage.json'
+			const grammarPath = path.resolve(__dirname, '../syntaxes/tangentquery.tmLanguage.json')
 			const file = await fs.promises.readFile(
 				grammarPath,
 				'utf8'
