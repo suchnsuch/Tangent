@@ -1,6 +1,6 @@
 import { IGrammar, INITIAL, IToken, Registry, StackElement } from 'vscode-textmate'
 import { Query, ClauseType, isClause, ClauseGroup, isQuery, PartialClauseValue } from './types'
-import { last } from '@such-n-such/core'
+import { last, escapeRegExp } from '@such-n-such/core'
 
 type TextRange = [number, number]
 
@@ -36,6 +36,8 @@ const KEYWORD = {
 	PUNCTUATION: {
 		STRING_START: 'punctuation.definition.string.begin.tangentquery',
 		STRING_END: 'punctuation.definition.string.end.tangentquery',
+		GROUP_START: 'punctuation.definition.group.begin',
+		GROUP_END: 'punctuation.definition.group.end'
 	}
 }
 
@@ -48,6 +50,10 @@ const KEYWORDS = {
 		KEYWORD.VALUE.REGEX,
 		KEYWORD.VALUE.WIKI,
 		KEYWORD.VALUE.SUBQUERY
+	],
+	GROUPS: [
+		KEYWORD.PUNCTUATION.GROUP_START,
+		KEYWORD.PUNCTUATION.GROUP_END
 	]
 }
 
@@ -80,6 +86,27 @@ function matchAnyScope(scopes: string[], targets: string[]) {
 		}
 	}
 	return false
+}
+
+function buildFuzzySegementMatcher(segment: string) {
+	const tokens = segment.split(/\s+/)
+	let matchString = ''
+
+	for (let index = 0; index < tokens.length; index++) {
+		// Escape all regex characters for now
+		matchString += '(' + escapeRegExp(tokens[index]) + ')'
+
+		if (index < tokens.length - 1) {
+			// Allow mid token to select everything
+			matchString += '.*'
+		}
+		else {
+			// Last tokens may only additionally match non-whitespace
+			matchString += '\\S*'
+		}
+	}
+
+	return new RegExp(matchString, 'im')
 }
 
 function tokenizeQueryText(queryText: string, grammar: IGrammar): IToken[] {
@@ -163,8 +190,6 @@ export function parseQueryText(queryText: string, grammar: IGrammar): QueryParse
 	
 	while (next()) {
 		const tokenText = getTokenText()
-		
-		console.log(tokenText, token.scopes)
 
 		if (!matchAnyScope(token.scopes, expect)) {
 			if (tokenText.trim()) {
@@ -192,12 +217,12 @@ export function parseQueryText(queryText: string, grammar: IGrammar): QueryParse
 			else {
 				tokenError(token, 'Implicit subquery not yet supported')
 			}
-			expect = [KEYWORD.FORM, ...KEYWORDS.JOINS, ...KEYWORDS.CLAUSE_STARTS]
+			expect = [KEYWORD.FORM, ...KEYWORDS.JOINS, ...KEYWORDS.CLAUSE_STARTS, ...KEYWORDS.GROUPS]
 		}
 		else if (lastScope === KEYWORD.CLAUSE) {
 			currentClause = tokenText.toLowerCase() as ClauseType
 
-			expect = [...KEYWORDS.VALUES]
+			expect = [...KEYWORDS.VALUES, KEYWORD.PUNCTUATION.GROUP_START]
 		}
 		else if (lastScope === KEYWORD.PUNCTUATION.STRING_START) {
 			const startToken = token
@@ -221,7 +246,10 @@ export function parseQueryText(queryText: string, grammar: IGrammar): QueryParse
 							})
 							break
 						case KEYWORD.VALUE.STRING_SINGLE:
-							
+							currentGroup.clauses.push({
+								type: currentClause,
+								regex: buildFuzzySegementMatcher(fullString)
+							})
 							break
 						case KEYWORD.VALUE.WIKI:
 							currentGroup.clauses.push({
@@ -255,7 +283,7 @@ export function parseQueryText(queryText: string, grammar: IGrammar): QueryParse
 				tokenError(startToken, `Expected ${VALUE_DELIMS[startTokenText]} to close the ${startTokenText} value.`)
 			}
 			
-			expect = [...KEYWORDS.JOINS, ...KEYWORDS.CLAUSE_STARTS]
+			expect = [...KEYWORDS.JOINS, ...KEYWORDS.CLAUSE_STARTS, KEYWORD.PUNCTUATION.GROUP_END]
 		}
 		else if (lastScope === KEYWORD.JOIN.AND || lastScope === KEYWORD.JOIN.OR) {
 			
@@ -268,10 +296,36 @@ export function parseQueryText(queryText: string, grammar: IGrammar): QueryParse
 			}
 
 			if (currentClause) {
-				expect = [KEYWORD.FORM, ...KEYWORDS.CLAUSE_STARTS, ...KEYWORDS.VALUES]
+				expect = [KEYWORD.FORM, ...KEYWORDS.CLAUSE_STARTS, ...KEYWORDS.VALUES, ...KEYWORDS.GROUPS]
 			}
 			else {
-				expect = [KEYWORD.FORM, ...KEYWORDS.CLAUSE_STARTS]
+				expect = [KEYWORD.FORM, ...KEYWORDS.CLAUSE_STARTS, ...KEYWORDS.GROUPS]
+			}
+		}
+		else if (lastScope === KEYWORD.PUNCTUATION.GROUP_START) {
+			const newGroup: ClauseGroup = {
+				join: undefined,
+				clauses: []
+			}
+			currentGroup.clauses.push(newGroup)
+			groupStack.push(newGroup)
+
+			if (currentClause) {
+				expect = [KEYWORD.FORM, ...KEYWORDS.CLAUSE_STARTS, ...KEYWORDS.VALUES, ...KEYWORDS.GROUPS]
+			}
+			else {
+				expect = [KEYWORD.FORM, ...KEYWORDS.CLAUSE_STARTS, ...KEYWORDS.GROUPS]
+			}
+		}
+		else if (lastScope === KEYWORD.PUNCTUATION.GROUP_END) {
+			if (groupStack.length === 1) {
+				tokenError(token, 'Attempted to close a group without opening one.')
+			}
+			else {
+				const group = groupStack.pop()
+				if (group.join === undefined) {
+					group.join = 'and'
+				}
 			}
 		}
 	}
