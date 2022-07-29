@@ -2,6 +2,7 @@
 	"name": "tangent-public",
 	"version": "0.1.0",
 	"description": "A monorepo of publicly-available code directly relating to Tangent.",
+	"repository": "https://github.com/suchnsuch/tangent-public",
 	"type": "module",
 	"scripts": {
 	  "test": "echo \"Error: no test specified\" && exit 1",
