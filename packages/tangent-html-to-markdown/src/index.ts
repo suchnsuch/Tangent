@@ -5,11 +5,11 @@ import TurndownService from 'turndown'
 const headernames = ['H1', 'H2', 'H3', 'H4', 'H5', 'H6']
 const blocknames = ['P', 'UL', 'OL', ...headernames]
 
-function getBlockContainers(node: Node, options) {
+function getBlockContainers(node: HTMLElement, options) {
 	let prefix = '\n\n'
 	let suffix = '\n\n'
 
-	if (options.googleDoc && node instanceof HTMLElement) {
+	if (options.googleDoc) {
 		if (node.style.marginTop === '0pt') {
 			prefix = '\n'
 		}
@@ -38,7 +38,7 @@ function getTurndown() {
 		turndown.addRule('paragraph', {
 			filter: 'p',
 
-			replacement (content, node: Node, options) {
+			replacement (content, node: HTMLElement, options) {
 				if (cleanPlaceholders(content).trim() === '') return ''
 
 				let { prefix, suffix } = getBlockContainers(node, options)
@@ -71,7 +71,7 @@ function getTurndown() {
 		turndown.addRule('list', {
 			filter: ['ul', 'ol'],
 
-			replacement: function (content, node: Node, options) {
+			replacement: function (content, node: HTMLElement, options) {
 				var parent = node.parentNode
 				let { prefix, suffix } = getBlockContainers(node, options)
 
@@ -141,27 +141,25 @@ function getTurndown() {
 		turndown.addRule('span', {
 			filter: 'span',
 
-			replacement: function (content: string, node: Node, options) {
+			replacement: function (content: string, node: HTMLElement, options) {
 				let prefix = ''
 				let suffix = ''
 
-				if (node instanceof HTMLElement) {
-					const weightString = node.style.fontWeight
-					if (weightString) {
-						const weight = parseInt(weightString)
-						// Don't mark bold in headers, redundant
-						if (weight > 400 && !headernames.includes(node.parentElement?.nodeName)) {
-							prefix += options.strongDelimiter
-							suffix += options.strongDelimiter
-						}	
-					}
-
-					if (node.style.fontStyle === 'italic') {
-						prefix += options.emDelimiter
-						suffix = options.emDelimiter + suffix
-					}
+				const weightString = node.style.fontWeight
+				if (weightString) {
+					const weight = parseInt(weightString)
+					// Don't mark bold in headers, redundant
+					if (weight > 400 && !headernames.includes(node.parentElement?.nodeName)) {
+						prefix += options.strongDelimiter
+						suffix += options.strongDelimiter
+					}	
 				}
 
+				if (node.style.fontStyle === 'italic') {
+					prefix += options.emDelimiter
+					suffix = options.emDelimiter + suffix
+				}
+				
 				return prefix + content + suffix
 			}
 		})
@@ -193,6 +191,7 @@ function getTurndown() {
 }
 
 export default function htmlToMarkdown(html: string): string {
+	// TODO: remove hard browser dependency with domino/jsdom/etc
 	if (html.startsWith('<!DOCTYPE html')) {
 		// When pasting a full document, we only care about the body.
 		let frag = document.createElement('html')
