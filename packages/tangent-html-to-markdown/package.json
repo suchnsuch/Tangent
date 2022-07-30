@@ -2,20 +2,6 @@
   "name": "@such-n-such/tangent-html-to-markdown",
   "version": "0.1.0",
   "description": "A utility for converting html (especially pasted markdown) to markdown suitable for consumption by Tangent.",
-  "main": "index.js",
-  "type": "module",
-  "devDependencies": {
-    "@types/jest": "^28.1.6",
-    "jest": "^28.1.3",
-    "jest-environment-jsdom": "^28.1.3",
-    "ts-jest": "^28.0.7"
-  },
-  "scripts": {
-    "test": "jest",
-    "build": "tsc --build",
-    "clean": "tsc --build --clean",
-    "rebuild": "npm run clean && npm run build"
-  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/suchnsuch/tangent-public.git"
@@ -31,9 +17,33 @@
     "url": "https://github.com/suchnsuch/tangent-public/issues"
   },
   "homepage": "https://github.com/suchnsuch/tangent-public#readme",
+
+  "type": "module",
+  "main": "./lib/index.js",
+  "types": "./lib/index.d.ts",
+  "files": [
+    "lib/**/*"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "test": "jest",
+    "build": "tsc --build tsconfig.build.json",
+    "clean": "tsc --build --clean tsconfig.build.json",
+    "rebuild": "npm run clean && npm run build",
+    "deploy": "npm run rebuild && npm publish"
+  },
+  
   "dependencies": {
     "@such-n-such/core": "^0.1.5",
     "@such-n-such/core-browser": "^0.1.0",
     "turndown": "^7.1.1"
+  },
+  "devDependencies": {
+    "@types/jest": "^28.1.6",
+    "jest": "^28.1.3",
+    "jest-environment-jsdom": "^28.1.3",
+    "ts-jest": "^28.0.7"
   }
 }
