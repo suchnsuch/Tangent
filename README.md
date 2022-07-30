@@ -4,7 +4,10 @@ This is a collection of code used by [Tangent](https://www.tangentnotes.com) tha
 
 Not all of Tangent and its related projects will be open source, but subsets that will empower the community will be made so.
 
-## Reporting Issues
+## Packages
+* [tangent-html-to-markdown](./packages/tangent-html-to-markdown/README.md) – The parser used to convert `text/html` clipboard data to Tangent-specific markdown text.
+
+## Reporting Tangent Issues
 As this repository is the public face of Tangent on [GitHub](https://github.com/suchnsuch/tangent-public), its issue tracking will serve as the primary way to track issues for the application as well as any of the actual packages in this repository.
 
 When reporting issues for Tangent itself, be sure to use the "Tangent App" label to differentiate the issue from others. https://github.com/suchnsuch/tangent-public/labels/Tangent%20App
