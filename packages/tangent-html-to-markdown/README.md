@@ -1,7 +1,7 @@
 # Tangent's HTML to Markdown
 This package converts an HTML string to the specific needs and desires of [Tangent's](https://www.tangentnotes.com) flavor of markdown. This is currently used as the converter when copy/pasting text from the web or other rich text sources that provide `text/html` data when copied.
 
-The current implementation wraps [Turndown}(https://github.com/mixmark-io/turndown) with many custom rules and pre/post-processing to get the desired result.
+The current implementation wraps [Turndown](https://github.com/mixmark-io/turndown) with many custom rules and pre/post-processing to get the desired result.
 
 ## Design Goals
 The overarching goal is that when you copy/paste text from the web or other source, pasting it into Tangent should result in something as close as possible to the source given the restrictions of Markdown.
