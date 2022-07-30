@@ -5,15 +5,15 @@
 	"repository": "https://github.com/suchnsuch/tangent-public",
 	"type": "module",
 	"scripts": {
-	  "test": "echo \"Error: no test specified\" && exit 1",
-	  "build": "tsc --build",
-	  "clean": "tsc --build --clean",
-	  "rebuild": "npm run clean && npm run build"
+		"test": "echo \"Error: no test specified\" && exit 1",
+		"build": "tsc --build",
+		"clean": "tsc --build --clean",
+		"rebuild": "npm run clean && npm run build"
 	},
 	"author": "Taylor Hadden",
 	"license": "MIT",
 	"workspaces": [
-	  "packages/tangent-query-parser"
+		"packages/tangent-query-parser",
+		"packages/tangent-html-to-markdown"
 	]
-  }
-  
+}
