@@ -1,6 +1,6 @@
 {
   "name": "@such-n-such/tangent-html-to-markdown",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "A utility for converting html (especially pasted markdown) to markdown suitable for consumption by Tangent.",
   "repository": {
     "type": "git",
