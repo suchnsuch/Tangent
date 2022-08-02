@@ -20,7 +20,9 @@ async function compare(filename: string) {
 describe('File comparisons', () => {
 	// These could be found and parsed automatically, but this is an easy way to have them be individual results.
 	test('raw-test',  () => compare('raw-test'))
+	
 	test('google-docs-copy-test', () => compare('google-docs-copy-test'))
+	test('google-sheets-copy-test', () => compare('google-sheets-copy-test'))
 	
 	// TODO: in theory, line 2 shouldn't exist, and the line 4 gap should be formed by the paragraph with the break in it
 	// The style tag in the header gives margin information for the paragraphs. This could be extracted.
