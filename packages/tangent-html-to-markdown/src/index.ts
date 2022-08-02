@@ -179,10 +179,83 @@ function getTurndown() {
 			}
 		})
 
-		// Avoid tags we don't want to see
-		turndown.addRule('null', {
-			filter: ['head', 'style'],
-			replacement: function (content, node, options) {
+		/**
+		 * The table elements are brought in as tab-delineated rows.
+		 * If Tangent ever supports something like the GitHub table syntax,
+		 * that would be the time to convert this over.
+		 */
+		turndown.addRule('table', {
+			filter: 'table',
+			replacement: function (content: string, node: HTMLElement, options) {
+				return content + '\n'
+			}
+		})
+
+		turndown.addRule('table-row', {
+			filter: 'tr',
+			replacement: function (content: string, node: HTMLElement, options) {
+				if (!content.trim()) {
+					return '<br>\n'
+				}
+				return content + '\n'
+			}
+		})
+
+		turndown.addRule('table-header', {
+			filter: 'th',
+			replacement: function (content: string, node: HTMLElement, options) {
+				content = options.strongDelimiter + content + options.strongDelimiter
+				if (node.previousElementSibling) {
+					return '\t' + content
+				}
+				return content
+			}
+		})
+
+		turndown.addRule('table-cell', {
+			filter: 'td',
+			replacement: function (content: string, node: HTMLElement, options) {
+				if (node.previousElementSibling) {
+					return '\t' + content
+				}
+				return content
+			}
+		})
+
+		/**
+		 * The following two rules exist because of how Turndown
+		 * processes trailing & leading whitespace for "non block" elements.
+		 * Even if content is dropped, trailing & leading whitespace is retained.
+		 * 
+		 * For these elements, we don't want that.
+		 */
+
+		// We want just the conent from these, no whitespace
+		const processedNoOpTargets = ['google-sheets-html-origin']
+		turndown.addRule('processed-noop', {
+			filter: function (node, options) {
+				if (processedNoOpTargets.includes(node.nodeName.toLowerCase())) {
+					node.flankingWhitespace = { leading: '', trailing: '' }
+					return true
+				}
+				return false
+			},
+			replacement: function (content) {
+				return content
+			}
+		})
+
+		// We want nothing from these tags, including whitespace
+		const processedNullTargets = ['head', 'style', 'col', 'colgroup']
+		turndown.addRule('processed-null', {
+			filter: function (node, options) {
+				if (processedNullTargets.includes(node.nodeName.toLowerCase())) {
+					node.flankingWhitespace = { leading: '', trailing: '' }
+					return true
+				}
+				return false
+			},
+			replacement: function () {
 				return ''
 			}
 		})
