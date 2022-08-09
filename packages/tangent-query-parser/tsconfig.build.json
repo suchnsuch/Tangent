@@ -1,0 +1,14 @@
+{
+	"include": ["src/**/*"],
+	"compilerOptions": {
+		"rootDir": "src",
+		"outDir": "lib",
+		"target": "ESNext",
+		"moduleResolution": "node",
+		"esModuleInterop": true,
+
+		"sourceMap": true,
+		"declaration": true,
+		"declarationMap": true
+	}
+}

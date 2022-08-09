@@ -2,7 +2,7 @@ import fs from 'fs'
 import path from 'path'
 import { Registry, parseRawGrammar } from 'vscode-textmate'
 import { loadWASM, createOnigScanner, createOnigString } from 'vscode-oniguruma'
-import { parseQueryText } from '../src'
+import { parseQueryText } from '../src/parser'
 
 function getNodePath(partial: string) {
 	return path.resolve(__dirname, '../../../node_modules', partial)
