@@ -1,4 +1,4 @@
-import { IGrammar, INITIAL, IToken } from 'vscode-textmate'
+import type { IGrammar, INITIAL, IToken, Registry, StackElement } from 'vscode-textmate'
 import { Query, ClauseType, ClauseGroup, isQuery } from './types'
 import { last, escapeRegExp } from '@such-n-such/core'
 
@@ -64,6 +64,18 @@ const VALUE_DELIMS = {
 	'/': '/'
 }
 
+let queryGrammar: IGrammar
+let initialStack: StackElement
+
+interface TextmateLib {
+	registry: Registry
+	initialStack: StackElement
+}
+export async function installTextmate(textmate: TextmateLib) {
+	queryGrammar = await textmate.registry.loadGrammar('source.tangentquery')
+	initialStack = textmate.initialStack
+}
+
 function normalizeForm(formText: string) {
 	return formText[0].toUpperCase() + formText.substring(1).toLowerCase()
 }
@@ -109,15 +121,20 @@ function buildFuzzySegementMatcher(segment: string) {
 	return new RegExp(matchString, 'im')
 }
 
-function tokenizeQueryText(queryText: string, grammar: IGrammar): IToken[] {
+function tokenizeQueryText(queryText: string): IToken[] {
+
+	if (!queryGrammar || !initialStack) {
+		throw "Call & await `installTextmate()` before using the parser."
+	}
+
 	const allTokens: IToken[] = []
 
-	let ruleStack = INITIAL
+	let ruleStack = initialStack
 	let lineStartOffset = 0
 
 	const lines = queryText.split('\n')
 	for (const line of lines) {
-		const result = grammar.tokenizeLine(line, ruleStack)
+		const result = queryGrammar.tokenizeLine(line, ruleStack)
 		ruleStack = result.ruleStack
 
 		for (const token of result.tokens) {
@@ -134,9 +151,9 @@ function tokenizeQueryText(queryText: string, grammar: IGrammar): IToken[] {
 	return allTokens
 }
 
-export function parseQueryText(queryText: string, grammar: IGrammar): QueryParseResult {
+export function parseQueryText(queryText: string): QueryParseResult {
 
-	const tokens: IToken[] = tokenizeQueryText(queryText, grammar)
+	const tokens: IToken[] = tokenizeQueryText(queryText)
 	const query: Query = { forms: [], join: undefined, clauses: [] }
 	const errors: QueryError[] = []
 

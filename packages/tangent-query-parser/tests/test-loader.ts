@@ -1,8 +1,8 @@
 import fs from 'fs'
 import path from 'path'
-import { Registry, parseRawGrammar } from 'vscode-textmate'
+import { Registry, parseRawGrammar, INITIAL } from 'vscode-textmate'
 import { loadWASM, createOnigScanner, createOnigString } from 'vscode-oniguruma'
-import { parseQueryText } from '../src/parser'
+import { installTextmate, parseQueryText } from '../src/parser'
 
 function getNodePath(partial: string) {
 	return path.resolve(__dirname, '../../../node_modules', partial)
@@ -39,10 +39,6 @@ const registry = new Registry({
 
 export { registry }
 
-export async function getTQGrammar() {
-	return registry.loadGrammar('source.tangentquery')
-}
-
-export async function parse(text: string) {
-	return parseQueryText(text, await getTQGrammar())
+export async function install() {
+	await installTextmate({ registry, initialStack: INITIAL })
 }

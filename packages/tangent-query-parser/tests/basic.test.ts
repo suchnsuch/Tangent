@@ -1,10 +1,14 @@
-import { ClauseType } from '../src/types'
-import { parse } from './test-loader'
+import { ClauseType, parseQueryText } from '../src'
+import { install } from './test-loader'
+
+beforeAll(async () => {
+	await install()
+})
 
 describe('Parsing Essentials', () => {
 
 	test('Notes with text content', async () => {
-		const result = await parse('Notes with "my text"')
+		const result = await parseQueryText('Notes with "my text"')
 		expect(result.query).toEqual({
 			forms: ['Notes'],
 			join: 'and',
@@ -18,7 +22,7 @@ describe('Parsing Essentials', () => {
 	})
 
 	test('Notes with multiple clauses', async () => {
-		const andResult = await parse('Notes with "my text" and "something"')
+		const andResult = await parseQueryText('Notes with "my text" and "something"')
 		expect(andResult.query).toEqual({
 			forms: ['Notes'],
 			join: 'and',
@@ -34,7 +38,7 @@ describe('Parsing Essentials', () => {
 			]
 		})
 
-		const orResult = await parse('Notes with "my text" or "something"')
+		const orResult = await parseQueryText('Notes with "my text" or "something"')
 		expect(orResult.query).toEqual({
 			forms: ['Notes'],
 			join: 'or',
@@ -54,6 +58,6 @@ describe('Parsing Essentials', () => {
 
 describe('Errors', () => {
 	test('Random garbage', async () => {
-		const result = await parse('zip zap zoopy')
+		const result = await parseQueryText('zip zap zoopy')
 	})
 })

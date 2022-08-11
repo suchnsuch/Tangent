@@ -1,9 +1,13 @@
-import { ClauseType } from '../src/types'
-import { parse } from './test-loader'
+import { ClauseType, parseQueryText } from '../src'
+import { install } from './test-loader'
+
+beforeAll(async () => {
+	await install()
+})
 
 describe('Explicit Groups', () => {
 	test('Trailing intra-clause Group', async () => {
-		const result = await parse('Notes with "my text" and ("this" or "that")')
+		const result = await parseQueryText('Notes with "my text" and ("this" or "that")')
 		expect(result.query).toEqual({
 			forms: ['Notes'],
 			join: 'and',
@@ -30,7 +34,7 @@ describe('Explicit Groups', () => {
 	})
 
 	test('Leading intra-clause Group', async () => {
-		const result = await parse('Notes with ("this" or "that") and "my text"')
+		const result = await parseQueryText('Notes with ("this" or "that") and "my text"')
 		expect(result.query).toEqual({
 			forms: ['Notes'],
 			join: 'and',
@@ -57,7 +61,7 @@ describe('Explicit Groups', () => {
 	})
 
 	test('Inter clause grouping', async () => {
-		const result = await parse('Notes with "my text" and (in [[place]] or linked from [[location]])')
+		const result = await parseQueryText('Notes with "my text" and (in [[place]] or linked from [[location]])')
 		expect(result.query).toEqual({
 			forms: ['Notes'],
 			join: 'and',
@@ -84,7 +88,7 @@ describe('Explicit Groups', () => {
 	})
 
 	test('Nested groups', async () => {
-		const result = await parse('Notes with "my text" and ((in [[place]] or [[folder]]) and linked from [[location]])')
+		const result = await parseQueryText('Notes with "my text" and ((in [[place]] or [[folder]]) and linked from [[location]])')
 		expect(result.query).toEqual({
 			forms: ['Notes'],
 			join: 'and',
@@ -122,7 +126,7 @@ describe('Explicit Groups', () => {
 
 describe('Implicit groups', () => {
 	test('Itra-group and & or', async () => {
-		const result = await parse('Notes with "foo" and "boo" or "goo"')
+		const result = await parseQueryText('Notes with "foo" and "boo" or "goo"')
 		expect(result.query).toEqual({
 			forms: ['Notes'],
 			join: 'or',
@@ -149,7 +153,7 @@ describe('Implicit groups', () => {
 	})
 
 	test('Inter group and & or', async () => {
-		const result = await parse('Notes with "foo" and in [[boo]] or with "goo"')
+		const result = await parseQueryText('Notes with "foo" and in [[boo]] or with "goo"')
 		expect(result.query).toEqual({
 			forms: ['Notes'],
 			join: 'or',
@@ -176,7 +180,7 @@ describe('Implicit groups', () => {
 	})
 
 	test('Mixed inter & intra', async () => {
-		const result = await parse('Notes with "foo" or "goo" and in [[boo]]')
+		const result = await parseQueryText('Notes with "foo" or "goo" and in [[boo]]')
 		expect(result.query).toEqual({
 			forms: ['Notes'],
 			join: 'and',
