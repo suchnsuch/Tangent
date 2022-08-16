@@ -2,10 +2,9 @@ import type { IGrammar, INITIAL, IToken, Registry, StackElement } from 'vscode-t
 import { Query, ClauseType, ClauseGroup, isQuery } from './types'
 import { last, escapeRegExp } from '@such-n-such/core'
 
-type TextRange = [number, number]
-
-interface QueryError {
-	position: TextRange
+export interface QueryError {
+	start: number
+	end: number
 	message: string
 }
 
@@ -168,7 +167,8 @@ export function parseQueryText(queryText: string): QueryParseResult {
 
 	if (!queryText) {
 		errors.push({
-			position: [0, 0],
+			start: 0,
+			end: 0,
 			message: 'Empty Query'
 		})
 		return buildResult()
@@ -176,10 +176,8 @@ export function parseQueryText(queryText: string): QueryParseResult {
 
 	function tokenError(token: IToken, message: string) {
 		errors.push({
-			position: [
-				token.startIndex, 
-				token.endIndex
-			],
+			start: token.startIndex,
+			end: token.endIndex,
 			message
 		})
 	}
@@ -253,6 +251,14 @@ export function parseQueryText(queryText: string): QueryParseResult {
 
 				if (last(token.scopes) === KEYWORD.PUNCTUATION.STRING_END) {
 					closed = true
+
+					if (fullString.trim() === '') {
+						errors.push({
+							start: startToken.startIndex,
+							end: token.endIndex,
+							message: 'An empy value matches everything and is invalid.'
+						})
+					}
 
 					switch (stringType) {
 						case KEYWORD.VALUE.STRING_DOUBLE:
