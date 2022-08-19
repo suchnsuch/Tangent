@@ -16,3 +16,23 @@ describe('Clause errors', () => {
 		})
 	})
 })
+
+describe('Value errors', () => {
+	test('Unclosed tokenized text', async () => {
+		const result = await parseQueryText(`Notes with '`)
+		expect(result.query).toBeUndefined()
+		expect(result.errors).toContainEqual<QueryError>({
+			start: 11, end: 12,
+			message: 'Value was not closed. Expected a `\'` to end the value.'
+		})
+	})
+
+	test('Unclosed wiki link', async () => {
+		const result = await parseQueryText(`Notes with [[My thing`)
+		expect(result.query).toBeUndefined()
+		expect(result.errors).toContainEqual<QueryError>({
+			start: 11, end: 21,
+			message: 'Value "My thing" was not closed. Expected a `]]` to end the value.'
+		})
+	})
+})

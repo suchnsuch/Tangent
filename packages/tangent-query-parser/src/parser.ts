@@ -249,6 +249,21 @@ export function parseQueryText(queryText: string): QueryParseResult {
 			do {
 				next()
 
+				if (!token) {
+					// Parser has run out of tokens without closing the value
+					let message = 'Value'
+					if (fullString) {
+						message += ' "' + fullString + '"'
+					}
+					message += ` was not closed. Expected a \`${VALUE_DELIMS[startTokenText]}\` to end the value.`
+					errors.push({
+						start: startToken.startIndex,
+						end: queryText.length,
+						message
+					})
+					return buildResult()
+				}
+
 				if (last(token.scopes) === KEYWORD.PUNCTUATION.STRING_END) {
 					closed = true
 
