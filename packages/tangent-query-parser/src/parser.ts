@@ -297,7 +297,7 @@ export function parseQueryText(queryText: string): QueryParseResult {
 						case KEYWORD.VALUE.REGEX:
 							let regexArgs = ''
 							const nextToken = peak()
-							if (last(nextToken.scopes) === KEYWORD.VALUE.REGEX_ARGS) {
+							if (nextToken && last(nextToken.scopes) === KEYWORD.VALUE.REGEX_ARGS) {
 								next()
 								regexArgs = getTokenText()
 							}
