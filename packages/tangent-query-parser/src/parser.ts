@@ -113,11 +113,11 @@ function buildFuzzySegementMatcher(segment: string) {
 		}
 		else {
 			// Last tokens may only additionally match non-whitespace
-			matchString += '\\S*'
+			matchString += '[\\w\\d]*'
 		}
 	}
 
-	return new RegExp(matchString, 'im')
+	return new RegExp(matchString, 'img')
 }
 
 function tokenizeQueryText(queryText: string): IToken[] {
