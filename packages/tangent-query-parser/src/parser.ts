@@ -36,7 +36,9 @@ const KEYWORD = {
 		STRING_START: 'punctuation.definition.string.begin.tangentquery',
 		STRING_END: 'punctuation.definition.string.end.tangentquery',
 		GROUP_START: 'punctuation.definition.group.begin',
-		GROUP_END: 'punctuation.definition.group.end'
+		GROUP_END: 'punctuation.definition.group.end',
+		QUERY_START: 'punctuation.definition.subquery.begin',
+		QUERY_END: 'punctuation.definition.subquery.end'
 	}
 }
 
@@ -185,8 +187,16 @@ export function parseQueryText(queryText: string): QueryParseResult {
 
 	const groupStack: ClauseGroup[] = [query]
 
-	let expect = [KEYWORD.FORM]
+	// Each query needs its own "current clause" context
+	// Allows for things like `Notes in { Folders named "Test" } or { Folders named "Foo" }`
+	const currentClauseStack: ClauseType[] = [null]
 	let currentClause: ClauseType = null
+	function setCurrentClause(clauseType: ClauseType) {
+		currentClause = clauseType
+		currentClauseStack[currentClauseStack.length - 1] = clauseType
+	}
+
+	let expect = [KEYWORD.FORM]
 
 	let tokenIndex = -1
 	let token: IToken = null
@@ -235,8 +245,7 @@ export function parseQueryText(queryText: string): QueryParseResult {
 			expect = [KEYWORD.FORM, ...KEYWORDS.JOINS, ...KEYWORDS.CLAUSE_STARTS, ...KEYWORDS.GROUPS]
 		}
 		else if (lastScope === KEYWORD.CLAUSE) {
-			currentClause = tokenText.toLowerCase() as ClauseType
-
+			setCurrentClause(tokenText.toLowerCase() as ClauseType)
 			expect = [...KEYWORDS.VALUES, KEYWORD.PUNCTUATION.GROUP_START]
 		}
 		else if (lastScope === KEYWORD.PUNCTUATION.STRING_START) {
@@ -323,7 +332,7 @@ export function parseQueryText(queryText: string): QueryParseResult {
 				tokenError(startToken, `Expected ${VALUE_DELIMS[startTokenText]} to close the ${startTokenText} value.`)
 			}
 			
-			expect = [...KEYWORDS.JOINS, ...KEYWORDS.CLAUSE_STARTS, KEYWORD.PUNCTUATION.GROUP_END]
+			expect = [...KEYWORDS.JOINS, ...KEYWORDS.CLAUSE_STARTS, KEYWORD.PUNCTUATION.GROUP_END, KEYWORD.PUNCTUATION.QUERY_END]
 		}
 		else if (lastScope === KEYWORD.JOIN.AND || lastScope === KEYWORD.JOIN.OR) {
 			
@@ -336,7 +345,7 @@ export function parseQueryText(queryText: string): QueryParseResult {
 			}
 
 			if (currentClause) {
-				expect = [KEYWORD.FORM, ...KEYWORDS.CLAUSE_STARTS, ...KEYWORDS.VALUES, ...KEYWORDS.GROUPS]
+				expect = [KEYWORD.FORM, ...KEYWORDS.CLAUSE_STARTS, ...KEYWORDS.VALUES, ...KEYWORDS.GROUPS, KEYWORD.PUNCTUATION.QUERY_START]
 			}
 			else {
 				expect = [KEYWORD.FORM, ...KEYWORDS.CLAUSE_STARTS, ...KEYWORDS.GROUPS]
@@ -351,13 +360,13 @@ export function parseQueryText(queryText: string): QueryParseResult {
 			groupStack.push(newGroup)
 
 			if (currentClause) {
-				expect = [KEYWORD.FORM, ...KEYWORDS.CLAUSE_STARTS, ...KEYWORDS.VALUES, ...KEYWORDS.GROUPS]
+				expect = [KEYWORD.FORM, ...KEYWORDS.CLAUSE_STARTS, ...KEYWORDS.VALUES, ...KEYWORDS.GROUPS, KEYWORD.PUNCTUATION.QUERY_START]
 			}
 			else {
 				expect = [KEYWORD.FORM, ...KEYWORDS.CLAUSE_STARTS, ...KEYWORDS.GROUPS]
 			}
 		}
-		else if (lastScope === KEYWORD.PUNCTUATION.GROUP_END) {
+		else if (lastScope === KEYWORD.PUNCTUATION.GROUP_END || lastScope === KEYWORD.PUNCTUATION.QUERY_END) {
 			if (groupStack.length === 1) {
 				tokenError(token, 'Attempted to close a group without opening one.')
 			}
@@ -366,7 +375,29 @@ export function parseQueryText(queryText: string): QueryParseResult {
 				if (group.join === undefined) {
 					group.join = 'and'
 				}
+
+				if (lastScope === KEYWORD.PUNCTUATION.QUERY_END) {
+					currentClauseStack.pop()
+					currentClause = last(currentClauseStack)
+				}
 			}
+		}
+		else if (lastScope === KEYWORD.PUNCTUATION.QUERY_START) {
+			const newQuery: Query = {
+				forms: [],
+				join: undefined,
+				clauses: []
+			}
+			currentGroup.clauses.push({
+				type: currentClause,
+				query: newQuery
+			})
+			groupStack.push(newQuery)
+			// The new query needs its own clause context
+			currentClauseStack.push(null)
+			currentClause = null
+
+			expect = [KEYWORD.FORM]
 		}
 	}
 

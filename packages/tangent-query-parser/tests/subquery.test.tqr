@@ -1,0 +1,9 @@
+// SYNTAX TEST "source.tangentquery"
+Notes in { Notes with "Test" }
+// <~- keyword.other.form
+//    ^^ keyword.other.clause
+//       ^ punctuation.definition.subquery.begin
+//                           ^ punctuation.definition.subquery.end
+//         ^^^^^ keyword.other.form
+//               ^^^^ keyword.other.clause
+//                    ^^^^^^ string.quoted.double.tangentquery

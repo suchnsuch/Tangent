@@ -17,7 +17,11 @@ export interface PartialClauseReference {
 	reference: string
 }
 
-export type PartialClauseValue = PartialClauseText | PartialClauseRegex | PartialClauseReference
+export interface PartialClauseQuery {
+	query: Query
+}
+
+export type PartialClauseValue = PartialClauseText | PartialClauseRegex | PartialClauseReference | PartialClauseQuery
 
 export type Clause = { type: ClauseType } & PartialClauseValue
 
