@@ -15,7 +15,7 @@ describe('Regex basics', () => {
 			clauses: [
 				{
 					type: ClauseType.With,
-					regex: /my text/
+					regex: /my text/d
 				}
 			]
 		})
@@ -29,7 +29,7 @@ describe('Regex basics', () => {
 			clauses: [
 				{
 					type: ClauseType.With,
-					regex: /my text/g
+					regex: /my text/gd
 				}
 			]
 		})

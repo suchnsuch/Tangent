@@ -117,7 +117,8 @@ function buildFuzzySegementMatcher(segment: string) {
 		}
 	}
 
-	return new RegExp(matchString, 'img')
+	// d is included so that indices of groups are returned
+	return new RegExp(matchString, 'imgd')
 }
 
 function tokenizeQueryText(queryText: string): IToken[] {
@@ -301,6 +302,8 @@ export function parseQueryText(queryText: string): QueryParseResult {
 								next()
 								regexArgs = getTokenText()
 							}
+							// Inject 'd' so that indices of groups are returned
+							if (!regexArgs.includes('d')) regexArgs += 'd'
 							currentGroup.clauses.push({
 								type: currentClause,
 								regex: new RegExp(fullString, regexArgs)
