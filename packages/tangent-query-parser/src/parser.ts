@@ -58,11 +58,14 @@ const KEYWORDS = {
 	]
 }
 
-const VALUE_DELIMS = {
+export const MATCHING_BRACES = {
 	"'": "'",
 	'"': '"',
-	'[[': ']]',
-	'/': '/'
+	'/': '/',
+	'(': ')',
+	'{': '}',
+	'[': ']',
+	'[[': ']]'
 }
 
 let queryGrammar: IGrammar
@@ -265,7 +268,7 @@ export function parseQueryText(queryText: string): QueryParseResult {
 					if (fullString) {
 						message += ' "' + fullString + '"'
 					}
-					message += ` was not closed. Expected a \`${VALUE_DELIMS[startTokenText]}\` to end the value.`
+					message += ` was not closed. Expected a \`${MATCHING_BRACES[startTokenText]}\` to end the value.`
 					errors.push({
 						start: startToken.startIndex,
 						end: queryText.length,
@@ -329,7 +332,9 @@ export function parseQueryText(queryText: string): QueryParseResult {
 			} while (token && token.scopes.includes(stringType))
 
 			if (!closed) {
-				tokenError(startToken, `Expected ${VALUE_DELIMS[startTokenText]} to close the ${startTokenText} value.`)
+				tokenError(
+					startToken,
+					`Expected ${MATCHING_BRACES[startTokenText]} to close the ${startTokenText} value.`)
 			}
 			
 			expect = [...KEYWORDS.JOINS, ...KEYWORDS.CLAUSE_STARTS, KEYWORD.PUNCTUATION.GROUP_END, KEYWORD.PUNCTUATION.QUERY_END]
