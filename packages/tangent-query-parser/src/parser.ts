@@ -8,10 +8,15 @@ export interface QueryError {
 	message: string
 }
 
+export interface QueryTokenAnnotation {
+	expects?: string[]
+}
+
 export interface QueryParseResult {
 	query?: Query
 	errors?: QueryError[]
 	tokens: IToken[]
+	annotations?: QueryTokenAnnotation[]
 }
 
 const KEYWORD = {
@@ -161,14 +166,15 @@ export function parseQueryText(queryText: string): QueryParseResult {
 	const tokens: IToken[] = tokenizeQueryText(queryText)
 	const query: Query = { forms: [], join: undefined, clauses: [] }
 	const errors: QueryError[] = []
+	const annotations: QueryTokenAnnotation[] = []
 
 	function buildResult(): QueryParseResult {
 		if (errors.length > 0) {
 			console.log(errors)
-			return { errors, tokens }
+			return { errors, tokens, annotations }
 		}
 		console.log(query)
-		return { query, tokens }
+		return { query, tokens, annotations }
 	}
 
 	if (!queryText) {
@@ -199,17 +205,28 @@ export function parseQueryText(queryText: string): QueryParseResult {
 		currentClauseStack[currentClauseStack.length - 1] = clauseType
 	}
 
-	let expect = [KEYWORD.FORM]
-
 	let tokenIndex = -1
 	let token: IToken = null
+	let annotation: QueryTokenAnnotation = null
+	let expectedNextToken = [KEYWORD.FORM]
 	function next() {
 		tokenIndex++
 		token = tokens[tokenIndex]
+		if (annotation && !annotation.expects) {
+			//annotation.expects = expectedNextToken
+		}
+		if (token) {
+			annotation = {}
+			annotations.push(annotation)
+		}
 		return token
 	}
 	function peak(offset = 1) {
 		return tokens[tokenIndex + offset]
+	}
+	function expect(...keys: string[]) {
+		expectedNextToken = keys
+		annotation.expects = keys
 	}
 	
 	function getTokenText(t: IToken = token) {
@@ -219,10 +236,12 @@ export function parseQueryText(queryText: string): QueryParseResult {
 	while (next()) {
 		const tokenText = getTokenText()
 
-		if (!matchAnyScope(token.scopes, expect)) {
+		if (!matchAnyScope(token.scopes, expectedNextToken)) {
 			if (tokenText.trim()) {
 				// This wasn't supposed to happen
-				tokenError(token, `Unexpected token "${tokenText}". Expected a: \"${expect.join(', ')}\"`)
+				tokenError(
+					token,
+					`Unexpected token "${tokenText}". Expected a: \"${expectedNextToken.join(', ')}\"`)
 			}
 			// Otherwise, this is whitespace
 			continue
@@ -245,11 +264,11 @@ export function parseQueryText(queryText: string): QueryParseResult {
 			else {
 				tokenError(token, 'Implicit subquery not yet supported')
 			}
-			expect = [KEYWORD.FORM, ...KEYWORDS.JOINS, ...KEYWORDS.CLAUSE_STARTS, ...KEYWORDS.GROUPS]
+			expect(KEYWORD.FORM, ...KEYWORDS.JOINS, ...KEYWORDS.CLAUSE_STARTS, ...KEYWORDS.GROUPS)
 		}
 		else if (lastScope === KEYWORD.CLAUSE) {
 			setCurrentClause(tokenText.toLowerCase() as ClauseType)
-			expect = [...KEYWORDS.VALUES, KEYWORD.PUNCTUATION.GROUP_START]
+			expect(...KEYWORDS.VALUES, KEYWORD.PUNCTUATION.GROUP_START)
 		}
 		else if (lastScope === KEYWORD.PUNCTUATION.STRING_START) {
 			const startToken = token
@@ -337,7 +356,7 @@ export function parseQueryText(queryText: string): QueryParseResult {
 					`Expected ${MATCHING_BRACES[startTokenText]} to close the ${startTokenText} value.`)
 			}
 			
-			expect = [...KEYWORDS.JOINS, ...KEYWORDS.CLAUSE_STARTS, KEYWORD.PUNCTUATION.GROUP_END, KEYWORD.PUNCTUATION.QUERY_END]
+			expect(...KEYWORDS.JOINS, ...KEYWORDS.CLAUSE_STARTS, KEYWORD.PUNCTUATION.GROUP_END, KEYWORD.PUNCTUATION.QUERY_END)
 		}
 		else if (lastScope === KEYWORD.JOIN.AND || lastScope === KEYWORD.JOIN.OR) {
 			
@@ -350,10 +369,10 @@ export function parseQueryText(queryText: string): QueryParseResult {
 			}
 
 			if (currentClause) {
-				expect = [KEYWORD.FORM, ...KEYWORDS.CLAUSE_STARTS, ...KEYWORDS.VALUES, ...KEYWORDS.GROUPS, KEYWORD.PUNCTUATION.QUERY_START]
+				expect(KEYWORD.FORM, ...KEYWORDS.CLAUSE_STARTS, ...KEYWORDS.VALUES, ...KEYWORDS.GROUPS, KEYWORD.PUNCTUATION.QUERY_START)
 			}
 			else {
-				expect = [KEYWORD.FORM, ...KEYWORDS.CLAUSE_STARTS, ...KEYWORDS.GROUPS]
+				expect(KEYWORD.FORM, ...KEYWORDS.CLAUSE_STARTS, ...KEYWORDS.GROUPS)
 			}
 		}
 		else if (lastScope === KEYWORD.PUNCTUATION.GROUP_START) {
@@ -365,10 +384,10 @@ export function parseQueryText(queryText: string): QueryParseResult {
 			groupStack.push(newGroup)
 
 			if (currentClause) {
-				expect = [KEYWORD.FORM, ...KEYWORDS.CLAUSE_STARTS, ...KEYWORDS.VALUES, ...KEYWORDS.GROUPS, KEYWORD.PUNCTUATION.QUERY_START]
+				expect(KEYWORD.FORM, ...KEYWORDS.CLAUSE_STARTS, ...KEYWORDS.VALUES, ...KEYWORDS.GROUPS, KEYWORD.PUNCTUATION.QUERY_START)
 			}
 			else {
-				expect = [KEYWORD.FORM, ...KEYWORDS.CLAUSE_STARTS, ...KEYWORDS.GROUPS]
+				expect(KEYWORD.FORM, ...KEYWORDS.CLAUSE_STARTS, ...KEYWORDS.GROUPS)
 			}
 		}
 		else if (lastScope === KEYWORD.PUNCTUATION.GROUP_END || lastScope === KEYWORD.PUNCTUATION.QUERY_END) {
@@ -402,7 +421,7 @@ export function parseQueryText(queryText: string): QueryParseResult {
 			currentClauseStack.push(null)
 			currentClause = null
 
-			expect = [KEYWORD.FORM]
+			expect(KEYWORD.FORM)
 		}
 	}
 
