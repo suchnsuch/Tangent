@@ -19,7 +19,7 @@ export interface QueryParseResult {
 	annotations?: QueryTokenAnnotation[]
 }
 
-const KEYWORD = {
+export const KEYWORD = {
 	FORM: 'keyword.other.form',
 	CLAUSE: 'keyword.other.clause',
 	NOT: 'keyword.other.negate',
@@ -47,7 +47,7 @@ const KEYWORD = {
 	}
 }
 
-const KEYWORDS = {
+export const KEYWORDS = {
 	JOINS: [KEYWORD.JOIN.AND, KEYWORD.JOIN.OR, KEYWORD.JOIN.COMMA],
 	CLAUSE_STARTS: [KEYWORD.CLAUSE, KEYWORD.NOT],
 	VALUES: [
