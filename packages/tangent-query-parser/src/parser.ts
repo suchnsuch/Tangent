@@ -63,6 +63,14 @@ export const KEYWORDS = {
 	]
 }
 
+export const VALUE_OPENERS = {
+	[KEYWORD.VALUE.STRING_DOUBLE]: '"',
+	[KEYWORD.VALUE.STRING_SINGLE]: "'",
+	[KEYWORD.VALUE.REGEX]: '/',
+	[KEYWORD.VALUE.WIKI]: '[[',
+	[KEYWORD.VALUE.SUBQUERY]: '{'
+}
+
 export const MATCHING_BRACES = {
 	"'": "'",
 	'"': '"',
@@ -369,10 +377,10 @@ export function parseQueryText(queryText: string): QueryParseResult {
 			}
 
 			if (currentClause) {
-				expect(KEYWORD.FORM, ...KEYWORDS.CLAUSE_STARTS, ...KEYWORDS.VALUES, ...KEYWORDS.GROUPS, KEYWORD.PUNCTUATION.QUERY_START)
+				expect(/*KEYWORD.FORM,*/ ...KEYWORDS.CLAUSE_STARTS, ...KEYWORDS.VALUES, ...KEYWORDS.GROUPS, KEYWORD.PUNCTUATION.QUERY_START)
 			}
 			else {
-				expect(KEYWORD.FORM, ...KEYWORDS.CLAUSE_STARTS, ...KEYWORDS.GROUPS)
+				expect(/*KEYWORD.FORM,*/ ...KEYWORDS.CLAUSE_STARTS, ...KEYWORDS.GROUPS)
 			}
 		}
 		else if (lastScope === KEYWORD.PUNCTUATION.GROUP_START) {
@@ -384,10 +392,10 @@ export function parseQueryText(queryText: string): QueryParseResult {
 			groupStack.push(newGroup)
 
 			if (currentClause) {
-				expect(KEYWORD.FORM, ...KEYWORDS.CLAUSE_STARTS, ...KEYWORDS.VALUES, ...KEYWORDS.GROUPS, KEYWORD.PUNCTUATION.QUERY_START)
+				expect(/*KEYWORD.FORM,*/ ...KEYWORDS.CLAUSE_STARTS, ...KEYWORDS.VALUES, ...KEYWORDS.GROUPS, KEYWORD.PUNCTUATION.QUERY_START)
 			}
 			else {
-				expect(KEYWORD.FORM, ...KEYWORDS.CLAUSE_STARTS, ...KEYWORDS.GROUPS)
+				expect(/*KEYWORD.FORM,*/ ...KEYWORDS.CLAUSE_STARTS, ...KEYWORDS.GROUPS)
 			}
 		}
 		else if (lastScope === KEYWORD.PUNCTUATION.GROUP_END || lastScope === KEYWORD.PUNCTUATION.QUERY_END) {
