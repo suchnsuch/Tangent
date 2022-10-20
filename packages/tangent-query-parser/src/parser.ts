@@ -81,6 +81,20 @@ export const MATCHING_BRACES = {
 	'[[': ']]'
 }
 
+export const CLAUSE_VALUES = {
+	'named': [KEYWORD.VALUE.STRING_DOUBLE, KEYWORD.VALUE.STRING_SINGLE, KEYWORD.VALUE.REGEX],
+	'with': KEYWORDS.VALUES,
+	'in': [KEYWORD.VALUE.WIKI, KEYWORD.VALUE.SUBQUERY]
+}
+
+function expectedValuesForClause(clause: ClauseType) {
+	const values = CLAUSE_VALUES[clause]
+	if (!values) {
+		console.warn('No values defined for ', clause)
+	}
+	return values ?? []
+}
+
 let queryGrammar: IGrammar
 let initialStack: StackElement
 
@@ -276,7 +290,7 @@ export function parseQueryText(queryText: string): QueryParseResult {
 		}
 		else if (lastScope === KEYWORD.CLAUSE) {
 			setCurrentClause(tokenText.toLowerCase() as ClauseType)
-			expect(...KEYWORDS.VALUES, KEYWORD.PUNCTUATION.GROUP_START)
+			expect(...expectedValuesForClause(currentClause), KEYWORD.PUNCTUATION.GROUP_START)
 		}
 		else if (lastScope === KEYWORD.PUNCTUATION.STRING_START) {
 			const startToken = token
@@ -377,7 +391,7 @@ export function parseQueryText(queryText: string): QueryParseResult {
 			}
 
 			if (currentClause) {
-				expect(/*KEYWORD.FORM,*/ ...KEYWORDS.CLAUSE_STARTS, ...KEYWORDS.VALUES, ...KEYWORDS.GROUPS, KEYWORD.PUNCTUATION.QUERY_START)
+				expect(/*KEYWORD.FORM,*/ ...KEYWORDS.CLAUSE_STARTS, ...expectedValuesForClause(currentClause), ...KEYWORDS.GROUPS, KEYWORD.PUNCTUATION.QUERY_START)
 			}
 			else {
 				expect(/*KEYWORD.FORM,*/ ...KEYWORDS.CLAUSE_STARTS, ...KEYWORDS.GROUPS)
@@ -392,7 +406,7 @@ export function parseQueryText(queryText: string): QueryParseResult {
 			groupStack.push(newGroup)
 
 			if (currentClause) {
-				expect(/*KEYWORD.FORM,*/ ...KEYWORDS.CLAUSE_STARTS, ...KEYWORDS.VALUES, ...KEYWORDS.GROUPS, KEYWORD.PUNCTUATION.QUERY_START)
+				expect(/*KEYWORD.FORM,*/ ...KEYWORDS.CLAUSE_STARTS, ...expectedValuesForClause(currentClause), ...KEYWORDS.GROUPS, KEYWORD.PUNCTUATION.QUERY_START)
 			}
 			else {
 				expect(/*KEYWORD.FORM,*/ ...KEYWORDS.CLAUSE_STARTS, ...KEYWORDS.GROUPS)
