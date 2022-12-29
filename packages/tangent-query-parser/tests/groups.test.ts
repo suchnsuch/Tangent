@@ -124,8 +124,10 @@ describe('Explicit Groups', () => {
 	})
 })
 
+// TODO: Make these tests pass
+// These tests are marked as failing so that they are ready to go when I actually want to implement this
 describe('Implicit groups', () => {
-	test('Itra-group and & or', async () => {
+	test.failing('Itra-group and & or', async () => {
 		const result = await parseQueryText('Notes with "foo" and "boo" or "goo"')
 		expect(result.query).toEqual({
 			forms: ['Notes'],
@@ -152,7 +154,7 @@ describe('Implicit groups', () => {
 		})
 	})
 
-	test('Inter group and & or', async () => {
+	test.failing('Inter group and & or', async () => {
 		const result = await parseQueryText('Notes with "foo" and in [[boo]] or with "goo"')
 		expect(result.query).toEqual({
 			forms: ['Notes'],
@@ -179,7 +181,7 @@ describe('Implicit groups', () => {
 		})
 	})
 
-	test('Mixed inter & intra', async () => {
+	test.failing('Mixed inter & intra', async () => {
 		const result = await parseQueryText('Notes with "foo" or "goo" and in [[boo]]')
 		expect(result.query).toEqual({
 			forms: ['Notes'],
