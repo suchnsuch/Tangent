@@ -1,5 +1,5 @@
 import type { IGrammar, INITIAL, IToken, Registry, StackElement } from 'vscode-textmate'
-import { Query, ClauseType, ClauseGroup, isQuery } from './types'
+import { Query, ClauseType, ClauseGroup, isQuery, PartialClauseType, ClauseMod } from './types'
 import { last, escapeRegExp } from '@such-n-such/core'
 
 export interface QueryError {
@@ -22,6 +22,7 @@ export interface QueryParseResult {
 export const KEYWORD = {
 	FORM: 'keyword.other.form',
 	CLAUSE: 'keyword.other.clause',
+	MOD: 'keyword.other.mod',
 	NOT: 'keyword.other.negate',
 	JOIN: {
 		ANY: 'keyword.operator.join',
@@ -57,6 +58,10 @@ export const KEYWORDS = {
 		KEYWORD.VALUE.WIKI,
 		KEYWORD.VALUE.SUBQUERY
 	],
+	REFERENCE_VALUES: [
+		KEYWORD.VALUE.WIKI,
+		KEYWORD.VALUE.SUBQUERY
+	],
 	GROUPS: [
 		KEYWORD.PUNCTUATION.GROUP_START,
 		KEYWORD.PUNCTUATION.GROUP_END
@@ -81,14 +86,35 @@ export const MATCHING_BRACES = {
 	'[[': ']]'
 }
 
+// An object of expected values for types and mods
 export const CLAUSE_VALUES = {
-	'named': [KEYWORD.VALUE.STRING_DOUBLE, KEYWORD.VALUE.STRING_SINGLE, KEYWORD.VALUE.REGEX],
-	'with': KEYWORDS.VALUES,
-	'in': [KEYWORD.VALUE.WIKI, KEYWORD.VALUE.SUBQUERY]
-}
+	[ClauseType.Named]: {
+		'': [KEYWORD.VALUE.STRING_DOUBLE, KEYWORD.VALUE.STRING_SINGLE, KEYWORD.VALUE.REGEX]
+	}, 
+	[ClauseType.With]: {
+		'': KEYWORDS.VALUES,
+		[ClauseMod.All]: KEYWORDS.REFERENCE_VALUES,
+		[ClauseMod.Any]: KEYWORDS.REFERENCE_VALUES
+	},
+	[ClauseType.In]: {
+		'': KEYWORDS.REFERENCE_VALUES,
+		[ClauseMod.All]: KEYWORDS.REFERENCE_VALUES,
+		[ClauseMod.Any]: KEYWORDS.REFERENCE_VALUES,
+	},
+	[ClauseType.LinkedFrom]: {
+		'': [KEYWORD.VALUE.WIKI],
+		[ClauseMod.All]: [KEYWORD.VALUE.WIKI],
+		[ClauseMod.Any]: [KEYWORD.VALUE.WIKI]
+	} 
+} as const
 
-function expectedValuesForClause(clause: ClauseType) {
-	const values = CLAUSE_VALUES[clause]
+function expectedValuesForClause(clause: PartialClauseType) {
+	const set = CLAUSE_VALUES[clause.type]
+	if (!set) {
+		console.warn('No values defined for ', clause.type)
+		return []
+	}
+	const values = set[clause.mod ?? '']
 	if (!values) {
 		console.warn('No values defined for ', clause)
 	}
@@ -192,10 +218,8 @@ export function parseQueryText(queryText: string): QueryParseResult {
 
 	function buildResult(): QueryParseResult {
 		if (errors.length > 0) {
-			console.log(errors)
 			return { errors, tokens, annotations }
 		}
-		console.log(query)
 		return { query, tokens, annotations }
 	}
 
@@ -220,11 +244,23 @@ export function parseQueryText(queryText: string): QueryParseResult {
 
 	// Each query needs its own "current clause" context
 	// Allows for things like `Notes in { Folders named "Test" } or { Folders named "Foo" }`
-	const currentClauseStack: ClauseType[] = [null]
-	let currentClause: ClauseType = null
+	const currentClauseStack: PartialClauseType[] = [null]
+	let currentClause: PartialClauseType = null
 	function setCurrentClause(clauseType: ClauseType) {
-		currentClause = clauseType
-		currentClauseStack[currentClauseStack.length - 1] = clauseType
+
+		currentClause = {
+			type: clauseType
+		}
+
+		currentClauseStack[currentClauseStack.length - 1] = currentClause
+	}
+	function setCurrentClauseMod(clauseMod: ClauseMod) {
+		currentClause = {
+			type: currentClause.type,
+			mod: clauseMod
+		}
+
+		currentClauseStack[currentClauseStack.length - 1] = currentClause
 	}
 
 	let tokenIndex = -1
@@ -290,6 +326,10 @@ export function parseQueryText(queryText: string): QueryParseResult {
 		}
 		else if (lastScope === KEYWORD.CLAUSE) {
 			setCurrentClause(tokenText.toLowerCase() as ClauseType)
+			expect(KEYWORD.MOD, ...expectedValuesForClause(currentClause), KEYWORD.PUNCTUATION.GROUP_START)
+		}
+		else if (lastScope === KEYWORD.MOD) {
+			setCurrentClauseMod(tokenText.toLowerCase() as ClauseMod)
 			expect(...expectedValuesForClause(currentClause), KEYWORD.PUNCTUATION.GROUP_START)
 		}
 		else if (lastScope === KEYWORD.PUNCTUATION.STRING_START) {
@@ -332,19 +372,19 @@ export function parseQueryText(queryText: string): QueryParseResult {
 					switch (stringType) {
 						case KEYWORD.VALUE.STRING_DOUBLE:
 							currentGroup.clauses.push({
-								type: currentClause,
+								...currentClause,
 								text: fullString
 							})
 							break
 						case KEYWORD.VALUE.STRING_SINGLE:
 							currentGroup.clauses.push({
-								type: currentClause,
+								...currentClause,
 								regex: buildFuzzySegementMatcher(fullString)
 							})
 							break
 						case KEYWORD.VALUE.WIKI:
 							currentGroup.clauses.push({
-								type: currentClause,
+								...currentClause,
 								reference: fullString
 							})
 							break
@@ -358,7 +398,7 @@ export function parseQueryText(queryText: string): QueryParseResult {
 							// Inject 'd' so that indices of groups are returned
 							if (!regexArgs.includes('d')) regexArgs += 'd'
 							currentGroup.clauses.push({
-								type: currentClause,
+								...currentClause,
 								regex: new RegExp(fullString, regexArgs)
 							})
 							break
@@ -391,7 +431,7 @@ export function parseQueryText(queryText: string): QueryParseResult {
 			}
 
 			if (currentClause) {
-				expect(/*KEYWORD.FORM,*/ ...KEYWORDS.CLAUSE_STARTS, ...expectedValuesForClause(currentClause), ...KEYWORDS.GROUPS, KEYWORD.PUNCTUATION.QUERY_START)
+				expect(/*KEYWORD.FORM,*/KEYWORD.MOD, ...KEYWORDS.CLAUSE_STARTS, ...expectedValuesForClause(currentClause), ...KEYWORDS.GROUPS, KEYWORD.PUNCTUATION.QUERY_START)
 			}
 			else {
 				expect(/*KEYWORD.FORM,*/ ...KEYWORDS.CLAUSE_STARTS, ...KEYWORDS.GROUPS)
@@ -406,7 +446,7 @@ export function parseQueryText(queryText: string): QueryParseResult {
 			groupStack.push(newGroup)
 
 			if (currentClause) {
-				expect(/*KEYWORD.FORM,*/ ...KEYWORDS.CLAUSE_STARTS, ...expectedValuesForClause(currentClause), ...KEYWORDS.GROUPS, KEYWORD.PUNCTUATION.QUERY_START)
+				expect(/*KEYWORD.FORM,*/ ...KEYWORDS.CLAUSE_STARTS, KEYWORD.MOD, ...expectedValuesForClause(currentClause), ...KEYWORDS.GROUPS, KEYWORD.PUNCTUATION.QUERY_START)
 			}
 			else {
 				expect(/*KEYWORD.FORM,*/ ...KEYWORDS.CLAUSE_STARTS, ...KEYWORDS.GROUPS)
@@ -435,7 +475,7 @@ export function parseQueryText(queryText: string): QueryParseResult {
 				clauses: []
 			}
 			currentGroup.clauses.push({
-				type: currentClause,
+				...currentClause,
 				query: newQuery
 			})
 			groupStack.push(newQuery)

@@ -142,6 +142,10 @@
 					"name": "keyword.other.clause"
 				},
 				{
+					"match": "\\b(?i:any|all)\\b",
+					"name": "keyword.other.mod"
+				},
+				{
 					"match": "\\b(?i:not)\\b",
 					"name": "keyword.other.negate"
 				},

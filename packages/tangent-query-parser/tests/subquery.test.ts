@@ -1,4 +1,4 @@
-import { ClauseType, parseQueryText, Query } from '../src'
+import { ClauseMod, ClauseType, parseQueryText, Query } from '../src'
 import { install } from './test-loader'
 
 beforeAll(async () => {
@@ -30,13 +30,14 @@ describe('Explicit subquery', () => {
 	})
 
 	test('Multiple subqueries', async () => {
-		const result = await parseQueryText('Notes in { Folders named "Test" } or { Folders named "Foo" }')
+		const result = await parseQueryText('Notes in any { Folders named "Test" } or { Folders named "Foo" }')
 		expect(result.query).toEqual<Query>({
 			forms: ['Notes'],
 			join: 'or',
 			clauses: [
 				{
 					type: ClauseType.In,
+					mod: ClauseMod.Any,
 					query: {
 						forms: ['Folders'],
 						join: 'and',
@@ -50,6 +51,7 @@ describe('Explicit subquery', () => {
 				},
 				{
 					type: ClauseType.In,
+					mod: ClauseMod.Any,
 					query: {
 						forms: ['Folders'],
 						join: 'and',

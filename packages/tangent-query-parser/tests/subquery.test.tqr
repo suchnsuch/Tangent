@@ -7,3 +7,23 @@ Notes in { Notes with "Test" }
 //         ^^^^^ keyword.other.form
 //               ^^^^ keyword.other.clause
 //                    ^^^^^^ string.quoted.double.tangentquery
+
+Notes in any { Folders named "Test" }
+// <~- keyword.other.form
+//    ^^ keyword.other.clause
+//       ^^^ keyword.other.mod
+//           ^ punctuation.definition.subquery.begin
+//                                  ^ punctuation.definition.subquery.end
+//             ^^^^^^^ keyword.other.form
+//                     ^^^^^ keyword.other.clause
+//                           ^^^^^^ string.quoted.double.tangentquery
+
+Notes in all { Folders named "Test" }
+// <~- keyword.other.form
+//    ^^ keyword.other.clause
+//       ^^^ keyword.other.mod
+//           ^ punctuation.definition.subquery.begin
+//                                  ^ punctuation.definition.subquery.end
+//             ^^^^^^^ keyword.other.form
+//                     ^^^^^ keyword.other.clause
+//                           ^^^^^^ string.quoted.double.tangentquery

@@ -5,6 +5,11 @@ export enum ClauseType {
 	LinkedFrom = 'linked from'
 }
 
+export enum ClauseMod {
+	Any = 'any',
+	All = 'all'
+}
+
 export interface PartialClauseText {
 	text: string
 }
@@ -21,9 +26,10 @@ export interface PartialClauseQuery {
 	query: Query
 }
 
+export type PartialClauseType = { type: ClauseType, mod?: ClauseMod }
 export type PartialClauseValue = PartialClauseText | PartialClauseRegex | PartialClauseReference | PartialClauseQuery
 
-export type Clause = { type: ClauseType } & PartialClauseValue
+export type Clause = PartialClauseType & PartialClauseValue
 
 export interface ClauseGroup {
 	join: 'and' | 'or'
