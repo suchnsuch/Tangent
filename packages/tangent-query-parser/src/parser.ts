@@ -36,7 +36,8 @@ export const KEYWORD = {
 		REGEX: 'string.regexp.tangentquery',
 		REGEX_ARGS: 'string.regexp.args.tangentquery',
 		WIKI: 'string.other.wikilink.tangentquery',
-		SUBQUERY: 'meta.subquery'
+		TAG: 'string.tag',
+		SUBQUERY: 'meta.subquery',
 	},
 	PUNCTUATION: {
 		STRING_START: 'punctuation.definition.string.begin.tangentquery',
@@ -44,7 +45,8 @@ export const KEYWORD = {
 		GROUP_START: 'punctuation.definition.group.begin',
 		GROUP_END: 'punctuation.definition.group.end',
 		QUERY_START: 'punctuation.definition.subquery.begin',
-		QUERY_END: 'punctuation.definition.subquery.end'
+		QUERY_END: 'punctuation.definition.subquery.end',
+		TAG: 'punctuation.definition.tag'
 	}
 }
 
@@ -56,7 +58,8 @@ export const KEYWORDS = {
 		KEYWORD.VALUE.STRING_DOUBLE,
 		KEYWORD.VALUE.REGEX,
 		KEYWORD.VALUE.WIKI,
-		KEYWORD.VALUE.SUBQUERY
+		KEYWORD.VALUE.SUBQUERY,
+		KEYWORD.VALUE.TAG
 	],
 	REFERENCE_VALUES: [
 		KEYWORD.VALUE.WIKI,
@@ -418,6 +421,18 @@ export function parseQueryText(queryText: string): QueryParseResult {
 					`Expected ${MATCHING_BRACES[startTokenText]} to close the ${startTokenText} value.`)
 			}
 			
+			expect(...KEYWORDS.JOINS, ...KEYWORDS.CLAUSE_STARTS, KEYWORD.PUNCTUATION.GROUP_END, KEYWORD.PUNCTUATION.QUERY_END)
+		}
+		else if (lastScope === KEYWORD.PUNCTUATION.TAG) {
+			next()
+
+			currentGroup.clauses.push({
+				...currentClause,
+				tag: {
+					name: getTokenText()
+				}
+			})
+
 			expect(...KEYWORDS.JOINS, ...KEYWORDS.CLAUSE_STARTS, KEYWORD.PUNCTUATION.GROUP_END, KEYWORD.PUNCTUATION.QUERY_END)
 		}
 		else if (lastScope === KEYWORD.JOIN.AND || lastScope === KEYWORD.JOIN.OR) {

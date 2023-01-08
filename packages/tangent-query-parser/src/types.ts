@@ -26,8 +26,17 @@ export interface PartialClauseQuery {
 	query: Query
 }
 
+export interface QueryTagDefinition {
+	name: string
+}
+
+export interface PartialClauseTag {
+	tag: QueryTagDefinition
+}
+
 export type PartialClauseType = { type: ClauseType, mod?: ClauseMod }
-export type PartialClauseValue = PartialClauseText | PartialClauseRegex | PartialClauseReference | PartialClauseQuery
+export type PartialClauseValue = PartialClauseText | PartialClauseRegex |
+	PartialClauseReference | PartialClauseQuery | PartialClauseTag
 
 export type Clause = PartialClauseType & PartialClauseValue
 

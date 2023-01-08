@@ -132,6 +132,19 @@
 						{ "include": "$self" }
 					],
 					"name": "meta.subquery"
+				},
+				{
+					"name": "string.tag",
+					"comment": "Can't use \\b word boundary at start, as # is not a word char",
+					"match": "(?:\\s)(#)([^\\s#]+)\\b",
+					"captures": {
+						"1": {
+							"name": "punctuation.definition.tag"
+						},
+						"2": {
+							"name": "string.tag.name"
+						}
+					}
 				}
 			]
 		},

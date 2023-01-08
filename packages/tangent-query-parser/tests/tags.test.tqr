@@ -1,0 +1,8 @@
+// SYNTAX TEST "source.tangentquery"
+
+Notes with #my-tag#badtag
+// <~- keyword.other.form
+//    ^^^^ keyword.other.clause
+//         ^ punctuation.definition.tag
+//         ^^^^^^^ string.tag
+//                ^^^^^^^ - string.tag
