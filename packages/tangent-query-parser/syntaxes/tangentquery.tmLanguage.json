@@ -145,6 +145,18 @@
 							"name": "string.tag.name"
 						}
 					}
+				},
+				{
+					"name": "keyword.other.todo.open",
+					"match": "\\b(?i:(open|incomplete|unfinished|unchecked)\\s+todos?)\\b"
+				},
+				{
+					"name": "keyword.other.todo.closed",
+					"match": "\\b(?i:(closed|done|finished|complete|checked)\\s+todos?)\\b"
+				},
+				{
+					"name": "keyword.other.todo.any",
+					"match": "\\b(?i:todos?)\\b"
 				}
 			]
 		},

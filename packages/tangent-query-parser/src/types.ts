@@ -10,6 +10,12 @@ export enum ClauseMod {
 	All = 'all'
 }
 
+export enum TodoState {
+	Any,
+	Open,
+	Closed
+}
+
 export interface PartialClauseText {
 	text: string
 }
@@ -34,9 +40,14 @@ export interface PartialClauseTag {
 	tag: QueryTagDefinition
 }
 
+export interface PartialClauseTodo {
+	todo: TodoState
+}
+
 export type PartialClauseType = { type: ClauseType, mod?: ClauseMod }
-export type PartialClauseValue = PartialClauseText | PartialClauseRegex |
-	PartialClauseReference | PartialClauseQuery | PartialClauseTag
+export type PartialClauseValue = PartialClauseText | PartialClauseRegex
+	| PartialClauseReference | PartialClauseQuery
+	| PartialClauseTag | PartialClauseTodo
 
 export type Clause = PartialClauseType & PartialClauseValue
 

@@ -1,0 +1,31 @@
+// SYNTAX TEST "source.tangentquery"
+
+Notes with todos
+//         ^^^^^ keyword.other.todo.any
+
+Notes with open todos
+//         ^^^^^^^^^^ keyword.other.todo.open
+
+Notes with closed todos
+//         ^^^^^^^^^^^^ keyword.other.todo.closed
+
+Notes with done todos
+//         ^^^^^^^^^^ keyword.other.todo.closed
+
+Notes with incomplete todos
+//         ^^^^^^^^^^^^^^^^ keyword.other.todo.open
+
+Notes with complete todos
+//         ^^^^^^^^^^^^^^ keyword.other.todo.closed
+
+Notes with finished todos
+//         ^^^^^^^^^^^^^^ keyword.other.todo.closed
+
+Notes with unfinished todos
+//         ^^^^^^^^^^^^^^^^ keyword.other.todo.open
+
+Notes with todo
+//         ^^^^ keyword.other.todo.any
+
+Notes with CLOSED ToDO
+//         ^^^^^^^^^^^ keyword.other.todo.closed

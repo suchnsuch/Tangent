@@ -1,5 +1,5 @@
 import type { IGrammar, INITIAL, IToken, Registry, StackElement } from 'vscode-textmate'
-import { Query, ClauseType, ClauseGroup, isQuery, PartialClauseType, ClauseMod } from './types'
+import { Query, ClauseType, ClauseGroup, isQuery, PartialClauseType, ClauseMod, TodoState } from './types'
 import { last, escapeRegExp } from '@such-n-such/core'
 
 export interface QueryError {
@@ -37,6 +37,11 @@ export const KEYWORD = {
 		REGEX_ARGS: 'string.regexp.args.tangentquery',
 		WIKI: 'string.other.wikilink.tangentquery',
 		TAG: 'string.tag',
+		TODO: {
+			ANY: 'keyword.other.todo.any',
+			OPEN: 'keyword.other.todo.open',
+			CLOSED: 'keyword.other.todo.closed'
+		},
 		SUBQUERY: 'meta.subquery',
 	},
 	PUNCTUATION: {
@@ -59,7 +64,10 @@ export const KEYWORDS = {
 		KEYWORD.VALUE.REGEX,
 		KEYWORD.VALUE.WIKI,
 		KEYWORD.VALUE.SUBQUERY,
-		KEYWORD.VALUE.TAG
+		KEYWORD.VALUE.TAG,
+		KEYWORD.VALUE.TODO.ANY,
+		KEYWORD.VALUE.TODO.OPEN,
+		KEYWORD.VALUE.TODO.CLOSED
 	],
 	REFERENCE_VALUES: [
 		KEYWORD.VALUE.WIKI,
@@ -78,6 +86,10 @@ export const VALUE_OPENERS = {
 	[KEYWORD.VALUE.WIKI]: '[[',
 	[KEYWORD.VALUE.SUBQUERY]: '{'
 }
+
+const EXPECTED_AFTER_VALUE = [
+	...KEYWORDS.JOINS, ...KEYWORDS.CLAUSE_STARTS, KEYWORD.PUNCTUATION.GROUP_END, KEYWORD.PUNCTUATION.QUERY_END
+]
 
 export const MATCHING_BRACES = {
 	"'": "'",
@@ -286,6 +298,9 @@ export function parseQueryText(queryText: string): QueryParseResult {
 		return tokens[tokenIndex + offset]
 	}
 	function expect(...keys: string[]) {
+		expectList(keys)
+	}
+	function expectList(keys: string[]) {
 		expectedNextToken = keys
 		annotation.expects = keys
 	}
@@ -421,7 +436,7 @@ export function parseQueryText(queryText: string): QueryParseResult {
 					`Expected ${MATCHING_BRACES[startTokenText]} to close the ${startTokenText} value.`)
 			}
 			
-			expect(...KEYWORDS.JOINS, ...KEYWORDS.CLAUSE_STARTS, KEYWORD.PUNCTUATION.GROUP_END, KEYWORD.PUNCTUATION.QUERY_END)
+			expectList(EXPECTED_AFTER_VALUE)
 		}
 		else if (lastScope === KEYWORD.PUNCTUATION.TAG) {
 			next()
@@ -433,7 +448,31 @@ export function parseQueryText(queryText: string): QueryParseResult {
 				}
 			})
 
-			expect(...KEYWORDS.JOINS, ...KEYWORDS.CLAUSE_STARTS, KEYWORD.PUNCTUATION.GROUP_END, KEYWORD.PUNCTUATION.QUERY_END)
+			expectList(EXPECTED_AFTER_VALUE)
+		}
+		else if (lastScope === KEYWORD.VALUE.TODO.ANY) {
+			currentGroup.clauses.push({
+				...currentClause,
+				todo: TodoState.Any
+			})
+
+			expectList(EXPECTED_AFTER_VALUE)
+		}
+		else if (lastScope === KEYWORD.VALUE.TODO.OPEN) {
+			currentGroup.clauses.push({
+				...currentClause,
+				todo: TodoState.Open
+			})
+
+			expectList(EXPECTED_AFTER_VALUE)
+		}
+		else if (lastScope === KEYWORD.VALUE.TODO.CLOSED) {
+			currentGroup.clauses.push({
+				...currentClause,
+				todo: TodoState.Closed
+			})
+
+			expectList(EXPECTED_AFTER_VALUE)
 		}
 		else if (lastScope === KEYWORD.JOIN.AND || lastScope === KEYWORD.JOIN.OR) {
 			
