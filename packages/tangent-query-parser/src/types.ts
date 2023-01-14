@@ -33,7 +33,7 @@ export interface PartialClauseQuery {
 }
 
 export interface QueryTagDefinition {
-	name: string
+	names: string[]
 }
 
 export interface PartialClauseTag {

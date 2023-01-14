@@ -1,6 +1,7 @@
 import type { IGrammar, INITIAL, IToken, Registry, StackElement } from 'vscode-textmate'
 import { Query, ClauseType, ClauseGroup, isQuery, PartialClauseType, ClauseMod, TodoState } from './types'
 import { last, escapeRegExp } from '@such-n-such/core'
+import { tokenizeTagName } from './tags'
 
 export interface QueryError {
 	start: number
@@ -444,7 +445,7 @@ export function parseQueryText(queryText: string): QueryParseResult {
 			currentGroup.clauses.push({
 				...currentClause,
 				tag: {
-					name: getTokenText()
+					names: tokenizeTagName(getTokenText())
 				}
 			})
 
