@@ -1,5 +1,7 @@
+export const tagNameSeperatorMatch = /[\.\/]/
+
 export function tokenizeTagName(name: string) {
-	return name.split(/[\.\/]/)
+	return name.split(tagNameSeperatorMatch)
 }
 
 export function tagContainsTag(containingTagNames: string[], testingTagNames: string[]) {

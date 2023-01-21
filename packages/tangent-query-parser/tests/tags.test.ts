@@ -1,5 +1,5 @@
 import { parseQueryText, ClauseType } from '../src'
-import { tokenizeTagName } from '../src/tags'
+import { tagContainsTag, tokenizeTagName } from '../src/tags'
 import { install } from './test-loader'
 
 beforeAll(async () => {
@@ -19,6 +19,14 @@ describe('Tag Tokenization', () => {
 	})
 	it('Should give single-item arrays with no seperators', () => {
 		expect(tokenizeTagName('parent')).toEqual(['parent'])
+	})
+})
+
+describe('Tag Matching', () => {
+	test('Empty name list should match anything', () => {
+		expect(tagContainsTag([], ['test'])).toBeTruthy()
+		expect(tagContainsTag([], ['test/other'])).toBeTruthy()
+		expect(tagContainsTag([], ['thing'])).toBeTruthy()
 	})
 })
 
