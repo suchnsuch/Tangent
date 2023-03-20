@@ -14,6 +14,7 @@
 	"license": "MIT",
 	"workspaces": [
 		"packages/tangent-query-parser",
-		"packages/tangent-html-to-markdown"
+		"packages/tangent-html-to-markdown",
+		"packages/tangent-test-workspace-generator"
 	]
 }

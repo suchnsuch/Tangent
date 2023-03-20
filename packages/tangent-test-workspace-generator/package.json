@@ -1,0 +1,16 @@
+{
+  "name": "tangent-test-workspace-generator",
+  "version": "0.0.1",
+  "description": "A package that will generate test workspaces for Tangent.",
+  "main": "index.js",
+  "scripts": {
+    "test": "jest"
+  },
+  "author": "Taylor Hadden",
+  "license": "MIT",
+  "dependencies": {
+    "lorem-ipsum": "^2.0.8",
+    "ts-node": "^10.9.1",
+    "yargs": "^17.7.1"
+  }
+}
