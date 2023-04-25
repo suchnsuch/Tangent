@@ -30,7 +30,7 @@
     "ts-jest": "^28.0.7",
     "typescript": "^4.7.4",
     "vscode-oniguruma": "^1.6.2",
-    "vscode-textmate": "^7.0.1",
+    "vscode-textmate": "^7.0.4",
     "vscode-tmgrammar-test": "^0.1.1"
   },
   "contributes": {
