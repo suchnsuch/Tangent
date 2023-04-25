@@ -6,9 +6,7 @@
 	"type": "module",
 	"scripts": {
 		"test": "echo \"Error: no test specified\" && exit 1",
-		"build": "tsc --build",
-		"clean": "tsc --build --clean",
-		"rebuild": "npm run clean && npm run build"
+		"build": "npm run build --workspaces --if-present"
 	},
 	"author": "Taylor Hadden",
 	"license": "MIT",
