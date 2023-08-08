@@ -1,4 +1,4 @@
-import { ClauseType, parseQueryText } from '../src'
+import { ClauseGroupMod, ClauseType, parseQueryText } from '../src'
 import { install } from './test-loader'
 
 beforeAll(async () => {
@@ -116,6 +116,72 @@ describe('Explicit Groups', () => {
 						{
 							type: ClauseType.LinkedFrom,
 							reference: 'location'
+						}
+					]
+				}
+			]
+		})
+	})
+})
+
+describe('Negated groups', () => {
+	test('Not should negate the next statement', async () => {
+		const result = await parseQueryText('Notes not with "my text"')
+		expect(result.query).toEqual({
+			forms: ['Notes'],
+			join: 'and',
+			clauses: [
+				{
+					mod: ClauseGroupMod.Not,
+					join: 'and',
+					clauses: [{
+						type: ClauseType.With,
+						text: 'my text'
+					}]
+				}
+			]
+		})
+	})
+
+	test('Not should not stick to chained clauses without explicit grouping', async () => {
+		const result = await parseQueryText('Notes not with "my text" or named "foo"')
+		expect(result.query).toEqual({
+			forms: ['Notes'],
+			join: 'or',
+			clauses: [
+				{
+					mod: ClauseGroupMod.Not,
+					join: 'and',
+					clauses: [{
+						type: ClauseType.With,
+						text: 'my text'
+					}]
+				},
+				{
+					type: ClauseType.Named,
+					text: 'foo'
+				}
+			]
+		})
+	})
+
+	test('Not should capture a defined group', async () => {
+		const result = await parseQueryText('Notes not (with "my text" or named "foo")')
+		expect(result.query).toEqual({
+			forms: ['Notes'],
+			join: 'and',
+			clauses: [
+				{
+					mod: ClauseGroupMod.Not,
+					join: 'or',
+					clauses: [
+						{
+							type: ClauseType.With,
+							text: 'my text'
+						},
+						{
+							type: ClauseType.Named,
+							text: 'foo'
 						}
 					]
 				}

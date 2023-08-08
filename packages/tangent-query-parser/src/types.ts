@@ -10,6 +10,10 @@ export enum ClauseMod {
 	All = 'all'
 }
 
+export enum ClauseGroupMod {
+	Not = 'not'
+}
+
 export enum TodoState {
 	Any,
 	Open,
@@ -44,19 +48,25 @@ export interface PartialClauseTodo {
 	todo: TodoState
 }
 
+export interface PartialClauseNegate {
+	clause: ClauseOrGroup
+}
+
 export type PartialClauseType = { type: ClauseType, mod?: ClauseMod }
 export type PartialClauseValue = PartialClauseText | PartialClauseRegex
 	| PartialClauseReference | PartialClauseQuery
 	| PartialClauseTag | PartialClauseTodo
+	| PartialClauseNegate
 
 export type Clause = PartialClauseType & PartialClauseValue
 
 export interface ClauseGroup {
 	join: 'and' | 'or'
+	mod?: ClauseGroupMod
 	clauses: ClauseOrGroup[]
 }
 
-type ClauseOrGroup = Clause | ClauseGroup
+export type ClauseOrGroup = Clause | ClauseGroup
 
 export interface Query extends ClauseGroup {
 	forms: string[]

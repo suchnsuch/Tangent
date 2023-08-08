@@ -1,5 +1,5 @@
 import type { IGrammar, INITIAL, IToken, Registry, StackElement } from 'vscode-textmate'
-import { Query, ClauseType, ClauseGroup, isQuery, PartialClauseType, ClauseMod, TodoState } from './types'
+import { Query, ClauseType, ClauseGroup, isQuery, PartialClauseType, ClauseMod, TodoState, ClauseGroupMod, ClauseOrGroup } from './types'
 import { last, escapeRegExp } from '@such-n-such/core'
 import { tokenizeTagName } from './tags'
 
@@ -306,6 +306,21 @@ export function parseQueryText(queryText: string): QueryParseResult {
 		expectedNextToken = keys
 		annotation.expects = keys
 	}
+
+	function appendToCurrentGroup(clause: ClauseOrGroup) {
+		const currentGroup = groupStack.at(-1)
+		if (currentGroup.clauses === undefined && currentGroup.mod === ClauseGroupMod.Not) {
+			// This will be a negated single group
+			currentGroup.clauses = [clause]
+			groupStack.pop()
+			if (currentGroup.join === undefined) {
+				currentGroup.join = 'and'// Doesn't matter, but is correct
+			}
+		}
+		else {
+			currentGroup.clauses.push(clause)
+		}
+	}
 	
 	function getTokenText(t: IToken = token) {
 		return queryText.substring(t.startIndex, t.endIndex)
@@ -391,19 +406,19 @@ export function parseQueryText(queryText: string): QueryParseResult {
 
 					switch (stringType) {
 						case KEYWORD.VALUE.STRING_DOUBLE:
-							currentGroup.clauses.push({
+							appendToCurrentGroup({
 								...currentClause,
 								text: fullString
 							})
 							break
 						case KEYWORD.VALUE.STRING_SINGLE:
-							currentGroup.clauses.push({
+							appendToCurrentGroup({
 								...currentClause,
 								regex: buildFuzzySegementMatcher(fullString)
 							})
 							break
 						case KEYWORD.VALUE.WIKI:
-							currentGroup.clauses.push({
+							appendToCurrentGroup({
 								...currentClause,
 								reference: fullString
 							})
@@ -417,7 +432,7 @@ export function parseQueryText(queryText: string): QueryParseResult {
 							}
 							// Inject 'd' so that indices of groups are returned
 							if (!regexArgs.includes('d')) regexArgs += 'd'
-							currentGroup.clauses.push({
+							appendToCurrentGroup({
 								...currentClause,
 								regex: new RegExp(fullString, regexArgs)
 							})
@@ -443,7 +458,7 @@ export function parseQueryText(queryText: string): QueryParseResult {
 		else if (lastScope === KEYWORD.PUNCTUATION.TAG) {
 			next()
 
-			currentGroup.clauses.push({
+			appendToCurrentGroup({
 				...currentClause,
 				tag: {
 					names: tokenizeTagName(getTokenText())
@@ -453,7 +468,7 @@ export function parseQueryText(queryText: string): QueryParseResult {
 			expectList(EXPECTED_AFTER_VALUE)
 		}
 		else if (lastScope === KEYWORD.VALUE.TODO.ANY) {
-			currentGroup.clauses.push({
+			appendToCurrentGroup({
 				...currentClause,
 				todo: TodoState.Any
 			})
@@ -461,7 +476,7 @@ export function parseQueryText(queryText: string): QueryParseResult {
 			expectList(EXPECTED_AFTER_VALUE)
 		}
 		else if (lastScope === KEYWORD.VALUE.TODO.OPEN) {
-			currentGroup.clauses.push({
+			appendToCurrentGroup({
 				...currentClause,
 				todo: TodoState.Open
 			})
@@ -469,7 +484,7 @@ export function parseQueryText(queryText: string): QueryParseResult {
 			expectList(EXPECTED_AFTER_VALUE)
 		}
 		else if (lastScope === KEYWORD.VALUE.TODO.CLOSED) {
-			currentGroup.clauses.push({
+			appendToCurrentGroup({
 				...currentClause,
 				todo: TodoState.Closed
 			})
@@ -493,13 +508,33 @@ export function parseQueryText(queryText: string): QueryParseResult {
 				expect(/*KEYWORD.FORM,*/ ...KEYWORDS.CLAUSE_STARTS, ...KEYWORDS.GROUPS)
 			}
 		}
-		else if (lastScope === KEYWORD.PUNCTUATION.GROUP_START) {
+		else if (lastScope === KEYWORD.NOT) {
+			// Not acts like a group start
 			const newGroup: ClauseGroup = {
+				mod: ClauseGroupMod.Not,
 				join: undefined,
-				clauses: []
+				clauses: undefined
 			}
-			currentGroup.clauses.push(newGroup)
+
+			appendToCurrentGroup(newGroup)
 			groupStack.push(newGroup)
+
+			expect(...KEYWORDS.CLAUSE_STARTS, ...KEYWORDS.GROUPS, KEYWORD.PUNCTUATION.QUERY_START)
+		}
+		else if (lastScope === KEYWORD.PUNCTUATION.GROUP_START) {
+			// Check for an open negated group without defined clauses
+			const lastGroup = groupStack.at(-1)
+			if (lastGroup && lastGroup.mod === ClauseGroupMod.Not && lastGroup.clauses === undefined) {
+				lastGroup.clauses = []
+			}
+			else {
+				const newGroup: ClauseGroup = {
+					join: undefined,
+					clauses: []
+				}
+				appendToCurrentGroup(newGroup)
+				groupStack.push(newGroup)
+			}
 
 			if (currentClause) {
 				expect(/*KEYWORD.FORM,*/ ...KEYWORDS.CLAUSE_STARTS, KEYWORD.MOD, ...expectedValuesForClause(currentClause), ...KEYWORDS.GROUPS, KEYWORD.PUNCTUATION.QUERY_START)
@@ -530,7 +565,7 @@ export function parseQueryText(queryText: string): QueryParseResult {
 				join: undefined,
 				clauses: []
 			}
-			currentGroup.clauses.push({
+			appendToCurrentGroup({
 				...currentClause,
 				query: newQuery
 			})
