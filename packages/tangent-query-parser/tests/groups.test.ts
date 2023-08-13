@@ -189,6 +189,34 @@ describe('Negated groups', () => {
 		})
 	})
 
+	test('Not should continue through an elided clause and then be dropped when a clause is included', async () => {
+		const result = await parseQueryText('Notes not with "foo" or "bar" and with "test"')
+		expect(result.query).toEqual({
+			forms: ['Notes'],
+			join: 'and',
+			clauses: [
+				{
+					mod: ClauseGroupMod.Not,
+					join: 'or',
+					clauses: [
+						{
+							type: ClauseType.With,
+							text: 'foo'
+						},
+						{
+							type: ClauseType.With,
+							text: 'bar'
+						}
+					]
+				},
+				{
+					type: ClauseType.With,
+					text: 'test'
+				}
+			]
+		})
+	})
+
 	test('Not should capture a defined group', async () => {
 		const result = await parseQueryText('Notes not (with "my text" or named "foo")')
 		expect(result.query).toEqual({
