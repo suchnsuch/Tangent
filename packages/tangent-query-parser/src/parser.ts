@@ -257,7 +257,12 @@ export function parseQueryText(queryText: string): QueryParseResult {
 		})
 	}
 
+	type ClauseGroupContext = {
+		negation?: 'open' | 'grouped' // open = `not with 'this' or 'that'` | grouped = `not (with 'this' or named 'that')`
+	}
+
 	const groupStack: ClauseGroup[] = [query]
+	const groupContextStack: ClauseGroupContext[] = [{}]
 
 	// Each query needs its own "current clause" context
 	// Allows for things like `Notes in { Folders named "Test" } or { Folders named "Foo" }`
@@ -307,19 +312,32 @@ export function parseQueryText(queryText: string): QueryParseResult {
 		annotation.expects = keys
 	}
 
+	function pushGroup(group: ClauseGroup, meta?: ClauseGroupContext) {
+		groupStack.push(group)
+		groupContextStack.push(meta)
+	}
+
+	function popGroup() {
+		const last = groupStack.pop()
+		groupContextStack.pop()
+		if (last.join === undefined) {
+			last.join = 'and' // Not technically necessary, but correct
+		}
+		return last
+	}
+
 	function appendToCurrentGroup(clause: ClauseOrGroup) {
 		const currentGroup = groupStack.at(-1)
-		if (currentGroup.clauses === undefined && currentGroup.mod === ClauseGroupMod.Not) {
-			// This will be a negated single group
-			currentGroup.clauses = [clause]
-			groupStack.pop()
-			if (currentGroup.join === undefined) {
-				currentGroup.join = 'and'// Doesn't matter, but is correct
+		if (currentGroup.mod === ClauseGroupMod.Not) {
+			if (currentGroup.clauses === undefined) {
+				// This negated group is now adding clauses
+				currentGroup.clauses = [clause]
+				return
 			}
 		}
-		else {
-			currentGroup.clauses.push(clause)
-		}
+
+		// Clause goes in the group!
+		currentGroup.clauses.push(clause)
 	}
 	
 	function getTokenText(t: IToken = token) {
@@ -493,11 +511,25 @@ export function parseQueryText(queryText: string): QueryParseResult {
 		}
 		else if (lastScope === KEYWORD.JOIN.AND || lastScope === KEYWORD.JOIN.OR) {
 			
-			const joinText = tokenText.toLowerCase() as ('and' | 'or')
-			if (currentGroup.join === undefined) {
-				currentGroup.join = joinText
+			let targetGroup = currentGroup
+			if (currentGroup.mod === ClauseGroupMod.Not && groupContextStack.at(-1)?.negation === 'open') {
+				// Check forward for clause. This breaks the open negation group.
+				// this is `Notes not with 'thing' and with 'foo'`
+				//   which is read as `Notes (not with 'thing') and (with 'foo')`
+				// the opposite is `Notes not with 'thing' or 'foo'`
+				//   which is read as `Notes (not with 'thing' or 'foo')`
+				const next = peak(2) // Need to peak 2 to jump the whitespace
+				if (next.scopes.at(-1) === KEYWORD.CLAUSE) {
+					popGroup()
+					targetGroup = groupStack.at(-1)
+				}
 			}
-			else if (currentGroup.join !== joinText) {
+
+			const joinText = tokenText.toLowerCase() as ('and' | 'or')
+			if (targetGroup.join === undefined) {
+				targetGroup.join = joinText
+			}
+			else if (targetGroup.join !== joinText) {
 				tokenError(token, 'Implicit group separationg not yet supported')
 			}
 
@@ -517,7 +549,7 @@ export function parseQueryText(queryText: string): QueryParseResult {
 			}
 
 			appendToCurrentGroup(newGroup)
-			groupStack.push(newGroup)
+			pushGroup(newGroup, { negation: 'open' })
 
 			expect(...KEYWORDS.CLAUSE_STARTS, ...KEYWORDS.GROUPS, KEYWORD.PUNCTUATION.QUERY_START)
 		}
@@ -526,6 +558,7 @@ export function parseQueryText(queryText: string): QueryParseResult {
 			const lastGroup = groupStack.at(-1)
 			if (lastGroup && lastGroup.mod === ClauseGroupMod.Not && lastGroup.clauses === undefined) {
 				lastGroup.clauses = []
+				groupContextStack.at(-1).negation = 'grouped' // The negated group is now scoped to this group start punctuation
 			}
 			else {
 				const newGroup: ClauseGroup = {
@@ -533,7 +566,7 @@ export function parseQueryText(queryText: string): QueryParseResult {
 					clauses: []
 				}
 				appendToCurrentGroup(newGroup)
-				groupStack.push(newGroup)
+				pushGroup(newGroup)
 			}
 
 			if (currentClause) {
@@ -548,7 +581,7 @@ export function parseQueryText(queryText: string): QueryParseResult {
 				tokenError(token, 'Attempted to close a group without opening one.')
 			}
 			else {
-				const group = groupStack.pop()
+				const group = popGroup()
 				if (group.join === undefined) {
 					group.join = 'and'
 				}
@@ -569,7 +602,7 @@ export function parseQueryText(queryText: string): QueryParseResult {
 				...currentClause,
 				query: newQuery
 			})
-			groupStack.push(newQuery)
+			pushGroup(newQuery)
 			// The new query needs its own clause context
 			currentClauseStack.push(null)
 			currentClause = null
@@ -579,7 +612,7 @@ export function parseQueryText(queryText: string): QueryParseResult {
 	}
 
 	while (groupStack.length) {
-		const group = groupStack.pop()
+		const group = popGroup()
 		if (group.join === undefined) {
 			group.join = 'and'
 		}

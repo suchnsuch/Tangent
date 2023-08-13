@@ -143,8 +143,32 @@ describe('Negated groups', () => {
 		})
 	})
 
-	test('Not should not stick to chained clauses without explicit grouping', async () => {
-		const result = await parseQueryText('Notes not with "my text" or named "foo"')
+	test('Not should grab clauses that share the same clause prefix', async () => {
+		const result = await parseQueryText('Notes not with "my text" or "foo"')
+		expect(result.query).toEqual({
+			forms: ['Notes'],
+			join: 'and',
+			clauses: [
+				{
+					mod: ClauseGroupMod.Not,
+					join: 'or',
+					clauses: [
+						{
+							type: ClauseType.With,
+							text: 'my text'
+						},
+						{
+							type: ClauseType.With,
+							text: 'foo'
+						}
+					]
+				}
+			]
+		})
+	})
+
+	test('Not should be dropped when the clause prefix is included', async () => {
+		const result = await parseQueryText('Notes not with "my text" or with "foo"')
 		expect(result.query).toEqual({
 			forms: ['Notes'],
 			join: 'or',
@@ -158,7 +182,7 @@ describe('Negated groups', () => {
 					}]
 				},
 				{
-					type: ClauseType.Named,
+					type: ClauseType.With,
 					text: 'foo'
 				}
 			]
