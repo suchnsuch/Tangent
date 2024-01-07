@@ -423,18 +423,18 @@ Once again, I link to [[Another Auto Test|that test, but with custom text]].`))
 		newPaths.push(folderPath)
 		await fileOp(fs.promises.mkdir(folderPath))
 
-		let folderNote = await createNote('Auto Folder/Folder Note')
+		let folderNote = await createNote('Auto Folder/Watch Target Note')
 		
 		let referencer = await createNote('Folder Note Watcher')
 		await workspace.updateFileContents(
-			referencer.path, `I am watching [[Folder Note]]`)
+			referencer.path, `I am watching [[Watch Target Note]]`)
 		
-		let overrideNote = await createNote('Folder Note')
+		let overrideNote = await createNote('Watch Target Note')
 
 		await workspace.watcherIdleHandle()
 
 		let referencerText = await workspace.getFileContents(referencer.path)
-		expect(referencerText).toEqual('I am watching [[Auto Folder/Folder Note]]')
+		expect(referencerText).toEqual('I am watching [[Auto Folder/Watch Target Note]]')
 	})
 
 	test('Creating new note in a different place than a virtual note by the same name', async () => {
