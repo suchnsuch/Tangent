@@ -4,6 +4,7 @@
 		"target": "ESNext",
 		"moduleResolution": "node",
 		"esModuleInterop": true,
-		"allowJs": true
+		"allowJs": true,
+		"types": ["node", "jest"]
 	}
 }
