@@ -1,0 +1,4 @@
+/* A test of custom styles in Tangent */
+body {
+	--textColor: green;
+}

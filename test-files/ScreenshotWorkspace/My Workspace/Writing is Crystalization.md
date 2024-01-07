@@ -1,0 +1,3 @@
+Thoughts in a pure form can be [[Expressing Thoughts is Difficult|difficult to express]]. They can be a vague feeling that shifts underneath you as you poke and prod it.
+
+By actually forcing a thought out into written words, you force it to collapse into a steady state. From there, you can examine it without it changing on you. From there, you can see if what you have written down truly matches the veiled creature in your head.

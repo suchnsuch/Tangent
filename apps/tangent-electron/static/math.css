@@ -1,0 +1,21 @@
+/*
+ * This works on top of Katex, and is loaded in a shadow-dom element
+ */
+.error {
+	color: red;
+
+	.block & {
+		display: block;
+		max-width: 80%;
+		margin-left: auto;
+		margin-right: auto;
+	}
+
+	> span:last-child {
+		font-family: 'FiraCode-Retina', FiraCode, Consolas, Menlo, Monaco, 'Courier New', monospace;
+
+		.block & {
+			display: block;
+		}
+	}
+}

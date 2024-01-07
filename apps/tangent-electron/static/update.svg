@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<svg xmlns="http://www.w3.org/2000/svg">
+	<symbol id="arrow" viewBox="0 0 24 24">
+		<path
+			d="M12,20 6,14 10,14 10,6 14,6 14,14 18,14 Z"
+			style="fill: var(--updateFill, none); stroke: var(--iconStroke, black); stroke-width: 1.5px; stroke-linecap: round; stroke-linejoin: round;"/>
+	</symbol>
+</svg>

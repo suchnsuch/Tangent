@@ -1,0 +1,10 @@
+.match-highlight {
+	position: relative;
+	&::after {
+		content: '';
+		position: absolute;
+		inset: 0;
+		background: var(--textColor);
+		opacity: .25;
+	}
+}

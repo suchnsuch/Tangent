@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:bx="https://boxy-svg.com">
+  <defs>
+    <linearGradient id="gradient-2" bx:pinned="true">
+      <stop style="stop-color: rgb(7, 43, 19);" offset="0.094"/>
+      <stop style="stop-color: rgb(2, 16, 6);" offset="0.833"/>
+    </linearGradient>
+    <linearGradient id="gradient-1" bx:pinned="true">
+      <stop style="stop-color: rgb(25, 120, 56);" offset="0"/>
+      <stop style="stop-color: rgb(19, 86, 39);" offset="1"/>
+    </linearGradient>
+    <linearGradient id="gradient-1-0" gradientUnits="userSpaceOnUse" x1="23.281" y1="6.567" x2="23.281" y2="12.567" gradientTransform="matrix(0.895774, 0.444511, -0.476039, 0.959306, 5, -8.4470495)" xlink:href="#gradient-1"/>
+    <linearGradient id="gradient-1-1" gradientUnits="userSpaceOnUse" x1="7.717" y1="12.75" x2="7.7165" y2="18.75" gradientTransform="matrix(0.881561, 0.472069, -0.447497, 0.835675, 8.46445775, -3.654667)" xlink:href="#gradient-1"/>
+    <linearGradient id="gradient-1-2" gradientUnits="userSpaceOnUse" x1="18.834" y1="19.0505" x2="18.834" y2="25" gradientTransform="matrix(0.900151, 0.435577, -0.417086, 0.86194, 11, -5)" xlink:href="#gradient-1"/>
+    <linearGradient id="gradient-2-0" gradientUnits="userSpaceOnUse" x1="18.497" y1="-1.583" x2="18.497" y2="28.418" spreadMethod="pad" gradientTransform="matrix(1.006449, 0.350628, -0.353785, 1.015513, 4.873365, -5.771333)" xlink:href="#gradient-2"/>
+  </defs>
+  <circle style="fill: url(#gradient-2-0); stroke: rgb(233, 233, 233); stroke-width: 2px;" cx="16" cy="16" r="14.921"/>
+  <path style="fill: none; stroke-width: 1px; stroke: rgb(233, 233, 233);" d="M 10.77 15.84 C 14.472 15.869 15.648 16.136 15.618 13.451 C 15.589 10.766 18.748 11.143 18.748 11.143"/>
+  <path style="fill: none; stroke-width: 1px; stroke: rgb(233, 233, 233);" d="M 10.632 15.811 C 13.041 15.94475 13.678 15.515 13.741 18.99 C 13.8035 22.465 16.029 22.184 16.029 22.184"/>
+  <circle style="stroke-width: 1px; fill: url(#gradient-1-1); stroke: rgb(233, 233, 233);" cx="8" cy="16" r="2.5"/>
+  <circle style="stroke-width: 1px; fill: url(#gradient-1-0); stroke: rgb(233, 233, 233);" cx="21" cy="11" r="2.5"/>
+  <circle style="stroke-width: 1px; fill: url(#gradient-1-2); stroke: rgb(233, 233, 233);" cx="19" cy="22" r="2.5"/>
+</svg>

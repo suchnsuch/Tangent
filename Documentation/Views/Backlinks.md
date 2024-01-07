@@ -1,0 +1,5 @@
+Backlinks let you see what other notes are referencing a given note. The number of backlinks for a note is shown in the bottom left corner of a note's panel. Clicking on this information row will pull up a display of all links made to this note and the context in which those links were made. You can also press `Cmd/Ctrl+Alt+Down` to open this panel when the note has focus.
+
+Clicking or selecting and pressing `Enter` on any of the displayed backlinks will add the link to the end of the [[Thread View|thread]] just as if you had navigated through a link in the note itself. You can also hold `Alt` when clicking or pressing `Enter` to instead open the note to the _left_ of your current note.
+
+Pressing `Escape`, `Cmd/Ctrl+Down/Up`, or clicking back to the note's text will close the backlink panel.

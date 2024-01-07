@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<svg fill="none" height="100" viewBox="0 0 100 100" width="100" xmlns="http://www.w3.org/2000/svg">
+	<symbol id="up" viewBox="0, 0, 100, 100">
+		<path d="M 27.346 87.196 H 100.951 L 100.951 74.696 L 125.951 99.696 L 100.951 124.696 L 100.951 112.196 H 27.346 V 87.196 Z"
+			stroke-width="1.5"
+			stroke-linejoin="round"
+			style="fill: none; stroke: var(--iconStroke, black);"
+			transform="matrix(0, -1, 1, 0, -49.357449, 126.864983)">
+		</path>
+	</symbol>
+</svg>

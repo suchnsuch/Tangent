@@ -1,0 +1,139 @@
+{
+	"appId": "com.SuchnSuch.Tangent",
+	"productName": "Tangent",
+	"copyright": "Copyright © 2022 Taylor Hadden",
+
+	"generateUpdatesFilesForAllChannels": true,
+
+	"files": [
+		"node_modules/**/*",
+		"static/**/*",
+		"package.json",
+		"defaults/**/*",
+		{
+			"from": "__build",
+			"to": "__build",
+			"filter": ["**/*",
+				"!bundle/app.css", "!bundle/app.css.map"
+			]
+		},
+		{
+			"from": "__build/bundle",
+			"to": "static",
+			"filter": ["*.css", "*.css.map"]
+		}
+	],
+
+	"mac": {
+		"category": "public.app-category.productivity",
+		"hardenedRuntime": true,
+		"entitlements": "build/entitlements.mac.plist",
+		"entitlementsInherit": "build/entitlements.mac.plist",
+		"target": {
+			"target": "default",
+			"arch": "universal"
+		},
+		"notarize": false,
+		"extendInfo": {
+			"CFBundleDocumentTypes": [
+				{
+					"LSItemContentTypes": ["public.folder", "public.directory"],
+					"CFBundleTypeRole": "Editor",
+					"LSHandlerRank": "Alternate"
+				},
+				{
+					"LSItemContentTypes": ["public.plain-text"],
+					"CFBundleTypeRole": "Editor",
+					"LSHandlerRank": "Default"
+				},
+				{
+					"LSItemContentTypes": [
+						"public.jpeg",
+						"public.tiff",
+						"public.png",
+						"com.compuserve.gif",
+						"com.microsoft.bmp",
+						"public.svg"
+					],
+					"CFBundleTypeRole": "Viewer",
+					"LSHandlerRank": "Alternate"
+				}
+			]
+		}
+	},
+
+	"win": {
+		"artifactName": "${productName}-Setup-${version}.${ext}",
+		"target": {
+			"target": "nsis",
+			"arch": ["x64", "arm64"]
+		},
+		"fileAssociations": [
+			{
+				"ext": ["md", "mdx"],
+				"description": "Markdown Files",
+				"role": "Editor",
+				"rank": "Alternate"
+			},
+			{
+				"ext": ["jpg", "jpeg", "png", "PNG", "gif", "bmp", "svg"],
+				"description": "Images Files",
+				"role": "Viewer"
+			}
+		]
+	},
+
+	"nsis": {
+		"oneClick": false,
+		"allowElevation": true,
+		"allowToChangeInstallationDirectory": true
+	},
+
+	"linux": {
+		"category": "Office",
+		"target": {
+			"target": "AppImage",
+			"arch": ["x64", "arm64"]
+		},
+		"fileAssociations": [
+			{
+				"ext": "md",
+				"mimeType": "text/plain"
+			},
+			{
+				"ext": "mdx",
+				"mimeType": "text/plain"
+			},
+			{
+				"ext": "jpg",
+				"mimeType": "image/jpeg"
+			},
+			{
+				"ext": "jpeg",
+				"mimeType": "image/jpeg"
+			},
+			{
+				"ext": "png",
+				"mimeType": "image/png"
+			},
+			{
+				"ext": "gif",
+				"mimeType": "image/gif"
+			},
+			{
+				"ext": "bmp",
+				"mimeType": "image/bmp"
+			}
+		]
+	},
+
+	"publish": [
+		{
+			"provider": "s3",
+			"bucket": "suchnsuch-public",
+			"path": "/Tangent/Releases/"
+		}
+	],
+
+	"afterSign": "build/notarize.js"
+}

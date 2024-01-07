@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<svg xmlns="http://www.w3.org/2000/svg">
+  <symbol id="sidebar-left-closed" viewBox="0 0 32 32">
+    <rect x="2" y="4" width="28" height="24" rx="4" ry="4" style="stroke: var(--iconStroke, black); stroke-width: 2px; fill: none;"/>
+    <line style="fill: none; stroke: var(--iconStroke, black); stroke-linecap: round; stroke-width: 2px;" x1="13" y1="4" x2="13" y2="28"/>
+
+    <line style="fill: none; stroke: var(--sidebarStroke, black); transition: stroke .5s; stroke-width: 2px;" x1="5" y1="9" x2="10" y2="9"/>
+    <line style="fill: none; stroke: var(--sidebarStroke, black); transition: stroke .5s; stroke-width: 2px;" x1="5" y1="14" x2="10" y2="14"/>
+    <line style="fill: none; stroke: var(--sidebarStroke, black); transition: stroke .5s; stroke-width: 2px;" x1="5" y1="18" x2="10" y2="18"/>
+    <line style="fill: none; stroke: var(--sidebarStroke, black); transition: stroke .5s; stroke-width: 2px;" x1="5" y1="22" x2="10" y2="22"/>
+  </symbol>
+  <symbol id="sidebar-left-fill" viewBox="0 0 32 32">
+    <rect x="2.648" y="3.89" width="10.014" height="24.263" rx="2" ry="2" style="fill: var(--iconStroke, black);"/>
+  </symbol>
+</svg>

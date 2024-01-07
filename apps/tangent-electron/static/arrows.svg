@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<svg fill="none" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg">
+	<symbol id="back" viewBox="0, 0, 24, 24">
+		<path d="m16 4-8 8 8 8" stroke="#000" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75"
+			style="fill: none; stroke: var(--iconStroke, black);" />
+	</symbol>
+	<symbol id="forward" viewBox="0, 0, 24, 24">
+		<path d="m8 4 8 8-8 8" stroke="#000" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75"
+			style="fill: none; stroke: var(--iconStroke, black);" />
+	</symbol>
+</svg>

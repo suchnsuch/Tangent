@@ -1,0 +1,3 @@
+[[Language is Serialized Data]]. If you just send off that data and never get anything back in confirmation, you never know if you actually delivered your information. When you're talking about something complex, this can quickly become a serious problem.
+
+If your conversational partner can express back the same concepts to you with new language, you can be extremely confident that the concepts actually unfolded into their mind in the way you intended.

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<svg xmlns="http://www.w3.org/2000/svg">
+	<symbol id="folder" viewBox="0 0 24 24">
+		<path 
+			d="M2,20 2,6 4,4 8,4 10,6 22,6 22,20 z"
+			style="stroke: var(--iconStroke, black); stroke-width: 1.5px; fill: var(--iconFill, none); stroke-linejoin: round;" />
+	</symbol>
+
+	<symbol id="plus" viewBox="0 0 24 24">
+		<line x1="8" y1="13" x2="16" y2="13" style="fill: none; stroke: var(--iconStroke, black); stroke-width: 2px;"/>
+		<line x1="12" y1="9" x2="12" y2="17" style="fill: none; stroke: var(--iconStroke, black); stroke-width: 2px;"/>
+	</symbol>
+</svg>

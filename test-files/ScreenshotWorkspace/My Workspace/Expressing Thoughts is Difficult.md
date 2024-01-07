@@ -1,0 +1,3 @@
+Thoughts can be a hard enough thing to nail down within your own head. When trying to translate them from your head to another, the difficulty is compounded.
+
+This is the essence of communication. One of the key aphorisms of communication education is to "repeat what you hear back". On the face of it, it seems ridiculous—nobody talks like that. However, this is truly a critical component of communication. [[Language is Serialized Data]]. [[Speak in TCP, Not UDP]].

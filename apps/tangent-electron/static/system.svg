@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<svg xmlns="http://www.w3.org/2000/svg">
+	<symbol id="gear" viewBox="0 0 24 24">
+		<circle
+			cx="12" cy="12" r="6"
+			style="fill: none; stroke: var(--iconStroke, black); stroke-width: 1.5px; stroke-linecap: round; stroke-linejoin: round;"/>
+		<circle
+			cx="12" cy="12" r="2"
+			style="fill: none; stroke: var(--iconStroke, black); stroke-width: 1.5px; stroke-linecap: round; stroke-linejoin: round;"/>
+		
+		<line
+			x1="12" y1="5"
+			x2="12" y2="4"
+			style="fill: none; stroke: var(--iconStroke, black); stroke-width: 2px; stroke-linecap: round; stroke-linejoin: round;"/>
+		<line
+			x1="12" y1="5"
+			x2="12" y2="4"
+			transform="rotate(45, 12, 12)"
+			style="fill: none; stroke: var(--iconStroke, black); stroke-width: 2px; stroke-linecap: round; stroke-linejoin: round;"/>
+		<line
+			x1="12" y1="5"
+			x2="12" y2="4"
+			transform="rotate(90, 12, 12)"
+			style="fill: none; stroke: var(--iconStroke, black); stroke-width: 2px; stroke-linecap: round; stroke-linejoin: round;"/>
+		<line
+			x1="12" y1="5"
+			x2="12" y2="4"
+			transform="rotate(135, 12, 12)"
+			style="fill: none; stroke: var(--iconStroke, black); stroke-width: 2px; stroke-linecap: round; stroke-linejoin: round;"/>
+		<line
+			x1="12" y1="5"
+			x2="12" y2="4"
+			transform="rotate(180, 12, 12)"
+			style="fill: none; stroke: var(--iconStroke, black); stroke-width: 2px; stroke-linecap: round; stroke-linejoin: round;"/>
+		
+		<line
+			x1="12" y1="5"
+			x2="12" y2="4"
+			transform="rotate(-45, 12, 12)"
+			style="fill: none; stroke: var(--iconStroke, black); stroke-width: 2px; stroke-linecap: round; stroke-linejoin: round;"/>
+		<line
+			x1="12" y1="5"
+			x2="12" y2="4"
+			transform="rotate(-90, 12, 12)"
+			style="fill: none; stroke: var(--iconStroke, black); stroke-width: 2px; stroke-linecap: round; stroke-linejoin: round;"/>
+		<line
+			x1="12" y1="5"
+			x2="12" y2="4"
+			transform="rotate(-135, 12, 12)"
+			style="fill: none; stroke: var(--iconStroke, black); stroke-width: 2px; stroke-linecap: round; stroke-linejoin: round;"/>
+		
+	</symbol>
+</svg>

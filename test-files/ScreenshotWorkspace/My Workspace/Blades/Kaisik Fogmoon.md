@@ -1,0 +1,1 @@
+A vampire who initially possessed the body of [[Reginald Pinkerworthy]]'s butler. He had been planning (along with his underlings [[Boxer]] and [[Derby]]) to transfer himself into Reginald's body instead. A chance encounter with [[The Sunken]] ended up accelerating those plans somewhat, though the loss of Reginald's house means that his plans have been temporarily dashed…

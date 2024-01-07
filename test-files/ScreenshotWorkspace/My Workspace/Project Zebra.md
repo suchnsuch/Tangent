@@ -1,0 +1,1 @@
+**Zebra** is the biggest project our team has taken on to date. It encompasses three departments across five disciplines. The client is easily the largest and most influential one we've worked with so far.

@@ -1,0 +1,45 @@
+const TsConfigPathsPlugin = require('tsconfig-paths-webpack-plugin')
+const path = require('path')
+
+// TODO: Make this not a copy paste
+const mode = process.env.NODE_ENV || 'production';
+const prod = mode === 'production';
+
+module.exports = {
+	entry: {
+		'bundle/preload': ['./src/preload/index.ts']
+	},
+	resolve: {
+		extensions: ['.mjs', '.js', '.ts', '.cjs'],
+		plugins: [
+			new TsConfigPathsPlugin()
+		]
+	},
+	output: {
+		path: path.join(__dirname, '../../__build'),
+		filename: '[name].js',
+		chunkFilename: '[name].[id].js'
+	},
+	target: 'electron-preload',
+	module: {
+		rules: [
+			{
+				test: /\.js$/,
+				resolve: { fullySpecified: false }
+			},
+			{
+				test: /\.ts$/,
+				use: 'ts-loader',
+				exclude: /node_modules/
+			}
+		]
+	},
+	externals: {
+		externalsPresets: {
+			electron: true
+		}
+	},
+	mode,
+	// Good source maps in prod, faster-ish maps in dev: https://webpack.js.org/configuration/devtool/#devtool
+	devtool: prod ? 'nosources-source-map' : 'eval-source-map'
+};

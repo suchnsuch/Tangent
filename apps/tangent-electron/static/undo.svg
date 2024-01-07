@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+	<symbol id="arc" viewBox="0 0 24 24">
+		<path style="stroke: var(--iconStroke, black); stroke-linecap: round; paint-order: fill; fill: none; stroke-width: 1.5px;" d="M 3,12 C 7,7 16,7 21,12"/>
+	</symbol>
+	<symbol id="undo" viewBox="0 0 24 24">
+		<polyline style="stroke: var(--iconStroke, black); fill: none; stroke-linecap: round; stroke-linejoin: round; stroke-width: 1.5px;" points="3.5190000534057617 9.020999908447266 2.691999912261963 12.069000244140625 5.677000045776367 12.041000366210938"/>
+	</symbol>
+	<symbol id="redo" viewBox="0 0 24 24">
+		<polyline style="stroke: var(--iconStroke, black); fill: none; stroke-linecap: round; stroke-linejoin: round; stroke-width: 1.5px;" points="19.269 12.31 18.442 9.262 21.427 9.29" transform="matrix(-1, 0, 0, -1, 39.868999, 21.572001)"/>
+	</symbol>
+</svg>

@@ -1,0 +1,1 @@
+This note also links to [[A Note to Link To]].

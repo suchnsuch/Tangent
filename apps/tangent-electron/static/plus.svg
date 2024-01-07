@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<svg xmlns="http://www.w3.org/2000/svg">
+	<symbol id="plus" viewBox="0 0 24 24">
+		<line x1="6" y1="12" x2="18" y2="12"
+			style="fill: none; stroke: var(--iconStroke, black); stroke-width: 2px;"
+			stroke-linecap="round"
+		/>
+		<line x1="12" y1="6" x2="12" y2="18"
+			style="fill: none; stroke: var(--iconStroke, black); stroke-width: 2px;"
+			stroke-linecap="round"
+		/>
+	</symbol>
+</svg>

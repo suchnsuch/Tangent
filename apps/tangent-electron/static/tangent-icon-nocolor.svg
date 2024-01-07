@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:bx="https://boxy-svg.com">
+  <symbol id="icon" viewBox="0 0 32 32">
+    <circle style="fill: none; stroke: var(--iconStroke, black); stroke-width: 2px;" cx="16" cy="16" r="14"/>
+    <path style="fill: none; stroke-width: 1px; stroke: var(--iconStroke, black);" d="M 10.77 15.84 C 14.472 15.869 15.648 16.136 15.618 13.451 C 15.589 10.766 18.748 11.143 18.748 11.143"/>
+    <path style="fill: none; stroke-width: 1px; stroke: var(--iconStroke, black);" d="M 10.632 15.811 C 13.041 15.94475 13.678 15.515 13.741 18.99 C 13.8035 22.465 16.029 22.184 16.029 22.184"/>
+    <circle style="stroke-width: 1px; fill: var(--iconStroke, black);" cx="8" cy="16" r="2.5"/>
+    <circle style="stroke-width: 1px; fill: var(--iconStroke, black);" cx="21" cy="11" r="2.5"/>
+    <circle style="stroke-width: 1px; fill: var(--iconStroke, black);" cx="19" cy="22" r="2.5"/>
+  </symbol>
+</svg>

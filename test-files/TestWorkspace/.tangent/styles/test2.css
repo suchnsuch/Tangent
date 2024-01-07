@@ -1,0 +1,8 @@
+/* A test of custom styles in Tangent */
+.note {
+	color: red;
+}
+article.note h1.line {
+	font-size: 400%;
+	color: blue;
+}
