@@ -1,15 +1,17 @@
-# Tangent-Public
-## Open Source-ish
-This is a collection of code used by [Tangent](https://www.tangentnotes.com) that has been made open source. This is currently a very limited selection that will start to open up as Tangent's publishing aspirations become solidified.
+# Tangent
+This is the monorepo for the [Tangent](https://www.tangentnotes.com) project.
 
-Not all of Tangent and its related projects will be open source, but subsets that will empower the community will be made so.
+### Applications
+The `apps` directory contains modules that produce versions of Tangent and other Tangent-related executables.
 
 ## Packages
+The `packages` directory contains modules that provide libraries of Tangent-related functionality.
 * [tangent-html-to-markdown](./packages/tangent-html-to-markdown/README.md) – The parser used to convert `text/html` clipboard data to Tangent-specific markdown text.
 
-## Reporting Tangent Issues
-As this repository is the public face of Tangent on [GitHub](https://github.com/suchnsuch/tangent-public), its issue tracking will serve as the primary way to track issues for the application as well as any of the actual packages in this repository.
+### Lib
+The `lib` directory contains externally-versioned libraries that have been submoduled for various reasons.
 
+## Reporting Tangent Issues
 When reporting issues for Tangent itself, be sure to use the "Tangent App" label to differentiate the issue from others. https://github.com/suchnsuch/tangent-public/labels/Tangent%20App
 
 When reporting issues, please include:
