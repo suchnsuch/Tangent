@@ -16,7 +16,7 @@ function resultToNodePaths(result: QueryResult) {
 }
 
 beforeAll(async () => {
-	const workspacePath = path.resolve(path.join(__dirname, '../../../../TestFiles/QueryTestWorkspace'))
+	const workspacePath = path.resolve(path.join(__dirname, '../../../../../test-files/QueryTestWorkspace'))
 
 	installTextmate({ registry: getRegistry(), initialStack: INITIAL })
 

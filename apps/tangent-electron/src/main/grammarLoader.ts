@@ -7,7 +7,7 @@ import Logger from 'js-logger'
 const log = Logger.get('grammar-loader')
 
 function getNodePath(partial: string) {
-	return path.resolve(__dirname, '../../node_modules', partial)
+	return path.resolve(__dirname, '../../../../node_modules', partial)
 }
 
 async function loadVSCodeOnigurumaLib() {

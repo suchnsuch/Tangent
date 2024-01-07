@@ -9,7 +9,7 @@ describe('IO', () => {
 	let newPaths: string[] = []
 
 	beforeAll(async () => {
-		const workspacePath = path.resolve(path.join(__dirname, '../../../../TestFiles/TestWorkspace'))
+		const workspacePath = path.resolve(path.join(__dirname, '../../../../../test-files/TestWorkspace'))
 		//await fs.promises.mkdir(workspacePath)
 		workspace = await Workspace.loadWorkspace(workspacePath)
 	})

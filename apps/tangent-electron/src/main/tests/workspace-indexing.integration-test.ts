@@ -12,7 +12,7 @@ describe('Indexing', () => {
 	let newPaths: string[] = []
 
 	beforeAll(() => {
-		const workspacePath = path.resolve(path.join(__dirname, '../../../../TestFiles/TestWorkspace'))
+		const workspacePath = path.resolve(path.join(__dirname, '../../../../../test-files/TestWorkspace'))
 		return Workspace.loadWorkspace(workspacePath).then(w => {
 			workspace = w
 		})
