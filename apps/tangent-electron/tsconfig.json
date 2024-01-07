@@ -13,6 +13,7 @@
 		"moduleResolution": "Node",
 		"allowJs": true,
 		"esModuleInterop": true,
+		"strict": false,
 		"verbatimModuleSyntax": false
 	},
 	"exclude": [ "__build", "node_modules", "out" ]

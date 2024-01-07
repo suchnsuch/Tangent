@@ -32,8 +32,7 @@
     "test:unit": "jest --ignoreProjects integration",
     "test:integration": "jest --ignoreProjects core dom",
     "test:end-to-end": "playwright test --project Tests",
-    "svelte-dev": "webpack watch",
-    "preinstall": "cd ../lib/typewriter && npm ci && npm run build"
+    "svelte-dev": "webpack watch"
   },
   "keywords": [],
   "author": {
@@ -41,7 +40,6 @@
     "email": "taylorhadden@icloud.com"
   },
   "dependencies": {
-    "@such-n-such/tangent-query-parser": "file:../lib/tangent-public/packages/tangent-query-parser",
     "@typewriter/delta": "^1.0.2",
     "@typewriter/document": "^0.7.9",
     "adm-zip": "^0.5.9",
@@ -59,7 +57,7 @@
     "semver": "^7.3.7",
     "source-map-support": "^0.5.19",
     "svelte": "^4.2.3",
-    "typewriter-editor": "file:../lib/typewriter",
+    "typewriter-editor": "file:../../lib/typewriter",
     "vscode-oniguruma": "^1.6.2",
     "vscode-textmate": "^7.0.1",
     "watcher": "^1.2.0",
@@ -70,8 +68,7 @@
     "@electron/notarize": "^1.2.3",
     "@playwright/test": "^1.39.0",
     "@popperjs/core": "^2.9.2",
-    "@such-n-such/core": "file:../lib/suchnsuch_common/packages/core",
-    "@such-n-such/tangent-html-to-markdown": "file:../lib/tangent-public/packages/tangent-html-to-markdown",
+    "@such-n-such/core": "^0.3.0",
     "@tsconfig/svelte": "^5.0.0",
     "@types/jest": "^27.0.3",
     "@types/prismjs": "^1.16.6",

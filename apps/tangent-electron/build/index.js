@@ -99,7 +99,7 @@ async function buildKatex() {
 	catch (e) {
 		try {
 			// Copy fonts to the build
-			const katexFontPath = path.resolve(path.join(__dirname, '../node_modules', 'katex', 'dist', 'fonts'))
+			const katexFontPath = path.resolve(path.join(__dirname, '../../../node_modules', 'katex', 'dist', 'fonts'))
 			await fs.promises.cp(katexFontPath, fontsPath, { recursive: true })
 		}
 		catch (e) {
@@ -115,7 +115,7 @@ async function buildKatex() {
 	catch (e) {
 		try {
 			// Copy fonts to the build
-			const katexStyle = path.resolve(path.join(__dirname, '../node_modules', 'katex', 'dist', 'katex.min.css'))
+			const katexStyle = path.resolve(path.join(__dirname, '../../../node_modules', 'katex', 'dist', 'katex.min.css'))
 			await fs.promises.copyFile(katexStyle, stylePath)
 		}
 		catch (e) {
@@ -133,7 +133,7 @@ async function buildDocumentation() {
 	catch (e) {
 		// Create the archive
 		let zip = new AdmZip()
-		const docPath = path.resolve(path.join(__dirname, '../../Documentation'))
+		const docPath = path.resolve(path.join(__dirname, '../../../Documentation'))
 		zip.addLocalFolder(docPath)
 		zip.writeZip(buildPath)
 	}
