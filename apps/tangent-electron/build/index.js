@@ -43,7 +43,7 @@ async function buildPrism() {
 			await fs.promises.mkdir(buildPath, { recursive: true })
 			console.log('Building Prismjs')
 			
-			const prismNodePath = path.resolve(path.join(__dirname, '../node_modules', 'prismjs'))
+			const prismNodePath = path.resolve(path.join(__dirname, '../../../node_modules', 'prismjs'))
 			await fs.promises.copyFile(
 				path.join(prismNodePath, 'prism.js'),
 				path.join(buildPath, 'prism.js'))
@@ -63,7 +63,7 @@ async function buildPrism() {
 			}))
 
 			// Svelte support
-			const prismSveltePath = path.resolve(path.join(__dirname, '../node_modules', 'prism-svelte', 'index.js'))
+			const prismSveltePath = path.resolve(path.join(__dirname, '../../../node_modules', 'prism-svelte', 'index.js'))
 			await fs.promises.copyFile(prismSveltePath, path.join(languageBuildPath, 'prism-svelte.min.js')) // The "min" is a lie
 
 			// Move themes
