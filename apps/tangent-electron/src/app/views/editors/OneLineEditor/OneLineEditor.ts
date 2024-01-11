@@ -11,7 +11,7 @@ export default class OneLineEditor extends Editor {
 						name: 'line',
 						selector: 'span.line',
 						render: (attributes, children) => {
-							return h('span', { classname: 'line' }, children)
+							return h('span', { className: 'line' }, children)
 						}
 					}
 				]

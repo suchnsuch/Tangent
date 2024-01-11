@@ -57,8 +57,8 @@ function mouseUp(event: MouseEvent) {
 function headerMouseUp(event: MouseEvent) {
 	mouseUp(event)
 	if (document.activeElement !== headerEditElement) {
-		headerEditElement.focus()
 		document.getSelection().selectAllChildren(headerEditElement)
+		headerEditElement.focus()
 	}
 }
 

@@ -317,8 +317,8 @@ function initializeSelection(_h?, _e?) {
 	isInitializing = true
 	if (note && headerEditElement && editorElement && isCurrent) {
 		if (note.loadState === 'new') {
-			headerEditElement.focus()
 			getSelection().selectAllChildren(headerEditElement)
+			headerEditElement.focus()
 		}
 		else if (virtual && detailsElement) {
 			openDetails()
