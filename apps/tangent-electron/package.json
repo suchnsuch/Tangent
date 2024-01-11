@@ -1,10 +1,10 @@
 {
   "name": "tangent_electron",
   "productName": "Tangent",
-  "version": "0.6.2",
+  "version": "0.7.0-alpha.1",
   "description": "Your Notes, Your Thoughts; Your Tangent",
   "repository": "https://github.com/suchnsuch/Tangent",
-  "license": "UNLICENSED",
+  "license": "Apache-2.0",
   "main": "__build/bundle/main.js",
   "scripts": {
     "dev": "NODE_ENV=development node dev.js",
