@@ -791,7 +791,7 @@ Hello there, I am a note and I link to [[Some Missing Image.png]]`)
 			await workspace.updateFileContents(linkingNote.path, 'I link to [[Virtual RM Target]]')
 			await workspace.updateFileContents(deleteTarget.path, 'I have contents!')
 
-			await wait(10) // TODO: Needs a tiny bit of slip here, not sure why. Removal fails the test.
+			await wait(50) // TODO: Needs a tiny bit of slip here, not sure why. Removal fails the test.
 			await fileOp(fs.promises.rm(deleteTarget.path))
 
 			expect(workspace.contentsStore.get(deleteTarget.path)).toBe(deleteTarget)
