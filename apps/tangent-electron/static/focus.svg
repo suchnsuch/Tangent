@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
+  <symbol id="alt-paragraphs" viewBox="0 0 32 32">
+    <line style="fill: none; stroke: var(--iconStroke, black); stroke-width: 2px;" x1="6" y1="3" x2="29" y2="3"/>
+    <line style="fill: none; stroke: var(--iconStroke, black); stroke-width: 2px;" x1="6" y1="7" x2="15.343" y2="7"/>
+    <line style="fill: none; stroke: var(--iconStroke, black); stroke-width: 2px;" x1="16.456" y1="7" x2="25.823" y2="7"/>
+    <line style="fill: none; stroke: var(--iconStroke, black); stroke-width: 2px;" x1="6" y1="25" x2="14.625" y2="25"/>
+    <line style="fill: none; stroke: var(--iconStroke, black); stroke-width: 2px;" x1="16.225" y1="25" x2="29" y2="25"/>
+    <line style="fill: none; stroke: var(--iconStroke, black); stroke-width: 2px;" x1="6" y1="29" x2="7.575" y2="29"/>
+    <line style="fill: none; stroke: var(--iconStroke, black); stroke-width: 2px;" x1="19.535" y1="29" x2="27.311" y2="29"/>
+    <line style="fill: none; stroke: var(--iconStroke, black); stroke-width: 2px;" x1="9.365" y1="29" x2="17.788" y2="29"/>
+  </symbol>
+  <symbol id="focus-paragraphs-alt-lines" viewBox="0 0 32 32">
+    <line style="fill: none; stroke: var(--iconStroke, black); stroke-width: 2px;" x1="6" y1="12" x2="18" y2="12"/>
+    <line style="fill: none; stroke: var(--iconStroke, black); stroke-width: 2px;" x1="19.258" y1="12" x2="29" y2="12"/>
+    <line style="fill: none; stroke: var(--iconStroke, black); stroke-width: 2px;" x1="6" y1="16" x2="8" y2="16"/>
+    <line style="fill: none; stroke: var(--iconStroke, black); stroke-width: 2px;" x1="16.987" y1="20" x2="21.987" y2="20"/>
+  </symbol>
+  <symbol id="focus-paragraphs-focus-lines" viewBox="0 0 32 32">
+    <line style="fill: none; stroke: var(--iconStroke, black); stroke-width: 2px;" x1="9.763" y1="16" x2="29" y2="16"/>
+    <line style="fill: none; stroke: var(--iconStroke, black); stroke-width: 2px;" x1="6" y1="20" x2="15.215" y2="20"/>
+  </symbol>
+  <symbol id="typewriter" viewBox="0 0 32 32">
+    <polygon style="fill: var(--iconStroke, black);" points="0 12 4.5 16.027 0 20"/>
+  </symbol>
+  <line style="fill: none; stroke: var(--iconStroke, black); stroke-width: 2px;" x1="9.763" y1="16" x2="29" y2="16"/>
+  <line style="fill: none; stroke: var(--iconStroke, black); stroke-width: 2px;" x1="6" y1="20" x2="15.215" y2="20" transform=""/>
+</svg>

@@ -1,0 +1,18 @@
+{
+	"version": 1,
+	"creationRules": [
+		{
+			"name": "📥 Inbox Note",
+			"nameTemplate": "%name%",
+			"folder": "Inbox",
+			"description": "Creates a new note for quickly capturing thoughts that are not yet completely formed."
+		},
+		{
+			"name": "📆 Daily Note",
+			"nameTemplate": "%YYYY%/%MM%-%Month%/%YYYY%-%MM%-%DD%",
+			"folder": "Log",
+			"mode": "createOrOpen",
+			"description": "Creates or opens a timestamped note for the current day for journaling and quickly jotting down quick thoughts."
+		}
+	]
+}

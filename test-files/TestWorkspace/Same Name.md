@@ -1,0 +1,1 @@
+This is a file with the same name as other files. This one is at the root.

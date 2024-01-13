@@ -1,0 +1,605 @@
+@function fontUnit($number) {
+	@return calc(var(--fontSize) * #{$number});
+}
+
+@function rhythmUnit($number) {
+	@return calc(var(--fontSize) * var(--baseline) * #{$number});
+}
+
+:root {
+	--noteFontSize: 16px;
+	--fontSize: var(--noteFontSize);
+	--baseline: 1.5;
+}
+
+article.note {
+	font-family: var(--noteFontFamily);
+	font-size: var(--fontSize);
+	line-height: rhythmUnit(1);
+	caret-color: var(--textColor);
+
+	padding: 1em 2em;
+
+	.line {
+		transition: opacity 1s;
+		padding: 0;
+	}
+
+	&.focusing .line {
+		opacity: .5;
+		transition: opacity .3s;
+
+		// See usage in `NoteEditor.svelte` for why class isn't used
+		&[data-focus="focused"] {
+			opacity: unset;
+
+			.unfocused {
+				opacity: .5;	
+			}
+		}
+	}
+
+	p {
+		margin: 0;
+		line-height: rhythmUnit(1); // to defeat default styling
+		min-height: rhythmUnit(1);
+
+		--lineIndent: 0; // Modified by the target
+
+		margin-left: calc(var(--spaceWidth) * var(--lineIndent));
+		&.revealed {
+			text-indent: calc(-1 * var(--spaceWidth) * var(--lineIndent));
+		}
+	}
+
+	s {
+		&.hidden {
+			text-decoration: none;
+		}
+	}
+
+	h1, h2, h3, h4, h5, h6 {
+		margin: 0;
+	}
+
+	h1.line {
+		padding: 0;
+		font-size: 200%;
+		line-height: rhythmUnit(1.5);
+		margin-bottom: rhythmUnit(.5);
+		font-weight: 600;
+	}
+	
+	h2.line {
+		padding: 0;
+		font-size: 150%;
+		line-height: rhythmUnit(1.25);
+		margin-bottom: rhythmUnit(.25);
+	}
+
+	h3.line {
+		padding: 0;
+		line-height: rhythmUnit(1);
+	}
+
+	blockquote {
+		margin: 0;
+
+		margin-left: 2em;
+		border-left: 4px solid var(--deemphasizedTextColor);
+
+		// TODO: Block quotes would idealy be nested
+		&.depth-1 {
+			border-left-width: 4px;
+		}
+		&.depth-2 {
+			border-left-width: 8px;
+		}
+		&.depth-3 {
+			border-left-width: 12px;
+		}
+		&.depth-4 {
+			border-left-width: 16px;
+		}
+
+		p {
+			line-height: rhythmUnit(1);
+			&:after {
+				content: "\a0";	
+			}
+		}
+	}
+
+	p.list {
+		--lineIndent: 0; // Modified by the target
+
+		position: relative;
+
+		&:not(.revealed) {
+			margin-left: calc((var(--spaceWidth) * var(--lineIndent)) + var(--indentWidth));
+			text-indent: calc(-1 * var(--spaceWidth));
+		}
+
+		&.revealed {
+			margin-left: calc(var(--spaceWidth) * var(--lineIndent));
+			text-indent: calc(-1 * var(--spaceWidth) * var(--lineIndent));
+		}
+
+		.list {
+			&:not(.revealed) {
+				span.text {
+					font-size: 0;
+					line-height: 0;
+					tab-size: 0; // Without this, tabs are always rendered. Silly.
+				}
+				
+				&:not(.checkbox)::after {
+					font-size: 100%;
+					position: absolute;
+					top: 0;
+					left: calc(-1 * var(--indentWidth));
+
+					content: attr(listGlyph);
+					width: var(--indentWidth);
+					display: block;
+					text-align: center;
+					text-indent: 0;
+
+					color: var(--accentTextColor);
+				}
+
+				&[listGlyph='*']::after {
+					content: '•';
+				}
+
+				&.checkbox t-checkbox {
+					// This is super hacky, but it gets the right result
+					// accross different line heights and font sizes
+					position: absolute;
+					left: calc(-.42 * var(--indentWidth));
+					top: calc(rhythmUnit(1) * .5);
+					transform: translateY(-75%);
+				}
+			}
+
+			&.revealed {
+				span.text {
+					color: green;	
+				}
+				&.checkbox t-checkbox {
+					display: none;
+					font-size: 0;
+				}
+			}
+		}
+
+		&.checked:not(.revealed) {
+			color: var(--deemphasizedTextColor);
+			text-decoration: line-through 1.5px;
+		}
+	}
+
+	// We want * lists to have extra space around them, but we don't want extra space when adjacent to blank lines.
+	// We also don't want extra space between a * list item and a child - list item.
+	// Technically a * followed by a - sibling also doesn't have space, but I'm okay with that slight glitch.
+	.line:not(.empty) + .list[listglyph^="*"], .list[listglyph^="*"] + .line:not([listglyph]):not(.empty) {
+		margin-top: .5em;
+	}
+
+	.hidden, .line_format {
+		color: green;
+	}
+
+	.hidden {
+		/*
+		 * This is a cheaky trick that makes text invisible but allows it to be navigated as expected.
+		 * `display: none;` does _not_ handle this as well.
+		 */
+		font-size: 0;
+		line-height: 0;
+		tab-size: 0; // Without this, tabs are always rendered. Silly.
+	}
+
+	.hidden.revealed {
+		font-size: unset;
+		line-height: unset;
+		tab-size: unset;
+	}
+
+	.horizontal_rule {
+		height: rhythmUnit(1);
+		position: relative;
+
+		&:not(.revealed)::after {
+			content: "";
+			display: block;
+			background: var(--deemphasizedTextColor);
+			opacity: .5;
+			height: 1px;
+
+			position: absolute;
+			top: rhythmUnit(.5);
+			left: .5em;
+			right: .5em;
+		}
+	}
+
+	code, .code_wrapper {
+		font-family: var(--codeFontFamily);
+	}
+
+	code.inline_code {
+		font-family: var(--codeFontFamily);
+		line-height: 1em; // This fixes an issue where the code was shifting other text down slightly
+
+		&:not(.hidden) {
+			color: var(--accentTextColor);
+
+			&:not(.revealed) {
+				&.afterSpace {
+					padding-inline-start: .25em;
+				}
+				&.beforeSpace {
+					padding-inline-end: .25em;
+				}
+			}
+		}
+
+		&.hidden.revealed {
+			// This fixes an issue where the code was shifting other text down slightly
+			line-height: 1em;
+		}
+	}
+
+	.line_format.code.start:not(.hidden):not(.revealed) {
+		font-size: 80%;
+		color: var(--deemphasizedTextColor);
+	}
+
+	pre {
+		margin: 0;
+		padding: 0 .5em;
+		margin-left: -.5em;
+		overflow: auto;
+		border-radius: var(--borderRadius);
+
+		transition: margin-left .2s, margin-right .2s;
+	}
+
+	figure {
+		margin: 0;
+		margin-left: calc(var(--spaceWidth) * var(--lineIndent));
+
+		cursor: pointer;
+
+		.revealed .line_format {
+			font-size: unset;
+			line-height: unset;
+			tab-size: unset;
+		}
+	}
+
+	span.tag {
+		font-size: 90%;
+		font-weight: 300;
+
+		span.tagSection {
+			white-space: nowrap;
+		}
+
+		&:not(.revealed) {
+
+			span.tagSection {
+				position: relative;
+				padding: .075em .3em;
+				background: var(--accentBackgroundColor);
+				border: 1px solid var(--accentBackgroundColor);
+				
+				&:not(.last) {
+					padding-right: 0;
+					border-right: none;
+				}
+
+				&.last {
+					border-top-right-radius: .4em;
+					border-bottom-right-radius: .4em;
+				}
+
+				&.tagSectionDepth-1 {
+					padding-left: 1.25em;
+					border-top-left-radius: .7em;
+					border-bottom-left-radius: .7em;
+
+					&::before {
+						content: "";
+						position: absolute;
+						width: .5em;
+						height: .5em;
+
+						left: 0.45em;
+						top: 50%;
+						transform: translateY(-50%);
+						
+						background: var(--noteBackgroundColor);
+						border-radius: .25em;
+					}
+				}
+				&:not(.tagSectionDepth-1) {
+					padding-left: 0;
+					border-left: none;
+				}
+
+				// Default colors for different depths
+				&.tagSectionDepth-2, &.tagSectionDepth-4, &.tagSectionDepth-6 {
+					background: var(--accentDeemphasizedBackgroundColor);
+				}
+			}
+
+			span.tagSeperator {
+				padding: .075em 0;
+				background: var(--accentBackgroundColor);
+				border: 1px solid var(--accentBackgroundColor);
+				border-left: none;
+				border-right: none;
+
+				// Default colors for different depths
+				&.tagSeperatorDepth-1, &.tagSeperatorDepth-3, &.tagSeperatorDepth-5 {
+					background: linear-gradient(100deg, var(--accentBackgroundColor) 48%, var(--accentDeemphasizedBackgroundColor) 52%);
+				}
+				&.tagSeperatorDepth-2, &.tagSeperatorDepth-4, &.tagSeperatorDepth-6 {
+					background: linear-gradient(100deg, var(--accentDeemphasizedBackgroundColor) 48%, var(--accentBackgroundColor) 52%);
+				}
+
+				&:not(.revealed) {
+					color: transparent;
+				}
+			}
+		}
+
+		&.revealed {
+			border: 1px solid var(--accentBackgroundColor);
+			padding: .075em .3em;
+
+			border-top-right-radius: .56em;
+			border-bottom-right-radius: .56em;
+			border-top-left-radius: 1em;
+			border-bottom-left-radius: 1em;
+		}
+	}
+
+	span.math {
+		font-family: var(--codeFontFamily);
+		color: var(--accentTextColor);
+
+		&.revealed {
+			padding-right: .5em;
+		}
+	}
+
+	.mathLine {
+		color: var(--textColor);
+		.line_format {
+			color: var(--textColor);
+		}
+	}
+
+	.linkHighlight {
+		background-color: var(--accentBackgroundColor);
+	}
+
+	.annotation {
+		background-color: var(--accentBackgroundColor);
+		&.soft {
+			background-color: var(--accentDeemphasizedBackgroundColor);
+		}
+	}
+
+	mark {
+		background: var(--highlightBackgroundColor);
+		color: var(--highlightTextColor);
+		border-radius: 1px;
+		padding: 0 .1em;
+
+		&.circle {
+			padding: 0 .3em;
+			border-radius: .5em;
+			&.start, &.end {
+				padding: 0;
+			}
+		}
+
+		&.revealed {
+			&:not(.start) {
+				padding-left: 0;
+				border-top-left-radius: 0;
+				border-bottom-left-radius: 0;
+			}
+			&:not(.end) {
+				padding-right: 0;
+				border-top-right-radius: 0;
+				border-bottom-right-radius: 0;
+			}
+		}
+
+		&.red {
+			background-color: var(--highlightRedBGColor);
+		}
+
+		&.orange {
+			background-color: var(--highlightOrangeBGColor);
+		}
+
+		&.yellow {
+			background-color: var(--highlightYellowBGColor);
+		}
+
+		&.green {
+			background-color: var(--highlightGreenBGColor);
+		}
+
+		&.blue {
+			background-color: var(--highlightBlueBGColor);
+		}
+
+		&.purple {
+			background-color: var(--highlightPurpleBGColor);
+		}
+	}
+
+	.comment:not(.token) {
+		font-size: 90%;
+		color: var(--deemphasizedTextColor);
+
+		&.start {
+			&.hidden {
+				font-size: 0;
+				&.revealed {
+					font-size: 90%;
+				}
+			}
+		}
+	}
+}
+
+// Options
+.margins-tight article.note {
+	padding: .5em;
+
+	h1, h2, h3 {
+		&.line {
+			margin-bottom: 0;
+		}
+	}
+}
+
+.margins-relaxed article.note {
+	padding: 2em 3em;
+
+	h1, h2, h3 {
+		&.line:not(:first-child) {
+			margin-top: rhythmUnit(1);
+		}
+	}
+
+	.horizontal_rule {
+		margin-top: rhythmUnit(1);
+		margin-bottom: rhythmUnit(1);
+	}
+}
+
+.hangingHeaders article.note {
+	.line {
+		padding-left: fontUnit(.5);
+	}
+	h1.line, h2.line, h3.line {
+		padding: 0;
+	}
+
+	// Oh dear…
+	p.list .list:not(.revealed):after {
+		left: calc(-1 * var(--indentWidth) + .5em);
+	}
+}
+
+// I might want to move this elsewhere
+t-link {
+	position: relative;
+
+	&[link-state="resolved"] {
+		color: var(--accentTextColor);
+	}
+	&[link-state="empty"], &[link-state="ambiguous"] {
+		color: var(--emptyLinkTextColor);
+	}
+	&[link-state="external"] {
+		color: var(--externalLinkColor);
+	}
+	&[link-state="untracked"] {
+		color: var(--untrackedLinkColor);
+	}
+
+	.link_internal {
+		//text-decoration: underline;
+		&:not(.start):not(.end) {
+			color: inherit;
+		}
+		
+		&.hidden.revealed {
+			color: inherit;
+		}
+
+		&.hashtag {
+			font-size: 0;
+			line-height: 0;
+			&.revealed {
+				font-size: unset;
+				line-height: unset;
+				padding: 0 .2em;
+			}
+		}
+
+		&.id.name:not(.hidden):not(.revealed)::before {
+			content: '→';
+			padding: 0 .2em;
+		}
+	}
+
+	.revealed, :not(.hidden) {
+		&.start, &.end {
+			font-size: 50%;
+			position: relative;
+			top: -.05em;
+			line-height: 50%;
+		}
+	}
+}
+
+.meta-pressed, .ctrl-pressed, .no-mod-link-click {
+	t-link, t-embed {
+		cursor: pointer;
+
+		&:hover, &.revealed {
+			.link_internal {
+				text-decoration: underline;
+			}
+		}
+	}
+	.tagSection:hover {
+		cursor: pointer;
+		text-decoration: underline;
+	}
+
+	&.link-cursor-arrow {
+		t-link, t-embed {
+			cursor: default;
+		}
+	}
+
+	&.link-cursor-directional {
+		t-link, t-embed {
+			cursor: e-resize;
+		}
+		&.alt-pressed {
+			t-link, t-embed {
+				cursor: w-resize;
+			}
+		}
+	}
+}
+
+t-embed {
+	&[link-state="error"] {
+		color: var(--emptyLinkTextColor);
+
+		.hidden {
+			color: var(--emptyLinkTextColor);
+			font-size: unset;
+			line-height: unset;
+			tab-size: unset;
+		}
+	}
+}
+
+.dark article.note pre {
+	background: #111;
+}

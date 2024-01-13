@@ -1,0 +1,73 @@
+.autocomplete-window {
+	border: 1px solid var(--borderColor);
+	background-color: var(--backgroundColor);
+	box-shadow: 0 5px 10px rgba(0, 0, 0, .3);
+	max-width: 350px;
+	max-height: 450px;
+	border-radius: calc(var(--inputBorderRadius) * 2);
+	padding: .25rem;
+
+	display: flex;
+	flex-direction: column;
+
+	.option {
+		padding: .2rem 1rem;
+		&.placeholder {
+			color: var(--deemphasizedTextColor);
+			font-style: italic;
+		}
+		&.selected {
+			background-color: var(--accentBackgroundColor);
+			border-radius: var(--inputBorderRadius);
+			border: 2px solid var(--accentBackgroundColor);
+		}
+	}
+
+	.instructions {
+		color: var(--deemphasizedTextColor);
+		font-size: 80%;
+		text-align: left;
+
+		> div {
+			padding: 0 .5rem;
+			&:first-child {
+				padding-top: .5rem;
+			}
+			&:last-child {
+				padding-bottom: .5rem;
+			}
+		}
+
+		.key {
+			font-size: 110%;
+			color: var(--textColor);
+			font-weight: bold;
+		}
+		.shortcut {
+			font-size: 110%;
+			color: var(--textColor);
+			font-weight: bold;
+			display: inline-flex;
+			gap: .1em;
+		}
+
+		code {
+			color: var(--textColor);
+		}
+	}
+}
+
+.autocompleting {
+	border-bottom: 2px dotted green;
+}
+
+t-link {
+	.revealed, :not(.hidden) {
+		&.start, &.end {
+			.autocompleting {
+				// Pushes the underline back
+				padding-bottom: 0.05em;
+			}
+		}
+	}
+}

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<svg xmlns="http://www.w3.org/2000/svg">
+	<symbol id="tag" viewBox="0 0 24 24">
+		<path 
+			d="M 8,6 20,6
+			a 2,2 0 0 1 2,2
+			L 22,16,
+			a 2,2 0 0 1 -2,2
+			L 8,18
+			A 6,6 0 0 1 8,6
+			z"
+			style="stroke: var(--iconStroke, black); stroke-width: 1.5px; fill: var(--iconFill, none); stroke-linejoin: round;" />
+		<circle
+			cx="8" cy="12"
+			r="1.5"
+			style="stroke: var(--iconStroke, black); stroke-width: 1px; fill: var(--iconFill, none); stroke-linejoin: round;">
+	</symbol>
+</svg>

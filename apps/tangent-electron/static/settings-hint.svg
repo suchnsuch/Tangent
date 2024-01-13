@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<svg viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg">
+  <symbol id="hint" viewBox="0 0 16 16">
+    <path
+      d="M5,6 8,11.5 11,6 Z"
+      style="stroke: var(--iconStroke, black); fill: var(--iconStroke, black); stroke-width: 2; stroke-linecap: round; stroke-linejoin: round;"/>
+  </symbol>
+  <symbol id="hint2" viewBox="0 0 16 16">
+    <path
+      d="M3,6 13,6 M5,9 11,9"
+      style="stroke: var(--iconStroke, black); fill: var(--iconStroke, black); stroke-width: 1; stroke-linecap: round; stroke-linejoin: round;"/>
+  </symbol>
+</svg>

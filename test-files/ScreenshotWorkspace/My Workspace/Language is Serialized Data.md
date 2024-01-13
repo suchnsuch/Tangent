@@ -1,0 +1,1 @@
+Just in the way that you can serialize complex models from a computer to JSON or XML and share them, human language serializes the complex structures and relationships within one mind and attempts to carry them over to another.

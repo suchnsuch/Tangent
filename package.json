@@ -1,18 +1,22 @@
 {
 	"name": "tangent-public",
 	"version": "0.1.0",
-	"description": "A monorepo of publicly-available code directly relating to Tangent.",
+	"description": "The Tangent Project's monorepo",
 	"repository": "https://github.com/suchnsuch/tangent-public",
 	"type": "module",
 	"scripts": {
-		"test": "echo \"Error: no test specified\" && exit 1",
+		"test": "npm run test --workspaces --if-present",
 		"build": "npm run build --workspaces --if-present"
 	},
 	"author": "Taylor Hadden",
 	"license": "MIT",
 	"workspaces": [
+		"apps/tangent-electron",
+		"apps/tangent-test-workspace-generator",
+
 		"packages/tangent-query-parser",
 		"packages/tangent-html-to-markdown",
-		"packages/tangent-test-workspace-generator"
+
+		"lib/typewriter"
 	]
 }

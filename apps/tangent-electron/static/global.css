@@ -1,0 +1,243 @@
+/* Variables */
+:where(:root), :where(.light) {
+	/* Structure */
+	--topBarHeight: 36px;
+
+	/* Styling */
+	--fontFamily: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+	--codeFontFamily: 'FiraCode-Retina', FiraCode, Consolas, Menlo, Monaco, 'Courier New', monospace;
+	--spaceWidth: .25em;
+	--indentSize: 8;
+	--indentWidth: calc(var(--indentSize) * var(--spaceWidth));
+	tab-size: var(--indentWidth);
+
+	--backgroundColor: #f6f6f6;
+	--textColor: #252525;
+	--deemphasizedTextColor: #575757;
+	--heavilyDeemphasizedTextColor: #858585;
+
+	--scrollbarColor: rgba(0, 0, 0, .1);
+	--scrollbarHoverColor: rgba(0, 0, 0, .2);
+	--scrollbarActiveColor: rgba(0, 0, 0, .15);
+
+	--buttonBackgroundColor: #e9e9e9;
+	--noteBackgroundColor: white;
+	--embossedBackgroundColor: #f7f7f7;
+
+	--borderColor: #e5e5e5;
+	--borderRadius: .75rem;
+
+	--iconStroke: #414141;
+
+	--accentHue: 141;
+	--accentSaturation: 67%;
+
+	--accentTextColor: hsl(var(--accentHue), var(--accentSaturation), 35%);
+	--deemphasizedAccentTextColor: hsl(var(--accentHue), var(--accentSaturation), 25%);
+
+	--accentBackgroundColor: hsl(
+		var(--accentHue),
+		var(--accentSaturation),
+		55%);
+	--accentDeemphasizedBackgroundColor: hsla(
+		var(--accentHue),
+		var(--accentSaturation),
+		55%, .3);
+	--accentActiveBackgroundColor: hsl(
+		var(--accentHue),
+		var(--accentSaturation),
+		48%);
+
+	--accentLastThreadColor: hsl(
+		calc(var(--accentHue) + 60),
+		calc(var(--accentSaturation) * .5),
+		55%);
+	--accentLastLastThreadColor: hsl(
+		calc(var(--accentHue) + 120),
+		calc(var(--accentSaturation) * .333),
+		45%);
+
+	--externalLinkColor: rgb(0, 100, 200);
+	--untrackedLinkColor: #6d00c6;
+	--emptyLinkTextColor: #9b321f;
+
+	--selectionBackgroundColor: var(--accentBackgroundColor);
+	--selectionPressedBackgroundColor: rgba(0, 0, 0, .2);
+
+	--highlightRedBGColor: #fa9d9d;
+	--highlightOrangeBGColor: #fcbd89;
+	--highlightYellowBGColor: yellow;
+	--highlightGreenBGColor: #94eb75;
+	--highlightBlueBGColor: #a3d2fc;
+	--highlightPurpleBGColor: #e7aaff;
+	--highlightTextColor: var(--textColor);
+
+	--highlightBackgroundColor: var(--highlightYellowBGColor);
+	--warningTextColor: rgb(194, 120, 9);
+
+	--dropTargetBackgroundColor: var(--accentBackgroundColor);
+	--dropTargetChildBackgroundColor: rgba(0, 0, 0, .1);
+}
+
+:where(.dark) {
+	--backgroundColor: #323232;
+	--textColor: #ccc;
+	--deemphasizedTextColor: #9a9a9a;
+	--heavilyDeemphasizedTextColor: #686868;
+
+	--scrollbarColor: rgba(255, 255, 255, .1);
+	--scrollbarHoverColor: rgba(255, 255, 255, .2);
+	--scrollbarActiveColor: rgba(255, 255, 255, .15);
+
+	--buttonBackgroundColor: #4c4c4c;
+	--noteBackgroundColor: #1e1e1e;
+	--embossedBackgroundColor: #151515;
+
+	--borderColor: #3d3d3d;
+
+	--iconStroke: #cecbcb;
+
+	--accentTextColor: hsl(var(--accentHue), var(--accentSaturation), 60%);
+	--deemphasizedAccentTextColor: hsl(var(--accentHue), calc(var(--accentSaturation) * .8 ), 40%);
+
+	--accentBackgroundColor: hsl(
+		var(--accentHue),
+		var(--accentSaturation),
+		25%);
+	--accentDeemphasizedBackgroundColor: hsla(
+		var(--accentHue),
+		var(--accentSaturation),
+		34%, .3);
+	--accentActiveBackgroundColor: hsl(
+		var(--accentHue),
+		var(--accentSaturation),
+		20%);
+
+	--accentLastThreadColor: hsl(
+		calc(var(--accentHue) + 60),
+		calc(var(--accentSaturation)),
+		30%);
+	--accentLastLastThreadColor: hsl(
+		calc(var(--accentHue) + 120),
+		calc(var(--accentSaturation) * .666),
+		35%);
+
+	--externalLinkColor: rgb(0, 150, 250);
+	--untrackedLinkColor: #a864e0;
+	--emptyLinkTextColor: #d65a49;
+
+	--selectionBackgroundColor: rgba(255, 255, 255, .16);
+	--selectionPressedBackgroundColor: rgba(255, 255, 255, .13);
+
+	--highlightRedBGColor: #ed5454;
+	--highlightOrangeBGColor: #f48b35;
+	--highlightYellowBGColor: #dfdc30;
+	--highlightGreenBGColor: #94dd3c;
+	--highlightBlueBGColor: #4fa9f4;
+	--highlightPurpleBGColor: #b881e9;
+
+	--highlightBackgroundColor: var(--highlightYellowBGColor);
+	--warningTextColor: orange;
+
+	--dropTargetBackgroundColor: var(--selectionBackgroundColor);
+	--dropTargetChildBackgroundColor: rgba(255, 255, 255, .05);
+}
+
+html, body {
+	position: relative;
+	width: 100%;
+	height: 100%;
+}
+
+body {
+	background: var(--backgroundColor);
+	color: var(--textColor);
+	margin: 0;
+	padding: 8px;
+	box-sizing: border-box;
+	font-family: var(--fontFamily);
+}
+
+* {
+	-webkit-user-select: none;
+	user-select: none;
+}
+*:focus {
+	outline: none;/*2px solid var(--deemphasizedAccentTextColor);*/
+}
+
+.light ::selection {
+	background-color: hsl(210, 100%, 87%);
+}
+.light ::selection:window-inactive {
+	background-color: hsl(210, 50%, 87%);
+}
+
+.dark ::selection {
+	background-color: hsl(210, 33%, 30%);
+}
+.dark ::selection:window-inactive {
+	background-color: hsl(210, 08%, 30%);
+}
+
+/* Scrollbar settings for windows because windows scrollbars are heinous */
+.win *::-webkit-scrollbar, .custom-scrollbar::-webkit-scrollbar {
+	background-color: transparent;
+	width: var(--scrollBarWidth);
+	height: var(--scrollBarWidth);
+	cursor: pointer;
+}
+.win *::-webkit-scrollbar-thumb, .custom-scrollbar::-webkit-scrollbar-thumb {
+	background-color: var(--scrollbarColor);
+}
+.win *::-webkit-scrollbar-thumb:hover, .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+	background-color: var(--scrollbarHoverColor);
+	cursor: pointer;
+}
+.win *::-webkit-scrollbar-thumb:active, .custom-scrollbar::-webkit-scrollbar-thumb:active {
+	background-color: var(--scrollbarActiveColor);
+	cursor: pointer;
+}
+
+a {
+	color: var(--externalLinkColor);
+	text-decoration: none;
+}
+
+a.local {
+	color: var(--accentTextColor);
+}
+a.local.deemphasized {
+	color: var(--deemphasizedTextColor);
+}
+a.local.deemphasized:hover {
+	color: var(--accentTextColor);
+}
+
+a:hover {
+	text-decoration: underline;
+}
+
+a:visited {
+	color: rgb(0,80,160);
+}
+
+label {
+	display: block;
+}
+
+p {
+	line-height: 1.5em;
+	margin: 0;
+}
+p:not(:last-child) {
+	margin-bottom: 1.5em;
+}
+
+.mac .shortcut .group:not(:last-child) {
+	margin-right: .2em;
+}
+
+.spacer {
+	flex-grow: 1;
+}

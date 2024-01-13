@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<svg viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg">
+  <symbol id="opener-arrow" viewBox="0 0 16 16">
+    <polyline
+      points="5,2 12,8 5,14"
+      style="stroke: var(--iconStroke, black); fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round;"/>
+  </symbol>
+</svg>

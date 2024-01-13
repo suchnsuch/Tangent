@@ -1,0 +1,9 @@
+{
+	"displayMode": "Feed",
+	"feed": {
+		"sorting": {
+			"sortKey": "modified"
+		},
+		"startAt": "end"
+	}
+}

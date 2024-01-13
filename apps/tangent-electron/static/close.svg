@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<svg xmlns="http://www.w3.org/2000/svg">
+	<symbol id="close" viewBox="0 0 24 24">
+		<line x1="9" y1="9" x2="15" y2="15" style="fill: none; stroke: var(--iconStroke, black); stroke-width: 2px; stroke-linecap: round;"/>
+		<line x1="9" y1="15" x2="15" y2="9" style="fill: none; stroke: var(--iconStroke, black); stroke-width: 2px; stroke-linecap: round;"/>
+	</symbol>
+	<symbol id="close-dirty" viewBox="0 0 24 24">
+		<circle cx="12" cy="12" r="3.5" style="fill: var(--iconStroke, black); stroke: none;" />
+	</symbol>
+	<symbol id="close-left" viewBox="0 0 24 24">
+		<path d="M14,8 9,12 14,16" style="fill: none; stroke: var(--iconStroke, black); stroke-width: 2px; stroke-linecap: round; stroke-linejoin: round;"/>
+	</symbol>
+	<symbol id="close-right" viewBox="0 0 24 24">
+		<path d="M10,8 15,12 10,16" style="fill: none; stroke: var(--iconStroke, black); stroke-width: 2px; stroke-linecap: round; stroke-linejoin: round;"/>
+	</symbol>
+</svg>

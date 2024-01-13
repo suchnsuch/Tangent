@@ -1,0 +1,20 @@
+{
+	"extends": "@tsconfig/svelte/tsconfig.json",
+	"compilerOptions": {
+		"outDir": "__build",
+		"sourceMap": true,
+		"baseUrl": "src",
+		"paths": {
+			"svelte/*": ["../node_modules/svelte/src/runtime/*"]
+		},
+		"target": "ES2020",
+		"lib": ["ESNext", "DOM"],
+		"types": ["jest", "svelte"],
+		"moduleResolution": "Node",
+		"allowJs": true,
+		"esModuleInterop": true,
+		"strict": false,
+		"verbatimModuleSyntax": false
+	},
+	"exclude": [ "__build", "node_modules", "out" ]
+}

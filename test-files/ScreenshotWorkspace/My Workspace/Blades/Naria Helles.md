@@ -1,0 +1,1 @@
+Elke's character. A noble fallen on hard times, now a Slide of the underworld.

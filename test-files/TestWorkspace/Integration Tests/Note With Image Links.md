@@ -1,0 +1,1 @@
+![](https://cdn.vox-cdn.com/thumbor/hV1KH5_UI6k5mtIDPHvJbmmcJhQ=/0x0:2040x1360/2570x1446/filters:focal(857x517:1183x843):format(webp)/cdn.vox-cdn.com/uploads/chorus_image/image/70603296/rbaldwin_220217_5051_0011.0.jpg)

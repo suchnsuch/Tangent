@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<svg xmlns="http://www.w3.org/2000/svg">
+	<symbol id="box" viewBox="0 0 16 16">
+		<rect x="1" y="1" width="14" height="14"
+			stroke-width="2"
+			rx="3"
+			style="fill: var(--checkFill);
+			fill-opacity: var(--checkFillOpacity);
+			transition: fill-opacity .5s;
+			stroke: var(--checkStroke);"
+		/>
+		<path
+			d="M 4 8 L 7 11 L 12 6"
+			stroke-width="2"
+			stroke-linecap="round"
+			stroke-linejoin="round"
+			style="fill: none; stroke: var(--markStroke); opacity: var(--markOpacity);"
+		/>
+	</symbol>
+</svg>

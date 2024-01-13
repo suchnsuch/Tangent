@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<svg xmlns="http://www.w3.org/2000/svg">
+	<symbol id="document" viewBox="0 0 24 24">
+		<path style="stroke: var(--iconStroke, black); stroke-width: 1.5px; fill: var(--iconFill, none);"
+			d="M4,2 4,22 20,22 20,7 15,2 z"/>
+		<path style="stroke: var(--iconStroke, black); stroke-width: 1.5px; fill: none;"
+			d="M15,2 15,7 20,7"/>
+	</symbol>
+
+	<symbol id="plus" viewBox="0 0 24 24">
+		<line x1="8" y1="13" x2="16" y2="13" style="fill: none; stroke: var(--iconStroke, black); stroke-width: 2px;"/>
+		<line x1="12" y1="9" x2="12" y2="17" style="fill: none; stroke: var(--iconStroke, black); stroke-width: 2px;"/>
+	</symbol>
+
+	<symbol id="text" viewBox="0 0 24 24">
+		<line x1="7" y1="13" x2="13" y2="13" style="fill: none; stroke: var(--iconStroke, black); stroke-width: 1px;"/>
+		<line x1="15" y1="13" x2="17" y2="13" style="fill: none; stroke: var(--iconStroke, black); stroke-width: 1px;"/>
+
+		<line x1="7" y1="15" x2="10" y2="15" style="fill: none; stroke: var(--iconStroke, black); stroke-width: 1px;"/>
+		<line x1="12" y1="15" x2="17" y2="15" style="fill: none; stroke: var(--iconStroke, black); stroke-width: 1px;"/>
+
+		<line x1="7" y1="17" x2="14" y2="17" style="fill: none; stroke: var(--iconStroke, black); stroke-width: 1px;"/>
+	</symbol>
+
+	<symbol id="image" viewBox="0 0 24 24">
+		<path style="stroke: var(--iconStroke, black); stroke-width: 1px; fill: none;"
+			d="M4,16 10,10 20,17"/>
+	</symbol>
+</svg>

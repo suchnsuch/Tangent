@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<svg xmlns="http://www.w3.org/2000/svg">
+	<symbol id="query" viewBox="0 0 24 24">
+		<circle style="stroke: var(--iconStroke, black); stroke-width: 2px; fill: var(--iconFill, none);"
+			cx="10" cy="10" r="7"/>
+		<line style="stroke: var(--iconStroke, black); stroke-width: 3px; fill: var(--iconFill, none); stroke-linecap: round;"
+			x1="16" y1="16" x2="20" y2="20"/>
+	</symbol>
+</svg>

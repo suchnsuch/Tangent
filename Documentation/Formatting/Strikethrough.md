@@ -1,0 +1,1 @@
+The strikethrough syntax lets you ~~cross out~~ text. You can do this by surrounding text in `~~two tilde~~` characters.

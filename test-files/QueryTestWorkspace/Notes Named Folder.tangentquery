@@ -1,0 +1,3 @@
+{
+	"queryString": "Notes named /Folder.*\\d/"
+}

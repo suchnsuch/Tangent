@@ -1,0 +1,45 @@
+.QueryEditor {
+	p {
+		margin: .5em;
+		&:first-child {
+			margin-top: 0;
+		}
+		&:last-child {
+			margin-bottom: 0;
+		}
+	}
+
+	.form {
+		position: relative;
+		&:hover {
+			&::after {
+				display: block;
+				position: absolute;
+				top: -.1em;
+				bottom: -.2em;
+				left: -.25em;
+				right: -.25em;
+				content: "";
+				border-radius: var(--inputBorderRadius);
+				border: 1px solid currentColor;
+				pointer-events: none;
+			}
+		}
+	}
+
+	.token.wikilink {
+		color: var(--accentTextColor);
+	}
+
+	.token.subquery.punctuation:not(.string) {
+		font-size: 140%;
+	}
+
+	.token.tag {
+		color: #ce9178;
+	}
+
+	.error {
+		border-bottom: 2px solid red;
+	}
+}

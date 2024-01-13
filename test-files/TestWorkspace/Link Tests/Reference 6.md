@@ -1,0 +1,1 @@
+[[Nexus]] is a cool place. Cool like chilly. Like cold. Antarctic. It would be cool to go to the arctic. I mean, I would be cold, yes, but it would also be pretty neat. Charter a boat, go get (not too) close with an iceberg. Cool stuff. Literally.
