@@ -1,6 +1,8 @@
 # Tangent
 This is the monorepo for the [Tangent](https://www.tangentnotes.com) project.
 
+Follow Tangent on <a rel="me" href="https://indieapps.space/@tangentnotes">Mastodon</a>!
+
 ## Getting Started
 Run `npm ci` at the root level of the repository to install all dependencies across the monorepo.
 
