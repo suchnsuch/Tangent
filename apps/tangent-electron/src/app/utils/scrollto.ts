@@ -1,5 +1,4 @@
 import { cubicInOut } from "svelte/easing";
-import { loop, now } from "svelte/internal";
 import { findParentScrollContainer } from './scrolling';
 
 interface AxisDimensions {
@@ -30,8 +29,25 @@ export interface ScrollToOptions {
 	onDone?: () => void
 }
 
-let noOp = () => {}
+const noOp = () => {}
 
+// This is a port over of `svelte/internal/loop.js` as it is no longer accessible by the build system
+type LoopCallback = (time: DOMHighResTimeStamp) => boolean
+const scrolls = new Set<LoopCallback>()
+
+function runCallbacks(time: DOMHighResTimeStamp) {
+	scrolls.forEach((task) => {
+		if (!task(time)) {
+			scrolls.delete(task)
+		}
+	})
+	if (scrolls.size > 0) requestAnimationFrame(runCallbacks)
+}
+
+function loopAnimationCallback(callback: (time: DOMHighResTimeStamp) => boolean) {
+	if (scrolls.size === 0) requestAnimationFrame(runCallbacks)
+	scrolls.add(callback)
+}
 
 function boxVerticalAxis(box: DOMRect): AxisDimensions {
 	return {
@@ -179,7 +195,7 @@ export default function scrollTo(options: ScrollToOptions) {
 		return noOp
 	}
 
-	const startTime = now()
+	const startTime = window.performance.now()
 	const endTime = startTime + duration
 
 	let scrolling = true
@@ -210,7 +226,7 @@ export default function scrollTo(options: ScrollToOptions) {
 	}
 	(container as any).__scrollStop = stop
 
-	loop(now => {
+	loopAnimationCallback(now => {
 		if (scrolling) {
 			if (now >= endTime) {
 				tick(1)

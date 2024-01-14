@@ -1,10 +1,34 @@
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const TsConfigPathsPlugin = require('tsconfig-paths-webpack-plugin')
 const path = require('path');
+const fs = require('fs');
 
 // TODO: Make this not a copy paste
 const mode = process.env.NODE_ENV || 'production';
 const prod = mode === 'production';
+
+function findAndResolvePath(partialPath) {
+	// Depending on package de-dupes, the svelte module could be
+	// at various levels of node_modules.
+	// This searches for a particular file path in the tree.
+	// Feels like a big ol hack, but if it works it works.
+	let steppingPath = partialPath
+	let max = 10
+	while (max > 0) {
+		const resolved = path.resolve(steppingPath)
+		try {
+			const stats = fs.statSync(resolved)
+			console.log('Resolved', partialPath, 'to', resolved)
+			return resolved
+		}
+		catch (e) {
+			max--
+			steppingPath = path.join('../', steppingPath)
+		}
+	}
+	console.log('Failed to resolve', partialPath)
+	return undefined;
+}
 
 module.exports = {
 	entry: {
@@ -12,7 +36,8 @@ module.exports = {
 	},
 	resolve: {
 		alias: {
-			svelte: path.resolve('node_modules', 'svelte/src/runtime')
+			// We want to resolve against the runtime of svelte, not other elements
+			svelte: findAndResolvePath('node_modules/svelte/src/runtime')
 		},
 		extensions: ['.mjs', '.js', '.svelte', '.ts'],
 		mainFields: ['svelte', 'browser', 'module', 'main'],
