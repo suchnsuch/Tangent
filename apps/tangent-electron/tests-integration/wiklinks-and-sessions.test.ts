@@ -124,7 +124,7 @@ test('Creating & Fulfilling Sibling Wiki Links', async ({ tangent, workspace }) 
 		}
 	}
 
-	await wait(500) // This delay is also required for the virtual note to propegate
+	await wait(600) // This delay is also required for the virtual note to propegate
 
 	expect(await window.getCurrentRawClientSession()).toMatchObject(expectedPreCreationSession)
 	expect(await window.getCurrentRawSession()).toMatchObject(expectedPreCreationSession)
