@@ -257,6 +257,12 @@ function onMergeMouseOut(event: MouseEvent) {
 	mergePreview = -1
 }
 
+$: if ($openSessions) {
+	// List has changed. Preview indices are no longer valid.
+	mergePreview = -1
+	archivePreview = -1
+}
+
 </script>
 
 <!-- svelte-ignore a11y-no-noninteractive-tabindex -->
@@ -278,7 +284,7 @@ function onMergeMouseOut(event: MouseEvent) {
 		style:transform={`scale(${$zoom})`}
 	>
 		<div class="extraSpace" style:grid-row={1}></div>
-		{#each $openSessions as session, index}
+		{#each $openSessions as session, index (session)}
 			{@const range = session.getDateRange()}
 			{@const isActive = session === $activeSession || mergePreview - 1 === index}
 			<div class={"menu buttonBar index" + index}
