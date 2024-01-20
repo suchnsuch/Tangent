@@ -1,4 +1,4 @@
-import type { TreeNode } from 'common/trees'
+import { validatePath, type TreeNode } from 'common/trees'
 import paths from 'common/paths'
 import type { Workspace } from '..'
 import Folder from '../Folder'
@@ -34,6 +34,13 @@ export default class CreateNewFolderCommand extends WorkspaceCommand {
 		if (!name) {
 			name = 'New Folder'
 		}
+
+		const validatedName = validatePath(name)
+		if (!validatedName) {
+			console.error('Could not validate the folder name: \"' + name + '\"')
+			return
+		}
+		name = validatedName
 
 		let newPath = paths.join(parent.path, name)
 

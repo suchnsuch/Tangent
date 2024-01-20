@@ -9,6 +9,7 @@ import PaletteActionView from 'app/utils/PaletteActionView.svelte'
 
 import ModalInputSelect from './ModalInputSelect.svelte'
 import NodeLine from '../views/summaries/NodeLine.svelte'
+import CreateNewFolderCommand from 'app/model/commands/CreateNewFolder'
 
 let workspace = getContext('workspace') as Workspace
 
@@ -53,7 +54,21 @@ function updateOptions(text: string) {
 		nodes = nodes.slice(0, 16)
 	}
 
-	if (nodes.length == 0 || 'workspace root'.includes(text.toLocaleLowerCase())) {
+	if (nodes.length == 0 && text) {
+		options = [
+			{
+				action: {
+					name: 'Create Folder "' + text + '"',
+					command: workspace.commands.createNewFolder,
+					context: {
+						name: text
+					}
+				}
+			},
+			{ node: workspace.directoryStore.files }
+		]
+	}
+	else if ('workspace root'.includes(text.toLocaleLowerCase())) {
 		options = [{ node: workspace.directoryStore.files, match: undefined }, ...nodes]
 	}
 	else {
@@ -75,8 +90,21 @@ function selectOption(event: CustomEvent<{option: Option, event}>) {
 
 		workspace.viewState.modal.close()
 	}
-	else if (action) {
-		
+	else if (action.command === workspace.commands.createNewFolder) {
+		// Cheat, since this is what we're using it for
+		const folder = (action.command as CreateNewFolderCommand).execute({
+			name: text,
+			creationMode: 'createOrOpen',
+			updateSelection: false
+		})
+
+		if (folder) {
+			workspace.commands.moveFile.execute({
+				subject,
+				target: folder
+			})
+		}
+		workspace.viewState.modal.close()
 	}
 }
 </script>

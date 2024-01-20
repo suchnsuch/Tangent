@@ -453,9 +453,16 @@ export default class Workspace extends EventDispatcher {
 	/**
 	 * Creates & adds a new tree node to the directoryStore.
 	 * @param node The raw node to add
-	 * @returns 
+	 * @returns The newly created node.
 	 */
-	createTreeNode(node: TreeNode, sendCreationMessage=true) {
+	createTreeNode(node: TreeNode, sendCreationMessage=true, ensureParents=true) {
+
+		if (ensureParents) {
+			// Ensure any parent folders exist.
+			// Don't need to send creation messages here.
+			// Creation in the backend will handle it.
+			this.ensureFolderExists(paths.dirname(node.path), false, false)
+		}
 
 		if (sendCreationMessage) {
 			// Send off the node to be created
@@ -463,10 +470,6 @@ export default class Workspace extends EventDispatcher {
 				this.api.createFolder(node.path)
 			}
 			else {
-				// Ensure any parent folders exist.
-				// Don't need to send creation messages here.
-				// Creation of files in the backend will handle it.
-				this.ensureFolderExists(paths.dirname(node.path), false, false)
 				this.api.createFile(node.path)
 			}
 		}
@@ -514,7 +517,7 @@ export default class Workspace extends EventDispatcher {
 					newRawNode.meta = { virtual: true }
 				}
 
-				return this.createTreeNode(newRawNode, sendCreationMessage)
+				return this.createTreeNode(newRawNode, sendCreationMessage, false)
 			},
 			virtual
 		)

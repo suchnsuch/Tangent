@@ -193,11 +193,7 @@ ipcMain.handle('createFolder', async (event, filepath) => {
 
 	if (workspace) {
 		try {
-			const queue = [] as PromiseStarter<any>[]
-			workspace.createFolder(windowHandle, filepath, undefined, queue)
-			for (const item of queue) {
-				await item()
-			}
+			await workspace.ensureFolderExists(windowHandle, filepath)
 		}
 		catch (err) {
 			log.error('Failed to create folder', err, {
