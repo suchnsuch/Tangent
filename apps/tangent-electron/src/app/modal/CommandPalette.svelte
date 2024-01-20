@@ -7,10 +7,10 @@ import NodeLine from '../views/summaries/NodeLine.svelte'
 import type { PaletteAction } from 'app/model/commands/WorkspaceCommand'
 import { iterateOverChildren, TreePredicateResult, TreeNode } from 'common/trees'
 import { isModKey } from 'app/utils/events'
-import { shortcutsHtmlString } from 'app/utils/shortcuts'
 import { stringSort } from 'common/sorting'
-import { buildFuzzySegementMatcher, buildMatcher, compareNodeSearch, orderTreeNodesForSearch, PathMatch, SegmentSearchNodePair } from 'common/search'
+import { buildFuzzySegementMatcher, buildMatcher, compareNodeSearch, orderTreeNodesForSearch, PathMatch, SearchMatchResult, SegmentSearchNodePair } from 'common/search'
 import SearchSegmentHighlight from 'app/utils/SearchSegmentHighlight.svelte'
+import PaletteActionView from 'app/utils/PaletteActionView.svelte'
 import type { NavigationData } from 'app/events'
 import { visibleFileTypeMatch, implicitExtensionsMatch } from 'common/fileExtensions'
 
@@ -40,8 +40,9 @@ function getPlaceholder(text: string) {
 }
 
 interface Option {
-	node?: TreeNode,
+	node?: TreeNode
 	action?: PaletteAction
+	match?: SearchMatchResult
 }
 
 let commandActions: PaletteAction[] = null
@@ -117,7 +118,8 @@ function updateOptions(text: string) {
 						command: workspace.commands.createNewFile,
 						context: {
 							name: text
-						}
+						},
+						shortcuts: null
 					}
 				}]
 			}
@@ -288,10 +290,6 @@ function shouldShowShortcut(action: PaletteAction) {
 	return action.command.shortcuts && action.command.isTopShortcutCommand
 }
 
-function getActionShortcutString(action: PaletteAction) {
-	return shortcutsHtmlString((action.shortcuts ?? action.command.shortcuts)[0])
-}
-
 </script>
 
 <main class="ModalContainer">
@@ -313,12 +311,11 @@ function getActionShortcutString(action: PaletteAction) {
 					showModDate={true}
 					nameMatch={option.match} />
 			{:else if option.action}
-				<div class="action" class:enabled={option.action.command.canExecute(option.action.context)}>
-					<span class="name"><SearchSegmentHighlight value={option.match ?? option.action.name}/></span>
-					{#if shouldShowShortcut(option.action)}
-						<span class="shortcut">{@html getActionShortcutString(option.action)}</span>
-					{/if}
-				</div>
+				<PaletteActionView
+					action={option.action}
+					match={option.match}
+					showShortcut={shouldShowShortcut(option.action)}
+				/>
 			{/if}
 		</svelte:fragment>
 		<div class="empty" slot="empty">
@@ -337,21 +334,6 @@ function getActionShortcutString(action: PaletteAction) {
 </main>
 
 <style lang="scss">
-.action {
-	display: flex;
-	align-items: center;
-
-	&:not(.enabled) {
-		opacity: .6;
-	}
-}
-.name {
-	flex-grow: 1;
-}
-.shortcut {
-	font-size: smaller;
-	opacity: .7;
-}
 .empty {
 	color: var(--deemphasizedTextColor);
 	text-align: center;

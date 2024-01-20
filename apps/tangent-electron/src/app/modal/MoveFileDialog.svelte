@@ -1,9 +1,11 @@
 <script lang="ts">
 import { getContext } from 'svelte'
 import { iterateOverChildren, type TreeNode } from 'common/trees'
-import { PathMatch, SegmentSearchNodePair, buildMatcher, orderTreeNodesForSearch } from 'common/search'
+import { PathMatch, SearchMatchResult, SegmentSearchNodePair, buildMatcher, orderTreeNodesForSearch } from 'common/search'
 import { implicitExtensionsMatch } from 'common/fileExtensions'
 import type Workspace from '../model/Workspace'
+import type { PaletteAction } from 'app/model/commands/WorkspaceCommand'
+import PaletteActionView from 'app/utils/PaletteActionView.svelte'
 
 import ModalInputSelect from './ModalInputSelect.svelte'
 import NodeLine from '../views/summaries/NodeLine.svelte'
@@ -14,7 +16,14 @@ export let subject: TreeNode
 $: parent = workspace.directoryStore.getParent(subject)
 
 let text: string = ''
-let options: SegmentSearchNodePair[] = []
+
+type Option = {
+	node?: TreeNode
+	action?: PaletteAction
+	match?: SearchMatchResult
+}
+
+let options: Option[] = []
 let selectedIndex = 0
 $: updateOptions(text)
 function updateOptions(text: string) {
@@ -52,19 +61,23 @@ function updateOptions(text: string) {
 	}
 }
 
-function autocomplete(event: CustomEvent<SegmentSearchNodePair>) {
+function autocomplete(event: CustomEvent<Option>) {
 	text = workspace.directoryStore.getPathToItem(event.detail.node)
 }
 
-function selectOption(event: CustomEvent<{option: SegmentSearchNodePair, event}>) {
-	const target = event.detail.option.node
+function selectOption(event: CustomEvent<{option: Option, event}>) {
+	const { node, action } = event.detail.option
+	if (node) {
+		workspace.commands.moveFile.execute({
+			subject,
+			target: node
+		})
 
-	workspace.commands.moveFile.execute({
-		subject,
-		target
-	})
-
-	workspace.viewState.modal.close()
+		workspace.viewState.modal.close()
+	}
+	else if (action) {
+		
+	}
 }
 </script>
 
@@ -87,12 +100,17 @@ function selectOption(event: CustomEvent<{option: SegmentSearchNodePair, event}>
 		<svelte:fragment slot="option" let:option>
 			{#if option.node === workspace.directoryStore.files}
 				Workspace Root
-			{:else}
+			{:else if option.node}
 				<NodeLine
 					node={option.node}
 					showFileType={!option.node.fileType.match(implicitExtensionsMatch)}
 					nameMatch={option.match}
 					/>
+			{:else if option.action}
+				<PaletteActionView
+					action={option.action}
+					match={option.match}
+				/>
 			{/if}
 		</svelte:fragment>
 	</ModalInputSelect>

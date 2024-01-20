@@ -3,13 +3,28 @@ import { focusLayer } from 'app/utils'
 import ScrollingItemList from 'app/utils/ScrollingItemList.svelte'
 import { createEventDispatcher } from 'svelte'
 
-const dispatch = createEventDispatcher()
+type T = $$Generic
+interface $$Slots {
+	option: {
+		option: T
+	},
+	empty: {},
+	placeholder: {}
+}
+
+const dispatch = createEventDispatcher<{
+	autocomplete: T,
+	select: {
+		option: T,
+		event: MouseEvent | KeyboardEvent
+	}
+}>()
 
 export let text: string
 export let placeholderMode: 'always' | 'hideWithText' = 'hideWithText'
 export let placeholder: string = 'Type to select...'
 
-export let options = []
+export let options: T[] = []
 export let selectedIndex = 0
 export let itemID: (item: any) => any = null
 export let getItemTooltip: (item: any, index?: number) => string = null
