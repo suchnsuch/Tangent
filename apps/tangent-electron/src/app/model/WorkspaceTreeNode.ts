@@ -83,6 +83,8 @@ export default abstract class WorkspaceTreeNode extends SelfStore implements Tre
 	}
 
 	rename(newName: string) {
+		if (!newName) return false
+		
 		if (this.fileType.startsWith('.')) {
 			newName += this.fileType
 		}
