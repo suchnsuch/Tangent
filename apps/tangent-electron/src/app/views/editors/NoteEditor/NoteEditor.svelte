@@ -944,7 +944,7 @@ function selectEnd(event?: MouseEvent) {
 		editor.root.focus({
 			preventScroll: true
 		})
-		editor.select(editor.doc.length)
+		editor.select(editor.doc.length - 1)
 	}
 }
 
