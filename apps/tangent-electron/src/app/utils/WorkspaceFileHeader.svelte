@@ -81,6 +81,11 @@ function onHeaderKeydown(event: KeyboardEvent) {
 
 		dispatch('enter-exit')
 	}
+	else if (event.key === 'Escape') {
+		event.preventDefault()
+		const name = node ? $node.name : ''
+		editor.setText(name, [0, name.length], Source.api)
+	}
 }
 </script>
 
