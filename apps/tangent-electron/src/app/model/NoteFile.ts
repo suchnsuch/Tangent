@@ -1,11 +1,10 @@
 import type { TreeNode } from 'common/trees'
 import File from "./File"
-import type { Line } from 'typewriter-editor'
+import { Line } from '@typewriter/document'
 
 import type Workspace from './Workspace'
 import { parseMarkdown } from 'common/markdownModel'
-import { areLineArraysOpTextEquivalent, typewriterToText } from 'common/typewriterUtils';
-import paths from 'common/paths';
+import { areLineArraysOpTextEquivalent, typewriterToText } from 'common/typewriterUtils'
 
 export default class NoteFile extends File implements TreeNode {
 
@@ -32,6 +31,15 @@ export default class NoteFile extends File implements TreeNode {
 			}
 			this.notifyChanged()
 		}
+	}
+
+	get length() {
+		if (!this._lines) return 0
+		let total = 0
+		for (const line of this._lines) {
+			total += Line.length(line)
+		}
+		return total
 	}
 
 	getFileContent(): string {
