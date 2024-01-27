@@ -6,7 +6,7 @@ import { SidebarMode } from 'common/SidebarState'
 import type { Workspace } from 'app/model'
 import command from 'app/model/commands/CommandAction'
 import { getSortModeDisplayName } from 'app/model/directoryView'
-import { appendContextTemplate } from 'app/model/contextmenu'
+import { appendContextTemplate, ExtendedContextEvent } from 'app/model/contextmenu'
 import { startDrag } from 'app/utils'
 import PopUpButton from 'app/utils/PopUpButton.svelte'
 
@@ -60,6 +60,19 @@ function startLeftDrag(event: MouseEvent) {
 }
 
 function onSidebarContextMenu(event: MouseEvent) {
+	const contextEvent = event as ExtendedContextEvent
+
+	if (!contextEvent.top && $currentTab === 'files') {
+		appendContextTemplate(event, [
+			{
+				command: workspace.commands.createNewFile
+			},
+			{
+				command: workspace.commands.createNewFolder
+			}
+		], 'top')
+	}
+
 	appendContextTemplate(event, [
 		{
 			label: 'Open Sidebar Documentation',
@@ -84,6 +97,7 @@ function onWorkspaceNameContextMenu(event: MouseEvent) {
 </script>
 
 <!-- svelte-ignore a11y-mouse-events-have-key-events -->
+<!-- svelte-ignore a11y-no-static-element-interactions -->
 <div 
 	class="sidebar left"
 	class:pinned={$mode === SidebarMode.pinned}
