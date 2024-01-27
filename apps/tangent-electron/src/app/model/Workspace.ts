@@ -44,6 +44,12 @@ import { swapRemove } from '@such-n-such/core'
 
 const menuContext = {}
 
+type CreateTreeNodeOptions = {
+	node: TreeNode
+	sendCreationMessage?: boolean
+	ensureParents?: boolean
+}
+
 export default class Workspace extends EventDispatcher {
 
 	api: WindowApi
@@ -452,25 +458,32 @@ export default class Workspace extends EventDispatcher {
 
 	/**
 	 * Creates & adds a new tree node to the directoryStore.
-	 * @param node The raw node to add
-	 * @returns The newly created node.
+	 * @param options.node The raw node to add.
+	 * @param options.ensureParents Create any parent nodes if necessary (default true).
+	 * @param options.sendCreationMessage Send the creation request to the backend (default true).
 	 */
-	createTreeNode(node: TreeNode, sendCreationMessage=true, ensureParents=true) {
+	createTreeNode(options: CreateTreeNodeOptions): TreeNode
+	createTreeNode(options: CreateTreeNodeOptions & { async: true }): Promise<TreeNode>
+	createTreeNode(options: CreateTreeNodeOptions & { paired: true }): { node: TreeNode, onComplete: Promise<void> }
+	createTreeNode(options: CreateTreeNodeOptions & { async?: true, paired?: true}) {
+		let node = options.node
 
-		if (ensureParents) {
+		if (options.ensureParents ?? true) {
 			// Ensure any parent folders exist.
 			// Don't need to send creation messages here.
 			// Creation in the backend will handle it.
 			this.ensureFolderExists(paths.dirname(node.path), false, false)
 		}
 
-		if (sendCreationMessage) {
+		let onComplete: Promise<void> = null
+
+		if (options.sendCreationMessage ?? true) {
 			// Send off the node to be created
 			if (node.fileType === 'folder') {
-				this.api.createFolder(node.path)
+				onComplete = this.api.createFolder(node.path)
 			}
 			else {
-				this.api.createFile(node.path)
+				onComplete = this.api.createFile(node.path)
 			}
 		}
 
@@ -500,6 +513,9 @@ export default class Workspace extends EventDispatcher {
 			handle.pushChangesIfDirty()
 		}
 
+		if (options.async) return onComplete.then(() => node)
+		if (options.paired) return { node, onComplete }
+
 		return node
 	}
 
@@ -507,17 +523,19 @@ export default class Workspace extends EventDispatcher {
 		return this.directoryStore.ensureFolderExists(
 			folderPath,
 			(parent, name) => {
-				const newRawNode: TreeNode = {
+				const node: TreeNode = {
 					path: paths.join(parent.path, name),
 					name,
 					fileType: 'folder'
 				}
 
 				if (virtual) {
-					newRawNode.meta = { virtual: true }
+					node.meta = { virtual: true }
 				}
 
-				return this.createTreeNode(newRawNode, sendCreationMessage, false)
+				return this.createTreeNode({
+					node, sendCreationMessage, ensureParents: false
+				})
 			},
 			virtual
 		)

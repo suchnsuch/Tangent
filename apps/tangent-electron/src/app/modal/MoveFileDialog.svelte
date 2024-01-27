@@ -92,18 +92,20 @@ function selectOption(event: CustomEvent<{option: Option, event}>) {
 	}
 	else if (action.command === workspace.commands.createNewFolder) {
 		// Cheat, since this is what we're using it for
-		const folder = (action.command as CreateNewFolderCommand).execute({
+		(action.command as CreateNewFolderCommand).execute({
 			name: text,
 			creationMode: 'createOrOpen',
-			updateSelection: false
+			updateSelection: false,
+			async: true
+		}).then(folder => {
+			if (folder) {
+				workspace.commands.moveFile.execute({
+					subject,
+					target: folder
+				})
+			}
 		})
 
-		if (folder) {
-			workspace.commands.moveFile.execute({
-				subject,
-				target: folder
-			})
-		}
 		workspace.viewState.modal.close()
 	}
 }

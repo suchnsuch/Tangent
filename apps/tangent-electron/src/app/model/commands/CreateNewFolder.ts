@@ -20,7 +20,9 @@ export default class CreateNewFolderCommand extends WorkspaceCommand {
 		super(workspace)
 	}
 
-	execute(context: CreateNewFolderCommandContext): Folder {
+	execute(context: CreateNewFolderCommandContext): Folder
+	execute(context: CreateNewFolderCommandContext & { async: true }): Promise<Folder>
+	execute(context: CreateNewFolderCommandContext & { async?: true }) {
 		let { name, parent, updateSelection, creationMode } = context
 
 		creationMode = creationMode ?? 'create'
@@ -73,14 +75,22 @@ export default class CreateNewFolderCommand extends WorkspaceCommand {
 			newRawNode.children = existingNode.children
 		}
 
-		const newNode = this.workspace.createTreeNode(newRawNode) as Folder
+		const { node: newNode, onComplete } = this.workspace.createTreeNode({
+			node: newRawNode, paired: true
+		})
 
 		if (updateSelection ?? true) {
 			viewState.tangent.updateThread({ currentNode: newNode, thread: 'retain' })
 			viewState.directoryView.toggleOpen(newNode)
 		}
 
-		return newNode
+		if (context.async) {
+			return onComplete.then(() => {
+				return newNode as Folder
+			})
+		}
+
+		return newNode as Folder
 	}
 
 	getLabel(content: CreateNewFolderCommandContext) {

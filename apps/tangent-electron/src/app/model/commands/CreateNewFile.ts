@@ -207,7 +207,7 @@ export default class CreateNewFileCommand extends WorkspaceCommand {
 			fileType: extension
 		}
 
-		const newNode = this.workspace.createTreeNode(newRawNode)
+		const newNode = this.workspace.createTreeNode({ node: newRawNode })
 		if (newNode instanceof File) {
 			newNode.loadState = 'new'
 		}
