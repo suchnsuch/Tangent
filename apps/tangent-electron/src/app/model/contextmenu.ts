@@ -1,10 +1,9 @@
-import { isMac } from 'common/isMac'
-import type { CommandContext } from './commands/Command'
+import type { AnyCommandContet } from './commands/Command'
 import type WorkspaceCommand from './commands/WorkspaceCommand'
 
 export interface ContextMenuCommand {
 	command?: WorkspaceCommand
-	commandContext?: CommandContext,
+	commandContext?: AnyCommandContet,
 	click?: () => void
 }
 
