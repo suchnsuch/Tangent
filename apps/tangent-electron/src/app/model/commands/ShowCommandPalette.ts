@@ -51,7 +51,7 @@ export default class ShowCommandPaletteCommand extends WorkspaceCommand {
 		}
 	}
 
-	getTooltip(context: CommandContext) {
+	getTooltip(context: ShowCommandPaletteCommandContext) {
 		if (this.tooltip) return this.tooltip
 
 		const prefix = context?.prefix ?? this.prefix

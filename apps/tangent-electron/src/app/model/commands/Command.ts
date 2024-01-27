@@ -4,9 +4,9 @@ import { eventIsShortcutable, shortcutFromEvent } from 'app/utils/shortcuts'
 export interface CommandContext {
 	/** Only present on execution */
 	initiatingEvent?: Event
-
-	[key: string]: any
 }
+
+export type AnyCommandContet = CommandContext & { [key: string]: any }
 
 export interface CommandOptions {
 	shortcut?: string
