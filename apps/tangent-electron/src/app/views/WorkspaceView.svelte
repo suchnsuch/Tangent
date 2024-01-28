@@ -174,6 +174,18 @@ function onWindowKeydown(event: KeyboardEvent) {
 	topCommandHandler(event)
 }
 
+function onWindowAuxClick(event: MouseEvent) {
+	if (event.defaultPrevented) return
+
+	if (event.button === 3) {
+		event.preventDefault()
+		workspace.commands.shiftHistoryBack.execute()
+	}
+	else if (event.button === 4) {
+		workspace.commands.shiftHistoryForward.execute()
+	}
+}
+
 function onContextMenu(event: ExtendedContextEvent) {
 	if (!event.defaultPrevented && (event.top || event.bottom)) {
 		workspace.showContextMenu(extractRawTemplate(event))
@@ -455,7 +467,7 @@ function buildMainMenu() {
 
 </script>
 
-<svelte:window on:keydown={onWindowKeydown} />
+<svelte:window on:keydown={onWindowKeydown} on:auxclick={onWindowAuxClick} />
 <!-- svelte-ignore avoid-mouse-events-on-document -->
 <svelte:document on:mouseleave={onDocumentMouseLeave} />
 <svelte:body on:mousemove={onMainMouseMove} on:contextmenu={onContextMenu}/>
