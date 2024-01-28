@@ -1,9 +1,9 @@
 import { shortcutDisplayString, shortcutsDisplayString } from 'app/utils/shortcuts';
-import Command, { CommandContext } from "./Command";
+import Command, { AnyCommandContet, CommandContext } from "./Command";
 
 export interface CommandActionOptions {
 	command: Command
-	context?: CommandContext
+	context?: AnyCommandContet
 	/** If false, click handler will not be added. Default true. */
 	includeClick?: boolean
 	/** If true, will prevent the default behavior of the click. Default false. */

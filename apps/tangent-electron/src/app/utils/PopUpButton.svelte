@@ -9,7 +9,7 @@ function getPopUpId() {
 import { createPopper } from '@popperjs/core'
 import type { Placement } from '@popperjs/core'
 import type { Command } from 'app/model/commands'
-import type { CommandContext } from 'app/model/commands/Command'
+import type { AnyCommandContet, CommandContext } from 'app/model/commands/Command'
 import commandAction from 'app/model/commands/CommandAction'
 import type { CommandActionOptions } from 'app/model/commands/CommandAction'
 import { focusLayer } from './focus'
@@ -28,7 +28,7 @@ export let blurWhenFinished = true
 export let escapeToRoot = true
 
 export let command: Command = null
-export let commandContext: CommandContext = null
+export let commandContext: AnyCommandContet = null
 /**
  * The template for a menu _or_ a function that returns the template.
  * A function will be called each time the menu is opened.
