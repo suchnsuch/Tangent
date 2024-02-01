@@ -122,7 +122,7 @@ export default class CreateNewFileCommand extends WorkspaceCommand {
 		}
 
 		// Last ditch attempts to determine critical elements
-		if (!folderPath) {
+		if (folderPath === false) {
 			// Determine the folder from the UI state
 			let selection = viewState.directoryView.selection.value
 			let deepestFolder: TreeNode = null

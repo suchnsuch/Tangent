@@ -65,10 +65,16 @@ function onSidebarContextMenu(event: MouseEvent) {
 	if (!contextEvent.top && $currentTab === 'files') {
 		appendContextTemplate(event, [
 			{
-				command: workspace.commands.createNewFile
+				command: workspace.commands.createNewFile,
+				commandContext: {
+					folder: workspace.directoryStore.files
+				}
 			},
 			{
-				command: workspace.commands.createNewFolder
+				command: workspace.commands.createNewFolder,
+				commandContext: {
+					parent: workspace.directoryStore.files
+				}
 			}
 		], 'top')
 	}
