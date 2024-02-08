@@ -159,6 +159,17 @@ export default class Settings extends ObjectStore {
 		}
 	})
 
+	panelSettingsHoverHotspot = new Setting<number>({
+		name: 'Panel Settings Hotspot',
+		description: 'How close to the top of a panel your must be (in pixels) to reveal the panel\'s settings pane.',
+		defaultValue: 40,
+		range: {
+			min: 5,
+			max: 150,
+			step: 1
+		}
+	})
+
 	// Map
 	mapZoomScrollMode = new Setting<string>({
 		name: 'Zoom & Pan',

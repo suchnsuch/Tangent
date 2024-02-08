@@ -25,8 +25,11 @@ let settings = workspace.settings
 		{#if !isMac}
 			<SettingView setting={settings.scrollBarWidth} />
 		{/if}
+	</div>
 
+	<div class="settingsGroup">
 		<SettingView setting={settings.sidebarHoverHotspot} />
+		<SettingView setting={settings.panelSettingsHoverHotspot} />
 	</div>
 </main>
 

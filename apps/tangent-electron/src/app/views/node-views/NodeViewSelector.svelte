@@ -18,6 +18,8 @@ const typedDispatch = createEventDispatcher<{
 
 const workspace = getContext('workspace') as Workspace
 
+const { panelSettingsHoverHotspot } = workspace.settings
+
 export var state: NodeViewState
 
 export var isCurrent: boolean
@@ -54,8 +56,11 @@ function onMouseMoveContainer(event: MouseEvent) {
 	clientX -= rect.x
 	clientY -= rect.y + extraTop
 
-	hintSettings = clientY < 100
-	showSettingsFromMouse = clientY < 40
+	const showThreshold = panelSettingsHoverHotspot.value
+	const hintThreshold = showThreshold * 1.75
+
+	hintSettings = clientY < hintThreshold
+	showSettingsFromMouse = clientY < showThreshold
 }
 
 let hoverTimeout = null
@@ -144,6 +149,7 @@ function getClassNamesForNode(node: TreeNode) {
 		{/if}
 		{#if showSettings}
 			<!-- svelte-ignore a11y-click-events-have-key-events -->
+			<!-- svelte-ignore a11y-no-static-element-interactions -->
 			<div
 				bind:this={settingsContainer}
 				class="settings-container"
