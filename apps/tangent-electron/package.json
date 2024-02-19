@@ -40,6 +40,7 @@
     "email": "taylorhadden@icloud.com"
   },
   "dependencies": {
+    "@such-n-such/tangent-query-parser": "^0.1.0",
     "@typewriter/delta": "^1.0.2",
     "@typewriter/document": "^0.7.9",
     "adm-zip": "^0.5.9",
@@ -69,6 +70,7 @@
     "@playwright/test": "^1.40.1",
     "@popperjs/core": "^2.9.2",
     "@such-n-such/core": "^0.3.0",
+    "@such-n-such/tangent-html-to-markdown": "^0.1.1",
     "@tsconfig/svelte": "^5.0.0",
     "@types/jest": "^27.0.3",
     "@types/prismjs": "^1.16.6",
