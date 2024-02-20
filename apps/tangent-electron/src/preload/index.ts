@@ -56,54 +56,6 @@ let bridge: WindowApi = {
 		ipcRenderer.send('receiveWorkspaceViewState', state)
 	},
 
-	onTreeChange(handler) {
-		on('treeChange', handler)
-	},
-
-	createFile(filepath, meta) {
-		return ipcRenderer.invoke('createFile', filepath, meta)
-	},
-
-	createFolder(filepath) {
-		return ipcRenderer.invoke('createFolder', filepath)
-	},
-
-	move(filepath, newPath) {
-		return ipcRenderer.invoke('move', filepath, newPath)
-	},
-
-	delete(filepath) {
-		return ipcRenderer.invoke('delete', filepath)
-	},
-
-	openFile(filepath) {
-		ipcRenderer.send('openFile', filepath)
-	},
-
-	onReceiveFileContents(handler) {
-		on('receiveFileContents', handler)
-	},
-
-	closeFile(filepath) {
-		ipcRenderer.send('closeFile', filepath)
-	},
-
-	updateFile(filepath, content) {
-		ipcRenderer.send('updateFile', filepath, content)
-	},
-
-	showInFileBrowser(path) {
-		ipcRenderer.send('showInFileBrowser', path)
-	},
-
-	openPath(path) {
-		ipcRenderer.invoke('openPath', path)
-	},
-
-	openExternal(path) {
-		ipcRenderer.invoke('openExternal', path)
-	},
-
 	onMenuAction(handler) {
 		on('onMenuAction', handler)
 	},
@@ -166,9 +118,42 @@ let bridge: WindowApi = {
 		}
 	},
 	file: {
+		onTreeChange(handler) {
+			on('treeChange', handler)
+		},
+		createFile(filepath, meta) {
+			return ipcRenderer.invoke('createFile', filepath, meta)
+		},
+		createFolder(filepath) {
+			return ipcRenderer.invoke('createFolder', filepath)
+		},
+		move(filepath, newPath) {
+			return ipcRenderer.invoke('move', filepath, newPath)
+		},
+		delete(filepath) {
+			return ipcRenderer.invoke('delete', filepath)
+		},
+		openFile(filepath) {
+			ipcRenderer.send('openFile', filepath)
+		},
+		onReceiveFileContents(handler) {
+			on('receiveFileContents', handler)
+		},
+		closeFile(filepath) {
+			ipcRenderer.send('closeFile', filepath)
+		},
+		updateFile(filepath, content) {
+			ipcRenderer.send('updateFile', filepath, content)
+		},
+		showInFileBrowser(path) {
+			ipcRenderer.send('showInFileBrowser', path)
+		},
 		selectPath(options) {
 			return ipcRenderer.invoke('selectPath', options)
-		}
+		},
+		openPath(path) {
+			ipcRenderer.invoke('openPath', path)
+		},
 	},
 	edit: {
 		nativeAction(action) {
@@ -179,6 +164,9 @@ let bridge: WindowApi = {
 		}
 	},
 	links: {
+		openExternal(path) {
+			ipcRenderer.invoke('openExternal', path)
+		},
 		getTitle(href) {
 			return ipcRenderer.invoke('getLinkTitle', href)
 		},

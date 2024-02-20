@@ -54,7 +54,7 @@ export default class MoveFileCommand extends WorkspaceCommand {
 				targetPath = paths.join(targetNode.path, paths.basename(subject))
 			}
 			
-			this.workspace.api.move(subject, targetPath)
+			this.workspace.api.file.move(subject, targetPath)
 		}
 	}
 

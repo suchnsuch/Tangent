@@ -38,30 +38,6 @@ export default interface WindowAPI {
 	onWorkspaceViewPatch(handler: (patch) => void)
 	setWorkspaceViewState(state)
 
-	onTreeChange(handler: (change: TreeChange) => void)
-
-	// File Handling
-	createFile(path: string, options?: IndexData): Promise<void>
-	createFolder(path: string): Promise<void>
-	move(filepath: string, newPath: string): Promise<void>
-	delete(filepath: string): Promise<void>
-	
-	/** Open a file and receive any changes via `onReceiveFileContents` */
-	openFile(filepath: string)
-	/** Add a handler to this to receive contents when an open file is loaded or changes. */
-	onReceiveFileContents(handler: (path: string , content: string | unknown) => void)
-	/** No longer watcha a file for changes. */
-	closeFile(filepath: string) // Stop receiving file changes
-	
-	/** Update a file with new contents. */
-	updateFile(filepath: string, content: string | unknown)
-	/** Show the file or folder in the native file browser. */
-	showInFileBrowser(path: string)
-	/** Open a path in the default format */
-	openPath(path: string)
-	/** Open a url in the default format */
-	openExternal(path: string)
-
 	onWorkspaceAction(handler: (actionName: string) => void)
 
 	// Menus
@@ -92,6 +68,26 @@ export default interface WindowAPI {
 
 	file: {
 		selectPath<T extends SelectPathOptions>(options: T): Promise<SelectPathResult<T>>
+		onTreeChange(handler: (change: TreeChange) => void)
+
+		createFile(path: string, options?: IndexData): Promise<void>
+		createFolder(path: string): Promise<void>
+		move(filepath: string, newPath: string): Promise<void>
+		delete(filepath: string): Promise<void>
+		
+		/** Open a file and receive any changes via `onReceiveFileContents` */
+		openFile(filepath: string)
+		/** Add a handler to this to receive contents when an open file is loaded or changes. */
+		onReceiveFileContents(handler: (path: string , content: string | unknown) => void)
+		/** No longer watcha a file for changes. */
+		closeFile(filepath: string) // Stop receiving file changes
+		
+		/** Update a file with new contents. */
+		updateFile(filepath: string, content: string | unknown)
+		/** Show the file or folder in the native file browser. */
+		showInFileBrowser(path: string)
+		/** Open a path in the default format */
+		openPath(path: string)
 	}
 
 	edit: {
@@ -100,6 +96,8 @@ export default interface WindowAPI {
 	}
 
 	links: {
+		/** Open a url in the default format */
+		openExternal(path: string)
 		getTitle(href: string): Promise<string>
 		saveFromUrl(href: string, contextPath: string): Promise<string>
 	}

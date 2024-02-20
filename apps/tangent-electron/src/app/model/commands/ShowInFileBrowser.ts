@@ -24,7 +24,7 @@ export default class ShowInFileBrowserCommand extends WorkspaceCommand {
 			target = target.path
 		}
 
-		this.workspace.api.showInFileBrowser(target)
+		this.workspace.api.file.showInFileBrowser(target)
 	}
 
 	getLabel(context: OpenInFileBrowserCommandContext) {

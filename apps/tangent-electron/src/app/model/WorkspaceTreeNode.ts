@@ -49,7 +49,7 @@ export default abstract class WorkspaceTreeNode extends SelfStore implements Tre
 	}
 
 	get api() {
-		return this.workspace.api
+		return this.workspace.api.file
 	}
 
 	get relativePath() {

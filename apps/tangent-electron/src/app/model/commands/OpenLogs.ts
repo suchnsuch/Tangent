@@ -8,7 +8,7 @@ export default class OpenLogsCommand extends WorkspaceCommand {
 	}
 
 	execute(_context) {
-		this.workspace.api.showInFileBrowser('logs')
+		this.workspace.api.file.showInFileBrowser('logs')
 	}
 
 	getLabel(context: CommandContext) {

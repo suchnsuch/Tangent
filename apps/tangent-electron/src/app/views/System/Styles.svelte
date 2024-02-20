@@ -51,7 +51,7 @@ function onActivatedChanged(style: TreeNode, event: Event) {
 }
 
 function gotoFileClicked(style: TreeNode) {
-	workspace.api.openPath(style.path)
+	workspace.api.file.openPath(style.path)
 }
 
 function createNewStyle() {

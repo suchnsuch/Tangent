@@ -19,7 +19,7 @@ export default class DeleteNodeCommand extends WorkspaceCommand {
 			target = target.path
 		}
 
-		this.workspace.api.delete(target)
+		this.workspace.api.file.delete(target)
 	}
 
 	getLabel(context: DeleteNodeCommandContext) {

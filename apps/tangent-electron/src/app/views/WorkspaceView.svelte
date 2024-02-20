@@ -435,26 +435,26 @@ function buildMainMenu() {
 				{
 					label: 'Tangent\'s Website',
 					click() {
-						workspace.api.openExternal('http://tangentnotes.com')
+						workspace.api.links.openExternal('http://tangentnotes.com')
 					}
 				},
 				{
 					label: 'Email Tangent\'s Team',
 					click() {
-						workspace.api.openExternal(`mailto:contact@tangentnotes.com?subject=Tangent v${workspace.version}`)
+						workspace.api.links.openExternal(`mailto:contact@tangentnotes.com?subject=Tangent v${workspace.version}`)
 					}
 				},
 				{ type: 'separator' },
 				{
 					label: 'Tangent on Discord',
 					click() {
-						workspace.api.openExternal('https://discord.gg/6VpvhUnxFe')
+						workspace.api.links.openExternal('https://discord.gg/6VpvhUnxFe')
 					}
 				},
 				{
 				label: 'Tangent on Mastodon',
 					click() {
-						workspace.api.openExternal('https://indieapps.space/@tangentnotes')
+						workspace.api.links.openExternal('https://indieapps.space/@tangentnotes')
 					}
 				},
 				{ type: 'separator' },

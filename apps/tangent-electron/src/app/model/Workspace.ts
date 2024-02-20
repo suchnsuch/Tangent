@@ -88,7 +88,7 @@ export default class Workspace extends EventDispatcher {
 		super()
 		this.api = api
 
-		api.onTreeChange(change => {
+		api.file.onTreeChange(change => {
 			try {
 				this.onReceivedTreeChange(change)
 			}
@@ -97,7 +97,7 @@ export default class Workspace extends EventDispatcher {
 				console.log(e)
 			}
 		})
-		api.onReceiveFileContents((path, content) => {
+		api.file.onReceiveFileContents((path, content) => {
 			try {
 				this.onReceiveFileContents(path, content)
 			}
@@ -480,10 +480,10 @@ export default class Workspace extends EventDispatcher {
 		if (options.sendCreationMessage ?? true) {
 			// Send off the node to be created
 			if (node.fileType === 'folder') {
-				onComplete = this.api.createFolder(node.path)
+				onComplete = this.api.file.createFolder(node.path)
 			}
 			else {
-				onComplete = this.api.createFile(node.path)
+				onComplete = this.api.file.createFile(node.path)
 			}
 		}
 
@@ -567,7 +567,7 @@ export default class Workspace extends EventDispatcher {
 		}
 
 		if (link && isExternalLink(link.href)) {
-			this.api.openExternal(link.href)
+			this.api.links.openExternal(link.href)
 			return
 		}
 
@@ -576,7 +576,7 @@ export default class Workspace extends EventDispatcher {
 			if (typeof resolution === 'string') {
 				// This only occurs in md links that do not resolve to the workspace
 				console.log('Link undetermined, opening locally:', resolution)
-				this.api.openPath(resolution)
+				this.api.file.openPath(resolution)
 				return
 			}
 			else if (resolution && !Array.isArray(resolution)) {
@@ -623,7 +623,7 @@ export default class Workspace extends EventDispatcher {
 		// Check that the target can be represented
 		if (!tangent.context.getState(targetNode, true, false)) {
 			console.warn('Cannot generate a view state for ', targetNode, 'Opening locally')
-			this.api.openPath(targetNode.path)
+			this.api.file.openPath(targetNode.path)
 			return
 		}
 
