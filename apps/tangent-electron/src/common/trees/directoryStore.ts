@@ -576,8 +576,15 @@ export default class DirectoryStore extends SelfStore implements DirectoryLookup
 		if (this.get(path)) {
 			const dir = paths.dirname(idealPath)
 			const extension = paths.extname(idealPath)
-			const baseName = paths.basename(idealPath, extension)
+			let baseName = paths.basename(idealPath, extension)
 			let number = 1
+
+			// Capture existing numbers in "foo 3" filenames
+			const numberMatch = baseName.match(/ \d+$/)
+			if (numberMatch) {
+				number = parseInt(numberMatch[0]) + 1
+				baseName = baseName.substring(0, baseName.length - numberMatch[0].length)
+			}
 
 			do {
 				path = paths.join(dir, `${baseName} ${number}${extension}`)

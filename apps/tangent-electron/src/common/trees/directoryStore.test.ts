@@ -438,3 +438,60 @@ describe('Resolving & Creating Partial Path Matches', () => {
 			.toBe(store.getRoot(0).children[0].children[2])
 	})
 })
+
+describe('getUniquePath()', () => {
+	function getTestStore() {
+		let root:TreeNode = {
+			name: 'root',
+			path: 'some/root',
+			depth: 1,
+			fileType: 'folder',
+			children: [
+				{
+					name: 'file',
+					path: 'some/root/file.txt',
+					depth: 2,
+					fileType: '.txt'
+				},
+				{
+					name: 'numbered',
+					path: 'some/root/numbered',
+					depth: 2,
+					fileType: 'folder',
+					children: [
+						{
+							name: 'file 1',
+							path: 'some/root/numbered/file 1.txt',
+							depth: 3,
+							fileType: '.txt'
+						},
+						{
+							name: 'file 2',
+							path: 'some/root/numbered/file 2.txt',
+							depth: 3,
+							fileType: '.txt'
+						},
+
+					]
+				}
+			]
+		}
+	
+		return new DirectoryStore(root)
+	}
+
+	it('Should not modifiy the path if the proposed path is already unique', () => {
+		const store = getTestStore()
+		expect(store.getUniquePath('some/root/location.txt')).toEqual('some/root/location.txt')
+	})
+
+	it('Should append a number to the path if there is a naming collision', () => {
+		const store = getTestStore()
+		expect(store.getUniquePath('some/root/file.txt')).toEqual('some/root/file 1.txt')
+	})
+
+	it('Should recognize existing files with a numbered naming scheme and increment', () => {
+		const store = getTestStore()
+		expect(store.getUniquePath('some/root/numbered/file 1.txt')).toEqual('some/root/numbered/file 3.txt')
+	})
+})
