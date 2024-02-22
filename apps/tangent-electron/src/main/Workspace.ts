@@ -698,6 +698,35 @@ export default class Workspace {
 		await Promise.all(tasks)
 	}
 
+	async copy(filepath: string, newPath?: string) {
+		const nodeToCopy = this.contentsStore.get(filepath)
+		if (!nodeToCopy) {
+			throw new Error('Cannot copy; path not found in the inde: ' + filepath)
+		}
+
+		newPath = newPath ?? nodeToCopy.path
+		newPath = this.contentsStore.getUniquePath(newPath)
+		
+		const newRawNode = shallowCopyTreeNodeWithoutChildren(nodeToCopy)
+		newRawNode.path = newPath
+		newRawNode.name = path.basename(newPath, newRawNode.fileType !== 'folder' ? newRawNode.fileType : undefined)
+
+		const newNode = this.nodeConstructor(newRawNode)
+		const addResult = this.contentsStore.add(newNode)
+		if (addResult > 0) {
+			this.sendTreeChange({
+				added: [ newRawNode ]
+			})
+		}
+		else {
+			throw new Error('File could not be added. ' + DirectoryStoreAddResult.describe(addResult) + ' File: ' + newRawNode.path)
+		}
+
+		ioLog.info(chalk.green('Moving'), chalk.gray(filepath), 'to', chalk.gray(newPath))
+
+		await fs.promises.cp(nodeToCopy.path, newPath, { recursive: true })
+	}
+
 	async delete(filepath: string) {
 		const nodeToDelete = this.contentsStore.get(filepath)
 		if (!nodeToDelete) {

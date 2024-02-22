@@ -30,6 +30,7 @@ import ArchivePreviousSessionsCommand from './ArchivePreviousSessions'
 import ShiftThreadHistoryCommand from './ShiftThreadHistory'
 import ShowAllChildMapNodesCommand from './ShowAllChildMapNodes'
 import ShowPreviousSessionCommand from './ShowPreviousSession'
+import DuplicateNodeCommand from './DuplicateNode'
 export { Command, CommandAction }
 
 export interface WorkspaceCommands {
@@ -79,6 +80,7 @@ export interface WorkspaceCommands {
 	moveToRightFile: ChangeCurrentFileCommand
 
 	moveFile: MoveFileCommand
+	duplicateNode: DuplicateNodeCommand
 	deleteNode: DeleteNodeCommand
 
 	setFocusLevel: SetFocusLevelCommand
@@ -232,6 +234,7 @@ export default function workspaceCommands(workspace: Workspace): WorkspaceComman
 		moveToRightFile: new ChangeCurrentFileCommand(workspace, { mode: 'right', shortcut: 'Mod+Alt+Right' }),
 
 		moveFile: new MoveFileCommand(workspace),
+		duplicateNode: new DuplicateNodeCommand(workspace),
 		deleteNode: new DeleteNodeCommand(workspace),
 
 		setFocusLevel: new SetFocusLevelCommand(workspace, null, true),

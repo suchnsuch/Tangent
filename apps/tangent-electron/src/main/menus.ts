@@ -77,6 +77,13 @@ export function createMenus(interop: {
 				registerAccelerator: false,
 				click: actionPassthrough
 			},
+			{
+				id: 'window_duplicateNode',
+				label: 'Duplicate',
+				accelerator: 'CommandOrControl+Shift+D',
+				registerAccelerator: false,
+				click: actionPassthrough
+			},
 			{ type: 'separator' },
 			{
 				id: 'window_closeCurrentFile',

@@ -282,8 +282,9 @@ ipcMain.handle('messageDialog', (event, args) => {
 ipcMain.handle('move', async (event, filepath, newPath) => {
 	const windowHandle = getWindowHandle(event.sender)
 	const workspace = validateWorkspaceForHandleFilepath(windowHandle, filepath)
+	const otherSpace = validateWorkspaceForHandleFilepath(windowHandle, newPath)
 
-	if (workspace) {
+	if (workspace && otherSpace) {
 		try {
 			await workspace.move(filepath, newPath)
 		}
@@ -294,7 +295,30 @@ ipcMain.handle('move', async (event, filepath, newPath) => {
 		}
 	}
 	else {
-		log.error('A window tried to rename a file outside of an open workspace', {
+		log.error('A window tried to move a file outside of an open workspace', {
+			filepath
+		})
+		windowHandle.postUserMessage('error', 'A file was attempted to be renamed outside of the workspace and was not renamed. ' + filepath)
+	}
+})
+
+ipcMain.handle('copy', async (event, filepath, newPath) => {
+	const windowHandle = getWindowHandle(event.sender)
+	const workspace = validateWorkspaceForHandleFilepath(windowHandle, filepath)
+	const otherSpace = validateWorkspaceForHandleFilepath(windowHandle, newPath)
+
+	if (workspace && otherSpace) {
+		try {
+			await workspace.copy(filepath, newPath)
+		}
+		catch (err) {
+			log.error(`Failed to copy ${filepath} to ${newPath}.`, err)
+			const filename = workspace.contentsStore.pathToRelativePath(filepath) || filepath
+			windowHandle.postUserMessage('error', `An error occured while copying ${filename}.\nPlease save your work elsewhere and restart Tangent.`)
+		}
+	}
+	else {
+		log.error('A window tried to copy a file outside of an open workspace', {
 			filepath
 		})
 		windowHandle.postUserMessage('error', 'A file was attempted to be renamed outside of the workspace and was not renamed. ' + filepath)

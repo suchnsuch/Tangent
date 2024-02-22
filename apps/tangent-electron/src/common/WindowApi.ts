@@ -73,6 +73,7 @@ export default interface WindowAPI {
 		createFile(path: string, options?: IndexData): Promise<void>
 		createFolder(path: string): Promise<void>
 		move(filepath: string, newPath: string): Promise<void>
+		copy(filepath: string, newPath?: string): Promise<void>
 		delete(filepath: string): Promise<void>
 		
 		/** Open a file and receive any changes via `onReceiveFileContents` */

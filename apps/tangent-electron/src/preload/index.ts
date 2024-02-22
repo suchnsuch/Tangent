@@ -130,6 +130,9 @@ let bridge: WindowApi = {
 		move(filepath, newPath) {
 			return ipcRenderer.invoke('move', filepath, newPath)
 		},
+		copy(filepath, newPath) {
+			return ipcRenderer.invoke('copy', filepath, newPath)
+		},
 		delete(filepath) {
 			return ipcRenderer.invoke('delete', filepath)
 		},

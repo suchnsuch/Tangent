@@ -259,6 +259,10 @@ function buildMainMenu() {
 					label: 'Save',
 					command: cmds.saveCurrentFile
 				},
+				{
+					label: 'Duplicate',
+					command: cmds.duplicateNode
+				},
 				{ type: 'separator' },
 				{ command: cmds.closeCurrentFile },
 				{ command: cmds.closeOtherFiles },

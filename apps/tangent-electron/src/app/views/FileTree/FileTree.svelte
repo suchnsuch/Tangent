@@ -127,8 +127,16 @@ function itemContext(event: MouseEvent, item: TreeNode) {
 	}
 
 	if (item.fileType !== 'tag') {
+
 		menu.push({
 			command: workspace.commands.openInFileBrowser,
+			commandContext: {
+				target: item
+			}
+		})
+
+		menu.push({
+			command: workspace.commands.duplicateNode,
 			commandContext: {
 				target: item
 			}
