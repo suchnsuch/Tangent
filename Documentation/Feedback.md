@@ -1,9 +1,9 @@
-Tangent has a [Discord Server](https://discord.gg/6VpvhUnxFe), a [Mastodon Handle](https://pkm.social/@tangentnotes), and  a [Twitter Handle](https://twitter.com/TangentNotes). Feel free to reach out on any platform if you have a suggestion, request, or need help.
+Tangent has a [Discord Server](https://discord.gg/6VpvhUnxFe) and a [Mastodon Handle](https://mastodon.social/@tangentnotes). Feel free to reach out on either platform if you have a suggestion, request, or need help.
 
-Tangent is developed by [Taylor Hadden](https://twitter.com/Cptn_ChillPill), and you can bug me directly on Twitter if you like.
+Tangent is developed by [Taylor Hadden](https://mastodon.social/@taylorhadden), and you can talk to me directly on Mastodon if you prefer.
 
 # Bug Reports
-If you encounter a bug, I'm sorry! I hope you haven't lost any work. The best way to report a bug is by [opening a new issue on GitHub](https://github.com/suchnsuch/tangent-public/issues/new); however, you can also reach out on the Discord, Mastodon, or Twitter.
+If you encounter a bug, I'm sorry! I hope you haven't lost any work. The best way to report a bug is by [opening a new issue on GitHub](https://github.com/suchnsuch/Tangent/issues/new); however, you can also reach out on the Discord or Mastodon.
 
 The best way I can help you fix a bug is if you can be as specific as possible. Any of these resources can be very helpful:
 
