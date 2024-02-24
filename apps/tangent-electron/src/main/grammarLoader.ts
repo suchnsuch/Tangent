@@ -6,13 +6,22 @@ import { loadWASM, createOnigScanner, createOnigString } from 'vscode-oniguruma'
 import Logger from 'js-logger'
 const log = Logger.get('grammar-loader')
 
-function getNodePath(partial: string) {
-	return path.resolve(__dirname, '../../../../node_modules', partial)
+async function getNodePath(partial: string) {
+	try {
+		const truePath = path.resolve(__dirname, '../../node_modules', partial) 
+		// Confirm it exists:
+		const stat = await fs.promises.stat(truePath)
+		return truePath
+	}
+	catch (e) {
+		log.warn('Falling back to root node modules for:', partial)
+		return path.resolve(__dirname, '../../../../node_modules', partial)
+	}
 }
 
 async function loadVSCodeOnigurumaLib() {
 	try {
-		const wasmPath = getNodePath('vscode-oniguruma/release/onig.wasm')
+		const wasmPath = await getNodePath('vscode-oniguruma/release/onig.wasm')
 		log.info('Loading onigurama wasm from: ' + wasmPath)
 		const wasmBin = (await fs.promises.readFile(wasmPath)).buffer
 		log.info('    onigurama bin read from disk...')
@@ -47,7 +56,7 @@ export function getRegistry() {
 			onigLib: getOnigurumaLib(),
 			async loadGrammar(scopeName: string) {
 				if (scopeName === 'source.tangentquery') {
-					const grammarPath = getNodePath('@such-n-such/tangent-query-parser/syntaxes/tangentquery.tmLanguage.json')
+					const grammarPath = await getNodePath('@such-n-such/tangent-query-parser/syntaxes/tangentquery.tmLanguage.json')
 					try {
 						log.info('Loading source.tangentquery grammar from: ' + grammarPath)
 						const file = await fs.promises.readFile(
