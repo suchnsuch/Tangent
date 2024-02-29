@@ -919,14 +919,14 @@ export default function editorModule(editor: Editor, options: {
 	function toggleItalic(event: ShortcutEvent) {
 		toggleInlineFormat(
 			event,
-			workspace.settings.italicsCharacters.value,
+			workspace?.settings?.italicsCharacters.value ?? '_',
 			attr => attr?.italic)
 	}
 
 	function toggleBold(event: ShortcutEvent) {
 		return toggleInlineFormat(
 			event,
-			workspace.settings.boldCharacters.value,
+			workspace?.settings?.boldCharacters.value ?? '**',
 			attr => attr?.bold)
 	}
 
@@ -970,37 +970,43 @@ export default function editorModule(editor: Editor, options: {
 		}
 		if (range) {
 			// Toggle off
-			const [start, end] = range
+			const lineRanges = doc.getLineRanges(range)
 			const change = editor.change
-				.delete([start, start + formatLength])
-				.delete([end - formatLength, end ])
-			
+
 			let newAt = at
 			let newTo = to
-			const atNormal = at - start
-			const toNormal = to - start
-			const length = end - start
 
-			if (atNormal < formatLength) {
-				newAt -= atNormal
-			}
-			else if (atNormal > length - formatLength) {
-				newAt -= formatLength + (atNormal - (length - formatLength))
-			}
-			else {
-				newAt -= formatLength
+			for (const lineRange of lineRanges) {
+				const [start, end] = range
+				change
+					.delete([start, start + formatLength])
+					.delete([end - formatLength, end ])
+				
+				const atNormal = at - start
+				const toNormal = to - start
+				const length = end - start
+
+				if (atNormal < formatLength) {
+					newAt -= atNormal
+				}
+				else if (atNormal > length - formatLength) {
+					newAt -= formatLength + (atNormal - (length - formatLength))
+				}
+				else {
+					newAt -= formatLength
+				}
+
+				if (toNormal < formatLength) {
+					newTo -= toNormal
+				}
+				else if (toNormal > length - formatLength) {
+					newTo -= formatLength + (toNormal - (length - formatLength))
+				}
+				else {
+					newTo -= formatLength
+				}
 			}
 
-			if (toNormal < formatLength) {
-				newTo -= toNormal
-			}
-			else if (toNormal > length - formatLength) {
-				newTo -= formatLength + (toNormal - (length - formatLength))
-			}
-			else {
-				newTo -= formatLength
-			}
-			
 			change.select([newAt, newTo])
 			change.apply()
 		}
@@ -1012,18 +1018,33 @@ export default function editorModule(editor: Editor, options: {
 			}
 			const [start, end] = target
 
+			const lineRanges = doc.getLineRanges(target)
 			const change = editor.change
-				.insert(start, formattingCharacters)
-				.insert(end, formattingCharacters)
+			let affectedLineCount = 0
+			for (const lineRange of lineRanges) {
+				const [lineStart, lineEnd] = lineRange
+
+				if (doc.getText(lineRange).trim() === '') {
+					// skip empty lines
+					continue
+				}
+
+				affectedLineCount++
+				const s = Math.max(start, lineStart)
+				const e = Math.min(lineEnd - 1, end)
+				change
+					.insert(s, formattingCharacters)
+					.insert(e, formattingCharacters)
+			}
 
 			if (at === to && start !== end && at === end) {
 				// Selection was at the end of a word.
 				// Shift selection _outside_ the inline format characters.
-				change.select([at + formatLength * 2, to + formatLength * 2])
+				change.select([at + formatLength, to + formatLength * 2])
 			}
 			else {
 				// Shift selection so cursor position stays consistent
-				change.select([at + formatLength, to + formatLength])
+				change.select([at + formatLength, to + formatLength * affectedLineCount * 2 - 1])
 			}
 
 			change.apply()
@@ -1421,6 +1442,7 @@ export default function editorModule(editor: Editor, options: {
 				updateSelectionReveal = true
 			})
 		},
-		toggleLineComment
+		toggleLineComment,
+		toggleItalic
 	}
 }

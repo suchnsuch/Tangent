@@ -463,3 +463,97 @@ This is line 2`)
 		expect(editor.doc.selection).toEqual([5, 22])
 	})
 })
+
+describe('Inline formatting', () => {
+	let editor: MarkdownEditor
+	const waitTime = 1
+
+	beforeEach(() => {
+		editor = new MarkdownEditor(null)
+		editor.setRoot(document.createElement('div'))
+		editor.select(0)
+	})
+
+	it('Should toggle inline formatting on when selection is touching a word', async () => {
+		editor.doc = markdownToTextDocument(`This is a line of text.`)
+		editor.select(12)
+		await wait(waitTime)
+		editor.modules.tangent.toggleItalic(new Event(''))
+
+		expect(editor.getText()).toEqual('This is a _line_ of text.')
+		expect(editor.doc.selection).toEqual([13, 13])
+	})
+
+	it('Should toggle inline formatting off when selection is touching a range of formatted text', async () => {
+		editor.doc = markdownToTextDocument(`This is _a line of text._`)
+		editor.select(12)
+		await wait(waitTime)
+		editor.modules.tangent.toggleItalic(new Event(''))
+
+		expect(editor.getText()).toEqual('This is a line of text.')
+		expect(editor.doc.selection).toEqual([11, 11])
+	})
+
+	it('Should toggle inline formatting on for selected text', async () => {
+		editor.doc = markdownToTextDocument(`This is a line of text.`)
+		editor.select([8, 14])
+		await wait(waitTime)
+		editor.modules.tangent.toggleItalic(new Event(''))
+
+		expect(editor.getText()).toEqual('This is _a line_ of text.')
+		expect(editor.doc.selection).toEqual([9, 15])
+	})
+
+	it('Should toggle inline formatting on when two lines are selected', async () => {
+		editor.doc = markdownToTextDocument(`
+This is line one.
+This is line two.
+`)
+		editor.select([6, 26])
+		await wait(waitTime)
+		editor.modules.tangent.toggleItalic(new Event(''))
+
+		expect(editor.getText()).toEqual(`
+This _is line one._
+_This is_ line two.
+`)
+		expect(editor.doc.selection).toEqual([7, 29])
+	})
+
+	it('Should toggle inline formatting on when three lines are selected', async () => {
+		editor.doc = markdownToTextDocument(`
+This is line one.
+This is line two.
+This is line three.
+`)
+		editor.select([6, 44])
+		await wait(waitTime)
+		editor.modules.tangent.toggleItalic(new Event(''))
+
+		expect(editor.getText()).toEqual(`
+This _is line one._
+_This is line two._
+_This is_ line three.
+`)
+		expect(editor.doc.selection).toEqual([7, 49])
+	})
+
+	it('Should skip blank lines when toggling formatting on across them', async () => {
+		editor.doc = markdownToTextDocument(`
+This is line one.
+
+This is line two.
+`)
+		editor.select([6, 27])
+		await wait(waitTime)
+		editor.modules.tangent.toggleItalic(new Event(''))
+
+		expect(editor.getText()).toEqual(`
+This _is line one._
+
+_This is_ line two.
+`)
+		expect(editor.doc.selection).toEqual([7, 30])
+	})
+
+})
