@@ -28,7 +28,7 @@ import type { HrefFormedLink } from 'common/indexing/indexTypes'
 import type { Workspace } from 'app/model'
 import type { AutocompleteModule } from '../autocomplete/autocompleteModule'
 import { findLinkAround, matchMarkdownLink, matchWikiLink, resolveLink } from 'common/markdownModel/links'
-import { AttributePredicate, findWordAroundPositionInDocument, getEditInfo, getRangeWhile, intersectRanges, rangeIsCollapsed } from 'common/typewriterUtils'
+import { AttributePredicate, findWordAroundPositionInDocument, getEditInfo, getRangeWhile, getRangesIntersecting, intersectRanges, rangeIsCollapsed } from 'common/typewriterUtils'
 import { isLeftClick, startDrag } from 'app/utils'
 import { repeatString } from '@such-n-such/core'
 import { subscribeUntil } from 'common/stores'
@@ -955,11 +955,12 @@ export default function editorModule(editor: Editor, options: {
 
 		const formatLength = formattingCharacters.length
 
-		let range = getRangeWhile(doc, selection, predicate)
-		if (!range && at === to) {
+		const ranges = getRangesIntersecting(doc, selection, predicate)
+		if (ranges.length === 0 && at === to) {
 			// Collapsed selection
 			// check back
 			const [start, end] = doc.getLineRange(at)
+			let range: EditorRange = null
 			if (start < at - 1) {
 				range = getRangeWhile(doc, [at - 1, to], predicate, 'start')
 			}
@@ -967,16 +968,18 @@ export default function editorModule(editor: Editor, options: {
 				// check forward
 				range = getRangeWhile(doc, [at, to + 1], predicate, 'end')
 			}
+			if (range) {
+				ranges.push(range)
+			}
 		}
-		if (range) {
+		if (ranges.length > 0) {
 			// Toggle off
-			const lineRanges = doc.getLineRanges(range)
 			const change = editor.change
 
 			let newAt = at
 			let newTo = to
 
-			for (const lineRange of lineRanges) {
+			for (const range of ranges) {
 				const [start, end] = range
 				change
 					.delete([start, start + formatLength])
@@ -986,24 +989,30 @@ export default function editorModule(editor: Editor, options: {
 				const toNormal = to - start
 				const length = end - start
 
-				if (atNormal < formatLength) {
-					newAt -= atNormal
-				}
-				else if (atNormal > length - formatLength) {
-					newAt -= formatLength + (atNormal - (length - formatLength))
-				}
-				else {
+				if (atNormal >= formatLength) {
 					newAt -= formatLength
 				}
+				if (atNormal > length - formatLength) {
+					const offset = length - atNormal
+					if (offset > 0) {
+						newAt -= Math.min(formatLength, offset)
+					}
+					else {
+						newAt -= formatLength
+					}
+				}
 
-				if (toNormal < formatLength) {
-					newTo -= toNormal
-				}
-				else if (toNormal > length - formatLength) {
-					newTo -= formatLength + (toNormal - (length - formatLength))
-				}
-				else {
+				if (toNormal >= formatLength) {
 					newTo -= formatLength
+				}
+				if (toNormal > length - formatLength) {
+					const offset = length - toNormal
+					if (offset > 0) {
+						newTo -= Math.min(formatLength, offset)
+					}
+					else {
+						newTo -= formatLength
+					}
 				}
 			}
 

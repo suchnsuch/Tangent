@@ -228,6 +228,71 @@ export function getRangeWhile(
 	return [start, end]
 }
 
+export function getRangesIntersecting(
+	doc: TextDocument,
+	range: EditorRange,
+	predicate: AttributePredicate
+): EditorRange[] {
+	let ranges: EditorRange[] = []
+	
+	const delta = doc.toDelta()
+	const startOpDetails = getOpDetailsForTextPosition(delta, range[0])
+	if (!startOpDetails) return ranges
+
+	let startIndex = startOpDetails.range[1]
+	const endIndex = range[1]
+
+	let walkingOp = startOpDetails.op
+	let opIndex = startOpDetails.index
+
+	let nextRange: EditorRange = null
+
+	const moveNext = (step: number) => {
+		opIndex += step
+		if (opIndex < 0 || opIndex >= delta.ops.length) {
+			return false
+		}
+		walkingOp = delta.ops[opIndex]
+		return true
+	}
+
+	if (predicate(startOpDetails.op.attributes)) {
+		nextRange = startOpDetails.range.slice() as EditorRange
+
+		// Look back to catch previous intersections
+		while (moveNext(-1) && predicate(walkingOp.attributes)) {
+			nextRange[0] -= Op.length(walkingOp)
+		}
+
+		startIndex = nextRange[1]
+		// Reset
+		walkingOp = startOpDetails.op
+		opIndex = startOpDetails.index
+	}
+
+	// Move forward to catch future intersections
+	while (moveNext(1)) {
+		const length = Op.length(walkingOp)
+		
+		if (predicate(walkingOp.attributes)) {
+			if (!nextRange) {
+				nextRange = [startIndex, startIndex]
+			}
+
+			nextRange[1] += length
+		}
+		else if (nextRange) {
+			ranges.push(nextRange)
+			nextRange = null
+		}
+
+		startIndex += length
+		if (!nextRange && startIndex >= endIndex) break
+	}
+
+	return ranges
+}
+
 export function getLineRangeWhile(
 	doc: TextDocument,
 	startingRange: number | EditorRange,

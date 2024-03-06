@@ -566,7 +566,17 @@ _This is_ line two.
 		expect(editor.doc.selection).toEqual([5, 17])
 	})
 
-	it('Should remove an inline format range intersecting the selection', async () => {
+	it('Should remove an inline format range intersecting the beginning of the selection', async () => {
+		editor.doc = markdownToTextDocument(`This is _a line_ of text.`)
+		editor.select([9, 19])
+		await wait(waitTime)
+		editor.modules.tangent.toggleItalic(new Event(''))
+
+		expect(editor.getText()).toEqual('This is a line of text.')
+		expect(editor.doc.selection).toEqual([8, 17])
+	})
+
+	it('Should remove an inline format range intersecting the end of the selection', async () => {
 		editor.doc = markdownToTextDocument(`This is _a line_ of text.`)
 		editor.select([5, 11])
 		await wait(waitTime)
@@ -576,14 +586,14 @@ _This is_ line two.
 		expect(editor.doc.selection).toEqual([5, 10])
 	})
 
-	it('Should remove multiple inline format ranges within or intersecting selectino', async () => {
+	it('Should remove multiple inline format ranges within or intersecting selection', async () => {
 		editor.doc = markdownToTextDocument(`This is _a_ line _of_ text.`)
 		editor.select([5, 19])
 		await wait(waitTime)
 		editor.modules.tangent.toggleItalic(new Event(''))
 
 		expect(editor.getText()).toEqual('This is a line of text.')
-		expect(editor.doc.selection).toEqual([5, 17])
+		expect(editor.doc.selection).toEqual([5, 16])
 	})
 
 })
