@@ -989,6 +989,9 @@ export default function editorModule(editor: Editor, options: {
 				const toNormal = to - start
 				const length = end - start
 
+				if (0 < atNormal && atNormal < formatLength) {
+					newAt -= formatLength - atNormal
+				}
 				if (atNormal >= formatLength) {
 					newAt -= formatLength
 				}
@@ -1002,6 +1005,9 @@ export default function editorModule(editor: Editor, options: {
 					}
 				}
 
+				if (0 < toNormal && toNormal < formatLength) {
+					newTo -= formatLength - toNormal
+				}
 				if (toNormal >= formatLength) {
 					newTo -= formatLength
 				}
@@ -1452,6 +1458,7 @@ export default function editorModule(editor: Editor, options: {
 			})
 		},
 		toggleLineComment,
-		toggleItalic
+		toggleItalic,
+		toggleBold
 	}
 }

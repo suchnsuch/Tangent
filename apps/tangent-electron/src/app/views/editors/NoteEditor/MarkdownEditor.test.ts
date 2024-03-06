@@ -596,4 +596,14 @@ _This is_ line two.
 		expect(editor.doc.selection).toEqual([5, 16])
 	})
 
+	it('Should adjust selection appropriately when selection is partially within formatting characters', async () => {
+		editor.doc = markdownToTextDocument(`Some **bold** stuff.`)
+		editor.select([6, 12])
+		await wait(waitTime)
+		editor.modules.tangent.toggleBold(new Event(''))
+
+		expect(editor.getText()).toEqual('Some bold stuff.')
+		expect(editor.doc.selection).toEqual([5, 9])
+	})
+
 })
