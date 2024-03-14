@@ -74,7 +74,8 @@ const {
 	hangingHeaders,
 	smartParagraphBreaks,
 	fixedTitle: fixedTitleSetting,
-	letCodeExpand
+	letCodeExpand,
+	linkClickPaneBehavior
 } = workspace.settings
 
 const editor = new MarkdownEditor(workspace)
@@ -639,10 +640,21 @@ function navigationForward(event: NavigationEvent) {
 	else {
 		const { shiftKey, altKey } = event.incitingEvent
 
+		let direction: NavigationData['direction'] = 'out'
+		if (altKey) {
+			direction = 'in'
+		}
+		else {
+			if (shiftKey !== (linkClickPaneBehavior.value === 'replace')) {
+				direction = 'replace'
+			}
+		}
+
+		console.log('Navigation forward')
 		dispatch('navigate', {
 			link,
 			origin: note,
-			direction: altKey ? 'in' : (shiftKey ? 'replace' : 'out')
+			direction
 		})
 	}
 }

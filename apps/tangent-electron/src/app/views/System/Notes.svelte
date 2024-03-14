@@ -54,7 +54,6 @@ async function getSpellCheckLanguages() {
 		<SettingView setting={settings.noteMargins} />
 		<SettingView setting={settings.fixedTitle} />
 		<SettingView setting={settings.hangingHeaders} />
-		<SettingView setting={settings.linkCursor} />
 	</div>
 
 	<h2>Editing</h2>
@@ -70,6 +69,12 @@ async function getSpellCheckLanguages() {
 				showReset={true}
 				getValues={getSpellCheckLanguages}/>
 		{/if}
+	</div>
+
+	<h2>Links</h2>
+	<div class="settingsGroup">
+		<SettingView setting={settings.linkCursor} />
+		<SettingView setting={settings.linkClickPaneBehavior} />
 	</div>
 
 	<h2>Code</h2>

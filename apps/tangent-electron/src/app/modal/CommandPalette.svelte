@@ -236,10 +236,14 @@ function selectOption(selectEvent: CustomEvent<{option: Option, event: KeyboardE
 			target: option.node
 		}
 
-		if (isModKey(event)) {
+		if (isModKey(event) || event.shiftKey || event.altKey) {
 			nav.origin = 'current'
-			if (event.shiftKey) {
+			nav.direction = 'out'
+			if (event.shiftKey !== (workspace.settings.linkClickPaneBehavior.value === 'replace')) {
 				nav.direction = 'replace'
+			}
+			if (event.altKey) {
+				nav.direction = 'in'
 			}
 		}
 

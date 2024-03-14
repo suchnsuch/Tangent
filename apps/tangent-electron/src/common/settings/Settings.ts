@@ -170,6 +170,25 @@ export default class Settings extends ObjectStore {
 		}
 	})
 
+	// Navigation
+	linkClickPaneBehavior = new Setting<string>({
+		name: 'Links & Panes',
+		description: 'How opening a link affects currently open panes in the thread.',
+		validValues: [
+			{
+				value: 'new',
+				displayName: 'Links Open New Pane',
+				description: 'Clicking a link opens a new pane.\n\nShift-Click to replace the current pane with the link instead.'
+			},
+			{
+				value: 'replace',
+				displayName: 'Links Replace Pane',
+				description: 'Clicking a link replaces the content of its pane.\n\nShift-Click to open in a new pane.'
+			}
+		],
+		defaultValue: 'new'
+	})
+
 	// Map
 	mapZoomScrollMode = new Setting<string>({
 		name: 'Zoom & Pan',

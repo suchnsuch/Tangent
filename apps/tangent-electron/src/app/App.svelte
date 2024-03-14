@@ -57,6 +57,13 @@ $: {
 	document.body.classList.add('link-cursor-' + linkCursorMode)
 }
 
+$: linkClickPaneBehavior = workspace?.settings.linkClickPaneBehavior
+$: {
+	const linkPaneMode = (linkClickPaneBehavior != null && $linkClickPaneBehavior) ?? 'new'
+	document.body.classList.remove('link-click-pane-new', 'link-click-pane-replace')
+	document.body.classList.add('link-click-pane-' + linkPaneMode)
+}
+
 $: accentHue = workspace?.settings.accentHue
 $: accentSaturation = workspace?.settings.accentSaturation
 $: noteFont = workspace?.settings.noteFont

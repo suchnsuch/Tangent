@@ -579,9 +579,15 @@ t-link {
 		t-link, t-embed {
 			cursor: e-resize;
 		}
+		&.link-click-pane-new.shift-pressed, &.link-click-pane-replace:not(.shift-pressed) {
+			t-link, t-embed {
+				cursor: pointer;
+			}
+		}
 		&.alt-pressed {
 			t-link, t-embed {
-				cursor: w-resize;
+				// TODO: This is a gross important, but leaving it for now
+				cursor: w-resize !important;
 			}
 		}
 	}
