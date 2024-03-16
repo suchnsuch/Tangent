@@ -4,13 +4,14 @@ import Setting, { getValue, getDescription, getDisplayName, SettingType, Setting
 import type Workspace from 'app/model/Workspace'
 import SvgIcon from '../smart-icons/SVGIcon.svelte'
 import PopUpButton from 'app/utils/PopUpButton.svelte'
+import SettingResetButton from './SettingResetButton.svelte'
 
 const workspace = getContext('workspace') as Workspace
 
 export let setting: Setting<SettingType, SettingType> | Setting<SettingType, SettingType[]>
 export let name: string = null
 
-export let showReset = typeof setting.value === 'number' && setting.range != null
+export let showReset = true
 export let form: SettingForm = setting.form
 export let display: 'block' | 'inline' = 'block'
 
@@ -171,21 +172,15 @@ function toggleItem(item) {
 		{#if effectiveValueList}
 			{#if Array.isArray($setting)}
 				<div class="range">
-				<PopUpButton name={multiItemDisplay($setting, effectiveValueList)} buttonClass="grow">
-					{#each effectiveValueList as item}
-						<label>
-							<input on:click={() => toggleItem(item)} type="checkbox" checked={$setting.includes(getValue(item))} />
-							<span>{getDisplayName(item) || 'Default'}</span>
-						</label>
-					{/each}
-				</PopUpButton>
-				{#if showReset}
-					<button
-						on:click={() => applyValue(setting.defaultValue)}
-						disabled={$setting === setting.defaultValue}
-					>Reset</button>
-				{/if}
-			</div>
+					<PopUpButton name={multiItemDisplay($setting, effectiveValueList)} buttonClass="grow">
+						{#each effectiveValueList as item}
+							<label>
+								<input on:click={() => toggleItem(item)} type="checkbox" checked={$setting.includes(getValue(item))} />
+								<span>{getDisplayName(item) || 'Default'}</span>
+							</label>
+						{/each}
+					</PopUpButton>
+				</div>
 			{:else}
 				{#if form === 'select'}
 					<select
@@ -197,7 +192,7 @@ function toggleItem(item) {
 						{/each}
 					</select>
 				{:else}
-					<div class="values buttonGroup">
+					<div class="values buttonGroup grow">
 						{#each effectiveValueList as validValue}
 							<button class:active={getValue(validValue) === $setting}
 								title={getDescription(validValue)}
@@ -224,12 +219,6 @@ function toggleItem(item) {
 					max={displayMax($setting)}
 					step={setting.range.step ?? .01}
 					bind:value={$setting}/>
-				{#if showReset}
-					<button
-						on:click={() => applyValue(setting.defaultValue)}
-						disabled={$setting === setting.defaultValue}
-					>Reset</button>
-				{/if}
 			</div>
 		{:else if typeof $setting === 'string'}
 			<div class="buttonGroup" title={setting.description}>
@@ -259,7 +248,15 @@ function toggleItem(item) {
 				bind:checked={$setting}
 				on:click|stopPropagation
 			/>
-		
+			<span class="spacer"></span>
+		{/if}
+		{#if showReset}
+			<button
+				title={"Reset \"" + setting.name + "\" to its default value."}
+				class="reset subtle"
+				on:click={() => $setting = setting.defaultValue}
+				disabled={$setting === setting.defaultValue}
+			><SvgIcon size={20} ref="reset.svg#arc"/></button>
 		{/if}
 	</div>
 </main>
@@ -301,12 +298,13 @@ h2 {
 }
 
 .value {
+	display: flex;
 	select {
 		width: 100%;
 	}
 	input[type="checkbox"] {
 		position: relative;
-		top: 2px;
+		//top: 2px;
 	}
 }
 
@@ -316,7 +314,10 @@ h2 {
 }
 
 .range {
+	flex-grow: 1;
 	display: flex;
+	align-items: center;
+
 	input[type="number"] {
 		min-width: 4em;
 	}
@@ -330,4 +331,14 @@ h2 {
 		flex-grow: 1;
 	}
 }
+
+button.reset {
+	padding: 2px;
+	margin-left: 2px;
+
+	&:disabled {
+		visibility: hidden;
+	}
+}
+
 </style>

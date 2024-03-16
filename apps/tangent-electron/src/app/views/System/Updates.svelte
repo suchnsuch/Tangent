@@ -60,7 +60,7 @@ function laterButtonClick() {
 
 <main>
 	<p>
-		<SettingView setting={channel} />
+		<SettingView setting={channel} showReset={false} />
 		{#if $channel === 'beta'}
 			<div class="message">
 				The beta channel may contain bugs.

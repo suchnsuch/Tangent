@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+	<symbol id="arc" viewBox="0 0 24 24">
+		<path
+			d="
+			M 4,14
+			A 8,8 0 1 0 10,6
+			M 9,6
+			l 3,-3
+			M 9,6
+			l 3,3
+			"
+			style="stroke: var(--iconStroke, black); stroke-linecap: round; paint-order: fill; fill: none; stroke-width: 1.5px;"
+		/>
+	</symbol>
+</svg>
