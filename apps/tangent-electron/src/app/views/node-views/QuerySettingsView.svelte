@@ -35,10 +35,14 @@ function onRename(event: CustomEvent<string>) {
 	if (parent && grandparent) {
 		if (parent.name === 'Temp' && grandparent.name === '.tangent') {
 			event.preventDefault()
+			// If I want to do this again, I should make a move() function on the WorkspaceTreeNode directly
+			// perhaps by overloading `MoveFileCommand` to include rename support.
 			const validatedName = validateFileSegment(event.detail)
 			if (!validatedName) return
 			const newPath = paths.join(workspace.directoryStore.files.path, event.detail) + state.node.fileType
-			workspace.api.move(state.node.path, newPath)
+			// Set the name now. This prevents a double-rename bug.
+			state.node.name = validatedName
+			workspace.api.file.move(state.node.path, newPath)
 		}
 	}
 }
