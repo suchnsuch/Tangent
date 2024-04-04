@@ -9,8 +9,6 @@ import type { TagSectionData } from './tag'
 
 const defaultOptions = {}
 
-const clickMessage = (isMac ? '⌘+Click' : 'Ctrl+Click') + ' or middle-click to open in a new pane.'
-
 function getHideableFormatClass(attributes, baseClass = '') {
 	let className = baseClass
 
@@ -367,7 +365,6 @@ const noteTypeset:TypesetTypes = {
 					't-link',
 					{
 						class: className,
-						title: clickMessage,
 						...attributes.t_link
 					},
 					children)
@@ -400,10 +397,8 @@ const noteTypeset:TypesetTypes = {
 			postProcess: (node) => {
 				node.children.push(h(
 					't-embed',
-					{
-						title: clickMessage,
-						...(node as any).t_embed_props
-					}))
+					(node as any).t_embed_props
+				))
 				return node;
 			}
 		},

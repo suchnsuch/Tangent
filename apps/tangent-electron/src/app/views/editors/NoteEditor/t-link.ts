@@ -3,12 +3,53 @@ import type { Workspace } from 'app/model'
 import { TreeNode } from 'common/trees'
 import { HrefForm, HrefFormedLink, StructureType } from 'common/indexing/indexTypes'
 import { isExternalLink } from 'common/links'
+import { isMac } from 'common/isMac'
 
 type LinkState = 'uninitialized' | 'empty' | 'resolved' | 'ambiguous' | 'untracked' | 'external' | 'error'
+
+function getClickMessage(name='', location='in a new pane.') {
+	let result = isMac ? '⌘+Click' : 'Ctrl+Click'
+	result += ' or middle-click to open '
+	if (name) {
+		result += name + ' '
+	}
+	result += location
+	return result
+}
+
+function linkStateTooltip(state: LinkState, context: string | TreeNode | TreeNode[]) {
+	switch (state) {
+		case 'uninitialized':
+			return undefined
+		case 'empty':
+			return '\"' + (context as TreeNode).name + '\" is virtual.\n' + getClickMessage('it')
+		case 'resolved':
+			return context
+				? getClickMessage('\"' + (context as TreeNode).name + '\"')
+				: getClickMessage()
+		case 'ambiguous':
+			const workspace = (document as any).workspace as Workspace
+			const nodePaths = (context as TreeNode[]).map(n => workspace.directoryStore.pathToPortablePath(n.path))
+			return `This link is ambigious between ${nodePaths.length} files:\n`
+				+ nodePaths.map(p => '    - ' + p).join('\n')
+		case 'external':
+			return getClickMessage('', 'in your default browser.')
+		case 'untracked':
+			const store  = ((document as any).workspace as Workspace).directoryStore
+			let target = store.pathToRelativePath(context as string)
+			if (target === false) {
+				target = context as string
+			}
+			return getClickMessage(`\"${target}\"`, 'in its default application.')
+		case 'error':
+			return 'Something went wrong resolving this link.'
+	}
+}
 
 class TangentLink extends HTMLElement {
 
 	protected linkState: LinkState
+	protected tooltip: string
 	handleUnsub: () => void
 
 	constructor() {
@@ -32,7 +73,7 @@ class TangentLink extends HTMLElement {
 	}
 
 	static get observedAttributes() {
-		return ['link-state', 'href', 'content_id', 'form', 'from']
+		return ['link-state', 'title', 'href', 'content_id', 'form', 'from']
 	}
 
 	attributeChangedCallback(name: string, oldValue: string, newValue: string) {
@@ -45,6 +86,14 @@ class TangentLink extends HTMLElement {
 					this.setAttribute(name, this.linkState)
 				}
 				break
+			case 'title':
+				// This is a hack to ensure that the link state values *alwasy* remain, even if
+				// a silly virtual dom thinks it's better than us and wants to override the
+				// attributes
+				if (newValue !== this.tooltip) {
+					this.setAttribute(name, this.tooltip)
+				}
+				break;
 			case 'href':
 			case 'content_id':
 				requestCallbackOnIdle(() => this.updateState(), 1000)
@@ -56,7 +105,7 @@ class TangentLink extends HTMLElement {
 		let link = this.getLinkInfo()
 		if (link) {
 			if (isExternalLink(link.href)) {
-				this.setLinkState('external')
+				this.setLinkState('external', null)
 				this.dropNodeHandle()
 			}
 			else {
@@ -71,7 +120,7 @@ class TangentLink extends HTMLElement {
 			}
 		}
 		else {
-			this.setLinkState('resolved')
+			this.setLinkState('resolved', null)
 		}
 	}
 	
@@ -94,7 +143,7 @@ class TangentLink extends HTMLElement {
 			newState = 'resolved'
 		}
 
-		this.setLinkState(newState)
+		this.setLinkState(newState, value)
 	}
 
 	private dropNodeHandle() {
@@ -108,9 +157,11 @@ class TangentLink extends HTMLElement {
 		return this.linkState
 	}
 
-	setLinkState(value: LinkState) {
+	setLinkState(value: LinkState, context: string | TreeNode | TreeNode[]) {
 		this.linkState = value
 		this.setAttribute('link-state', value)
+		this.tooltip = linkStateTooltip(value, context)
+		this.setAttribute('title', this.tooltip)
 	}
 
 	onClick(event) {
