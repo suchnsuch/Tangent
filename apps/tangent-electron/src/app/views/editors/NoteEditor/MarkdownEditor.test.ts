@@ -483,6 +483,15 @@ describe('Inline formatting', () => {
 		expect(editor.getText()).toEqual('This is a _line_ of text.')
 		expect(editor.doc.selection).toEqual([13, 13])
 	})
+	it('Should toggle long inline formatting on when selection is touching a word', async () => {
+		editor.doc = markdownToTextDocument(`This is a line of text.`)
+		editor.select(12)
+		await wait(waitTime)
+		editor.modules.tangent.toggleBold(new Event(''))
+
+		expect(editor.getText()).toEqual('This is a **line** of text.')
+		expect(editor.doc.selection).toEqual([14, 14])
+	})
 
 	it('Should toggle inline formatting off when selection is touching a range of formatted text', async () => {
 		editor.doc = markdownToTextDocument(`This is _a line of text._`)
@@ -493,6 +502,15 @@ describe('Inline formatting', () => {
 		expect(editor.getText()).toEqual('This is a line of text.')
 		expect(editor.doc.selection).toEqual([11, 11])
 	})
+	it('Should toggle long inline formatting off when selection is touching a range of formatted text', async () => {
+		editor.doc = markdownToTextDocument(`This is **a line of text.**`)
+		editor.select(12)
+		await wait(waitTime)
+		editor.modules.tangent.toggleBold(new Event(''))
+
+		expect(editor.getText()).toEqual('This is a line of text.')
+		expect(editor.doc.selection).toEqual([10, 10])
+	})
 
 	it('Should toggle inline formatting on for selected text', async () => {
 		editor.doc = markdownToTextDocument(`This is a line of text.`)
@@ -502,6 +520,15 @@ describe('Inline formatting', () => {
 
 		expect(editor.getText()).toEqual('This is _a line_ of text.')
 		expect(editor.doc.selection).toEqual([9, 15])
+	})
+	it('Should toggle long inline formatting on for selected text', async () => {
+		editor.doc = markdownToTextDocument(`This is a line of text.`)
+		editor.select([8, 14])
+		await wait(waitTime)
+		editor.modules.tangent.toggleBold(new Event(''))
+
+		expect(editor.getText()).toEqual('This is **a line** of text.')
+		expect(editor.doc.selection).toEqual([10, 16])
 	})
 
 	it('Should toggle inline formatting on when two lines are selected', async () => {
@@ -518,6 +545,21 @@ This _is line one._
 _This is_ line two.
 `)
 		expect(editor.doc.selection).toEqual([7, 29])
+	})
+	it('Should toggle long inline formatting on when two lines are selected', async () => {
+		editor.doc = markdownToTextDocument(`
+This is line one.
+This is line two.
+`)
+		editor.select([6, 26])
+		await wait(waitTime)
+		editor.modules.tangent.toggleBold(new Event(''))
+
+		expect(editor.getText()).toEqual(`
+This **is line one.**
+**This is** line two.
+`)
+		expect(editor.doc.selection).toEqual([8, 32])
 	})
 
 	it('Should toggle inline formatting on when three lines are selected', async () => {
@@ -537,6 +579,23 @@ _This is_ line three.
 `)
 		expect(editor.doc.selection).toEqual([7, 49])
 	})
+	it('Should toggle long inline formatting on when three lines are selected', async () => {
+		editor.doc = markdownToTextDocument(`
+This is line one.
+This is line two.
+This is line three.
+`)
+		editor.select([6, 44])
+		await wait(waitTime)
+		editor.modules.tangent.toggleBold(new Event(''))
+
+		expect(editor.getText()).toEqual(`
+This **is line one.**
+**This is line two.**
+**This is** line three.
+`)
+		expect(editor.doc.selection).toEqual([8, 54])
+	})
 
 	it('Should skip blank lines when toggling formatting on across them', async () => {
 		editor.doc = markdownToTextDocument(`
@@ -555,12 +614,38 @@ _This is_ line two.
 `)
 		expect(editor.doc.selection).toEqual([7, 30])
 	})
+	it('Should skip blank lines when toggling long formatting on across them', async () => {
+		editor.doc = markdownToTextDocument(`
+This is line one.
+
+This is line two.
+`)
+		editor.select([6, 27])
+		await wait(waitTime)
+		editor.modules.tangent.toggleBold(new Event(''))
+
+		expect(editor.getText()).toEqual(`
+This **is line one.**
+
+**This is** line two.
+`)
+		expect(editor.doc.selection).toEqual([8, 33])
+	})
 
 	it('Should remove an inline format range contained in selection', async () => {
 		editor.doc = markdownToTextDocument(`This is _a line_ of text.`)
 		editor.select([5, 19])
 		await wait(waitTime)
 		editor.modules.tangent.toggleItalic(new Event(''))
+
+		expect(editor.getText()).toEqual('This is a line of text.')
+		expect(editor.doc.selection).toEqual([5, 17])
+	})
+	it('Should remove a long inline format range contained in selection', async () => {
+		editor.doc = markdownToTextDocument(`This is **a line** of text.`)
+		editor.select([5, 21])
+		await wait(waitTime)
+		editor.modules.tangent.toggleBold(new Event(''))
 
 		expect(editor.getText()).toEqual('This is a line of text.')
 		expect(editor.doc.selection).toEqual([5, 17])
@@ -575,6 +660,16 @@ _This is_ line two.
 		expect(editor.getText()).toEqual('This is a line of text.')
 		expect(editor.doc.selection).toEqual([8, 17])
 	})
+	it('Should remove a long inline format range intersecting the beginning of the selection', async () => {
+		editor.doc = markdownToTextDocument(`This is **a line** of text.`)
+		editor.select([10, 21])
+		await wait(waitTime)
+		editor.modules.tangent.toggleBold(new Event(''))
+
+		expect(editor.getText()).toEqual('This is a line of text.')
+		expect(editor.doc.selection).toEqual([8, 17])
+	})
+
 
 	it('Should remove an inline format range intersecting the end of the selection', async () => {
 		editor.doc = markdownToTextDocument(`This is _a line_ of text.`)
@@ -585,12 +680,30 @@ _This is_ line two.
 		expect(editor.getText()).toEqual('This is a line of text.')
 		expect(editor.doc.selection).toEqual([5, 10])
 	})
+	it('Should remove a long inline format range intersecting the end of the selection', async () => {
+		editor.doc = markdownToTextDocument(`This is **a line** of text.`)
+		editor.select([5, 11])
+		await wait(waitTime)
+		editor.modules.tangent.toggleBold(new Event(''))
+
+		expect(editor.getText()).toEqual('This is a line of text.')
+		expect(editor.doc.selection).toEqual([5, 9])
+	})
 
 	it('Should remove multiple inline format ranges within or intersecting selection', async () => {
 		editor.doc = markdownToTextDocument(`This is _a_ line _of_ text.`)
 		editor.select([5, 19])
 		await wait(waitTime)
 		editor.modules.tangent.toggleItalic(new Event(''))
+
+		expect(editor.getText()).toEqual('This is a line of text.')
+		expect(editor.doc.selection).toEqual([5, 16])
+	})
+	it('Should remove multiple long inline format ranges within or intersecting selection', async () => {
+		editor.doc = markdownToTextDocument(`This is **a** line **of** text.`)
+		editor.select([5, 22])
+		await wait(waitTime)
+		editor.modules.tangent.toggleBold(new Event(''))
 
 		expect(editor.getText()).toEqual('This is a line of text.')
 		expect(editor.doc.selection).toEqual([5, 16])
