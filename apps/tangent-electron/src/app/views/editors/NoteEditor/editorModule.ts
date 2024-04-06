@@ -1059,7 +1059,7 @@ export default function editorModule(editor: Editor, options: {
 			}
 			else {
 				// Shift selection so cursor position stays consistent
-				change.select([at + formatLength, to + formatLength * affectedLineCount * 2 - 1])
+				change.select([at + formatLength, to + formatLength * (affectedLineCount * 2 - 1)])
 			}
 
 			change.apply()
