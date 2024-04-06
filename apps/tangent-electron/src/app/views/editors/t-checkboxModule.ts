@@ -1,5 +1,5 @@
 import { checkboxMatcher, matchList } from 'common/markdownModel/list';
-import type { Editor, Line } from 'typewriter-editor';
+import { getIndexFromNode, type Editor, type Line } from 'typewriter-editor';
 import TangentCheckbox from './NoteEditor/t-checkbox';
 
 export default function tCheckboxModule(editor: Editor) {
@@ -12,11 +12,8 @@ export default function tCheckboxModule(editor: Editor) {
 		const doc = editor.doc
 
 		// Find the logical line by way of the line elements index
-		const lineElement = checkbox.closest('.line')
-		const parent = lineElement.parentElement;
-		const index = Array.prototype.indexOf.call(parent.children, lineElement)
-		
-		const line = doc.lines[index]
+		const index = getIndexFromNode(editor, checkbox)
+		const line = doc.getLineAt(index)
 		toggleCheckboxOnLine(line)
 	}
 
