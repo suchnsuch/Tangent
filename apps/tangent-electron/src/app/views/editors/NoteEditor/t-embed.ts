@@ -84,15 +84,15 @@ class TangentEmbed extends TangentLink {
 
 			const handleForm = form => {
 				if (!form || form?.mode === 'error') {
-					this.setLinkState('error')
+					this.setLinkState('error', null)
 				}
 				else {
 					if (form.mode === 'image') {
 						if (isExternalLink(form.src)) {
-							return this.setLinkState('external')
+							return this.setLinkState('external', null)
 						}
 					}
-					this.setLinkState('resolved')
+					this.setLinkState('resolved', null)
 				}
 			}
 
