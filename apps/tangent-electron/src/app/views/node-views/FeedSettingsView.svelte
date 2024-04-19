@@ -11,14 +11,23 @@ $: settings = state.settings
 	setting={settings.sorting.sortKey}
 	name="Sort By"
 	display="inline"
-	form="select" />
+	form="select"
+	showReset={false}
+/>
 <SettingView
 	setting={settings.sorting.sortOrder}
 	name="Order"
 	display="inline"
-	form="select" />
+	form="select"
+	showReset={false}
+/>
 
-<SettingView setting={settings.startAt} display="inline" form="select" />
+<SettingView
+	setting={settings.startAt}
+	display="inline"
+	form="select"
+	showReset={false}
+/>
 
 <span class="spacer"></span>
 

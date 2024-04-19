@@ -4,7 +4,6 @@ import Setting, { getValue, getDescription, getDisplayName, SettingType, Setting
 import type Workspace from 'app/model/Workspace'
 import SvgIcon from '../smart-icons/SVGIcon.svelte'
 import PopUpButton from 'app/utils/PopUpButton.svelte'
-import SettingResetButton from './SettingResetButton.svelte'
 
 const workspace = getContext('workspace') as Workspace
 

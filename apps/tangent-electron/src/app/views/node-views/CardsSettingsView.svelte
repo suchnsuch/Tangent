@@ -10,12 +10,18 @@ $: settings = state.settings
 	setting={settings.sorting.sortKey}
 	name="Sort By"
 	display="inline"
-	form="select" />
+	form="select"
+	showReset={false}
+/>
 <SettingView
 	setting={settings.sorting.sortOrder}
 	name="Order"
 	display="inline"
-	form="select" />
+	form="select"
+	showReset={false}
+/>
 <SettingView
 	display="inline"
-	setting={settings.showWordCount}/>
+	setting={settings.showWordCount}
+	showReset={false}
+/>
