@@ -300,7 +300,7 @@ export default class WindowHandle {
 		if (optMessage) {
 			message.title = messageOrTitle
 		}
-		this.window.webContents.send('message', message)
+		this.window?.webContents?.send('message', message)
 	}
 
 	sendPastePlaintext() {

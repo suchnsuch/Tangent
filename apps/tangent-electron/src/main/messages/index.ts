@@ -353,8 +353,15 @@ ipcMain.on('openFile', (event, filepath) => {
 
 	if (windowHandle && workspace) {
 		log.info('opening file', filepath)
-		// This will auto-load and send the file contents
-		workspace.openFile(windowHandle, filepath)
+		try {
+			// This will auto-load and send the file contents
+			workspace.openFile(windowHandle, filepath)
+		}
+		catch (err) {
+			log.error('Failed to open file', filepath, err)
+			const filename = workspace.contentsStore.pathToRelativePath(filepath) || filepath
+			windowHandle.postUserMessage('error', `Tangent failed to open ${filename}. See logs for more details.`)
+		}
 	}
 	else {
 		// If we get here, that's bad
@@ -376,7 +383,14 @@ ipcMain.on('closeFile', (event, filepath) => {
 	const workspace = validateWorkspaceForHandleFilepath(windowHandle, filepath)
 	
 	if (windowHandle && workspace) {
-		workspace.dropFile(windowHandle, filepath)
+		try {
+			workspace.dropFile(windowHandle, filepath)
+		}
+		catch (err) {
+			log.error('Failed to close file', filepath, err)
+			const filename = workspace.contentsStore.pathToRelativePath(filepath) || filepath
+			windowHandle.postUserMessage('error', `Tangent failed to close ${filename}. See logs for more details.`)
+		}
 	}
 	else {
 		log.error('A window tried to close a file outside of an open workspace', {
