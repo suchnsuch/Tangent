@@ -720,3 +720,94 @@ This **is line one.**
 	})
 
 })
+
+describe('Link toggling', () => {
+	let editor: MarkdownEditor
+	const waitTime = 1
+
+	beforeEach(() => {
+		editor = new MarkdownEditor(null)
+		editor.setRoot(document.createElement('div'))
+		editor.select(0)
+	})
+
+	it('Should toggle a markdown link off', async () => {
+		editor.doc = markdownToTextDocument(`My cool [link](https://duckduckgo.com/) `)
+		editor.select(10)
+		await wait(waitTime)
+		editor.modules.tangent.toggleLink(new Event(''))
+
+		expect(editor.getText()).toEqual(`My cool link `)
+		expect(editor.doc.selection).toEqual([9, 9])
+	})
+
+	it('Toggling off a markdown link with the cursor in the url should place the cursor at the end', async () => {
+		editor.doc = markdownToTextDocument(`My cool [link](https://duckduckgo.com/) `)
+		editor.select(25)
+		await wait(waitTime)
+		editor.modules.tangent.toggleLink(new Event(''))
+
+		expect(editor.getText()).toEqual(`My cool link `)
+		expect(editor.doc.selection).toEqual([12, 12])
+	})
+
+	it('Toggling off a markdown link with the cursor at the end of the url the end', async () => {
+		editor.doc = markdownToTextDocument(`My cool [link](https://duckduckgo.com/) `)
+		editor.select(39)
+		await wait(waitTime)
+		editor.modules.tangent.toggleLink(new Event(''))
+
+		expect(editor.getText()).toEqual(`My cool link `)
+		expect(editor.doc.selection).toEqual([12, 12])
+	})
+
+	// TODO: Right now toggling off requires a collapsed selection.
+	it.skip('Toggling off a markdown link with selection spanned out of the url should offset correctly', async () => {
+		editor.doc = markdownToTextDocument(`My cool [link](https://duckduckgo.com/) thing dude`)
+		editor.select([10, 45])
+		await wait(waitTime)
+		editor.modules.tangent.toggleLink(new Event(''))
+
+		expect(editor.getText()).toEqual(`My cool link thing dude`)
+		expect(editor.doc.selection).toEqual([9, 18])
+	})
+
+	it('Should create a wiki link around a whole word', async () => {
+		editor.doc = markdownToTextDocument(`My cool Link `)
+		editor.select(10)
+		await wait(waitTime)
+		editor.modules.tangent.toggleWikiLink(new Event(''))
+
+		expect(editor.getText()).toEqual(`My cool [[Link]] `)
+	})
+
+	it('Should toggle a wiki link off', async () => {
+		editor.doc = markdownToTextDocument(`My cool [[Link]] `)
+		editor.select(10)
+		await wait(waitTime)
+		editor.modules.tangent.toggleWikiLink(new Event(''))
+
+		expect(editor.getText()).toEqual(`My cool Link `)
+		expect(editor.doc.selection).toEqual([8, 8])
+	})
+
+	it('Toggling off a wiki link with the cursor in the first formatting characters puts selection at the start', async () => {
+		editor.doc = markdownToTextDocument(`My cool [[Link]] `)
+		editor.select(9)
+		await wait(waitTime)
+		editor.modules.tangent.toggleWikiLink(new Event(''))
+
+		expect(editor.getText()).toEqual(`My cool Link `)
+		expect(editor.doc.selection).toEqual([8, 8])
+	})
+
+	it('Toggling off a wiki link with the cursor in the last formatting characters puts selection at the start', async () => {
+		editor.doc = markdownToTextDocument(`My cool [[Link]] `)
+		editor.select(15)
+		await wait(waitTime)
+		editor.modules.tangent.toggleWikiLink(new Event(''))
+
+		expect(editor.getText()).toEqual(`My cool Link `)
+		expect(editor.doc.selection).toEqual([12, 12])
+	})
+})

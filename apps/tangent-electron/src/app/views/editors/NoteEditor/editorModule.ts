@@ -793,10 +793,34 @@ export default function editorModule(editor: Editor, options: {
 				const link = findLinkAround(doc, at, matchMarkdownLink)
 				if (link) {
 					const { start, end } = link
-					editor.change
+					let [from, to] = editor.doc.selection
+
+					const secondMarkupStart = end - link.href.length - 3
+
+					let change = editor.change
 						.delete([start, start + 1])
-						.delete([end - link.href.length - 3, end])
-						.apply()
+						.delete([secondMarkupStart, end])
+
+					let selectionFixup = (value) => {
+
+						if (value > secondMarkupStart) {
+							value -= value - (secondMarkupStart)
+						}
+
+						if (value > start) {
+							// for the initial `[`
+							value -= 1
+						}
+
+						return value
+					}
+					
+					from = selectionFixup(from)
+					to = selectionFixup(to)
+
+					change.select([from, to])
+
+					change.apply()
 				}
 			}
 		}
@@ -884,10 +908,10 @@ export default function editorModule(editor: Editor, options: {
 
 			const text = doc.getText([linkStart, linkEnd])
 
-			const resolution = resolveLink(workspace.directoryStore, {
+			const resolution = workspace ? resolveLink(workspace.directoryStore, {
 				form: 'wiki',
 				href: text
-			})
+			}) : null
 
 			const change = editor.change
 
@@ -1459,6 +1483,9 @@ export default function editorModule(editor: Editor, options: {
 		},
 		toggleLineComment,
 		toggleItalic,
-		toggleBold
+		toggleBold,
+
+		toggleLink,
+		toggleWikiLink
 	}
 }
