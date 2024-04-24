@@ -68,9 +68,7 @@ export function matchMarkdownLink(text: string, startIndex=0): LinkInfo {
 			}
 		}
 
-		index-- // Pull back
-
-		if (depth !== 0 || text[index] !== ')') {
+		if (depth !== 0 || text[index - 1] !== ')') {
 			return null
 		}
 
@@ -79,7 +77,7 @@ export function matchMarkdownLink(text: string, startIndex=0): LinkInfo {
 			form: 'md',
 			start: startIndex + match.index,
 			end: startIndex + index,
-			href: text.substring(linkStart, index)
+			href: text.substring(linkStart, index - 1)
 		}
 		if (match[2]) {
 			details.text = match[2]

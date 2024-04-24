@@ -6,7 +6,7 @@ describe('Markdown Links', () => {
 		expect(matchMarkdownLink('[text](link)')).toEqual({
 			type: StructureType.Link,
 			start: 0,
-			end: 11,
+			end: 12,
 			form: 'md',
 			text: 'text',
 			href: 'link'
@@ -17,7 +17,7 @@ describe('Markdown Links', () => {
 		expect(matchMarkdownLink('foo [text](link) boo')).toEqual({
 			type: StructureType.Link,
 			start: 4,
-			end: 15,
+			end: 16,
 			form: 'md',
 			text: 'text',
 			href: 'link'
@@ -28,7 +28,7 @@ describe('Markdown Links', () => {
 		expect(matchMarkdownLink('[text](link())')).toEqual({
 			type: StructureType.Link,
 			start: 0,
-			end: 13,
+			end: 14,
 			form: 'md',
 			text: 'text',
 			href: 'link()'
@@ -37,7 +37,7 @@ describe('Markdown Links', () => {
 		expect(matchMarkdownLink('[text](link()thing)')).toEqual({
 			type: StructureType.Link,
 			start: 0,
-			end: 18,
+			end: 19,
 			form: 'md',
 			text: 'text',
 			href: 'link()thing'
@@ -46,7 +46,7 @@ describe('Markdown Links', () => {
 		expect(matchMarkdownLink('[text](link()thing[])')).toEqual({
 			type: StructureType.Link,
 			start: 0,
-			end: 20,
+			end: 21,
 			form: 'md',
 			text: 'text',
 			href: 'link()thing[]'
@@ -55,7 +55,7 @@ describe('Markdown Links', () => {
 		expect(matchMarkdownLink('My [md link](link(with)[brackets])')).toEqual({
 			type: StructureType.Link,
 			start: 3,
-			end: 33,
+			end: 34,
 			form: 'md',
 			text: 'md link',
 			href: 'link(with)[brackets]'
