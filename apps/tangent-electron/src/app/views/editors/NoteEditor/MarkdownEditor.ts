@@ -98,8 +98,12 @@ function getCopyRange(editor: Editor, event: ClipboardEvent): EditorRange {
 	return [from + lineRange[0], to + lineRange[0]]
 }
 
+interface MarkdownEditorOptions extends EditorOptions {
+	includeAutocomplete?: boolean
+}
+
 export default class MarkdownEditor extends Editor {
-	constructor(workspace: Workspace, options?: EditorOptions) {
+	constructor(workspace: Workspace, options?: MarkdownEditorOptions) {
 
 		options = options || {}
 
@@ -116,7 +120,7 @@ export default class MarkdownEditor extends Editor {
 			} = defaultModules
 
 			options.modules = {
-				autocomplete: workspace ? autocompleteBuilder([
+				autocomplete: (workspace && (options?.includeAutocomplete ?? true)) ? autocompleteBuilder([
 					new WikiLinkAutocompleter(workspace),
 					new TagAutocompleter(workspace)
 				]) : null,

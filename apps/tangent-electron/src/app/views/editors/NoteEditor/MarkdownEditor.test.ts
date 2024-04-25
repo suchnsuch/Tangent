@@ -1,6 +1,7 @@
 import { wait } from '@such-n-such/core'
 import { markdownToTextDocument } from 'common/markdownModel'
 import MarkdownEditor from './MarkdownEditor'
+import { Workspace } from 'app/model'
 
 describe('List Handling', () => {
 
@@ -729,6 +730,65 @@ describe('Link toggling', () => {
 		editor = new MarkdownEditor(null)
 		editor.setRoot(document.createElement('div'))
 		editor.select(0)
+	})
+
+	it('Should convert selected text to a markdown link with a url in the clipboard', async () => {
+		Object.assign(navigator, {
+			clipboard: {
+				readText() {
+					return Promise.resolve('https://duckduckgo.com/')
+				}
+			}
+		})
+
+		editor.doc = markdownToTextDocument(`My cool link`)
+		editor.select([8, 12])
+		await wait(waitTime)
+		await editor.modules.tangent.toggleLink(new Event(''))
+
+		expect(editor.getText()).toEqual('My cool [link](https://duckduckgo.com/)')
+		expect(editor.doc.selection).toEqual([39, 39])
+	})
+
+	it('Should convert the word under the cursor to a markdown link with a url in the clipboard', async () => {
+		Object.assign(navigator, {
+			clipboard: {
+				readText() {
+					return Promise.resolve('https://duckduckgo.com/')
+				}
+			}
+		})
+
+		editor.doc = markdownToTextDocument(`My cool link`)
+		editor.select(9)
+		await wait(waitTime)
+		await editor.modules.tangent.toggleLink(new Event(''))
+
+		expect(editor.getText()).toEqual('My cool [link](https://duckduckgo.com/)')
+		expect(editor.doc.selection).toEqual([39, 39])
+	})
+
+	it('Should convert a raw link to a markdown link', async () => {
+		// A tasty mock
+		let workspace = {
+			api: {
+				links: {
+					getTitle(link) {
+						return Promise.resolve('My Cool Title')
+					}
+				}
+			}
+		}
+		// Autocomplete gets angry when it's given a partial workspace
+		editor = new MarkdownEditor(workspace as Workspace, { includeAutocomplete: false })
+		editor.setRoot(document.createElement('div'))
+		editor.doc = markdownToTextDocument(`I have linked to https://duckduckgo.com/`)
+		editor.select(23)
+		await wait(waitTime)
+
+		await editor.modules.tangent.toggleLink(new Event(''))
+
+		expect(editor.getText()).toEqual('I have linked to [My Cool Title](https://duckduckgo.com/)')
 	})
 
 	it('Should toggle a markdown link off', async () => {
