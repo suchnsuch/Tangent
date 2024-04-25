@@ -84,6 +84,8 @@ export default class File extends WorkspaceTreeNode {
 	}
 
 	protected async cacheFileInternal(): Promise<FileContent> {
+		// No need to cache a virtual file. We know it's not there.
+		if (this.meta?.virtual) return this.contents
 
 		log.trace('caching ' + chalk.green(this.path))
 		try {
