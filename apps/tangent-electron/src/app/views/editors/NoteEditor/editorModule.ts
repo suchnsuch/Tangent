@@ -585,13 +585,18 @@ export default function editorModule(editor: Editor, options: {
 			// Pause selection reveal until mouse up
 			updateSelectionReveal = false
 
-			// Force a selection reset.
-			// This allows you to click inside an existing selection.
-			// This needs to happen while selection reveal is paused or reveal can flicker.
-			if (!rangeIsCollapsed(editor.doc.selection)) {
-				editor.select(null)
+			const bounds = editor.getBounds(editor.doc.selection)
+			if (bounds.top < event.clientY && bounds.bottom > event.clientY &&
+				bounds.left < event.clientX && bounds.right > event.clientX
+			) {
+				// When clicking within a selection, force a selection reset.
+				// This allows you to click inside an existing selection.
+				// This needs to happen while selection reveal is paused or reveal can flicker.
+				if (!rangeIsCollapsed(editor.doc.selection)) {
+					editor.select(null)
+				}
 			}
-			
+
 			startDrag({
 				end: () => {
 					// Timeout delay is necessary to avoid a strange bug where
