@@ -84,6 +84,8 @@ export default class Indexer {
 
 		let tasks = []
 		forAllNodes(this.store.files, (node, parent) => {
+			if (node.name.startsWith('.'))
+				return false
 			if (!this.isParseableFile(node))
 				return
 			nodeMap.set(node.path, node)
