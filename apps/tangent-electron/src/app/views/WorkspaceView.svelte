@@ -194,6 +194,8 @@ function onContextMenu(event: ExtendedContextEvent) {
 
 function openCreationRules(event: Event) {
 	event.preventDefault()
+	// Otherwise, the pop up menu closes itself immediately
+	event.stopPropagation()
 	newNoteMenuIsOpen = false
 	$systemMenuIsOpen = true
 	workspace.viewState.system.section.set('Creation Rules')
