@@ -234,6 +234,12 @@ foo: bar
 
 test`)
 	})
+
+	test('Empty front matter', () => {
+		ensureRoundTrip(`---
+---
+Hi there.`)
+	})
 	
 	test('Unclosed code', () => {
 		ensureRoundTrip(`\`\`\`js
@@ -277,6 +283,21 @@ And this is not yaml`, parsingOptions)
 					list: ['a', 'b', 3],
 					list2: ['foo', 'bar', 'bat']
 				}
+			}
+		])
+	})
+
+	it('Should handle completely empty front matter', () => {
+		const result = parser.parseMarkdown(`---
+---
+Hi there.`, parsingOptions)
+
+		expect(result.structure).toEqual([
+			{
+				type: StructureType.FrontMatter,
+				start: 0,
+				end: 7,
+				data: null
 			}
 		])
 	})

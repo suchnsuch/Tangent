@@ -218,10 +218,10 @@ export function parseMarkdown(source: string | TextDocument, options?: MarkdownP
 		}
 
 		const hitEnd = line === end
+		allCode = allCode ?? ''
 
 		// Close out the code
 		if (realLanguage) {
-			allCode = allCode || ''
 			
 			const tokens = tokenize(allCode, realLanguage)
 			if (!tokens) {
@@ -231,12 +231,14 @@ export function parseMarkdown(source: string | TextDocument, options?: MarkdownP
 
 			// This code is touchy. Make sure you run tests to confirm
 			if (hitEnd) {
-				// this catches empty or unflushed lines
-				// Don't use commitLine() as it messes with spans
-				builder.buildLine()
-				// Reset the span start to the _start_ of the `end` line
-				// This lets the caller decide how to format it
-				spanStart = feed.index - line.length
+				if (allCode) {
+					// this catches empty or unflushed lines
+					// Don't use commitLine() as it messes with spans
+					builder.buildLine()
+					// Reset the span start to the _start_ of the `end` line
+					// This lets the caller decide how to format it
+					spanStart = feed.index - line.length
+				}
 			}
 			else {
 				// The end of parsing will push the last line
@@ -275,14 +277,14 @@ export function parseMarkdown(source: string | TextDocument, options?: MarkdownP
 					strict: false
 				})
 
-				if (data) {
-					structure.push({
-						type: StructureType.FrontMatter,
-						start: 0,
-						end: feed.index,
-						data
-					})
+				structure.push({
+					type: StructureType.FrontMatter,
+					start: 0,
+					end: feed.index,
+					data
+				})
 
+				if (data) {
 					// Push links
 					if (data.tags) {
 						const tags = data.tags

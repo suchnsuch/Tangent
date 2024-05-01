@@ -224,6 +224,26 @@ article.note {
 		}
 	}
 
+	.frontMatterLine {
+		&.start, &.end {
+			height: rhythmUnit(1);
+			position: relative;
+			
+			&:not(.revealed)::after {
+				content: "";
+				display: block;
+				background: var(--deemphasizedTextColor);
+				opacity: .5;
+				height: 1px;
+
+				position: absolute;
+				top: rhythmUnit(.5);
+				left: .5em;
+				right: .5em;
+			}
+		}
+	}
+
 	code, .code_wrapper {
 		font-family: var(--codeFontFamily);
 	}

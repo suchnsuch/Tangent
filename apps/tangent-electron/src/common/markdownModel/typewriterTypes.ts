@@ -219,9 +219,15 @@ const noteTypeset:TypesetTypes = {
 				return prev.front_matter === next.front_matter
 			},
 			renderMultiple: lineData => {
-				const children = lineData.map(([attributes, children, id]) => {
+				const children = lineData.map(([attributes, children, id], index) => {
 					let props = getCoreLineProperties(attributes, 'frontMatterLine')
 					props.key = id
+					if (index === 0) {
+						props.className += ' start'
+					}
+					else if (index === lineData.length - 1) {
+						props.className += ' end'
+					}
 					return h('div', props, children)
 				})
 				return h('div', { className: 'frontMatter', spellcheck: false }, h('code', null, children))
