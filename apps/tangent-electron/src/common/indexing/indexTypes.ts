@@ -85,7 +85,7 @@ export namespace IndexData {
 		yield node.path
 		
 		const frontMatter = findFrontMatter(node)
-		if (frontMatter && Array.isArray(frontMatter.data.aliases)) {
+		if (frontMatter && Array.isArray(frontMatter.data?.aliases)) {
 			const base = paths.dirname(node.path)
 			for (const alias of frontMatter.data.aliases) {
 				if (typeof alias !== 'string') continue
