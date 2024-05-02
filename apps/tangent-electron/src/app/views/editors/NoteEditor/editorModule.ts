@@ -586,7 +586,8 @@ export default function editorModule(editor: Editor, options: {
 			updateSelectionReveal = false
 
 			const bounds = editor.getBounds(editor.doc.selection)
-			if (bounds.top < event.clientY && bounds.bottom > event.clientY &&
+			if (bounds &&
+				bounds.top < event.clientY && bounds.bottom > event.clientY &&
 				bounds.left < event.clientX && bounds.right > event.clientX
 			) {
 				// When clicking within a selection, force a selection reset.
