@@ -140,7 +140,7 @@ $: annotations.forwardFrom(state.annotations)
 $: focusing = (focusLevel >= FocusLevel.Paragraph) && (layout !== 'fill' || hasSelection && !justScrolled)
 $: virtual = $note.meta?.virtual
 
-$: willFixTitle = (fixedTitle ?? $fixedTitleSetting) && focusLevel <= FocusLevel.File
+$: willFixTitle = (fixedTitle ?? $fixedTitleSetting)
 
 editor.enabled = editable
 editor.on('root', onEditorRoot)
@@ -1277,6 +1277,17 @@ main {
 			top: var(--extraTop);
 			z-index: 10;
 			background: linear-gradient(var(--noteBackgroundColor), 92%, transparent);
+		}
+
+		> :global(header::before) {
+			content: "";
+			display: block;
+			height: var(--extraTop);
+			position: absolute;
+			bottom: 100%;
+			width: 100%;
+			z-index: 10;
+			background: var(--noteBackgroundColor);
 		}
 	}
 }
