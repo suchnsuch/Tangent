@@ -1,4 +1,4 @@
-import { defaultModules, Editor, EditorOptions, Delta, EditorRange } from "typewriter-editor"
+import { defaultModules, Editor, EditorOptions, Delta, EditorRange, Source } from "typewriter-editor"
 
 import htmlToMarkdown from '@such-n-such/tangent-html-to-markdown'
 import editorModule from './editorModule'
@@ -155,5 +155,12 @@ export default class MarkdownEditor extends Editor {
 	outdent(): this {
 		indentLines(this, -1)
 		return this
+	}
+
+	select(at: number | EditorRange, source?: Source): this {
+		if (this.modules.input.isComposing()) {
+			return this
+		}
+		return super.select(at, source)
 	}
 }
