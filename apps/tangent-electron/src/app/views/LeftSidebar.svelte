@@ -17,7 +17,6 @@ import SvgIcon from './smart-icons/SVGIcon.svelte'
 
 const workspace = getContext('workspace') as Workspace
 
-// Sidebar
 const mode = workspace.viewState.leftSidebar.mode
 const size = workspace.viewState.leftSidebar.size
 const currentTab = workspace.viewState.leftSidebar.currentTab
@@ -38,6 +37,11 @@ const tabs = [
 export let visible: boolean
 export let hoveringOver: boolean
 export let resizing: boolean = false
+export let width = 100
+
+let windowWidth = 100
+
+$: width = Math.min($size, windowWidth - 40)
 
 let sortMenuIsOpen = false
 let directoryViewSort = workspace.viewState.directoryView.sortMode
@@ -102,6 +106,8 @@ function onWorkspaceNameContextMenu(event: MouseEvent) {
 }
 </script>
 
+<svelte:window bind:innerWidth={windowWidth} />
+
 <!-- svelte-ignore a11y-mouse-events-have-key-events -->
 <!-- svelte-ignore a11y-no-static-element-interactions -->
 <div 
@@ -112,7 +118,7 @@ function onWorkspaceNameContextMenu(event: MouseEvent) {
 	on:mouseover={() => updateHoveringLeftSidebar(true)}
 	on:mouseleave={() => updateHoveringLeftSidebar(false)}
 	on:contextmenu={onSidebarContextMenu}
-	style={ `width: ${$size}px; transform: translateX(${visible ? 0 : -$size - 10}px);` }
+	style={ `width: ${width}px; transform: translateX(${visible ? 0 : -width - 10}px);` }
 >
 	<header>
 		<div

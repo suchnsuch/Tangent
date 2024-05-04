@@ -62,7 +62,7 @@ $: {
 // Sidebar
 let sidebarHoverHotspot = workspace.settings.sidebarHoverHotspot
 let leftSidebarMode = workspace.viewState.leftSidebar.mode
-let leftSidebarSize = workspace.viewState.leftSidebar.size
+let leftSidebarSize = 100
 
 let leftSidebarVisible = $leftSidebarMode === SidebarMode.pinned
 let lastLeftSidebarShouldBeVisible = leftSidebarVisible
@@ -642,7 +642,7 @@ function buildMainMenu() {
 	<div
 		class="content"
 		class:resizing={resizingLeftSidebar}
-		style={`left: ${$leftSidebarMode === SidebarMode.pinned ? $leftSidebarSize : 0}px;`}
+		style={`left: ${$leftSidebarMode === SidebarMode.pinned ? leftSidebarSize : 0}px;`}
 		>
 		<TangentView tangent={workspace.viewState.tangent}/>
 	</div>
@@ -650,6 +650,7 @@ function buildMainMenu() {
 
 <LeftSidebar
 	visible={leftSidebarVisible}
+	bind:width={leftSidebarSize}
 	bind:hoveringOver={hoveringOverLeftSidebar}
 	bind:resizing={resizingLeftSidebar} />
 
@@ -670,6 +671,7 @@ main {
 	position: absolute;
 	inset: 0;
 	overflow: hidden;
+	background-color: var(--noteBackgroundColor);
 }
 
 .content {
