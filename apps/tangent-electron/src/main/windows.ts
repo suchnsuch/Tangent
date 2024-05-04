@@ -19,6 +19,8 @@ export function createWindow(assignedWorkspace?: string) {
 	let windowOptions: Electron.BrowserWindowConstructorOptions = {
 		width: 2000,
 		height: 1200,
+		minWidth: 100,
+		minHeight: 100,
 		webPreferences: {
 			preload: path.join(__dirname, 'preload.js')
 		},
