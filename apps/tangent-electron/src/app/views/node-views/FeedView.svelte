@@ -341,6 +341,7 @@ function extraBottomClick(event: MouseEvent) {
 	use:cachedScroll={{ scrollY, applicationDelay: scrollResumePromise }}
 	on:mousemove={updateShowCreateFromHover}
 	style:padding-top={`${extraTop}px`}
+	style:--fixedHeaderExtraTop={`${extraTop}px`}
 >
 	{#each feedNodes as item (item.path)}
 		<!-- svelte-ignore a11y-click-events-have-key-events -->
@@ -424,4 +425,8 @@ function extraBottomClick(event: MouseEvent) {
 	background: var(--backgroundColor);
 	color: var(--deemphasizedTextColor);
 }
+
+.feed .note :global(.fixedTitle) > :global(header::before) {
+	height: var(--fixedHeaderExtraTop);
+} 
 </style>
