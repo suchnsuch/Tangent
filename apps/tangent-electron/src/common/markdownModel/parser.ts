@@ -83,6 +83,8 @@ export function parseMarkdown(source: string | TextDocument, options?: MarkdownP
 	// Index values
 	let structure: StructureData[] = []
 
+	let errors: any[] = []
+
 	// Processing values
 	let awaiting: string[] = null
 	function flagAwaiting(message: string) {
@@ -275,9 +277,16 @@ export function parseMarkdown(source: string | TextDocument, options?: MarkdownP
 
 				// Yaml doesn't like tabs for indentation
 				let translated = allCode.replace(/\t+/g, '    ')
-				const data = parseYaml(translated, {
-					strict: false
-				})
+				let data: any = null
+				try {
+					data = parseYaml(translated, {
+						strict: false
+					})
+				}
+				catch (e) {
+					// TODO: make issues user-facing
+					errors.push(e)
+				}
 
 				structure.push({
 					type: StructureType.FrontMatter,
@@ -1087,6 +1096,7 @@ export function parseMarkdown(source: string | TextDocument, options?: MarkdownP
 	let result: ParseResult = {
 		lines: builder.lines,
 		structure,
+		errors,
 		awaiting
 	}
 	
@@ -1100,6 +1110,7 @@ export function parseMarkdown(source: string | TextDocument, options?: MarkdownP
 interface ParseResult {
 	lines: Line[]
 	structure: StructureData[]
+	errors?: any[] // TODO: Better errors
 	awaiting?: string[]
 	startLineIndex?: number
 }

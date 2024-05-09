@@ -318,6 +318,23 @@ Hi there.`, parsingOptions)
 		])
 	})
 
+	it('Should not throw with impropper YAML', () => {
+		const result = parser.parseMarkdown(`---
+dupe: 1
+dupe: 2
+---
+Hi there.`, parsingOptions)
+
+		expect(result.errors).toHaveLength(1)
+		expect(result.structure).toEqual([
+			{
+				type: StructureType.FrontMatter,
+				start: 0,
+				end: 23,
+				data: null
+			}
+		])
+	})
 })
 
 describe('Todos', () => {
