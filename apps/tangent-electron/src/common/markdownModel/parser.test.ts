@@ -301,6 +301,23 @@ Hi there.`, parsingOptions)
 			}
 		])
 	})
+
+	it('Should gracefully handle marginally inaccurate closing lines', () => {
+		const result = parser.parseMarkdown(`---
+test: thing
+--- 
+Hi there.`, parsingOptions)
+
+		expect(result.structure).toEqual([
+			{
+				type: StructureType.FrontMatter,
+				start: 0,
+				end: 20,
+				data: { test: 'thing' }
+			}
+		])
+	})
+
 })
 
 describe('Todos', () => {

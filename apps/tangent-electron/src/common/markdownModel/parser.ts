@@ -190,11 +190,14 @@ export function parseMarkdown(source: string | TextDocument, options?: MarkdownP
 
 		let allCode: string = null
 		let line: string = null
+		let hitEnd = false
 
 		while (feed.hasMore(true)) {
 			line = feed.getLineText(feed.index, true)
-			if (line === end) {
+			// Allow ending line to include whitespace
+			if (line.trimEnd() === end) {
 				// Break out and handle below
+				hitEnd = true
 				break
 			}
 
@@ -217,7 +220,6 @@ export function parseMarkdown(source: string | TextDocument, options?: MarkdownP
 			}
 		}
 
-		const hitEnd = line === end
 		allCode = allCode ?? ''
 
 		// Close out the code
