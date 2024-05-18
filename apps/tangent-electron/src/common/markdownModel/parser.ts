@@ -190,7 +190,8 @@ export function parseMarkdown(source: string | TextDocument, options?: MarkdownP
 			realLanguage = null
 		}
 
-		let allCode: string = null
+		// The code sent to be parsed by the language parser
+		let allCode: string = ''
 		let line: string = null
 		let hitEnd = false
 
@@ -203,30 +204,28 @@ export function parseMarkdown(source: string | TextDocument, options?: MarkdownP
 				break
 			}
 
-			// If there is a real langauge, pull data
-			allCode = allCode !== null ? allCode + '\n' + line : line
-
+			allCode = allCode + line
+			
 			if (!realLanguage) {
+				// We can commit this code immediately.
+				// Real languages are tokenized below.
 				commitSpan(0)
 			}
 
 			if (feed.hasMore(true)) {
+				// Line breaks need to be inserted manually
+				allCode += '\n'
+
 				if (!realLanguage) {
 					commitLine()
 				}
+				
 				moveNext(false, true)
-
-				if (!feed.hasMore(true)) {
-					allCode = allCode !== null ? allCode + '\n' + '' : ''
-				}
 			}
 		}
 
-		allCode = allCode ?? ''
-
 		// Close out the code
 		if (realLanguage) {
-			
 			const tokens = tokenize(allCode, realLanguage)
 			if (!tokens) {
 				console.error('No tokens for', realLanguage)
@@ -235,14 +234,9 @@ export function parseMarkdown(source: string | TextDocument, options?: MarkdownP
 
 			// This code is touchy. Make sure you run tests to confirm
 			if (hitEnd) {
-				if (allCode) {
-					// this catches empty or unflushed lines
-					// Don't use commitLine() as it messes with spans
-					builder.buildLine()
-					// Reset the span start to the _start_ of the `end` line
-					// This lets the caller decide how to format it
-					spanStart = feed.index - line.length
-				}
+				// Reset the span start to the _start_ of the `end` line
+				// This lets the caller decide how to format it
+				spanStart = feed.index - line.length
 			}
 			else {
 				// The end of parsing will push the last line

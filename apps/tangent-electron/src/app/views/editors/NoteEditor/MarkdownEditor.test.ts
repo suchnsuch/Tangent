@@ -871,3 +871,35 @@ describe('Link toggling', () => {
 		expect(editor.doc.selection).toEqual([12, 12])
 	})
 })
+
+describe('Code Formatting & Editing', () => {
+
+	let editor: MarkdownEditor
+	const waitTime = 1
+
+	beforeEach(() => {
+		editor = new MarkdownEditor(null)
+		editor.setRoot(document.createElement('div'))
+		editor.select(0)
+	})
+
+	// This (somewhat awkwardly) catches this issue: https://github.com/suchnsuch/Tangent/issues/72
+	it('Should correctly handle empty code blocks', () => {
+		editor.doc = markdownToTextDocument(`
+\`\`\`js
+a
+\`\`\`
+`)
+		editor.delete([7, 8])
+
+		// The active text should just be marked as an empty code line.
+		expect(editor.getActive()).toEqual({
+			empty: true,
+			code: 'js',
+
+			// These are for completeness, but aren't relevant to the actual text
+			redo: false,
+			undo: true
+		})
+	})
+})
