@@ -98,6 +98,13 @@ export default class UnicodeAutocompleter implements AutocompleteHandler {
 		if (!selection || selection[0] != selection[1]) return false
 
 		const line = doc.getLineAt(selection[0])
+		if (line.attributes.code) return false
+
+		// Use the format data of the previous character to "dead recon" this one
+		// as the new character will not yet be formatted.
+		const formats = doc.getFormats(selection[0] - 1)
+		if (formats.inline_code) return false
+		
 		const [lineStart, lineEnd] = doc.getLineRange(line)
 		const lineText = lineToText(line)
 
