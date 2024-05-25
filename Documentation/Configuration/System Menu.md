@@ -8,5 +8,7 @@ There are multiple sections:
 * [[Database]]
 * [[Maps]]
 * [[Notes]]
+* [[Custom Styles]]
+* [[Dictionary]]
 * [[Updates]]
 * [[Debug]]
