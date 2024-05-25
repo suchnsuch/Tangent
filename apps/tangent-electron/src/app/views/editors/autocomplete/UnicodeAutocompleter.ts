@@ -1,14 +1,15 @@
 import { Workspace } from 'app/model'
 import { AutocompleteHandler, AutocompleteModule } from './autocompleteModule'
 import { Editor, EditorRange, ShortcutEvent, TextDocument, normalizeRange } from 'typewriter-editor'
-import { findCharactersBetweenWhiteSpaceAtPositionInDocument, findWordAroundPositionInDocument } from 'common/typewriterUtils'
+import { findCharactersBetweenWhiteSpaceAtPositionInDocument, findWordAroundPositionInDocument, lineToText } from 'common/typewriterUtils'
 import { WritableStore } from 'common/stores'
 import { clamp } from 'common/utils'
+import { findCharactersBetweenWhitespace } from 'common/stringUtils'
 
 type MatcherItem = {
 	match: RegExp,
 	replace: string|string[],
-	autoActivates?: boolean
+	mustBeMidLine?: boolean // This is a way to dodge away from `---` markdown formatting collisions
 }
 
 const matches: MatcherItem[] = [
@@ -44,16 +45,13 @@ const matches: MatcherItem[] = [
 			'⟵'
 		]
 	},
-
-	// We don't want ndash and mdashes to automatically pop up
-	// as that collides _hard_ with the "horizontal rule" markdown syntax
 	{
 		match: /---/,
 		replace: [
 			'—',
 			'–'
 		],
-		autoActivates: false
+		mustBeMidLine: true
 	},
 	{
 		match: /--/,
@@ -61,7 +59,7 @@ const matches: MatcherItem[] = [
 			'–',
 			'—'
 		],
-		autoActivates: false
+		mustBeMidLine: true
 	}
 ]
 
@@ -86,7 +84,7 @@ export default class UnicodeAutocompleter implements AutocompleteHandler {
 
 	canActivateFromTyping(char: string, doc: TextDocument): false | EditorRange {
 		if (activateChars.includes(char)) {
-			return this.tryToActivate(doc, true)
+			return this.tryToActivate(doc)
 		}
 		return false
 	}
@@ -95,21 +93,24 @@ export default class UnicodeAutocompleter implements AutocompleteHandler {
 		return this.tryToActivate(doc)
 	}
 
-	tryToActivate(doc: TextDocument, autoActivate=false): false | EditorRange {
+	tryToActivate(doc: TextDocument): false | EditorRange {
 		const selection = normalizeRange(doc.selection)
 		if (!selection || selection[0] != selection[1]) return false
 
-		const [wordStart, wordEnd] = findCharactersBetweenWhiteSpaceAtPositionInDocument(doc, selection[0])
-		const text = doc.getText([wordStart, wordEnd])
+		const line = doc.getLineAt(selection[0])
+		const [lineStart, lineEnd] = doc.getLineRange(line)
+		const lineText = lineToText(line)
+
+		const [wordStart, wordEnd] = findCharactersBetweenWhitespace(lineText, selection[0] - lineStart)
+		const text = doc.getText([lineStart + wordStart, lineStart + wordEnd])
 
 		for (const matcher of matches) {
-			if (autoActivate && !(matcher.autoActivates ?? true)) {
-				continue
-			}
-
 			const match = text.match(matcher.match)
 			if (match) {
-				const start = wordStart + match.index
+				if (matcher.mustBeMidLine && wordStart === 0 && match.index === 0) {
+					continue
+				}
+				const start = lineStart + wordStart + match.index
 				const end = start + match[0].length
 				return [start, end]
 			}
