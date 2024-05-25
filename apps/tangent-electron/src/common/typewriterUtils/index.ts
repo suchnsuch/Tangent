@@ -1,5 +1,5 @@
 import { TextDocument, Line, Delta, Op, AttributeMap, EditorRange, normalizeRange } from '@typewriter/document'
-import { findWordAround } from '../stringUtils'
+import { findCharactersBetweenWhitespace, findWordAround } from '../stringUtils'
 
 export function rangeContainsRange(container: EditorRange, contained: EditorRange) {
 	if (!container || !contained) return false
@@ -91,6 +91,15 @@ export function findWordAroundPositionInDocument(doc: TextDocument, position: nu
 	const lineText = lineToText(line)
 
 	const [wordStart, wordEnd] = findWordAround(lineText, position - start)
+	return [start + wordStart, start + wordEnd]
+}
+
+export function findCharactersBetweenWhiteSpaceAtPositionInDocument(doc: TextDocument, position: number): EditorRange {
+	const line = doc.getLineAt(position)
+	const [start, end] = doc.getLineRange(line)
+	const lineText = lineToText(line)
+
+	const [wordStart, wordEnd] = findCharactersBetweenWhitespace(lineText, position - start)
 	return [start + wordStart, start + wordEnd]
 }
 

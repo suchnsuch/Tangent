@@ -57,6 +57,16 @@ export function findWordAround(text: string, position: number) {
 	return [wordStart, wordEnd]
 }
 
+export function findCharactersBetweenWhitespace(text: string, position: number) {
+	const match = /\S/
+	const behindSearch = searchWhileCharacterMatches(text, match, position, -1)
+	const wordStart = behindSearch.foundAnyMatches ? behindSearch.index : position
+	const aheadSearch = searchWhileCharacterMatches(text, match, position - 1, 1)
+	const wordEnd = aheadSearch.foundAnyMatches ? aheadSearch.index : position
+
+	return [wordStart, wordEnd]
+}
+
 export function padString(text: string, length: number) {
 	while (text.length < length) {
 		text += ' '

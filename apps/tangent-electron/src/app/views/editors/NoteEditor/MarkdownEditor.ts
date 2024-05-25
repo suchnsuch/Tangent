@@ -11,6 +11,7 @@ import tlinkModule from '../t-linkModule'
 import tCheckboxModule from '../t-checkboxModule'
 import TagAutocompleter from '../autocomplete/TagAutocompleter'
 import { getRegexMatchIndices } from '@such-n-such/core'
+import UnicodeAutocompleter from '../autocomplete/UnicodeAutocompleter'
 
 function indentLines(editor: MarkdownEditor, direction: -1 | 1) {
 	const { doc } = editor
@@ -122,7 +123,8 @@ export default class MarkdownEditor extends Editor {
 			options.modules = {
 				autocomplete: (workspace && (options?.includeAutocomplete ?? true)) ? autocompleteBuilder([
 					new WikiLinkAutocompleter(workspace),
-					new TagAutocompleter(workspace)
+					new TagAutocompleter(workspace),
+					new UnicodeAutocompleter(workspace)
 				]) : null,
 
 				...trimmedDefaultModules,

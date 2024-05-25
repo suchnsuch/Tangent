@@ -52,7 +52,9 @@ import paths from 'common/paths';
 import { NoteDetailMode } from 'app/model/nodeViewStates/NoteViewState';
 import TagAutocompleter from '../autocomplete/TagAutocompleter';
 import TagAutocompleteMenu from '../autocomplete/TagAutocompleteMenu.svelte';
-    import { getPixelValue } from 'app/utils/style';
+import { getPixelValue } from 'app/utils/style';
+import UnicodeAutocompleter from '../autocomplete/UnicodeAutocompleter';
+import UnicodeAutocompleteMenu from '../autocomplete/UnicodeAutocompleteMenu.svelte';
 
 // Technically, this just needs to exist _somewhere_. Putting it here because of the svelte dependency
 // Force the use of the variable so that it is included in the bundle
@@ -1179,6 +1181,8 @@ function onDetailsContexMenu(event: MouseEvent) {
 			<WikiLinkAutocompleteMenu {handler} />
 		{:else if handler instanceof TagAutocompleter}
 			<TagAutocompleteMenu {handler} />
+		{:else if handler instanceof UnicodeAutocompleter}
+			<UnicodeAutocompleteMenu {handler} />
 		{/if}
 	</AutoCompleteMenu>
 	{#if !editorIsFocused && virtual}
