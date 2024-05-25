@@ -12,6 +12,7 @@ import About from './About.svelte'
 import Maps from './Maps.svelte'
 import Notes from './Notes.svelte'
 import Styles from './Styles.svelte'
+import Dictionary from './Dictionary.svelte'
 import Debug from './Debug.svelte'
 import DocumentationLink from 'app/utils/DocumentationLink.svelte'
 
@@ -65,6 +66,10 @@ const menus = [
 	{
 		name: 'Custom Styles',
 		component: Styles
+	},
+	{
+		name: 'Dictionary',
+		component: Dictionary
 	},
 	{
 		name: 'Updates',

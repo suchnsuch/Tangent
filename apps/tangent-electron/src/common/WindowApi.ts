@@ -119,6 +119,11 @@ export default interface WindowAPI {
 		getRecentChanges(): Promise<string[]>
 	}
 
+	dictionary: {
+		getAllWords(): Promise<string[]>,
+		removeWord(string)
+	}
+
 	update: UpdateAPI
 }
 

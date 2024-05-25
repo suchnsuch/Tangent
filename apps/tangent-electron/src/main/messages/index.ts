@@ -16,6 +16,7 @@ import Logger from 'js-logger'
 import { fillDateFormat } from 'common/dates'
 
 import './queries'
+import './dictionary'
 import { FileSaveResult } from 'main/File'
 import { PromiseStarter } from '@such-n-such/core'
 

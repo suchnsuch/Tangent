@@ -204,6 +204,14 @@ let bridge: WindowApi = {
 			return ipcRenderer.invoke('documentation', 'getRecentChanges')
 		}
 	},
+	dictionary: {
+		getAllWords() {
+			return ipcRenderer.invoke('dictionary', 'getAllWords')
+		},
+		removeWord(word) {
+			return ipcRenderer.invoke('dictionary', 'remove', word)
+		}
+	},
 	update: {
 		onChecking(handler) {
 			on('checking-for-update', handler)
