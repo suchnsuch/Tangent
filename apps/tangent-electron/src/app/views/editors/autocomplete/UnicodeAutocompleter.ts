@@ -84,7 +84,7 @@ export default class UnicodeAutocompleter implements AutocompleteHandler {
 
 	canActivateFromTyping(char: string, doc: TextDocument): false | EditorRange {
 		if (activateChars.includes(char)) {
-			return this.tryToActivate(doc)
+			return this.tryToActivate(doc, true)
 		}
 		return false
 	}
@@ -93,7 +93,7 @@ export default class UnicodeAutocompleter implements AutocompleteHandler {
 		return this.tryToActivate(doc)
 	}
 
-	tryToActivate(doc: TextDocument): false | EditorRange {
+	tryToActivate(doc: TextDocument, autoActivate=false): false | EditorRange {
 		const selection = normalizeRange(doc.selection)
 		if (!selection || selection[0] != selection[1]) return false
 
@@ -114,7 +114,7 @@ export default class UnicodeAutocompleter implements AutocompleteHandler {
 		for (const matcher of matches) {
 			const match = text.match(matcher.match)
 			if (match) {
-				if (matcher.mustBeMidLine && wordStart === 0 && match.index === 0) {
+				if (autoActivate && matcher.mustBeMidLine && wordStart === 0 && match.index === 0) {
 					continue
 				}
 				const start = lineStart + wordStart + match.index
