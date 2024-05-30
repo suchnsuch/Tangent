@@ -405,8 +405,8 @@ export async function solveQuery(query: Query, interop: QuerySolverInterop): Pro
 					
 					for (const todo of IndexData.todos(node.meta)) {
 						if (targetState === TodoState.Any ||
-							(targetState === TodoState.Open && !todo.checked) ||
-							(targetState === TodoState.Closed && todo.checked))
+							(targetState === TodoState.Open && !todo.state) ||
+							(targetState === TodoState.Closed && todo.state))
 						{
 							annotations.push({
 								start: todo.start,

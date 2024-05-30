@@ -69,19 +69,25 @@ describe('Match List', () => {
 			indent: '',
 			form: ListForm.Unordered,
 			glyph: '- [ ]',
-			checked: false
+			todoState: 'open'
 		})
 		expect(matchList('- [] Collapsed checkbox!')).toEqual<ListDefinition>({
 			indent: '',
 			form: ListForm.Unordered,
 			glyph: '- []',
-			checked: false
+			todoState: 'open'
 		})
 		expect(matchList('+ [x] Checked checkbox!')).toEqual<ListDefinition>({
 			indent: '',
 			form: ListForm.Unordered,
 			glyph: '+ [x]',
-			checked: true
+			todoState: 'checked'
+		})
+		expect(matchList('+ [-] Checked checkbox!')).toEqual<ListDefinition>({
+			indent: '',
+			form: ListForm.Unordered,
+			glyph: '+ [-]',
+			todoState: 'canceled'
 		})
 	})
 })

@@ -74,8 +74,8 @@ export function getLineFormattingPrefix(line: Line, forNextLine = false): string
 					// Increment the number from the current value
 					nextGlyph = getGlyphForNumber(match.form, match.index + 1)
 				}
-				if (match.checked !== undefined) {
-					nextGlyph = nextGlyph.replace(/\[x?\]/, '[ ]')
+				if (match.todoState !== undefined) {
+					nextGlyph = nextGlyph.replace(/\[[x-]?\]/, '[ ]')
 				}
 			}
 

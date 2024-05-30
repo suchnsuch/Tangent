@@ -175,7 +175,11 @@ article.note {
 
 		&.checked:not(.revealed) {
 			color: var(--deemphasizedTextColor);
-			text-decoration: line-through 1.5px;
+			text-decoration: line-through 1.5px var(--textColor);
+		}
+		&.canceled:not(.revealed) {
+			color: var(--deemphasizedTextColor);
+			text-decoration: line-through wavy 1.5px;
 		}
 	}
 

@@ -4,17 +4,25 @@
 		<rect x="1" y="1" width="14" height="14"
 			stroke-width="2"
 			rx="3"
-			style="fill: var(--checkFill);
-			fill-opacity: var(--checkFillOpacity);
+			style="fill: var(--boxFill);
+			fill-opacity: var(--boxFillOpacity);
 			transition: fill-opacity .5s;
-			stroke: var(--checkStroke);"
+			stroke: var(--boxStroke);"
 		/>
 		<path
 			d="M 4 8 L 7 11 L 12 6"
 			stroke-width="2"
 			stroke-linecap="round"
 			stroke-linejoin="round"
-			style="fill: none; stroke: var(--markStroke); opacity: var(--markOpacity);"
+			style="fill: none; stroke: var(--checkStroke); opacity: var(--checkOpacity);"
+		/>
+
+		<path
+			d="M 4 8 L 12 8"
+			stroke-width="2"
+			stroke-linecap="round"
+			stroke-linejoin="round"
+			style="fill: none; stroke: var(--cancelStroke); opacity: var(--cancelOpacity);"
 		/>
 	</symbol>
 </svg>

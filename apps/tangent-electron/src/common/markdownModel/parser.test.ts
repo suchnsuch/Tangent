@@ -342,22 +342,30 @@ describe('Todos', () => {
 		const result = parser.parseMarkdown(`
 - Not a todo
 - [ ] An unchecked todo
-- [x] A checked todo`)
+- [x] A checked todo
+- [-] A canceled todo`)
 
 		expect(result.structure).toEqual([
 			{
 				type: StructureType.Todo,
 				start: 14,
 				end: 37,
-				checked: false,
+				state: 'open',
 				text: 'An unchecked todo'
 			},
 			{
 				type: StructureType.Todo,
 				start: 38,
 				end: 58,
-				checked: true,
+				state: 'checked',
 				text: 'A checked todo'
+			},
+			{
+				type: StructureType.Todo,
+				start: 59,
+				end: 80,
+				state: 'canceled',
+				text: 'A canceled todo'
 			}
 		])
 	})

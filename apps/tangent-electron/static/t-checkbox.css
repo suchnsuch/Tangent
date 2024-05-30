@@ -3,22 +3,32 @@
 }
 
 svg {
-	--checkStroke: var(--accentBackgroundColor);
-	--checkFill: var(--accentBackgroundColor);
-	--checkFillOpacity: 0;
+	--boxStroke: var(--accentBackgroundColor);
+	--boxFill: var(--accentBackgroundColor);
+	--boxFillOpacity: 0;
 	
-	--markStroke: white;
-	--markOpacity: 0;
+	--checkStroke: white;
+	--checkOpacity: 0;
+
+	--cancelStroke: white;
+	--cancelOpacity: 0;
 }
 
 :host(:hover) svg {
-	--checkFillOpacity: .25;
+	--boxFillOpacity: .25;
 }
 
-:host([checked="true"]) svg {
-	--checkFillOpacity: 1;
-	--markOpacity: 1;
+:host([state="checked"]) svg {
+	--boxFillOpacity: 1;
+	--checkOpacity: 1;
 }
-:host([checked="true"]:hover) svg {
-	--checkFillOpacity: .75;
+:host([state="checked"]:hover) svg {
+	--boxFillOpacity: .75;
+}
+
+:host([state="canceled"]) svg {
+	--boxFillOpacity: 1;
+	--boxFill: #666;
+	--boxStroke: #666;
+	--cancelOpacity: 1;
 }

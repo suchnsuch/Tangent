@@ -177,6 +177,7 @@ export interface FrontMatter {
 	data: { [key: string]: any }
 }
 
+export type TodoState = 'open' | 'checked' | 'canceled'
 export interface TodoInfo {
 	type: StructureType.Todo
 
@@ -184,7 +185,7 @@ export interface TodoInfo {
 	start: number
 	end: number
 
-	checked: boolean
+	state: TodoState
 	// The text after the checkbox
 	text: string
 }

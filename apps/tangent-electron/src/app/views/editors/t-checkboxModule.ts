@@ -26,7 +26,7 @@ export default function tCheckboxModule(editor: Editor) {
 		const listData = matchList(lineText)
 		if (!listData) return
 
-		if (listData.checked == undefined) return
+		if (listData.todoState == undefined) return
 
 		const checkMatch = listData.glyph.match(checkboxMatcher)
 		if (!checkMatch) return

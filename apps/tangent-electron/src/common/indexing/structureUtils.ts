@@ -20,7 +20,7 @@ export function structureSoftEquals(a: StructureData, b: StructureData): boolean
 			return false // TODO: This is _so_ not accurate :P
 		case StructureType.Todo:
 			b = b as (TodoInfo)
-			return a.checked === b.checked && a.text === b.text
+			return a.state === b.state && a.text === b.text
 		default:
 			throw new Error(`structureSoftEquals not implemented for ${(a as any).type}`)
 	}

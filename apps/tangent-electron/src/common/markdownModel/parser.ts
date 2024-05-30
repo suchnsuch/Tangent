@@ -517,16 +517,16 @@ export function parseMarkdown(source: string | TextDocument, options?: MarkdownP
 			const listDetail = matchList(line)
 			if (listDetail) {
 				const start = feed.index
-				if (listDetail.checked === undefined) {
+				if (listDetail.todoState === undefined) {
 					// IMPROVE: A dirty hack to make the delta format compose
-					listDetail.checked = null
+					listDetail.todoState = null
 				}
 				else {
 					structure.push({
 						type: StructureType.Todo,
 						start,
 						end: start + line.length,
-						checked: listDetail.checked,
+						state: listDetail.todoState,
 						text: line.substring(ListDefinition.length(listDetail))
 					})
 				}

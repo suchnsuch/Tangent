@@ -150,8 +150,8 @@ const noteTypeset:TypesetTypes = {
 				props.listForm = listData.form
 				props.listGlyph = listData.glyph
 
-				if (listData.checked) {
-					props.className += ' checked'
+				if (listData.todoState) {
+					props.className += ' checkbox ' + listData.todoState
 				}
 
 				return h('p', props, children)
@@ -276,7 +276,7 @@ const noteTypeset:TypesetTypes = {
 				if (attributes.list_format) {
 					const listData = attributes.list_format as ListDefinition
 					props.listGlyph = listData.glyph
-					if (listData.checked != null) {
+					if (listData.todoState != null) {
 						props.className += ' checkbox'
 					}
 				}
@@ -337,13 +337,13 @@ const noteTypeset:TypesetTypes = {
 					className += ' revealed'
 				}
 
-				if (listData.checked != undefined) {
+				if (listData.todoState != undefined) {
 					className += ' checkbox'
 					if (!attributes.revealed) {
 						children = [
 							h('span', { className: 'text' }, children),
 							h('t-checkbox', {
-								checked: listData.glyph.includes('x')
+								state: listData.todoState
 							})
 						]
 					}

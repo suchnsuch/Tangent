@@ -1,3 +1,5 @@
+import { TodoState } from 'common/indexing/indexTypes'
+
 /**
  * This is a very complicated match
  * Selection group 1 hits the indentation
@@ -9,7 +11,7 @@
  * 	7: upper-case single letters
  * 8: Checkbox on top of list
  */
-export const listMatcher = /^([ \t]*)(([-+\*])|((\d+)|([a-z])|([A-Z]))\.)( \[[ x]?\])? /
+export const listMatcher = /^([ \t]*)(([-+\*])|((\d+)|([a-z])|([A-Z]))\.)( \[[ x\-]?\])? /
 
 /**
  * A subset of the above match
@@ -19,7 +21,7 @@ export const listMatcher = /^([ \t]*)(([-+\*])|((\d+)|([a-z])|([A-Z]))\.)( \[[ x
  */
 export const numericGlyphMatcher = /(\d+)|([a-z])|([A-Z])/
 
-export const checkboxMatcher = /\[([x ]?)\]/
+export const checkboxMatcher = /\[([x\- ]?)\]/
 
 export enum ListForm {
 	Unordered,
@@ -53,7 +55,7 @@ export interface ListDefinition {
 	/** The numeric value of the ordered glyph */
 	index?: number,
 
-	checked?: boolean
+	todoState?: TodoState
 }
 
 export namespace ListDefinition {
@@ -61,6 +63,16 @@ export namespace ListDefinition {
 		// Include an extra one because the last space is not included in the glyph
 		return definition.indent.length + definition.glyph.length + 1
 	}
+}
+
+function checkboxGlyphToTodoState(glyph: string): TodoState {
+	if (glyph.includes('x')) {
+		return 'checked'
+	}
+	else if (glyph.includes('-')) {
+		return 'canceled'
+	}
+	return 'open'
 }
 
 export function matchList(line: string): ListDefinition {
@@ -83,7 +95,7 @@ export function matchList(line: string): ListDefinition {
 		}
 
 		if (match[8]) {
-			definition.checked = match[8].includes('x')
+			definition.todoState = checkboxGlyphToTodoState(match[8])
 			definition.glyph += match[8]
 		}
 
