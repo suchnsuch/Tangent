@@ -273,7 +273,7 @@ describe('List Handling', () => {
 
 			await wait(waitTime)
 
-			editor.modules.tCheckbox.toggleCheckboxOnLine(editor.doc.lines[1])
+			editor.modules.tCheckbox.setCheckboxOnLine(editor.doc.lines[1])
 
 			await wait(waitTime)
 
@@ -287,7 +287,7 @@ describe('List Handling', () => {
 
 			await wait(waitTime)
 
-			editor.modules.tCheckbox.toggleCheckboxOnLine(editor.doc.lines[1])
+			editor.modules.tCheckbox.setCheckboxOnLine(editor.doc.lines[1])
 
 			await wait(waitTime)
 
@@ -301,7 +301,7 @@ describe('List Handling', () => {
 
 			await wait(waitTime)
 
-			editor.modules.tCheckbox.toggleCheckboxOnLine(editor.doc.lines[1])
+			editor.modules.tCheckbox.setCheckboxOnLine(editor.doc.lines[1])
 
 			await wait(waitTime)
 

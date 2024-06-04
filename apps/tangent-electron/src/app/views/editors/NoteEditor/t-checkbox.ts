@@ -7,7 +7,8 @@ class TangentCheckbox extends HTMLElement {
 	constructor() {
 		super()
 
-		this.addEventListener('click', this.onClick)
+		this.addEventListener('click', this.annotateEvent)
+		this.addEventListener('contextmenu', this.annotateEvent)
 
 		const shadow = this.attachShadow({ mode: 'open' })
 
@@ -34,7 +35,7 @@ class TangentCheckbox extends HTMLElement {
 		shadow.appendChild(checkbox)
 	}
 
-	onClick(event) {
+	annotateEvent(event) {
 		event.tCheckbox = this
 	}
 
