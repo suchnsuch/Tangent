@@ -14,9 +14,14 @@ export enum ClauseGroupMod {
 	Not = 'not'
 }
 
-export enum TodoState {
+export enum TodoQueryState {
 	Any,
 	Open,
+	// The todo was completed
+	Complete,
+	// The todo was canceled
+	Canceled,
+	// The todo is no longer open; either complete or canceled
 	Closed
 }
 
@@ -45,7 +50,7 @@ export interface PartialClauseTag {
 }
 
 export interface PartialClauseTodo {
-	todo: TodoState
+	todo: TodoQueryState
 }
 
 export interface PartialClauseNegate {

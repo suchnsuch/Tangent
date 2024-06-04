@@ -201,6 +201,7 @@ describe('Querying Todos', () => {
 	test('Can get items with any todos', async () => {
 		const result = await solveQuery('Notes with todos')
 		expect(resultToNodePaths(result)).toEqual([
+			'Todos/Note With Canceled Todos.md',
 			'Todos/Note With Closed Todos.md',
 			'Todos/Note With Mixed Todos.md',
 			'Todos/Note With Open Todos.md'
@@ -215,9 +216,25 @@ describe('Querying Todos', () => {
 		])
 	})
 
+	test('Can get items with canceled todos', async () => {
+		const result = await solveQuery('Notes with canceled todos')
+		expect(resultToNodePaths(result)).toEqual([
+			'Todos/Note With Canceled Todos.md'
+		])
+	})
+
+	test('Can get items with complete todos', async () => {
+		const result = await solveQuery('Notes with complete todos')
+		expect(resultToNodePaths(result)).toEqual([
+			'Todos/Note With Closed Todos.md',
+			'Todos/Note With Mixed Todos.md'
+		])
+	})
+
 	test('Can get items with closed todos', async () => {
 		const result = await solveQuery('Notes with closed todos')
 		expect(resultToNodePaths(result)).toEqual([
+			'Todos/Note With Canceled Todos.md',
 			'Todos/Note With Closed Todos.md',
 			'Todos/Note With Mixed Todos.md'
 		])

@@ -39,44 +39,109 @@ const WEAK_SCOPES = [
 export interface QueryAutocompleteItem {
 	key: string
 	text: string
+	label?: string
+	tooltip?: string
 	match?: SearchMatchResult
 }
 
-const COMPLETE_TEXT: { [key: string]: string[] } = {
-	[KEYWORD.FORM]: [
-		'Files', 'Notes', 'Images',
-		'Sets', 'Folders', 'Queries'
-	],
-	[KEYWORD.CLAUSE]: [
-		'in', 'with', 'named',
-		//'linked from' // Not in yet
-	],
-	[KEYWORD.NOT]: ['not'],
-	[KEYWORD.JOIN.AND]: ['and'],
-	[KEYWORD.JOIN.OR]: ['or'],
-	[KEYWORD.VALUE.TODO.ANY]: ['Todos'],
-	[KEYWORD.VALUE.TODO.OPEN]: ['Open Todos'],
-	[KEYWORD.VALUE.TODO.CLOSED]: ['Closed Todos']
+const COMPLETE_DATA: { [key: string]: {
+	text?: string | string[],
+	label?: string,
+	tooltip?: string
+}} = {
+	[KEYWORD.FORM]: {
+		text: [
+			'Files', 'Notes', 'Images',
+			'Sets', 'Folders', 'Queries'
+		]
+	},
+	[KEYWORD.CLAUSE]: {
+		text: [
+			'in', 'with', 'named',
+			//'linked from' // Not in yet
+		]
+	},
+	[KEYWORD.NOT]: {
+		text: 'not',
+		tooltip: 'Inverts the next clause.'
+	},
+	[KEYWORD.JOIN.AND]: {
+		text: 'and'
+	},
+	[KEYWORD.JOIN.OR]: {
+		text: 'or'
+	},
+	[KEYWORD.VALUE.STRING_DOUBLE]: {
+		label: '\"Exact Text\"',
+		text: '',
+		tooltip: 'Searches for an exact string of text, as written.'
+	},
+	[KEYWORD.VALUE.STRING_SINGLE]: {
+		label: '\'Fuzzy Text\'',
+		text: '',
+		tooltip: 'Converts the search string into a case-insensitive fuzzy matcher that matches the text in order, but not necessarily sequentially.'
+	},
+	[KEYWORD.VALUE.REGEX]: {
+		label: '/Regex/',
+		text: '',
+		tooltip: 'Searches with the provided regex statement.'
+	},
+	[KEYWORD.VALUE.WIKI]: {
+		label: '[[Wiki Reference]]',
+		text: '',
+		tooltip: 'Selects items that contain a reference to the file behind the wiki reference.'
+	},
+	[KEYWORD.VALUE.TAG]: {
+		label: '#tag',
+		text: '',
+		tooltip: 'Selects items that contain the defined tag.'
+	},
+	[KEYWORD.VALUE.SUBQUERY]: {
+		label: '{Subquery}',
+		text: '',
+		tooltip: 'Selects items that match an additional subquery. e.g. `Notes in {Folders named "Foo"}`'
+	},
+	[KEYWORD.VALUE.TODO.ANY]: {
+		text: 'Todos',
+		tooltip: 'Matches all Todos, in any state.'
+	},
+	[KEYWORD.VALUE.TODO.OPEN]: {
+		text: 'Open Todos',
+		tooltip: 'Matches all incomplete Todos.'
+	},
+	[KEYWORD.VALUE.TODO.CANCELED]: {
+		text: 'Canceled Todos',
+		tooltip: 'Matches all canceled Todos.'
+	},
+	[KEYWORD.VALUE.TODO.COMPLETE]: {
+		text: 'Complete Todos',
+		tooltip: 'Matches all complete Todos.'
+	},
+	[KEYWORD.VALUE.TODO.CLOSED]: {
+		text: 'Closed Todos',
+		tooltip: 'Matches all canceled or complete Todos.'
+	}
 }
 
-const RAW_KEY_COMPLETES = [
-	...NON_ACTIVATE_VALUES,
-	KEYWORD.VALUE.SUBQUERY
-]
-
 function appendKeyToItems(key: string, items: QueryAutocompleteItem[]) {
-	const texts = COMPLETE_TEXT[key]
-	if (texts) {
-		for (const text of texts) {
+	const data = COMPLETE_DATA[key]
+	if (!data) return
+
+	let { text, tooltip, label } = data
+
+	if (Array.isArray(text)) {
+		for (const t of text) {
 			items.push({
 				key,
-				text
+				text: t,
+				label,
+				tooltip
 			})
 		}
 	}
-	else if (RAW_KEY_COMPLETES.includes(key)) {
+	else {
 		items.push({
-			key, text: ''
+			key, text, tooltip, label
 		})
 	}
 }
@@ -209,7 +274,6 @@ export default class QueryAutocompleter implements AutocompleteHandler {
 		const scopes = token.scopes
 
 		if (includesAny(scopes, NON_ACTIVATE_VALUES)) {
-			console.warn('tokens invalid:', scopes)
 			return false
 		}
 

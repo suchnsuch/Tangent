@@ -3,7 +3,6 @@ import type QueryAutocompleter from './QueryAutocompleter'
 
 import ScrollingItemList from 'app/utils/ScrollingItemList.svelte'
 import SearchSegmentHighlight from 'app/utils/SearchSegmentHighlight.svelte'
-import { KEYWORD } from '@such-n-such/tangent-query-parser'
 
 export let handler: QueryAutocompleter
 
@@ -28,25 +27,13 @@ function nodeOptionEvent(option: any, event: Event) {
 		onItemEvent={nodeOptionEvent}
 	>
 		<svelte:fragment slot="item" let:item>
-			{#if item.text === ''}
-				{#if item.key === KEYWORD.VALUE.STRING_DOUBLE}
-					"Exact Text"
-				{:else if item.key === KEYWORD.VALUE.STRING_SINGLE}
-					'Fuzzy Text'
-				{:else if item.key === KEYWORD.VALUE.REGEX}
-					/Regex/
-				{:else if item.key === KEYWORD.VALUE.WIKI}
-					[[Wiki Reference]]
-				{:else if item.key === KEYWORD.VALUE.TAG}
-					#tag
-				{:else if item.key === KEYWORD.VALUE.SUBQUERY}
-					&lbrace;Subquery&rbrace;
+			<div title={item.tooltip}>
+				{#if item.label}
+					{item.label}
 				{:else}
-					Unhandled Key: {item.key}
+					<SearchSegmentHighlight value={item.match ?? item.text} />
 				{/if}
-			{:else}
-				<SearchSegmentHighlight value={item.match ?? item.text} />
-			{/if}
+			</div>
 		</svelte:fragment>
 	</ScrollingItemList>
 </div>

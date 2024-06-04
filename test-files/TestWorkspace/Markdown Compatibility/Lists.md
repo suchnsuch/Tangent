@@ -20,7 +20,7 @@ And we want that to work really well.
 	
 # Checkboxes
 - [x] Checkboxes!
-- [ ] Another checkbox
+- [-] A canceled checkbox
 - [ ] Checkboxes should sort to the top of a line, rather than anywhere else. This is some extra text that ensures this item gets really large and extends well past a single line.
 * [ ] Okay!
 

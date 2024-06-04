@@ -1,11 +1,11 @@
 import { filterIterator, mapIterator } from '@such-n-such/core'
-import { Clause, ClauseGroup, ClauseType, ClauseMod, isGroup, parseQueryText, PartialClauseReference, PartialClauseValue, Query, QueryError, PartialClauseType, TodoState, tagContainsTag, ClauseGroupMod } from '@such-n-such/tangent-query-parser'
+import { Clause, ClauseGroup, ClauseType, ClauseMod, isGroup, parseQueryText, PartialClauseReference, PartialClauseValue, Query, QueryError, PartialClauseType, TodoQueryState, tagContainsTag, ClauseGroupMod } from '@such-n-such/tangent-query-parser'
 import QueryInfo, { queryFileType } from 'common/dataTypes/QueryInfo'
 import { DirectoryStore, iterateOverChildren, TreeNode, TreePredicateResult, validatePath } from 'common/trees'
 import { getFileTypeRegex, imageFileExtensions } from 'common/fileExtensions'
 import { addPreviewToReference, Annotation, areReferencesEquivalent, cleanReference, createReference, getNode, getNodeFromReference, isNode, isReference, isSubReference, TreeNodeOrReference } from 'common/nodeReferences'
 import type { ObjectStore } from 'common/stores'
-import { IndexData } from './indexTypes'
+import { IndexData, TodoState } from './indexTypes'
 import { getTextAnnotations } from './queryAnnotations'
 import type { QueryResult } from './queryResults'
 import { getTagPath, isTagTreeNode, TagTreeNode } from './TagNode'
@@ -67,6 +67,23 @@ function allValidNodes(directory: DirectoryStore) {
 		if (n.name.startsWith('.')) return TreePredicateResult.Ignore
 		return TreePredicateResult.Include
 	})
+}
+
+function doTodoStatesMatch(state: TodoState, query: TodoQueryState): boolean {
+	switch (query) {
+		case TodoQueryState.Any:
+			return true
+		case TodoQueryState.Open:
+			return state === 'open'
+		case TodoQueryState.Complete:
+			return state === 'checked'
+		case TodoQueryState.Canceled:
+			return state === 'canceled'
+		case TodoQueryState.Closed:
+			return state === 'checked' || state === 'canceled'
+		default:
+			return false
+	}
 }
 
 /**
@@ -395,7 +412,7 @@ export async function solveQuery(query: Query, interop: QuerySolverInterop): Pro
 				return new Set(queryFilter(set, item => {
 					const node = getNode(item, directory)
 					if (isSubReference(item)) {
-						log.warn('Tags in sub references not yet supported!', item)
+						log.warn('Todos in sub references not yet supported!', item)
 						return false
 					}
 
@@ -404,10 +421,7 @@ export async function solveQuery(query: Query, interop: QuerySolverInterop): Pro
 					const annotations: Annotation[] = []
 					
 					for (const todo of IndexData.todos(node.meta)) {
-						if (targetState === TodoState.Any ||
-							(targetState === TodoState.Open && !todo.state) ||
-							(targetState === TodoState.Closed && todo.state))
-						{
+						if (doTodoStatesMatch(todo.state, targetState)) {
 							annotations.push({
 								start: todo.start,
 								end: todo.end,

@@ -151,8 +151,16 @@
 					"match": "\\b(?i:(open|incomplete|unfinished|unchecked)\\s+todos?)\\b"
 				},
 				{
+					"name": "keyword.other.todo.complete",
+					"match": "\\b(?i:(done|complete|checked|finished)\\s+todos?)\\b"
+				},
+				{
+					"name": "keyword.other.todo.canceled",
+					"match": "\\b(?i:(cancell?ed)\\s+todos?)\\b"
+				},
+				{
 					"name": "keyword.other.todo.closed",
-					"match": "\\b(?i:(closed|done|finished|complete|checked)\\s+todos?)\\b"
+					"match": "\\b(?i:(closed)\\s+todos?)\\b"
 				},
 				{
 					"name": "keyword.other.todo.any",

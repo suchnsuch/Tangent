@@ -1,5 +1,5 @@
 import type { IGrammar, INITIAL, IToken, Registry, StackElement } from 'vscode-textmate'
-import { Query, ClauseType, ClauseGroup, isQuery, PartialClauseType, ClauseMod, TodoState, ClauseGroupMod, ClauseOrGroup } from './types'
+import { Query, ClauseType, ClauseGroup, isQuery, PartialClauseType, ClauseMod, TodoQueryState, ClauseGroupMod, ClauseOrGroup } from './types'
 import { last, escapeRegExp } from '@such-n-such/core'
 import { tokenizeTagName } from './tags'
 
@@ -41,6 +41,8 @@ export const KEYWORD = {
 		TODO: {
 			ANY: 'keyword.other.todo.any',
 			OPEN: 'keyword.other.todo.open',
+			COMPLETE: 'keyword.other.todo.complete',
+			CANCELED: 'keyword.other.todo.canceled',
 			CLOSED: 'keyword.other.todo.closed'
 		},
 		SUBQUERY: 'meta.subquery',
@@ -68,6 +70,8 @@ export const KEYWORDS = {
 		KEYWORD.VALUE.TAG,
 		KEYWORD.VALUE.TODO.ANY,
 		KEYWORD.VALUE.TODO.OPEN,
+		KEYWORD.VALUE.TODO.COMPLETE,
+		KEYWORD.VALUE.TODO.CANCELED,
 		KEYWORD.VALUE.TODO.CLOSED
 	],
 	REFERENCE_VALUES: [
@@ -488,7 +492,7 @@ export function parseQueryText(queryText: string): QueryParseResult {
 		else if (lastScope === KEYWORD.VALUE.TODO.ANY) {
 			appendToCurrentGroup({
 				...currentClause,
-				todo: TodoState.Any
+				todo: TodoQueryState.Any
 			})
 
 			expectList(EXPECTED_AFTER_VALUE)
@@ -496,7 +500,23 @@ export function parseQueryText(queryText: string): QueryParseResult {
 		else if (lastScope === KEYWORD.VALUE.TODO.OPEN) {
 			appendToCurrentGroup({
 				...currentClause,
-				todo: TodoState.Open
+				todo: TodoQueryState.Open
+			})
+
+			expectList(EXPECTED_AFTER_VALUE)
+		}
+		else if (lastScope === KEYWORD.VALUE.TODO.COMPLETE) {
+			appendToCurrentGroup({
+				...currentClause,
+				todo: TodoQueryState.Complete
+			})
+
+			expectList(EXPECTED_AFTER_VALUE)
+		}
+		else if (lastScope === KEYWORD.VALUE.TODO.CANCELED) {
+			appendToCurrentGroup({
+				...currentClause,
+				todo: TodoQueryState.Canceled
 			})
 
 			expectList(EXPECTED_AFTER_VALUE)
@@ -504,7 +524,7 @@ export function parseQueryText(queryText: string): QueryParseResult {
 		else if (lastScope === KEYWORD.VALUE.TODO.CLOSED) {
 			appendToCurrentGroup({
 				...currentClause,
-				todo: TodoState.Closed
+				todo: TodoQueryState.Closed
 			})
 
 			expectList(EXPECTED_AFTER_VALUE)

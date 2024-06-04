@@ -1,4 +1,4 @@
-import { parseQueryText, ClauseType, TodoState } from '../src'
+import { parseQueryText, ClauseType, TodoQueryState } from '../src'
 import { install } from './test-loader'
 
 beforeAll(async () => {
@@ -14,7 +14,7 @@ describe('Tag Parsing', () => {
 			clauses: [
 				{
 					type: ClauseType.With,
-					todo: TodoState.Any
+					todo: TodoQueryState.Any
 				}
 			]
 		})
@@ -28,7 +28,35 @@ describe('Tag Parsing', () => {
 			clauses: [
 				{
 					type: ClauseType.With,
-					todo: TodoState.Open
+					todo: TodoQueryState.Open
+				}
+			]
+		})
+	})
+
+	test('Notes with finished todos', async () => {
+		const result = await parseQueryText('Notes with finished todos')
+		expect(result.query).toEqual({
+			forms: ['Notes'],
+			join: 'and',
+			clauses: [
+				{
+					type: ClauseType.With,
+					todo: TodoQueryState.Complete
+				}
+			]
+		})
+	})
+
+	test('Notes with canceled todos', async () => {
+		const result = await parseQueryText('Notes with canceled todos')
+		expect(result.query).toEqual({
+			forms: ['Notes'],
+			join: 'and',
+			clauses: [
+				{
+					type: ClauseType.With,
+					todo: TodoQueryState.Canceled
 				}
 			]
 		})
@@ -42,7 +70,7 @@ describe('Tag Parsing', () => {
 			clauses: [
 				{
 					type: ClauseType.With,
-					todo: TodoState.Closed
+					todo: TodoQueryState.Closed
 				}
 			]
 		})
