@@ -91,7 +91,7 @@ async function buildPrism() {
 }
 
 async function buildKatex() {
-	const fontsPath = path.resolve(path.join(__dirname, '../__build/fonts'))
+	const fontsPath = path.resolve(path.join(__dirname, '../__build/bundle/fonts'))
 	try {
 		await fs.promises.stat(fontsPath)
 		console.log('Fonts already built!')
