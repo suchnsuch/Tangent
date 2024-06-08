@@ -149,6 +149,7 @@ describe('Group negation', () => {
 	test('Negation with positives', async () => {
 		const result = await solveQuery('Notes in [[Todos]] not named "Mixed"')
 		expect(resultToNodePaths(result)).toEqual([
+			'Todos/Note With Canceled Todos.md',
 			'Todos/Note With Closed Todos.md',
 			'Todos/Note With Open Todos.md'
 		])
