@@ -494,6 +494,16 @@ describe('Inline formatting', () => {
 		expect(editor.doc.selection).toEqual([14, 14])
 	})
 
+	it('Should toggle inline formatting on when selection is at the end of a word', async () => {
+		editor.doc = markdownToTextDocument(`This is a line of text.`)
+		editor.select(14)
+		await wait(waitTime)
+		editor.modules.tangent.toggleItalic(new Event(''))
+
+		expect(editor.getText()).toEqual('This is a _line_ of text.')
+		expect(editor.doc.selection).toEqual([16, 16]) // _after_ formatting characters
+	})
+
 	it('Should toggle inline formatting off when selection is touching a range of formatted text', async () => {
 		editor.doc = markdownToTextDocument(`This is _a line of text._`)
 		editor.select(12)

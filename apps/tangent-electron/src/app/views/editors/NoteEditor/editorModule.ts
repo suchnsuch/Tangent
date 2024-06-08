@@ -1085,7 +1085,7 @@ export default function editorModule(editor: Editor, options: {
 			if (at === to && start !== end && at === end) {
 				// Selection was at the end of a word.
 				// Shift selection _outside_ the inline format characters.
-				change.select([at + formatLength, to + formatLength * 2])
+				change.select(at + formatLength * 2)
 			}
 			else {
 				// Shift selection so cursor position stays consistent
