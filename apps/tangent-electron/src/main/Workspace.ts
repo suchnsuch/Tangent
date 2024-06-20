@@ -735,7 +735,7 @@ export default class Workspace {
 		ioLog.info(chalk.green('Deleting'), chalk.gray(filepath))
 
 		// TODO: This may want to be some kind of external handler system?
-		if (shell) {
+		if (shell && getSettings()?.debug_sendItemsToTrash.value) {
 			await shell.trashItem(filepath)
 		}
 		else {

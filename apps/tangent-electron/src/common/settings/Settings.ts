@@ -437,6 +437,13 @@ export default class Settings extends ObjectStore {
 		defaultValue: true
 	})
 
+	debug_sendItemsToTrash = new Setting<boolean>({
+		name: 'Trash Deleted Items',
+		description: 'Whether or not deleted items should be sent to the OS trash/recycling bin.'
+			+ '\n\nIf deleting items causes issues, try disabling this setting.',
+		defaultValue: true
+	})
+
 	constructor() {
 		super()
 		this.setupObservables()

@@ -18,6 +18,7 @@ let settings = workspace.settings
 	<div class="settingsGroup">
 		<SettingView setting={settings.debug_sendCrashReports} />
 		<SettingView setting={settings.debug_createVirtualFiles} />
+		<SettingView setting={settings.debug_sendItemsToTrash} />
 	</div>
 </main>
 
