@@ -34,7 +34,8 @@ export default class QueryViewState extends BaseSetViewState {
 		})
 
 		this.queryResult = derived(this.queryInfo, (queryInfo, set) => {
-			return derived(queryInfo.queryString, (queryString, set) => {
+			// TODO: Improve query invalidation to reduce false positives
+			return derived([queryInfo.queryString, workspace.directoryStore], ([queryString, store], set) => {
 				const id = this.lastRequestID.update(i => i + 1)
 				workspace.api.query.resultsForQuery(queryString).then(queryResult => {
 					set(queryResult)
