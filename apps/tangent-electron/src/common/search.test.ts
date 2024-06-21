@@ -4,7 +4,8 @@ import { buildFuzzySegementMatcher, buildMatcher, compareNodeSearch, nodeSearchR
 
 describe('Match building', () => {
 	it('should split characters by whitespace', () => {
-		expect(buildFuzzySegementMatcher('foo bar')).toEqual(/(foo).*(bar)/di)
+		// Not matching diacritics here for readability
+		expect(buildFuzzySegementMatcher('foo bar', false)).toEqual(/(foo).*(bar)/di)
 	})
 })
 
@@ -171,5 +172,18 @@ describe('Alias Searching', () => {
 			'Some/File I made.md',
 			'Some/I made files'
 		])
+	})
+})
+
+describe('Diacritics', () => {
+	test('Fuzy matches hit diacritics', () => {
+		let matcher = buildMatcher('Note', { fuzzy: true })
+		expect(matcher.test('Noté')).toBeTruthy()
+		expect(matcher.test('note')).toBeTruthy()
+		expect(matcher.test('nôte')).toBeTruthy()
+		expect(matcher.test('nøte')).toBeTruthy()
+
+		matcher = buildMatcher('and', { fuzzy: true })
+		expect(matcher.test('ånd')).toBeTruthy()
 	})
 })
