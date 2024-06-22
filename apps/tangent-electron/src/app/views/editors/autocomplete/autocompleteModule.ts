@@ -248,7 +248,7 @@ export class AutocompleteModule {
 				if (insert?.length === 1) {
 					for (const handler of this.handlers) {
 						const activation = handler.canActivateFromTyping(insert, doc) 
-						if (activation !== false) {
+						if (activation) {
 							this.activateHandler(handler, activation, doc)
 							return
 						}

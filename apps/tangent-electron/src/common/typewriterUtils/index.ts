@@ -42,6 +42,9 @@ export function typewriterToText(model: TextDocument | Line[], startLine?: numbe
 	return strings.join('\n')
 }
 
+/**
+ * Differs from standard by not including a trailing '\n'
+ */
 export function lineToText(line: Line) {
 	return line.content.ops.map(op => op.insert).join('')
 }
