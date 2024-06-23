@@ -58,6 +58,10 @@ export function tokenize(code: string, language: string): TokenStream {
 	return null
 }
 
+export function getLanguageAliases() {
+	return languageAliasLookup
+}
+
 /**
  * Confirms a language and potentially triggers the load of a new language definition and any of its dependencies.
  * @param format The source text to check

@@ -149,9 +149,6 @@ export function compareNodeSearch(a: SearchMatchResult, b: SearchMatchResult) {
 	const bIndices = getRegexMatchIndices(b)
 	const maxIndex = Math.min(aIndices.length, bIndices.length)
 	
-	let aTotal = 0
-	let bTotal = 0
-
 	for (let index = 1; index < maxIndex; index++) {
 		const [aStart, aEnd] = aIndices[index]
 		const [bStart, bEnd] = bIndices[index]
@@ -167,9 +164,6 @@ export function compareNodeSearch(a: SearchMatchResult, b: SearchMatchResult) {
 			// Later ends are better if starts are equal
 			return endDiff
 		}
-
-		//aTotal += aEnd - aStart
-		//bTotal += bEnd - bStart
 	}
 
 	// Since earlier matches are equal, more matches are better

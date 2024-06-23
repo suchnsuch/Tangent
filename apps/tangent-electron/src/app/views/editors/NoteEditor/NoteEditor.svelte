@@ -55,6 +55,8 @@ import TagAutocompleteMenu from '../autocomplete/TagAutocompleteMenu.svelte';
 import { getPixelValue } from 'app/utils/style';
 import UnicodeAutocompleter from '../autocomplete/UnicodeAutocompleter';
 import UnicodeAutocompleteMenu from '../autocomplete/UnicodeAutocompleteMenu.svelte';
+import CodeBlockAutocompleter from '../autocomplete/CodeBlockAutoCompleter';
+import CodeBlockAutocompleteMenu from '../autocomplete/CodeBlockAutocompleteMenu.svelte';
 
 // Technically, this just needs to exist _somewhere_. Putting it here because of the svelte dependency
 // Force the use of the variable so that it is included in the bundle
@@ -1183,6 +1185,8 @@ function onDetailsContexMenu(event: MouseEvent) {
 			<TagAutocompleteMenu {handler} />
 		{:else if handler instanceof UnicodeAutocompleter}
 			<UnicodeAutocompleteMenu {handler} />
+		{:else if handler instanceof CodeBlockAutocompleter}
+			<CodeBlockAutocompleteMenu {handler} />
 		{/if}
 	</AutoCompleteMenu>
 	{#if !editorIsFocused && virtual}
