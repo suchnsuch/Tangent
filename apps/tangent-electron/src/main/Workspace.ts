@@ -230,8 +230,16 @@ export default class Workspace {
 			await workspace.indexer.initializeFromRaw(indexData)
 		}
 		catch (err) {
-			log.error('Index failed to initialize.')
+			log.error('Index failed to initialize. Rebuilding...')
 			log.log(err)
+
+			try {
+				await workspace.indexer.initializeFromRaw({})
+			}
+			catch (err) {
+				log.error('  Rebuild failed.')
+				log.log(err)
+			}
 		}
 
 		log.info(`Loading of workspace at "${filepath}" complete`)

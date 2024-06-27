@@ -67,22 +67,30 @@ export default class Indexer {
 	}
 
 	async initializeFromRaw(rawIndex: any) {
+		const indexStart = performance.now()
 
 		// Actually load index
-		let rawMap = new Map<string, IndexData>()
+		const rawMap = new Map<string, IndexData>()
 		
 		if (rawIndex?.items) {
-			for (const item of rawIndex.items) {
-				rawMap.set(item.path, {
-					modified: new Date(item.modified),
-					structure: item.structure
-				})
+			for (const itemPath of Object.keys(rawIndex.items)) {
+				const item = rawIndex.items[itemPath]
+				const meta: IndexData = {}
+
+				meta.modified = new Date(item.modified)
+				meta.structure = item.structure
+
+				if (item.virtual) {
+					meta.virtual = true
+				}
+
+				rawMap.set(itemPath, meta)
 			}
 		}
 
-		let nodeMap = new Map<string, TreeNode>()
+		const nodeMap = new Map<string, TreeNode>()
 
-		let tasks = []
+		const tasks = []
 		forAllNodes(this.store.files, (node, parent) => {
 			if (node.name.startsWith('.'))
 				return false
@@ -108,6 +116,11 @@ export default class Indexer {
 
 		await Promise.all(tasks)
 
+		const postReindex = performance.now()
+
+		log.info(`Cached index contained ${rawMap.size} files.`)
+		log.info(`  Integrated cache and reindexed ${tasks.length} files in ${postReindex - indexStart}ms.`)
+
 		// TODO: don't reset this every load
 		for (const node of nodeMap.values()) {
 			node.meta.inLinks = []
@@ -127,6 +140,10 @@ export default class Indexer {
 
 		this.linkCache = null
 
+		const postLinkConnection = performance.now()
+
+		log.info(`  Connected all links in ${postLinkConnection - postReindex}ms.`)
+
 		this.interop.updateMetadata([...mapIterator(nodeMap.values(), n => {
 			return {
 				path: n.path,
@@ -134,7 +151,42 @@ export default class Indexer {
 			}
 		})])
 
+		const indexingComplete = performance.now()
+
+		log.info(`  Sent index in ${indexingComplete - postLinkConnection}ms.`)
+		log.info(`Indexing complete in ${indexingComplete - indexStart}ms.`)
+
 		return nodeMap
+	}
+
+	getRawIndex() {
+		const raw = {
+			version: 1,
+			items: {}
+		}
+
+		forAllNodes(this.store.files, (node, parent) => {
+
+			if (!node.meta) return
+			const meta = node.meta
+			
+			const data: any = {
+				modified: meta.modified
+				// Don't include in-links as those are rebuilt each time
+			}
+
+			if (meta.structure?.length) {
+				data.structure = meta.structure
+			}
+
+			if (meta.virtual) {
+				data.virtual = true
+			}
+
+			raw.items[node.path] = data
+		})
+
+		return raw
 	}
 
 	isParseableFile(node: TreeNode) {
@@ -209,10 +261,15 @@ export default class Indexer {
 			try {
 				const { structure } = parseMarkdown(contents, this.parsingOptions)
 
-				return {
+				const meta: IndexData = {
 					modified: node.modified,
-					structure
 				}
+				
+				if (structure.length) {
+					meta.structure = structure
+				}
+
+				return meta
 			}
 			catch (e) {
 				log.error('Failed to parse file:' + node.path)
