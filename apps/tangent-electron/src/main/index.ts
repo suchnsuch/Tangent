@@ -23,7 +23,8 @@ import {
 	workspacesInfoPath, 
 	saveAndCloseWorkspaces,
 	findClosestWorkspace,
-	contentsMap
+	contentsMap,
+	hasShutdownWorkspaces
 } from './workspaces'
 import { createMenus } from './menus'
 
@@ -39,6 +40,7 @@ import { installTextmate } from '@such-n-such/tangent-query-parser'
 import { getRegistry } from './grammarLoader'
 import { INITIAL } from 'vscode-textmate'
 import { initializeDebugging } from './debugging'
+import { addShutDownTask, isReadyToShutDown, shutDown } from './shutdown'
 
 /******************
  * Initialization *
@@ -265,10 +267,21 @@ Tangent ${app.getVersion()} Launched With Arguments:`, process.argv)
 		}
 	});
 
-	// The application will exit, but windows have not yet been closed
+	// Application is attempting to quite, but windows haven't been closed yet.
 	app.on('before-quit', () => {
-		saveSettings(true)
-		saveAndCloseWorkspaces()
+		if (!hasShutdownWorkspaces())
+		{
+			// This ensures open workspaces are retained
+			addShutDownTask(saveAndCloseWorkspaces())
+		}
+	})
+
+	// Windows have all been closed and the application is attempting to exit
+	app.on('will-quit', (event) => {
+		if (!isReadyToShutDown()) {
+			event.preventDefault()
+		}
+		shutDown()
 	})
 }
 

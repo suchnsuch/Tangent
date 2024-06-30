@@ -76,7 +76,7 @@ export default class WindowHandle {
 
 		if (this.workspace !== workspace) {
 			if (this.workspace) {
-				dropWorkspace(this.workspace, this)
+				await dropWorkspace(this.workspace, this)
 			}
 
 			// If we are reloading the window, no need to do this
@@ -199,7 +199,7 @@ export default class WindowHandle {
 		}
 	}
 
-	close() {
+	async close() {
 		try {
 			const settingsPath = this.getWorkspaceViewStateFilePath()
 			log.info('Saving workspace ', path.basename(settingsPath))
@@ -216,8 +216,8 @@ export default class WindowHandle {
 				fullscreen
 			}
 
-			fs.mkdirSync(path.dirname(settingsPath), { recursive: true })
-			fs.writeFileSync(
+			await fs.promises.mkdir(path.dirname(settingsPath), { recursive: true })
+			await fs.promises.writeFile(
 				settingsPath,
 				JSON.stringify(viewState, null, '\t'),
 				'utf8')
@@ -231,7 +231,7 @@ export default class WindowHandle {
 		}
 
 		if (this.workspace) {
-			dropWorkspace(this.workspace, this)
+			await dropWorkspace(this.workspace, this)
 		}
 
 		this.window = null

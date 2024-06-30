@@ -129,11 +129,14 @@ export default class Indexer {
 		// Validate & connect links, using cache
 		this.linkCache = new Map()
 
+		let applyLinkCount = 0
+
 		for (const node of nodeMap.values()) {
 			const meta = node.meta as IndexData
 			if (meta.structure) {
 				for (let connection of IndexData.outgoingConnections(meta)) {
 					this.applyLink(node, connection)
+					applyLinkCount++
 				}
 			}
 		}
@@ -142,7 +145,7 @@ export default class Indexer {
 
 		const postLinkConnection = performance.now()
 
-		log.info(`  Connected all links in ${postLinkConnection - postReindex}ms.`)
+		log.info(`  Connected ${applyLinkCount} links in ${postLinkConnection - postReindex}ms.`)
 
 		this.interop.updateMetadata([...mapIterator(nodeMap.values(), n => {
 			return {
@@ -292,7 +295,8 @@ export default class Indexer {
 		if (connection.to) {
 			target = this.store.get(connection.to)
 		}
-		else if (connection.href) {
+
+		if (!target && connection.href) {
 			if (this.linkCache) {
 				// This will break if links ever support relativity
 				const cacheID = connection.type.toString() + connection.href

@@ -100,6 +100,7 @@ export function patchSettings(patch) {
 		nativeTheme.themeSource = settings.appearance.value as 'system' | 'light' | 'dark'
 	}
 
+	// Technically async. Dangling like this isn't ideal.
 	saveSettings()
 
 	postSettings(patch)

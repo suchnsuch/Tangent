@@ -251,10 +251,22 @@ export default class Workspace {
 		return workspace
 	}
 
-	close() {
+	async close() {
 		if (this.watcher) {
 			log.info('Closing workspace', this.rootPath)
 			this.watcher.close()
+
+			const raw = this.indexer.getRawIndex()
+			const generatedDir = path.join(
+				this.contentsStore.files.path,
+				Workspace.TANGENT_DIRECTORY,
+				'generated')
+
+			await fs.promises.mkdir(generatedDir, { recursive: true })
+			await fs.promises.writeFile(
+				path.join(generatedDir, 'index.json'),
+				JSON.stringify(raw, null, '\t')
+			)
 		}
 		else {
 			log.warn('Attempted to close an already closed workspace', this.rootPath)

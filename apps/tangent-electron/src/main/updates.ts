@@ -130,13 +130,13 @@ export function checkForUpdates() {
 	}
 }
 
-ipcMain.on('update', (event, message) => {
+ipcMain.on('update', async (event, message) => {
 	switch (message) {
 		case 'now':
 			if (readyUpdate) {
 				if (mode === 'production') {
 					log.info('Quitting and installing update by user request')
-					saveAndCloseWorkspaces()
+					await saveAndCloseWorkspaces()
 					autoUpdater.quitAndInstall(false, true)
 				}
 				else {

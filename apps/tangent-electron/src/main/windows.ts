@@ -10,6 +10,7 @@ import { contentsMap, workspaceMap } from './workspaces'
 import { ipcMain } from 'electron'
 import { cleanMenuTemplate } from '../common/menus'
 import { getSettings } from './settings'
+import { addShutDownTask } from './shutdown'
 
 let defaultLanguages = null
 
@@ -176,7 +177,7 @@ export function createWindow(assignedWorkspace?: string) {
 		let handle = contentsMap.get(newWindow.webContents)
 		if (handle) {
 			// Save out the window state
-			handle.close()
+			addShutDownTask(handle.close())
 
 			if (isMac || contentsMap.size > 1) {
 				// On windows/linux do not flush the last window.

@@ -7,4 +7,5 @@ node_modules/
 **/.tangent/**/*.workspace
 **/.tangent/tangents/
 **/.tangent/Temp/
+**/.tangent/Generated/
 .obsidian

@@ -65,22 +65,22 @@ export function getWindowHandle(key: BrowserWindow | Electron.WebContents): Wind
 	return contentsMap.get(key)
 }
 
-export function dropWorkspace(workspace: Workspace, handle: WindowHandle) {
+export async function dropWorkspace(workspace: Workspace, handle: WindowHandle) {
 	if (handle) {
 		workspace.removeObserver(handle)
 	}
 
 	if (workspace.observers.length === 0) {
-		workspace.close()
+		await workspace.close()
 		// Do not delete, otherwise the workspace will be forgotten
 		workspaceMap.set(workspace.rootPath, null)
 	}
 }
 
-let hasSavedAndClosedWorkspaces = false
-export function saveAndCloseWorkspaces() {
-	if (hasSavedAndClosedWorkspaces) return
-	hasSavedAndClosedWorkspaces = true
+let workspaceShutdownState: 'open' | 'closing' | 'finished' = 'open'
+export async function saveAndCloseWorkspaces() {
+	if (workspaceShutdownState !== 'open') return
+	workspaceShutdownState = 'closing'
 	
 	// Save open workspace info
 	const knownWorkspaces = []
@@ -98,31 +98,43 @@ export function saveAndCloseWorkspaces() {
 		}
 	}
 
-	try {
-		const workspaces = {
-			knownWorkspaces,
-			openWorkspaces
+	let promises: Promise<any>[] = []
+
+	const writeWorkspaceInfo = async () => {
+		try {
+			const workspaces = {
+				knownWorkspaces,
+				openWorkspaces
+			}
+	
+			const payload = JSON.stringify(workspaces, null, '\t')
+	
+			log.log('Writing workspace info to: ', workspacesInfoPath, payload)
+			await fs.promises.writeFile(workspacesInfoPath, payload)
 		}
-
-		const payload = JSON.stringify(workspaces, null, '\t')
-
-		log.log('Writing workspace info to: ', workspacesInfoPath, payload)
-		fs.writeFileSync(workspacesInfoPath, payload)
-		log.log('...Finished')
+		catch (err) {
+			log.error('Could not save workspace data')
+			log.error(err)
+		}
 	}
-	catch (err) {
-		log.error('Could not save workspace data')
-		log.error(err)
-	}
+
+	promises.push(writeWorkspaceInfo())
 
 	for (let workspace of workspaceMap.values()) {
 		if (workspace) {
-			workspace.close()
+			promises.push(workspace.close())
 		}
 	}
+
+	await Promise.all(promises).catch(err => {
+		log.error('Error closing workspaces')
+		log.error(err)
+	})
+
+	workspaceShutdownState = 'finished'
 }
 
-export function hasShutdownWorkspaces() { return hasSavedAndClosedWorkspaces }
+export function hasShutdownWorkspaces() { return workspaceShutdownState === 'finished' }
 
 /**
  * Finds the closest .tangent directory, or uses the given directory / parent directory (for files)

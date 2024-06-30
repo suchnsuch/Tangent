@@ -11,7 +11,7 @@ async function start() {
 
 	let args = []
 	if (process.env.DEBUG) {
-		args = [`--inspect=${process.env.DEBUG}`, '.']
+		args = ['.', `--inspect-brk=${process.env.DEBUG}`]
 	}
 	else {
 		args = ['.']

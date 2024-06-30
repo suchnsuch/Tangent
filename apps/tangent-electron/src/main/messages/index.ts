@@ -75,7 +75,7 @@ ipcMain.handle('getWorkspaceDialog', async (event) => {
 	return null
 })
 
-ipcMain.on('forgetWorkspace', (event, path) => {
+ipcMain.on('forgetWorkspace', async (event, path) => {
 	const browserWindow = BrowserWindow.fromWebContents(event.sender)
 
 	const workspace = workspaceMap.get(path)
@@ -96,7 +96,7 @@ ipcMain.on('forgetWorkspace', (event, path) => {
 	
 		if (result === 0) {
 			if (workspace) {
-				workspace.close()
+				await workspace.close()
 			}
 			workspaceMap.delete(path)
 		}
