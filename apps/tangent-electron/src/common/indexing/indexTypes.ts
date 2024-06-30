@@ -81,17 +81,18 @@ export namespace IndexData {
 		if (frontMatter) func(frontMatter)
 	}
 
-	export function* pathAndAliasPaths(node: TreeNode) {
-		yield node.path
-		
+	export function findAliasPaths(node: TreeNode) : null | string[] {
 		const frontMatter = findFrontMatter(node)
 		if (frontMatter && Array.isArray(frontMatter.data?.aliases)) {
+			const result: string[] = []
 			const base = paths.dirname(node.path)
 			for (const alias of frontMatter.data.aliases) {
 				if (typeof alias !== 'string') continue
-				yield paths.join(base, alias)
+				result.push(paths.join(base, alias))
 			}
+			return result
 		}
+		return null
 	}
 }
 

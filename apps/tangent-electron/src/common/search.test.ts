@@ -168,8 +168,7 @@ describe('Alias Searching', () => {
 			}
 		}
 
-		expect([... IndexData.pathAndAliasPaths(testNode)]).toEqual([
-			'Some/File I made.md',
+		expect(IndexData.findAliasPaths(testNode)).toEqual([
 			'Some/I made files'
 		])
 	})

@@ -3,7 +3,7 @@ import * as paths from '../paths'
 import { SelfStore } from 'common/stores'
 
 import { forAllNodes, integrateTrees, iterateOverChildren, TreeNode, TreePredicate, TreePredicateResult } from './directory'
-import { bestMatchForSearch, buildMatcher, nodeSearchResults, PathMatch, SegmentSearchNodePair, SearchMatchResult } from '../search'
+import { bestMatchForSearch, buildMatcher, nodeSearchResults, PathMatch, SegmentSearchNodePair, SearchMatchResult, isSearchArray } from '../search'
 
 interface GetMatches_Base {
 	/** The node to look under */
@@ -486,15 +486,20 @@ export default class DirectoryStore extends SelfStore implements DirectoryLookup
 			}
 
 			if (options.includeMatches === 'all') {
-				for (const match of nodeSearchResults(child, pathMatch, root)) {
-					if (match) {
-						if (!approved) approved = []
-						approved.push({
-							node: child,
-							match
-						})
+				const results = nodeSearchResults(child, pathMatch, root)
+				if (isSearchArray(results)) {
+					for (const match of results) {
+						if (match) {
+							if (!approved) approved = []
+							approved.push({ node: child, match })
+						}
 					}
 				}
+				else {
+					if (!approved) approved = []
+					approved.push({ node: child, match: results })
+				}
+				
 			}
 			else {
 				const match = bestMatchForSearch(child, pathMatch, root)

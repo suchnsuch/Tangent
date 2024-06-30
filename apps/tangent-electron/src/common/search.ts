@@ -111,21 +111,34 @@ export function buildMatcher(pathString: string, options?: BuildMatcherOptions):
 	return new RegExp(matchString, flags)
 }
 
-export function* nodeSearchResults(node: TreeNode, searchMatch: RegExp, root?: TreeNode): Generator<SearchMatchResult> {
-	for (const path of IndexData.pathAndAliasPaths(node)) {
-		if (root) {
-			const childPath = paths.getChildPath(root.path, path)
-			if (childPath) {
-				yield normalizeSeperators(childPath, '/').match(searchMatch)
-			}
-			else {
-				console.error('Search could not find child path for', root, node)
-			}
+function pathSearchResult(path: string, searchMatch: RegExp, root?: string): SearchMatchResult {
+	if (root) {
+		const childPath = paths.getChildPath(root, path)
+		if (childPath) {
+			// yield normalizeSeperators(childPath, '/').match(searchMatch)
+			return normalizeSeperators(childPath, '/').match(searchMatch)
 		}
 		else {
-			yield normalizeSeperators(path, '/').match(searchMatch)
+			console.error('Search could not find child path for', root, path)
 		}
 	}
+	else {
+		return normalizeSeperators(path, '/').match(searchMatch)
+	}
+}
+
+export function nodeSearchResults(node: TreeNode, searchMatch: RegExp, root?: TreeNode): SearchMatchResult | SearchMatchResult[] {
+
+	const rawMatch = pathSearchResult(node.path, searchMatch, root.path)
+
+	const aliasPaths = IndexData.findAliasPaths(node)
+	if (aliasPaths) {
+		const result = [rawMatch]
+		result.push(...aliasPaths.map(p => pathSearchResult(p, searchMatch, root.path)))
+		return result
+	}
+
+	return rawMatch
 }
 
 export function compareNodeSearch(a: SearchMatchResult, b: SearchMatchResult) {
@@ -177,10 +190,20 @@ export function compareNodeSearch(a: SearchMatchResult, b: SearchMatchResult) {
 	return bRatio - aRatio
 }
 
+export function isSearchArray(result: SearchMatchResult | SearchMatchResult[]) : result is SearchMatchResult[] {
+	if (result && !('input' in result)) {
+		return true
+	}
+	return false
+}
+
 export function bestMatchForSearch(node: TreeNode, searchMatch: RegExp, root?: TreeNode): SearchMatchResult {
+	const nodeResults = nodeSearchResults(node, searchMatch, root)
+	if (!isSearchArray(nodeResults)) return nodeResults
+
 	let bestMatch: SearchMatchResult = null
 
-	for (const match of nodeSearchResults(node, searchMatch, root)) {
+	for (const match of nodeResults) {
 		const comparison = compareNodeSearch(bestMatch, match)
 		if (comparison > 0) {
 			bestMatch = match
