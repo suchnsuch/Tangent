@@ -1,0 +1,22 @@
+{
+	"version": "0.2.0",
+	"configurations": [
+		{
+			"name": "Debug Tangent Electron Main",
+			"type": "node",
+			"request": "launch",
+			"cwd": "${workspaceFolder}/apps/tangent-electron",
+			"preLaunchTask": {
+				"type": "npm",
+				"script": "build:dev",
+				"path": "apps/tangent-electron"
+			},
+			"runtimeExecutable": "${workspaceFolder}/node_modules/.bin/electron",
+			"windows": {
+				"runtimeExecutable": "${workspaceFolder}/node_modules/.bin/electron.cmd"
+			},
+			"args": ["."],
+			"outputCapture": "std"
+		}
+	]
+}

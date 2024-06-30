@@ -1,0 +1,5 @@
+{
+	"jestrunner.configPath": "apps/tangent-electron/jest.config.js",
+	"jestrunner.jestPath": "",
+	"jestrunner.codeLensSelector": "**/*.{test,spec,integration-test}.{js,jsx,ts,tsx}"
+}

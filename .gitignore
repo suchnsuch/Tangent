@@ -3,7 +3,6 @@ node_modules/
 
 /packages/**/lib/
 
-.vscode/settings.json
 **/.tangent/**/*.workspace
 **/.tangent/tangents/
 **/.tangent/Temp/
