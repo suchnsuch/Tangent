@@ -288,6 +288,8 @@ article.note {
 		border-radius: var(--borderRadius);
 
 		transition: margin-left .2s, margin-right .2s;
+
+		caret-color: var(--codeCaretColor);
 	}
 
 	figure {
