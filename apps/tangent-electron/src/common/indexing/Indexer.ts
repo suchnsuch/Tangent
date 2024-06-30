@@ -1,7 +1,7 @@
 import { mapIterator } from '@such-n-such/core'
 import { TreeNode, forAllNodes, DirectoryStore, TreePredicateResult, defaultStoreFilter } from 'common/trees'
 import type { ObjectStore } from 'common/stores'
-import { ConnectionInfo, HrefFormedLink, IndexData, IndexDataUpdate } from './indexTypes'
+import { ConnectionInfo, HrefFormedLink, IndexData, IndexDataUpdate, StructureData, StructureType } from './indexTypes'
 
 import { linkInfoToText, MarkdownParsingOptions, parseMarkdown } from '../markdownModel/parser'
 import { getExtensionRegex } from '../fileExtensions'
@@ -67,26 +67,37 @@ export default class Indexer {
 	}
 
 	async initializeFromRaw(rawIndex: any) {
+		log.info('Initializing Index')
 		const indexStart = performance.now()
 
-		// Actually load index
 		const rawMap = new Map<string, IndexData>()
-		
 		if (rawIndex?.items) {
 			for (const itemPath of Object.keys(rawIndex.items)) {
 				const item = rawIndex.items[itemPath]
 				const meta: IndexData = {}
 
 				meta.modified = new Date(item.modified)
-				meta.structure = item.structure
+
+				if (Array.isArray(item.structure)) {
+					meta.structure = item.structure
+					
+					for (const link of IndexData.outgoingConnections(meta)) {
+						if (link.to) {
+							link.to = this.store.portablePathToPath(link.to)
+						}
+					}
+				}
 
 				if (item.virtual) {
 					meta.virtual = true
 				}
 
-				rawMap.set(itemPath, meta)
+				rawMap.set(this.store.portablePathToPath(itemPath), meta)
 			}
 		}
+
+		let rebuildLinks = false
+		const indexDate = rawIndex?.date ? new Date(rawIndex.date) : new Date(1990, 0, 1)
 
 		const nodeMap = new Map<string, TreeNode>()
 
@@ -94,6 +105,10 @@ export default class Indexer {
 		forAllNodes(this.store.files, (node, parent) => {
 			if (node.name.startsWith('.'))
 				return false
+			if (!rebuildLinks && node !== this.store.files && node.modified && indexDate < node.modified) {
+				log.info(`  Node newer than index cache. Links will be re-resolved. ${node.path}`)
+				rebuildLinks = true
+			}
 			if (!this.isParseableFile(node))
 				return
 			nodeMap.set(node.path, node)
@@ -114,11 +129,22 @@ export default class Indexer {
 			}
 		})
 
+		if (rebuildLinks) {
+			for (const node of nodeMap.values()) {
+				if (Array.isArray(node.meta?.structure)) {
+					// Strip the hard path this resolves to
+					for (const link of IndexData.outgoingConnections(node.meta)) {
+						delete link.to
+					}
+				}
+			}
+		}
+
 		await Promise.all(tasks)
 
 		const postReindex = performance.now()
 
-		log.info(`Cached index contained ${rawMap.size} files.`)
+		log.info(`  Cached index contained ${rawMap.size} files.`)
 		log.info(`  Integrated cache and reindexed ${tasks.length} files in ${postReindex - indexStart}ms.`)
 
 		// TODO: don't reset this every load
@@ -165,6 +191,7 @@ export default class Indexer {
 	getRawIndex() {
 		const raw = {
 			version: 1,
+			date: new Date(),
 			items: {}
 		}
 
@@ -179,14 +206,25 @@ export default class Indexer {
 			}
 
 			if (meta.structure?.length) {
-				data.structure = meta.structure
+				const structure: StructureData[] = []
+				for (const item of meta.structure) {
+					if (item.type === StructureType.Link || item.type === StructureType.Embed) {
+						const newItem = { ...item }
+						newItem.to = this.store.pathToPortablePath(item.to)
+						structure.push(newItem)
+					}
+					else {
+						structure.push(item)
+					}
+				}
+				data.structure = structure
 			}
 
 			if (meta.virtual) {
 				data.virtual = true
 			}
 
-			raw.items[node.path] = data
+			raw.items[this.store.pathToPortablePath(node.path)] = data
 		})
 
 		return raw
