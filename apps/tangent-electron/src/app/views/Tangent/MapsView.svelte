@@ -311,6 +311,7 @@ $: if ($openSessions) {
 		<div class="extraSpace" style:grid-row={1}></div>
 		{#each $openSessions as session, index (session)}
 			{@const range = session.getDateRange()}
+			{@const date = range?.first ?? new Date()}
 			{@const isActive = session === $activeSession || mergePreview - 1 === index}
 			<div class={"menu buttonBar index" + index}
 				style:grid-row={2 + index * 2}
@@ -351,13 +352,8 @@ $: if ($openSessions) {
 				class:mergeInPreview={mergePreview - 1 === index}
 			>
 				<header style:grid-row={3 + index * 2} class:isActive>
-					{#if range.first}
-						<h1>{friendlyWeekDay(range.first)}</h1>
-						<div>{fillDateFormat('%Month% %Do%, %YYYY%', range.first)}</div>
-					{:else}
-						<h1>New Session</h1>
-					{/if}
-					
+					<h1>{friendlyWeekDay(date)}</h1>
+					<div>{fillDateFormat('%Month% %Do%, %YYYY%', date)}</div>
 				</header>
 				<article style:grid-row={3 + index * 2}
 					use:classStore={{ store: session.isEmpty, className: 'empty' }}

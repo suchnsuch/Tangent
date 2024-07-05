@@ -860,7 +860,6 @@ function cleanupConnectionHover() {
 					size="256"
 					styleString="--iconStroke: var(--embossedBackgroundColor);"
 					/>
-				<h1>No files in your map. Create or open a new note from the left sidebar.</h1>
 				<div class="buttons">
 					<button use:command={{
 						command: workspace.commands.createNewFile,
@@ -923,17 +922,18 @@ svg {
 .empty {
 	color: var(--deemphasizedTextColor);
 	font-style: italic;
-	text-align: center;
 	flex-grow: 1;
 
-	h1 {
-		margin-top: 5vh;
-		font-size: 110%;
-		font-weight: normal;
+	display: flex;
+	align-items: center;
+
+	:global(svg) {
+		display: block;
+		margin: 0 8vw;
 	}
 
 	.buttons {
-		display: inline-flex;
+		display: flex;
 		flex-direction: column;
 		align-items: stretch;
 
