@@ -99,7 +99,7 @@ function openDocumentation() {
 		</div>
 	
 		{#if workspaces.length}
-			<p style="text-align: center;">	
+			<p class="documentation">	
 				<!-- svelte-ignore a11y-invalid-attribute -->
 				<a href="#" on:click={openDocumentation} class="local">Open Documentation</a>
 			</p>
@@ -184,5 +184,10 @@ button p {
 	flex-grow: 1;
 
 	font-size: 80%;
+}
+
+.documentation {
+	text-align: center;
+	margin-top: 1em;
 }
 </style>
