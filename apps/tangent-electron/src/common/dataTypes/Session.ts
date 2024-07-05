@@ -444,22 +444,26 @@ export default class Session extends ObjectStore {
 		}
 	}
 
-	addThreadHistory(item: ThreadHistoryItem, reset=false) {
-
+	willItemChangeState(item: ThreadHistoryItem) {
 		if (!item) {
 			console.warn('Attempted to add a falsey thread history item')
-			return
+			return false
 		}
 
 		if (fixThreadHistoryItem(item)) {
 			console.warn('Fixed thread history item', item)
 		}
 
-		if (threadHistoryItemsAreEqual(item, this._currentThreadItem.value)) {
+		return !threadHistoryItemsAreEqual(item, this._currentThreadItem.value)
+	}
+
+	addThreadHistory(item: ThreadHistoryItem, reset=false) {
+
+		if (!this.willItemChangeState(item)) {
 			// No need to insert duplicate history
 			return
 		}
-
+		
 		const index = reset ? 0 : this.threadIndex.value + 1
 		
 		this.undoStack.withUndoGroup(() => {
@@ -499,12 +503,7 @@ export default class Session extends ObjectStore {
 		}
 	}
 
-	/**
-	 * Updates the thread given the passed options.
-	 * You should ideally go through the Tangent implementation,
-	 * which can create new sessions and implements better call safety.
-	 */
-	updateThread(options: UpdateThreadOptions) {
+	optionsToThreadItem(options: UpdateThreadOptions): ThreadHistoryItem {
 		const { thread, currentNode } = this.currentThread.value ?? EmptyThreadHistoryItem
 
 		let nextThread: TreeNode[] = null
@@ -562,10 +561,19 @@ export default class Session extends ObjectStore {
 			? nextThread[nextCurrentNodeIndex]
 			: nextThread.at(-1) ?? null
 
-		this.addThreadHistory({
+		return {
 			thread: nextThread,
 			currentNode: nextCurrentNode
-		})
+		}
+	}
+
+	/**
+	 * Updates the thread given the passed options.
+	 * You should ideally go through the Tangent implementation,
+	 * which can create new sessions and implements better call safety.
+	 */
+	updateThread(options: UpdateThreadOptions) {
+		this.addThreadHistory(this.optionsToThreadItem(options))
 	}
 
 	getDateRange(): { first?: Date, last?: Date } {

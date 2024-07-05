@@ -200,9 +200,17 @@ export default class Tangent {
 	 * 		or is the last node in the thread.
 	 */
 	updateThread(opts: { thread: TreeNode[] | 'retain', currentNode?: TreeNode | number })
+	updateThread(options: UpdateThreadOptions)
 	updateThread(options: UpdateThreadOptions) {
 		const session = this.activeSession.value
 		if (session) {
+
+			const nextHistoryItem = session.optionsToThreadItem(options)
+			if (session === this.activeSession.value && !session.willItemChangeState(nextHistoryItem)) {
+				// No need to push state or create a new session
+				return
+			}
+
 			const now = new Date()
 			const { last } = session.getDateRange()
 			
@@ -214,7 +222,9 @@ export default class Tangent {
 				const tangentInfo = this.tangentInfo.value
 				const previousSessionPath = tangentInfo.activeSession.value?.path ?? ''
 
-				if (options.thread === 'retain') {
+				if (options.thread === 'retain' &&
+					typeof options.currentNode !== 'number' &&
+					this.thread.value.includes(options.currentNode)) {
 					// Since the request was to retain the thread, we pull in the current thread.
 					// The new session won't have that thread, and we need to maintain continuity.
 					options.thread = this.thread.value
@@ -229,7 +239,8 @@ export default class Tangent {
 				tangentInfo.activeSession.set(newSessionFile)
 			}
 			else {
-				session.updateThread(options)
+				// Use the previously computed history item
+				session.addThreadHistory(nextHistoryItem)
 			}
 		}
 		else {

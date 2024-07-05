@@ -23,7 +23,7 @@ import { readable } from 'svelte/store'
 import { markEventAsShortcutable } from 'app/utils/shortcuts'
 import SvgIcon from '../smart-icons/SVGIcon.svelte'
 import type { RemoveFromMapCommandContext } from 'app/model/commands/RemoveFromMap'
-import { ThreadHistoryItem } from 'common/dataTypes/Session'
+import { ThreadHistoryItem, UpdateThreadOptions } from 'common/dataTypes/Session'
 import { isMac } from 'common/isMac'
 import { createCommandHandler } from 'app/model/commands/Command'
 
@@ -43,6 +43,10 @@ const commandHandler = createCommandHandler([
 
 export let session: Session
 export let isActive: boolean
+
+export let updateThread: (options: UpdateThreadOptions) => void = null
+
+if (!updateThread) updateThread = session.updateThread.bind(session)
 
 $: map = session.map
 $: current = session.currentThread
@@ -303,31 +307,38 @@ function startThreadingDrag(thread: TreeNode[]) {
 		end() {
 			const thread = threadStack
 			if (thread.length > initialLength) {
-				session.undoStack.withUndoGroup(() => {
-					thread.reduce((p, c) => {
-						if (p) {
-							const previousNode = map.get(p)
-							const currentNode = map.get(c)
 
-							map.connect({
-								from: previousNode,
-								to: currentNode,
-								strength: MapStrength.Navigated
-							})
-						}
-						return c
+				let currentNode = $current.currentNode
+				if (!thread.includes(currentNode)) {
+					currentNode = thread.at(-1)
+				}
+
+				const updateThreadOptions = {
+					thread,
+					currentNode
+				}
+
+				if (isActive) {
+					session.undoStack.withUndoGroup(() => {
+						thread.reduce((p, c) => {
+							if (p) {
+								const previousNode = map.get(p)
+								const currentNode = map.get(c)
+
+								session.map.connect({
+									from: previousNode.node.value,
+									to: currentNode.node.value,
+									strength: MapStrength.Navigated
+								})
+							}
+							return c
+						})
+						session.updateThread(updateThreadOptions)
 					})
-
-					let currentNode = $current.currentNode
-					if (!thread.includes(currentNode)) {
-						currentNode = thread.at(-1)
-					}
-
-					session.addThreadHistory({
-						thread,
-						currentNode
-					})
-				})
+				}
+				else {
+					updateThread(updateThreadOptions)
+				}
 			}
 
 			threadStack = [...$current.thread]
@@ -351,21 +362,21 @@ function onMapNodeClick(event: MouseEvent, node: MapNode) {
 	const treeNode = node.node.value
 
 	if (event.shiftKey) {
-		session.addThreadHistory({
+		updateThread({
 			currentNode: treeNode,
 			thread: [...$current.thread, treeNode]
 		})
 		event.preventDefault()
 	}
 	else if ((isMac && event.metaKey) || (!isMac && event.ctrlKey)) {
-		session.updateThread({
+		updateThread({
 			from: $current.currentNode,
 			currentNode: treeNode
 		})
 		event.preventDefault()
 	}
 	else {
-		session.updateThread({ currentNode: treeNode, thread: 'retain' })
+		updateThread({ currentNode: treeNode, thread: 'retain' })
 		event.preventDefault()
 	}
 }
@@ -394,7 +405,7 @@ function onMapNodeContextMenu(event: MouseEvent, node: MapNode) {
 			label: 'Show in Thread',
 			accelerator: 'Enter',
 			click: () => {
-				session.updateThread({ currentNode: node.node.value, thread: 'retain' })
+				updateThread({ currentNode: node.node.value, thread: 'retain' })
 				workspace.commands.setThreadFocusLevel.execute({})
 			}
 		},
@@ -402,58 +413,60 @@ function onMapNodeContextMenu(event: MouseEvent, node: MapNode) {
 			label: 'Focus on This',
 			accelerator: 'CommandOrControl+Enter',
 			click: () => {
-				session.updateThread({ currentNode: node.node.value, thread: 'retain' })
+				updateThread({ currentNode: node.node.value, thread: 'retain' })
 				workspace.commands.toggleFocusMode.execute({})
 			}
 		}
 	]
 
-	const children = node.getOutLinks()
-	if (children.length > 0) {
+	if (isActive) {
+		const children = node.getOutLinks()
+		if (children.length > 0) {
+			options.push(
+				{ type: 'separator' },
+				{
+					label: 'Show All Children',
+					command: workspace.commands.showAllChildMapNodes,
+					commandContext: {
+						initiatingEvent: event,
+						node,
+						session
+					}
+				}
+			)
+		}
+
+		const removeContext: RemoveFromMapCommandContext = {
+			session,
+			node: node.node.value,
+			initiatingEvent: event
+		}
 		options.push(
 			{ type: 'separator' },
 			{
-				label: 'Show All Children',
-				command: workspace.commands.showAllChildMapNodes,
-				commandContext: {
-					initiatingEvent: event,
-					node,
-					session
-				}
+				label: 'Remove from Map',
+				command: workspace.commands.removeNodeFromMap,
+				commandContext: removeContext
+			},
+			{
+				label: 'Remove This and All Children',
+				command: workspace.commands.removeNodeAndChildrenFromMap,
+				commandContext: removeContext
+			},
+			{
+				label: 'Remove All But This and Children',
+				command: workspace.commands.removeEverythingButNodeFromMap,
+				commandContext: removeContext
 			}
 		)
-	}
 
-	const removeContext: RemoveFromMapCommandContext = {
-		session,
-		node: node.node.value,
-		initiatingEvent: event
-	}
-	options.push(
-		{ type: 'separator' },
-		{
-			label: 'Remove from Map',
-			command: workspace.commands.removeNodeFromMap,
-			commandContext: removeContext
-		},
-		{
-			label: 'Remove This and All Children',
-			command: workspace.commands.removeNodeAndChildrenFromMap,
-			commandContext: removeContext
-		},
-		{
-			label: 'Remove All But This and Children',
-			command: workspace.commands.removeEverythingButNodeFromMap,
-			commandContext: removeContext
+		if ($current.thread.includes(node.node.value)) {
+			options.push({
+				label: 'Remove All But This Thread',
+				command: workspace.commands.removeEverythingButThreadFromMap,
+				commandContext: removeContext
+			})
 		}
-	)
-
-	if ($current.thread.includes(node.node.value)) {
-		options.push({
-			label: 'Remove All But This Thread',
-			command: workspace.commands.removeEverythingButThreadFromMap,
-			commandContext: removeContext
-		})
 	}
 
 	appendContextTemplate(event, options)
@@ -648,6 +661,7 @@ function openMenus(type: 'in' | 'out') {
 }
 
 function interpretKeyboardEvent(event: KeyboardEvent) {
+	if (!isActive) return
 	switch (event.key) {
 		case 'ArrowLeft':
 			if (event.ctrlKey || event.metaKey) {
@@ -712,7 +726,7 @@ function onConnectionMouseDown(event: MouseEvent, meta: ConnectionMeta) {
 }
 
 function onConnectionClick(event: MouseEvent, meta: ConnectionMeta) {
-	if (event.altKey) {
+	if (event.altKey && isActive) {
 		session.undoStack.withUndoGroup(() => {
 			map.disconnect(meta.connection)
 		})
@@ -720,18 +734,14 @@ function onConnectionClick(event: MouseEvent, meta: ConnectionMeta) {
 	}
 
 	if (meta.thread) {
-		session.undoStack.withUndoGroup(() => {
-			const thread = meta.thread
-			session.updateThread({ thread })
-		})
+		const thread = meta.thread
+		updateThread({ thread })
 		return event.preventDefault()
 	}
 	else {
 		// Connect the two items
-		session.undoStack.withUndoGroup(() => {
-			session.updateThread({
-				thread: [ meta.connection.fromTreeNode, meta.connection.toTreeNode ]
-			})
+		updateThread({
+			thread: [ meta.connection.fromTreeNode, meta.connection.toTreeNode ]
 		})
 	}
 }
@@ -917,8 +927,8 @@ svg {
 	flex-grow: 1;
 
 	h1 {
-		margin-top: 10vh;
-		font-size: 120%;
+		margin-top: 5vh;
+		font-size: 110%;
 		font-weight: normal;
 	}
 

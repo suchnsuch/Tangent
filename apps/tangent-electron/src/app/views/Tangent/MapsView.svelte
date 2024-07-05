@@ -8,7 +8,8 @@ import { fillDateFormat, friendlyWeekDay, shortestDayDate } from 'common/dates'
 import command from 'app/model/commands/CommandAction'
 import classStore from 'app/utils/ClassStoreAction'
 import { fade } from 'svelte/transition'
-    import { cubicInOut } from 'svelte/easing';
+import { cubicInOut } from 'svelte/easing'
+import Session, { UpdateThreadOptions } from 'common/dataTypes/Session'
 
 const workspace = getContext('workspace') as Workspace
 const {
@@ -63,18 +64,30 @@ onMount(() => {
 	}
 })
 
-$: $currentNode ? ensureCurrentNodeIsContained('buffer', 250) : null
+$: $currentNode ? onCurrentNodeChange() : null
+
+var nextContainMode: ContainMode = 'buffer'
+var nextContainSpeed = 250
+function onCurrentNodeChange() {
+	tick().then(() => {
+		ensureCurrentNodeIsContained(nextContainMode, nextContainSpeed)
+		nextContainMode = 'buffer'
+		nextContainSpeed = 250
+	})
+}
 
 type Containment = 'in' | 'start' | 'end'
 type ContainMode = 'buffer' | 'center' | 'center-hard'
 
 function ensureCurrentNodeIsContained(mode: ContainMode = 'buffer', scrollTime = 0) {
 	if (!container) return
+	console.log('Containing with', mode)
 	// Ensure that the current node is visible
 	const element = container.querySelector('.active .MapNodeView.current')
 	if (element) {
 		const elementContainer = element.getBoundingClientRect()
 		const viewContainer = view.getBoundingClientRect()
+		console.log(viewContainer)
 		const buffer = 100
 
 		let containX: Containment = 'in'
@@ -117,6 +130,7 @@ function ensureCurrentNodeIsContained(mode: ContainMode = 'buffer', scrollTime =
 		}
 		
 		if (scrollX !== undefined || scrollY !== undefined) {
+			console.log({ scrollX, scrollY })
 			setScroll(scrollX, scrollY, scrollTime)
 		}
 	}
@@ -219,6 +233,11 @@ function onKeydown(event: KeyboardEvent) {
 }
 
 function onPointerDown(event: PointerEvent) {
+	if (!document.activeElement || !view?.contains(document.activeElement)) {
+		// We always want to grab focus from elsewhere if a child is clicked
+		view?.focus()
+	}
+
 	if (event.defaultPrevented) return
 
 	let last = Point.make(event)
@@ -240,6 +259,13 @@ function onPointerDown(event: PointerEvent) {
 	})
 }
 
+function updateMapThread(session: Session, options: UpdateThreadOptions) {
+	tangent.updateThread(options)
+	if (session !== activeSession.value) {
+		nextContainMode = 'center-hard'
+		nextContainSpeed = 500
+	}
+}
 
 let archivePreview = -1
 function onArchiveMouseOver(event: MouseEvent, index: number) {
@@ -277,7 +303,6 @@ $: if ($openSessions) {
 	on:pointerdown={onPointerDown}
 	tabindex="0"
 >
-	<nav class="buttonBar">Where Buttons Go</nav>
 	<div
 		bind:this={container}
 		class="container"
@@ -319,8 +344,6 @@ $: if ($openSessions) {
 					</button>
 				{/if}
 				<span class="spacer"></span>
-
-				
 			</div>
 			<div class="map"
 				class:archivePreview={archivePreview > index}
@@ -339,7 +362,7 @@ $: if ($openSessions) {
 				<article style:grid-row={3 + index * 2}
 					use:classStore={{ store: session.isEmpty, className: 'empty' }}
 				>
-					<MapView {session} {isActive} />
+					<MapView {session} {isActive} updateThread={o => updateMapThread(session, o)} />
 				</article>
 			</div>
 		{/each}
@@ -369,26 +392,6 @@ main {
 
 	&.grab-pan {
 		cursor: grabbing;
-	}
-}
-
-nav {
-	position: sticky;
-	top: 0;
-	left: 0;
-	right: 0;
-	z-index: 1;
-
-	font-size: 80%;
-	padding: .5em;
-
-	background-color: var(--noteBackgroundColor);
-	box-shadow: 0 0 10px rgba(0, 0, 0, .1);
-
-	opacity: 0;
-	transition: opacity .5s;
-	&:hover {
-		opacity: 1;
 	}
 }
 
@@ -509,16 +512,6 @@ article {
 	padding: 0 100px;
 
 	transition: opacity .3s;
-
-	&:global(.empty) {
-		width: 100cqw;
-		grid-column: 1 / 3;
-		padding: 0;
-	}
-
-	:global(.MapView:not(.active)) {
-		pointer-events: none;
-	}
 
 	.archivePreview &, .mergeUpPreview & {
 		opacity: .4;
