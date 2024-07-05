@@ -277,7 +277,11 @@ export default class Indexer {
 			existingData.virtual = false
 		}
 
-		node.meta = Object.assign(node.meta || {}, parsedData)
+		// Update 
+		node.meta = Object.assign(existingData ?? {}, parsedData)
+		if (!parsedData.structure && node.meta.structure) {
+			delete node.meta.structure
+		}
 
 		this.interop.updateMetadata([...mapIterator(dirtyMeta, n => {
 			return {
@@ -303,7 +307,7 @@ export default class Indexer {
 				const { structure } = parseMarkdown(contents, this.parsingOptions)
 
 				const meta: IndexData = {
-					modified: node.modified,
+					modified: node.modified ?? node.created
 				}
 				
 				if (structure.length) {

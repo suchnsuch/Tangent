@@ -284,7 +284,7 @@ Hello there, I am a note and I link to [[Another Auto Test]]`)
 		await workspace.updateFileContents(autoTest.path, `
 Hello. I no longer link to that note.`)
 
-		expect([...IndexData.outgoingConnections(autoTest.meta)].length).toEqual(0)
+		expect([...IndexData.outgoingConnections(autoTest.meta)]).toEqual([])
 		expectNoFile('Another Auto Test')
 
 		// Externally update the note with a new reference
