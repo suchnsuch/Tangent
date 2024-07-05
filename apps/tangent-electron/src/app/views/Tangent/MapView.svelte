@@ -478,30 +478,40 @@ function onMapNodeAddLink(event: CustomEvent, mapNode: MapNode) {
 		direction: 'in' | 'out'
 	} = event.detail
 
-	session.undoStack.withUndoGroup(() => {
-		const target = map.getOrCreate(node, MapStrength.Full)
-		let threadShift = 0
-		switch (direction) {
-			case 'in':
-				map.connect({ from: target, to: mapNode })
-				threadShift = -1
-				break
-			case 'out':
-				map.connect({ from: mapNode, to: target })
-				threadShift = 1
-				break
-		}
+	const originNode = mapNode.node.value
+	const originThreadIndex = $current.thread.indexOf(originNode)
 
-		const originNode = mapNode.node.value
-		const originThreadIndex = $current.thread.indexOf(originNode)
-		if (originThreadIndex >= 0) {
-			session.updateThread({
-				currentNode: target.node.value,
-				from: threadShift > 0 ? originNode : null,
-				to: threadShift < 0 ? originNode : null
+	const update: UpdateThreadOptions = {
+		currentNode: originThreadIndex >= 0 ? node : null
+	}
+
+	switch (direction) {
+		case 'in':
+			update.from = node
+			update.to = mapNode.node.value
+			break
+		case 'out':
+			update.from = mapNode.node.value
+			update.to = node
+			break
+	}
+
+	if (isActive) {
+		session.undoStack.withUndoGroup(() => {
+			map.getOrCreate(node, MapStrength.Full)
+			map.connect({
+				from: update.from,
+				to: update.to
 			})
-		}
-	})
+
+			if (update.currentNode) {
+				session.updateThread(update)
+			}
+		})
+	}
+	else if (update.currentNode) {
+		updateThread(update)
+	}
 }
 
 function navigateToGeneration(mode: 'parent' | 'child', stretchThread: boolean) {
