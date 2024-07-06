@@ -379,6 +379,15 @@ describe('Resolving & Creating Partial Path Matches', () => {
 			.toEqual(store.getRoot(0).children[2])
 	})
 
+	it('Should not return any matches when there are no valid matches', () => {
+		const store = getTestStore()
+
+		expect(store.getMatchesForPath('Floogle', {
+			fuzzy: true,
+			includeMatches: 'all'
+		})).toEqual([])
+	})
+
 	describe('Get Path to Item', () => {
 		const store = getTestStore()
 		const root = store.getRoot(0)

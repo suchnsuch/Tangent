@@ -495,7 +495,7 @@ export default class DirectoryStore extends SelfStore implements DirectoryLookup
 						}
 					}
 				}
-				else {
+				else if (results) {
 					if (!approved) approved = []
 					approved.push({ node: child, match: results })
 				}
