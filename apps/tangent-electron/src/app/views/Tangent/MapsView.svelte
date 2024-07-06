@@ -49,11 +49,16 @@ updateZoomTimeout()
 
 onMount(() => {
 	if (view && $tangentInfo) {
+		// Disable automatic scroll-to-current behavior so that the cache can be restored
+		nextContainMode = null
 		tick().then(() => {
 			view.scrollLeft = $tangentInfo.scrollX.value
 			view.scrollTop = $tangentInfo.scrollY.value
 			
 			ensureCurrentNodeIsContained('center')
+
+			// Restore normal scroll-to-current
+			nextContainMode = 'buffer'
 		})
 	}
 	return () => {
@@ -69,6 +74,7 @@ $: $currentNode ? onCurrentNodeChange() : null
 var nextContainMode: ContainMode = 'buffer'
 var nextContainSpeed = 250
 function onCurrentNodeChange() {
+	if (!nextContainMode) return // Trust this will be reset
 	tick().then(() => {
 		ensureCurrentNodeIsContained(nextContainMode, nextContainSpeed)
 		nextContainMode = 'buffer'
