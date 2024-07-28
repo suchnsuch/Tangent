@@ -1,4 +1,4 @@
-import { getEditInfo } from 'common/typewriterUtils';
+import { getEditInfo, rangeIsCollapsed } from 'common/typewriterUtils';
 import { Editor, EditorChangeEvent, line, normalizeRange, Source } from 'typewriter-editor';
 
 export type BraceCompletions = {
@@ -70,62 +70,72 @@ export default function autoBraces(editor: Editor, options?: AutoBracesModulOpti
 		}
 		return best
 	}
+	
+	function onKeyDown(event: KeyboardEvent) {
+		if (event.defaultPrevented) return
+		if (event.ctrlKey || event.metaKey) return
+		const doc = editor.doc
 
-	function onChanging(event: EditorChangeEvent) {
-		const doc = event.doc
+		const selection = doc.selection
+		if (!selection || !rangeIsCollapsed(selection)) return
 
-		if (event.source === Source.api || event.source === Source.history) return
+		const start = selection[0]
 
-		if (event.change && event.changedLines?.length) {
-			const info = getEditInfo(event.change.delta)
-			const insert = info?.insert
-			if (insert && insert.length === 1) {
-				const start = info.offset + 1
-				const nextText = doc.getText([start, start + longestCloser.length])
-				const lastText = doc.getText([start - longestOpener.length, start])
-
-				// Hop over already typed characters
-				if (nextText.startsWith(insert) && isClosingCharacter(insert)) {
-
-					const opener = getBestOpener(lastText)
-					// Prevent jumping items when still building out a longer opener
-					if (!opener || nextText.startsWith(values[opener])) {
-						event.preventDefault()
-						editor.select(start)
-						return
-					}
-				}
-
-				// Insert matching quotes/braces
-				const insertion: string = getMatchingCharacter(insert)
-				if (insertion && checkInsertion(start, insertion)) {
-					const change = doc.change.insert(start, insertion)
-					event.modify(change.delta)
-					requestAnimationFrame(() => editor.select(start))
-					return
-				}
-			}
-			else if (info?.shift === -1) {
-				// Delete occuring, check to remove matching characters
-				const start = normalizeRange(doc.selection)[0]
-				const oldText = event.old.getText([start, start + 1])
-				const pair = getMatchingCharacter(oldText)
-				const nextText = doc.getText([start, start + 1])
-				if (pair === nextText) {
-					const change = doc.change.delete([start, start + 1])
-					event.modify(change.delta)
-					return
-				}
+		if (event.code === 'Backspace') {
+			const deleteTarget = doc.getText([start - 1, start])
+			const pair = getMatchingCharacter(deleteTarget)
+			const nextText = doc.getText([start, start + 1])
+			if (pair === nextText) {
+				// Allow the deletion to resolve, then remove the paired brace
+				requestAnimationFrame(() => {
+					console.log(editor.doc.getText([start - 1, start]))
+					editor.delete([start - 1, start])
+				})
+				return
 			}
 		}
+		else if (event.key.length === 1) {
+			const insert = event.key
+			
+			const nextText = doc.getText([start, start + longestCloser.length])
+			const lastText = doc.getText([start - longestOpener.length, start])
+
+			// Hop over already typed characters
+			if (nextText.startsWith(insert) && isClosingCharacter(insert)) {
+
+				const opener = getBestOpener(lastText)
+				// Prevent jumping items when still building out a longer opener
+				if (!opener || nextText.startsWith(values[opener])) {
+					event.preventDefault()
+					editor.select(start + 1)
+					return
+				}
+			}
+
+			// Insert matching quotes/braces
+			const insertion: string = getMatchingCharacter(insert)
+			if (insertion && checkInsertion(start, insertion)) {
+				// Allow the current keypress to resolve, then insert the paired brace
+				requestAnimationFrame(() => {
+					editor.change
+						.insert(start + 1, insertion)
+						.select(start + 1)
+						.apply()
+				})
+				return
+			}
+		}
+
 	}
 
 	return {
 		init() {
-			editor.on('changing', onChanging)
+			// editor.on('changing', onChanging)
+			editor.root.addEventListener('keydown', onKeyDown)
 		},
 		destroy() {
-			editor.off('changing', onChanging)
+			// editor.off('changing', onChanging)
+			editor.root.removeEventListener('keydown', onKeyDown)
 		},
 		updateValues,
 		addInsertionPredicate(predicate: InsertionPredicate) {

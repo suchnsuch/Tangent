@@ -9,6 +9,7 @@ import { MATCHING_BRACES } from '@such-n-such/tangent-query-parser';
 import QueryAutocompleter from './QueryAutocompleter';
 import { selectionModule } from '../selectionEvents';
 import TagAutocompleter from '../autocomplete/TagAutocompleter';
+import autoWrapping from '../autobraces/autoWrappingModule';
 
 export default class QueryEditor extends Editor {
 	constructor(workspace: Workspace, options?: EditorOptions) {
@@ -40,6 +41,7 @@ export default class QueryEditor extends Editor {
 
 				...trimmedDefaultModules,
 
+				autoWrapping,
 				autoBraces: editor => autoBraces(editor, { values: MATCHING_BRACES }),
 				selectionEvents: selectionModule,
 
