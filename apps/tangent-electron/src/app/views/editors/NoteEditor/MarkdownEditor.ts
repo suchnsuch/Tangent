@@ -13,6 +13,7 @@ import TagAutocompleter from '../autocomplete/TagAutocompleter'
 import { getRegexMatchIndices } from '@such-n-such/core'
 import UnicodeAutocompleter from '../autocomplete/UnicodeAutocompleter'
 import CodeBlockAutocompleter from '../autocomplete/CodeBlockAutoCompleter'
+import autoWrapping from '../autobraces/autoWrappingModule'
 
 function indentLines(editor: MarkdownEditor, direction: -1 | 1) {
 	const { doc } = editor
@@ -133,6 +134,7 @@ export default class MarkdownEditor extends Editor {
 
 				tLink: tlinkModule,
 				tCheckbox: tCheckboxModule,
+				autoWrap: autoWrapping,
 				// This goes before copy/paste to get priority over those events
 				tangent: editor => editorModule(editor, { workspace }),
 				
