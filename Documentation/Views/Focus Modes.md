@@ -4,8 +4,9 @@ When you want to isolate a single note from the [[Thread View]], you can invoke 
 
 1. **File focus** will present the current note as if it were the only note in the Thread.
 2. **Typewriter focus** will additionally ensure that your typing cursor remains in the center of the screen as you type and move around.
-3. **Paragraph focus** will additionally fade out all text except for your current paragraph.
-4. **Sentence focus** fades out all text except for your current sentence.
+3. **Paragraph focus** will additionally fade out all text except for your current line and all adjacent lines with content.
+4. **Line focus** will fade out all text except for your current line.
+5. **Sentence focus** fades out all text except for your current sentence.
 
 In all of these modes, the top bar and [[The Sidebar]] are automatically hidden by default. If you summon the sidebar while in a focus mode, the top bar will return as well.
 
