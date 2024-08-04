@@ -169,6 +169,13 @@ export default class SetFocusLevelCommand extends WorkspaceCommand {
 				}
 			},
 			{
+				name: 'Enter Line Focus',
+				command: this,
+				context: {
+					targetFocusLevel: FocusLevel.Line
+				}
+			},
+			{
 				name: 'Enter Sentence Focus',
 				command: this,
 				context: {

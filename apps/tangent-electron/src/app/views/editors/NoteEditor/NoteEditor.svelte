@@ -7,6 +7,7 @@ import {
 	EditorChangeEvent,
 	EditorRange,
 	KeyboardEventWithShortcut,
+	Line,
 	normalizeRange,
 	Source,
 	TextDocument
@@ -548,7 +549,58 @@ function applyFocusDecorations(doc: TextDocument) {
 	decorator.clear()
 	const selection = normalizeRange(doc.selection)
 	if (selection) {
-		const lines = doc.getLinesAt(selection)
+		let lines = doc.getLinesAt(selection)
+
+		if (lines.length && focusLevel === FocusLevel.Paragraph) {
+			// Extend focus to adjacent qualifying lines
+			function isValidLine(line: Line) {
+				const attr = line.attributes
+				return (!attr.empty && !attr.whitespace)
+					|| attr.code
+					|| attr.front_matter
+					|| attr.math
+			}
+
+			const first = lines[0]
+			if (isValidLine(first)) {
+				const linesToAdd: Line[] = []
+				let lineIndex = doc.lines.indexOf(first) - 1
+				for (; lineIndex >= 0; lineIndex--) {
+					const line = doc.lines[lineIndex]
+					if (isValidLine(line)) {
+						linesToAdd.push(line)
+					}
+					else {
+						break
+					}
+				}
+
+				if (linesToAdd.length) {
+					linesToAdd.reverse()
+					lines = [...linesToAdd, ...lines]
+				}
+			}
+
+			const last = lines[lines.length - 1]
+			if (isValidLine(last)) {
+				const linesToAdd: Line[] = []
+				let lineIndex = doc.lines.indexOf(first) + 1
+				for (; lineIndex < doc.lines.length; lineIndex++) {
+					const line = doc.lines[lineIndex]
+					if (isValidLine(line)) {
+						linesToAdd.push(line)
+					}
+					else {
+						break
+					}
+				}
+
+				if (linesToAdd.length) {
+					lines = [...lines, ...linesToAdd]
+				}
+			}
+		}
+
 		for (const line of lines) {
 			const [lineStart, lineEnd] = doc.getLineRange(line)
 

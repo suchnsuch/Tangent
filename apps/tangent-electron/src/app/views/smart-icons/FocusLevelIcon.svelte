@@ -11,9 +11,11 @@ export let size = 24
 		style={`opacity: ${focusLevel >= FocusLevel.Typewriter ? 1 : 0}; transition: opacity .5s;`}/>
 	<use href="focus.svg#alt-paragraphs"
 		style={`opacity: ${focusLevel >= FocusLevel.Paragraph ? .5 : 1}; transition: opacity .5s;`}/>
-	<use href="focus.svg#focus-paragraphs-alt-lines"
+	<use href="focus.svg#focus-paragraph"
+		style={`opacity: ${focusLevel >= FocusLevel.Line ? .5 : 1}; transition: opacity .5s;`}/>
+	<use href="focus.svg#focus-line"
 		style={`opacity: ${focusLevel >= FocusLevel.Sentence ? .5 : 1}; transition: opacity .5s;`}/>
-	<use href="focus.svg#focus-paragraphs-focus-lines"/>
+	<use href="focus.svg#focus-sentence"/>
 {:else if focusLevel === FocusLevel.Thread}
 	<use href="thread.svg#thread" />
 {:else if focusLevel === FocusLevel.Map}

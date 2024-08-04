@@ -101,21 +101,28 @@ function getCoreLineProperties(attributes, baseClass = ''): AttributeMap {
 		style += `--lineIndent: ${indent.indentSize};`
 	}
 
-	// Since this touches the class, need to reimplement decoration classes
-	const decoration = attributes.decoration
-	if (decoration) {
-		for (const key of Object.keys(decoration)) {
-			if (decoration[key]?.class) {
-				className += ' ' + decoration[key].class
-			}
-		}
-	}
-	
-	return {
+	let props: AttributeMap = {
 		className,
 		style,
 		dir: 'auto' // for RTL language support
 	}
+
+	const decoration = attributes.decoration
+	if (decoration) {
+		for (const dec of Object.values(decoration)) {
+			for (const key of Object.keys(dec)) {
+				if (key === 'class') {
+					// Since this touches the class, need to reimplement decoration classes
+					props.className += ' ' + dec[key]
+				}
+				else {
+					props[key] = dec[key]
+				}
+			}
+		}
+	}
+	
+	return props
 }
 
 function codeFormatAltClass(type: string) {

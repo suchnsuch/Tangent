@@ -51,6 +51,10 @@ export default class LinesBuilder {
 			finalAttributes.empty = true
 		}
 
+		if (this.spans.length === 1 && this.spans[0].attributes?.line_format === 'indent') {
+			finalAttributes.whitespace = true
+		}
+
 		Object.assign(finalAttributes, ...Object.values(this.openLineFormats), attributes)
 
 		this.lines.push(Line.create(new Delta(this.spans), finalAttributes))

@@ -16,7 +16,8 @@ export enum FocusLevel {
 	File = 1,
 	Typewriter = 2,
 	Paragraph = 3,
-	Sentence = 4,
+	Line = 4,
+	Sentence = 5,
 
 	Lowest = Map,
 	Highest = Sentence
@@ -58,7 +59,9 @@ export namespace FocusLevel {
 			case FocusLevel.Typewriter:
 				return `Hides all other files and centers the cursor vertically as you type.`
 			case FocusLevel.Paragraph:
-				return `Hides all other files and highlights the current paragraph.`
+				return `Hides all other files and highlights the current paragraph block.`
+			case FocusLevel.Line:
+				return 'Hides all other files and highlights the current line.'
 			case FocusLevel.Sentence:
 				return `Hides all other files and highlights the current sentence.`
 		}

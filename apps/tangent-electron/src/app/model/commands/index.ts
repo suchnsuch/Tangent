@@ -89,6 +89,7 @@ export interface WorkspaceCommands {
 	setFileFocusLevel: SetFocusLevelCommand
 	setTypewriterFocusLevel: SetFocusLevelCommand
 	setParagraphFocusLevel: SetFocusLevelCommand
+	setLineFocusLevel: SetFocusLevelCommand
 	setSentenceFocusLevel: SetFocusLevelCommand
 	toggleFocusMode: ToggleFocusModeCommand
 
@@ -254,6 +255,9 @@ export default function workspaceCommands(workspace: Workspace): WorkspaceComman
 		}),
 		setParagraphFocusLevel: new SetFocusLevelCommand(workspace, {
 			targetFocusLevel: FocusLevel.Paragraph
+		}),
+		setLineFocusLevel: new SetFocusLevelCommand(workspace, {
+			targetFocusLevel: FocusLevel.Line
 		}),
 		setSentenceFocusLevel: new SetFocusLevelCommand(workspace, {
 			targetFocusLevel: FocusLevel.Sentence

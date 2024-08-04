@@ -311,6 +311,12 @@ export function createMenus(interop: {
 				click: actionPassthrough
 			},
 			{
+				id: 'window_setLineFocusLevel',
+				label: '    Line',
+				type: 'checkbox',
+				click: actionPassthrough
+			},
+			{
 				id: 'window_setSentenceFocusLevel',
 				label: '    Sentence',
 				type: 'checkbox',
