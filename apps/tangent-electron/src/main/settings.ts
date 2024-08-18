@@ -9,9 +9,15 @@ import { getVersionChannel, getWorkspaceNamePrefix } from './environment'
 import { applyPatch } from 'common/stores'
 import Settings from 'common/settings/Settings'
 
-export const settingsPath = path.join(
-	app?.getPath('userData') ?? '',
-	getWorkspaceNamePrefix() + 'settings.json')
+let _settingsPath: string = null
+export function getSettingsPath() {
+	if (!_settingsPath) {
+		_settingsPath = path.join(
+			app?.getPath('userData') ?? '',
+			getWorkspaceNamePrefix() + 'settings.json')
+	}
+	return _settingsPath
+}
 
 const log = Logger.get('settings')
 
@@ -26,6 +32,7 @@ export async function loadSettings() {
 	// If settings are loaded outside the app environment, no reason to try
 	if (app) {
 		try {
+			const settingsPath = getSettingsPath()
 			log.info('Loading settings from: ', settingsPath)
 			const text = await fs.promises.readFile(settingsPath, 'utf8')
 			const data = JSON.parse(text)
@@ -73,10 +80,10 @@ export async function saveSettings(sync=false) {
 
 		const text = JSON.stringify(data, null, '\t')
 		if (sync) {
-			fs.writeFileSync(settingsPath, text)
+			fs.writeFileSync(getSettingsPath(), text)
 		}
 		else {
-			await fs.promises.writeFile(settingsPath, text)
+			await fs.promises.writeFile(getSettingsPath(), text)
 		}
 	}
 	catch (err) {

@@ -11,10 +11,11 @@ import { getWorkspaceNamePrefix } from './environment'
 
 const log = Logger.get('documentation')
 
-const lastVersionPath = path.join(
-	app.getPath('userData'),
-	getWorkspaceNamePrefix() + 'last_version.txt'
-)
+function getLastVersionPath() {
+	return path.join(
+		app.getPath('userData'),
+		getWorkspaceNamePrefix() + 'last_version.txt')
+}
 
 let documentationHandle: WindowHandle = null
 
@@ -126,7 +127,7 @@ async function getRecentChanges() {
 		let cachedLastVersion: string = null
 		let cachedThisVersion: string = null
 		try {
-			const fileData = await fs.promises.readFile(lastVersionPath, 'utf8')
+			const fileData = await fs.promises.readFile(getLastVersionPath(), 'utf8')
 			const versions = fileData.split(' ')
 			if (versions.length != 2) throw 'nope'
 
@@ -161,7 +162,7 @@ async function getRecentChanges() {
 		if (thisVersion != cachedThisVersion || cachedLastVersion == cachedThisVersion) {
 			try {
 				await fs.promises.writeFile(
-					lastVersionPath,
+					getLastVersionPath(),
 					`${lastVersion} ${thisVersion}`,
 					'utf8')
 			}

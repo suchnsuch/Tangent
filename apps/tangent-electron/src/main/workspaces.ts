@@ -9,9 +9,15 @@ import Workspace from "./Workspace"
 
 const log = Logger.get('workspaces')
 
-export const workspacesInfoPath = path.join(
-	app.getPath('userData'),
-	getWorkspaceNamePrefix() + 'workspaces.json')
+let _workspacesInfoPath: string = null
+export function getWorkspacesInfoPath() {
+	if (!_workspacesInfoPath) {
+		_workspacesInfoPath = path.join(
+			app.getPath('userData'),
+			getWorkspaceNamePrefix() + 'workspaces.json')
+	}
+	return _workspacesInfoPath
+}
 
 const defaultSettingsPath = path.resolve(path.join(__dirname, '../../defaults'))
 
@@ -109,8 +115,9 @@ export async function saveAndCloseWorkspaces() {
 	
 			const payload = JSON.stringify(workspaces, null, '\t')
 	
-			log.log('Writing workspace info to: ', workspacesInfoPath, payload)
-			await fs.promises.writeFile(workspacesInfoPath, payload)
+			const workspaceInfoPath = getWorkspacesInfoPath()
+			log.log('Writing workspace info to: ', workspaceInfoPath, payload)
+			await fs.promises.writeFile(workspaceInfoPath, payload)
 		}
 		catch (err) {
 			log.error('Could not save workspace data')

@@ -20,7 +20,7 @@ import {
 	getWorkspace,
 	getWindowHandle,
 	workspaceMap,
-	workspacesInfoPath, 
+	getWorkspacesInfoPath, 
 	saveAndCloseWorkspaces,
 	findClosestWorkspace,
 	contentsMap,
@@ -156,6 +156,7 @@ Tangent ${app.getVersion()} Launched With Arguments:`, process.argv)
 		}
 		
 		try {
+			const workspacesInfoPath = getWorkspacesInfoPath()
 			log.info('  Loading workspace info from: ', workspacesInfoPath)
 
 			let workspaces = null
@@ -304,6 +305,16 @@ else {
 if (require('electron-squirrel-startup')) { // eslint-disable-line global-require
 	app.quit()
 	shouldInit = false
+}
+
+if (process.env.PORTABLE_EXECUTABLE_DIR) {
+	// user data should be stored relative to the exe
+	const userDataPath = path.join(process.env.PORTABLE_EXECUTABLE_DIR, '.tangent_config')
+	fs.mkdirSync(userDataPath, { recursive: true })
+	app.setPath('userData', userDataPath)
+
+	// Redirect chromium session data back to its default location
+	app.setPath('sessionData', app.getPath('appData'))
 }
 
 if (shouldInit) initializeApplication()
