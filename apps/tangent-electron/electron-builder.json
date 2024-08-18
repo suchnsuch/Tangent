@@ -64,11 +64,16 @@
 	},
 
 	"win": {
-		"artifactName": "${productName}-Setup-${version}.${ext}",
-		"target": {
-			"target": "nsis",
-			"arch": ["x64", "arm64"]
-		},
+		"target": [
+			{
+				"target": "nsis",
+				"arch": ["x64", "arm64"]
+			},
+			{
+				"target": "portable",
+				"arch": ["x64", "arm64"]
+			}
+		],
 		"fileAssociations": [
 			{
 				"ext": ["md", "mdx"],
@@ -85,9 +90,14 @@
 	},
 
 	"nsis": {
+		"artifactName": "${productName}-Setup-${version}.${ext}",
 		"oneClick": false,
 		"allowElevation": true,
 		"allowToChangeInstallationDirectory": true
+	},
+
+	"portable": {
+		"artifactName": "${productName}-Portable-${version}.${ext}"
 	},
 
 	"linux": {
