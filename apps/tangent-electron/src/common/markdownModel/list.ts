@@ -63,6 +63,14 @@ export namespace ListDefinition {
 		// Include an extra one because the last space is not included in the glyph
 		return definition.indent.length + definition.glyph.length + 1
 	}
+	export function areEqual(a: ListDefinition, b: ListDefinition) {
+		return a.indent === b.indent &&
+			a.form === b.form &&
+			a.glyph === b.glyph &&
+			// Use `==` to allow undefined & null to match as those are equivalent for our purposes
+			a.index == b.index &&
+			a.todoState == b.todoState
+	}
 }
 
 function checkboxGlyphToTodoState(glyph: string): TodoState {

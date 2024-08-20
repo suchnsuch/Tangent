@@ -143,7 +143,7 @@ export default function editorModule(editor: Editor, options: {
 			})
 		} 
 		else if (oldList && newList) {
-			if (!isEqual(oldList, newList)) {
+			if (!ListDefinition.areEqual(oldList, newList)) {
 				// Only do anything if there is a difference
 				if (oldList.indent === newList.indent) {
 					// Any change to form should propegate down
@@ -278,7 +278,7 @@ export default function editorModule(editor: Editor, options: {
 		}
 
 		let offset = 0
-		function addToOffset(position: number, addition: number) {
+		function offsetSelection(position: number, addition: number) {
 			if (selection) {
 				if (selection[0] + offset > position) {
 					selection[0] += addition
@@ -314,7 +314,7 @@ export default function editorModule(editor: Editor, options: {
 					.insert(deleteEnd, insertedText)
 				didSomething = true
 
-				addToOffset(lineStart, sizeDiff)
+				offsetSelection(lineStart, sizeDiff)
 			}
 			if (basisNumber) basisNumber++
 		}
@@ -349,7 +349,7 @@ export default function editorModule(editor: Editor, options: {
 
 					didSomething = true
 					
-					addToOffset(lineStart, sizeDiff)
+					offsetSelection(lineStart, sizeDiff)
 				}
 
 				if (basisNumber) basisNumber++

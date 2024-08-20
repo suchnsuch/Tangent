@@ -236,6 +236,32 @@ describe('List Handling', () => {
 20. Twenty`)
 	})
 
+	it('Should not mangle lists when deleting an empty item', async () => {
+		editor.doc = markdownToTextDocument(`
+1. One
+2. Two
+3. 
+4. Four
+5. Five
+6. Six
+7. Seven
+8. Eight`)
+
+		editor.select(18)
+		editor.delete(1)
+
+		await wait(waitTime)
+
+		expect(editor.getText()).toEqual(`
+1. One
+2. Two
+3. 4. Four
+4. Five
+5. Six
+6. Seven
+7. Eight`)
+	})
+
 	it('Should not destroy pasted list text', async () => {
 		editor.doc = markdownToTextDocument(``)
 
