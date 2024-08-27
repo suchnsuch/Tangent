@@ -11,20 +11,30 @@ import FocusLevelIcon from '../smart-icons/FocusLevelIcon.svelte';
 import { derived } from 'svelte/store';
 import { FocusLevel } from 'common/dataTypes/TangentInfo'
 import MapsView from './MapsView.svelte';
+import { SelfStore } from 'common/stores';
 
 export let tangent: Tangent
 $: focusLevel = tangent.focusLevel
-$: session = tangent.activeSession
 
 const workspace = getContext('workspace') as Workspace
 
-const title = derived(tangent.currentNode, currentNode => {
+function createTitle(name: string) {
 	let result = workspace.directoryStore.files.name + ' – Tangent'
-	if (currentNode) {
-		result = currentNode.name + ' – ' + result
+	if (name) {
+		result = name + ' – ' + result
 	}
-
 	return result
+}
+
+const title = derived(tangent.currentNode, (currentNode, set) => {
+	if (currentNode && currentNode instanceof SelfStore) {
+		return derived(currentNode, node => {
+			return createTitle(node.name)
+		}).subscribe(set)
+	}
+	else {
+		set(createTitle(currentNode?.name))
+	}
 })
 
 let zoomLevel = 0
