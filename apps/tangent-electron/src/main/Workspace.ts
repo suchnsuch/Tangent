@@ -239,6 +239,7 @@ export default class Workspace {
 			catch (err) {
 				log.error('  Rebuild failed.')
 				log.log(err)
+				userFacingErrors.push('The workspace index hit a critical error and failed to build.\n\nPlease send an issue with the log file.')
 			}
 		}
 
