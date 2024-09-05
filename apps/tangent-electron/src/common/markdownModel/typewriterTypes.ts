@@ -262,7 +262,7 @@ const noteTypeset:TypesetTypes = {
 				if (revealed) className += ' revealed'
 				return h('figure', { }, [
 					h('pre', { className, spellcheck: false }, h('code', { className }, codeChildren)),
-					h('t-math', { 'math-source': math.source, 'block': '' })
+					h('t-math', { 'math-source': math.source, 'block': '', className: revealed ? 'revealed' : '' })
 				])
 			}
 		},
@@ -492,13 +492,15 @@ const noteTypeset:TypesetTypes = {
 			selector: 'span.math',
 			render: (attributes, children) => {
 				let className = 'math hidden'
-				if (attributes.revealed) {
-					className += ' revealed'
-				}
-
+				
 				let mathAttr = {
 					'math-source': attributes.math.source,
 				} as any
+
+				if (attributes.revealed) {
+					className += ' revealed'
+					mathAttr.className = 'revealed'
+				}
 
 				if (attributes.math.isBlock) {
 					mathAttr.block = ''

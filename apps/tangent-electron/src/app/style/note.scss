@@ -289,7 +289,8 @@ article.note {
 
 		transition: margin-left .2s, margin-right .2s;
 
-		caret-color: var(--codeCaretColor);
+		color: var(--codeColor);
+		caret-color: var(--codeColor);
 	}
 
 	figure {
@@ -302,6 +303,10 @@ article.note {
 			font-size: unset;
 			line-height: unset;
 			tab-size: unset;
+		}
+
+		pre {
+			cursor: text;
 		}
 	}
 
@@ -403,10 +408,22 @@ article.note {
 	}
 
 	.mathLine {
-		color: var(--textColor);
+		color: var(--codeColor);
 		.line_format {
-			color: var(--textColor);
+			color: var(--codeColor);
 		}
+	}
+
+	t-math[block].revealed {
+		display: block;
+		background: var(--backgroundColor);
+		border-radius: var(--borderRadius);
+		padding: 2px;
+	}
+
+	t-math.revealed {
+		background: var(--backgroundColor);
+		padding: 2px;
 	}
 
 	.linkHighlight {

@@ -20,3 +20,6 @@ $$
 $$
 \bar{x} = \frac{1}{N}\sum_{i=1}^Nx_i
 $$
+
+
+And also inline math: $x^2$, $\sqrt4$
