@@ -21,7 +21,8 @@ ipcMain.handle('query', async (event, type, payload) => {
 			}
 		}
 		catch (err) {
-			log.error(`Failed to parse query {${payload}}.\n`, err)
+			const action = type === 'parse' ? 'parse' : 'complete'
+			log.error(`Failed to ${action} query {${payload}}.\n`, err)
 			if (err instanceof Error) {
 				log.info(err.stack)
 			}

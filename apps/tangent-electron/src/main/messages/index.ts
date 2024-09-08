@@ -353,7 +353,7 @@ ipcMain.on('openFile', (event, filepath) => {
 	const workspace = validateWorkspaceForHandleFilepath(windowHandle, filepath)
 
 	if (windowHandle && workspace) {
-		log.info('opening file', filepath)
+		log.trace('opening file', filepath)
 		try {
 			// This will auto-load and send the file contents
 			workspace.openFile(windowHandle, filepath)

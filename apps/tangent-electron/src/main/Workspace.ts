@@ -407,6 +407,7 @@ export default class Workspace {
 				}
 
 				try {
+					log.info(`Creating a virtual node from "${chalk.green(link.href)}" at "${chalk.grey(newPath)}".`)
 					const newNode = this.createFile(null, newPath, { 
 						virtual: true
 					})
@@ -502,6 +503,7 @@ export default class Workspace {
 			}
 
 			if (existingFile.path !== filepath) {
+				log.info('Moving existing virtual file')
 				this.trackActivePromise(this.move(existingFile.path, filepath))
 			}
 

@@ -598,7 +598,7 @@ export default class Indexer {
 		let extension = paths.extname(filepath)
 		if (!extension.match(parseableFileMatch)) return null
 
-		let name = paths.basename(filepath, extension)
+		let name = paths.basename(filepath)
 		let result = this.store.getMatchesForPath(name, {
 			bestOnly: true
 		})
