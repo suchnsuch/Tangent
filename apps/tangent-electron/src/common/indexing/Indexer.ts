@@ -270,7 +270,9 @@ export default class Indexer {
 
 		for (const link of IndexData.outgoingConnections(parsedData)) {
 			const target = this.applyLink(node, link)
-			dirtyMeta.add(target)
+			if (target) {
+				dirtyMeta.add(target)
+			}
 		}
 
 		if (existingData?.virtual && contents) {
