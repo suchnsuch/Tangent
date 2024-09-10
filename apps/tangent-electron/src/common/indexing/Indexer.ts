@@ -533,7 +533,8 @@ export default class Indexer {
 		})])
 
 		await Promise.all(mapIterator(affectedNodes, node => {
-			return this.confirmLinks(node, linkedNodes)
+			// Moving virtual links should never update referenced text
+			return this.confirmLinks(node, linkedNodes, !seedNode.meta?.virtual)
 		}))
 	}
 
@@ -542,9 +543,10 @@ export default class Indexer {
 	 **/
 	private async confirmLinks(
 		target: TreeNode,
-		linkedNodes: Map<string, LinkConfirmation>)
-	{
-		let text = await this.interop.getFileContents(target.path)
+		linkedNodes: Map<string, LinkConfirmation>,
+		updateText: boolean
+	) {
+		let text = updateText ? await this.interop.getFileContents(target.path) : ''
 
 		const theLinks = [...IndexData.outgoingConnections(target.meta, link => {
 			const linkedNode = linkedNodes.get(link.to)
@@ -556,6 +558,7 @@ export default class Indexer {
 		let adjustStart = 0
 
 		let metaChanged = false
+		let textChanged = false
 
 		for (const link of theLinks) {
 			const linkedInfo = linkedNodes.get(link.to)
@@ -567,8 +570,8 @@ export default class Indexer {
 				metaChanged = true;
 			}
 
-			if (link.href !== linkedInfo.href) {
-				metaChanged = true
+			if (updateText && link.href !== linkedInfo.href) {
+				textChanged = true
 				const { start, end } = link
 				const pre = text.substring(0, start + adjustStart)
 				const linkText = text.substring(start + adjustStart, end + adjustStart)
@@ -591,7 +594,9 @@ export default class Indexer {
 			}])
 		}
 
-		await this.interop.updateFileContents(target.path, text) 
+		if (textChanged) {
+			await this.interop.updateFileContents(target.path, text) 
+		}
 	}
 
 	getBestVirtualFile(filepath: string): TreeNode {

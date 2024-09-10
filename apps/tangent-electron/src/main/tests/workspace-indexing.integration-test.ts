@@ -222,6 +222,26 @@ describe('Indexing', () => {
 			await expect(getStats).resolves.not.toThrowError()
 			expect(stats.isDirectory).toBeTruthy()
 		})
+
+		test('Virtual links should be moved when a similar virtual link includes folder information', async () => {
+			// This is based off of `Integration Tests/Virtual Link Shenanigans.md`
+			const file = getAndCheckFile('Some Virtual File')
+			const relativePath = workspace.contentsStore.pathToRelativePath(file.path)
+			expect(relativePath).toEqual(path.join('Some Virtual Folder', 'Some Virtual File.md'))
+
+			const shenanigans = getAndCheckFile('Virtual Link Shenanigans')
+			// Renaming virtual files should _not_ change the text of any source files.
+			expect(shenanigans.meta.structure[1]).toMatchObject<Partial<LinkInfo>>({
+				href: 'Some Virtual Folder/Some Virtual File'
+			})
+		})
+
+		test('Virtual links that collide with virtual folders should not rename folders as files', async () => {
+			const results = workspace.contentsStore.getMatchesForPath('Some Virtual Folder', {
+				bestOnly: true
+			})
+			expect(results[0].fileType).toEqual('folder')
+		})
 	})
 
 	test('Links with periods should resolve correctly', async () => {
