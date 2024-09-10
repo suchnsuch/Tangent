@@ -778,17 +778,25 @@ export default class Workspace {
 					filepath
 				})
 			}
+
 			try {
 				const fileSaveResult = await file.setContents(contents, updater)
 				if (fileSaveResult !== FileSaveResult.Success) {
 					return fileSaveResult
 				}
+			}
+			catch (err) {
+				fileLog.error('Failed to set contents of', filepath, err)
+				return FileSaveResult.Failed
+			}
 
+			try {
 				await this.indexer.onFileContentChanged(filepath, contents)
 				return FileSaveResult.Success
 			}
 			catch (err) {
-				fileLog.error('Failed to set contents of', filepath, err)
+				fileLog.error('Reindexing of updated file failed:', filepath, err)
+				return FileSaveResult.Failed
 			}
 		}
 		else {
