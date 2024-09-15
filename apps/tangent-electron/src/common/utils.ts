@@ -31,3 +31,19 @@ export function extractLeadingEmoji(value: string) {
 	}
 	return null
 }
+
+export function filterInPlace<T>(list: T[], predicate: (item: T) => boolean) {
+	let i = 0
+	let j = 0
+	for (; i < list.length && j < list.length; i++) {
+		const item = list[i]
+		if (predicate(item)) {
+			list[j] = item
+			j++
+		}
+	}
+
+	while (j < list.length) {
+		list.pop()
+	}
+}

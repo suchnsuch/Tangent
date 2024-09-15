@@ -1,7 +1,11 @@
 import fs from 'fs'
 import path from 'path'
 
+import Logger from 'js-logger'
 import type { TreeNode } from 'common/trees'
+import { filterInPlace } from 'common/utils'
+
+const log = Logger.get('workspace.io')
 
 /**
  * Reads TreeNodes from a path, including any children
@@ -11,15 +15,14 @@ import type { TreeNode } from 'common/trees'
  */
 export async function loadTreeFromPath(
 	filepath: string,
-	nodeBuilder?: (node: TreeNode) => Promise<TreeNode>)
-	: Promise<TreeNode>
+) : Promise<TreeNode>
 {
 	let stats: fs.Stats = null
 	try {
 		stats = await fs.promises.stat(filepath)
 	}
 	catch (err) {
-		// Could not read the filepath, it probably doesn't exist
+		log.error(`Could not read "${filepath}". It will not be indexed.`)
 		return null
 	}
 	
@@ -37,17 +40,15 @@ export async function loadTreeFromPath(
 
 		item.children = await Promise.all(files.map(async file => {
 			let childPath = path.join(filepath, file)
-			return loadTreeFromPath(childPath, nodeBuilder)
+			return loadTreeFromPath(childPath)
 		}))
+
+		filterInPlace(item.children, node => node != null)
 	}
 	else if (stats.isFile()) {
 		let extension = path.extname(item.path)
 		item.name = path.basename(item.path, extension)
 		item.fileType = extension
-	}
-
-	if (nodeBuilder) {
-		item = await nodeBuilder(item as TreeNode)
 	}
 
 	return item as TreeNode
