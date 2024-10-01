@@ -10,7 +10,7 @@ import { rangeContainsRange } from 'common/typewriterUtils';
 import { EmbedType, getEmbedType } from 'common/embedding';
 import { buildFuzzySegementMatcher, buildMatcher, orderTreeNodesForSearch, SegmentSearchNodePair, SearchMatchResult } from 'common/search';
 import { implicitExtensionsMatch } from 'common/fileExtensions';
-import { normalizeSeperators } from "common/paths";
+import paths, { normalizeSeperators } from "common/paths";
 
 export interface WikiLinkAutocompleteNodeItem {
 	node: TreeNode
@@ -234,7 +234,8 @@ export default class WikiLinkAutocompleter implements AutocompleteHandler {
 				
 				if (match.input !== relativePath && match.input !== selectedNode.node.path) {
 					// This matched to an alias
-					result += '|' + match.input
+					// Strip out any path information that was presented with the alias.
+					result += '|' + paths.basename(match.input)
 				}
 			}
 		}
