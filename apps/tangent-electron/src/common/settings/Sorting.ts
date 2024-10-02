@@ -33,10 +33,19 @@ export function sortNodes(nodes: TreeNodeOrReference[], sort: SortMode, store?: 
 			return numberedStringSort(aValue, bValue, numberedStringSortCache) * (sort.order === 'ascending' ? 1 : -1)
 		}
 
-		if (aValue < bValue || bValue === undefined) {
+		if (aValue === bValue) return 0
+
+		if (aValue === undefined) {
+			return 1
+		}
+		if (bValue === undefined) {
+			return -1
+		}
+		
+		if (aValue < bValue) {
 			return sort.order === 'ascending' ? -1 : 1
 		}
-		if (aValue > bValue || aValue === undefined) {
+		if (aValue > bValue) {
 			return sort.order === 'descending' ? -1 : 1
 		}
 		return 0
