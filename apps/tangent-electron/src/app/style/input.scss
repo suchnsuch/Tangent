@@ -72,20 +72,26 @@ button, .button, select {
 	&:disabled {
 		color: #999;
 	}
+
+	&:not(:disabled):hover {
+		background-color: var(--buttonHoverColor);
+	}
 }
 
 button, .button {
 
 	--bgColor_Selected: var(--accentBackgroundColor);
 	--bgColor_Active: var(--accentActiveBackgroundColor);
+	--bgColor_Checked: var(--accentBackgroundColor);
 
 	&.subtle, &.no-callout {
 		background-color: transparent;
 	}
 
 	&.subtle {
-		--bgColor_Selected: var(--buttonBackgroundColor);
-		--bgColor_Active: var(--selectionBackgroundColor);
+		--bgColor_Selected: var(--buttonHoverColor);
+		--bgColor_Checked: var(--selectionBackgroundColor);
+		--bgColor_Active: var(--selectionPressedBackgroundColor);
 	}
 	
 	&.relaxed {
@@ -111,13 +117,14 @@ button, .button {
 		}
 	}
 
-	&:not(:disabled):active, &[checked="true"], &.active, &.open {
+	&:not(:disabled):active, &.active {
 		background-color: var(--bgColor_Active);
 		color: var(--textColor);
 	}
 
-	&:not(:disabled):active.subtle {
-		background-color: transparent;
+	&[checked="true"], &.open {
+		background-color: var(--bgColor_Checked);
+		color: var(--textColor);
 	}
 
 	&:focus {

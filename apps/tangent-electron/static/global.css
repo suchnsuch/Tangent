@@ -21,6 +21,7 @@
 	--scrollbarActiveColor: rgba(0, 0, 0, .15);
 
 	--buttonBackgroundColor: #e9e9e9;
+	--buttonHoverColor: #e5e5e5;
 	--noteBackgroundColor: white;
 	--embossedBackgroundColor: #f7f7f7;
 
@@ -90,6 +91,7 @@
 	--scrollbarActiveColor: rgba(255, 255, 255, .15);
 
 	--buttonBackgroundColor: #4c4c4c;
+	--buttonHoverColor: #565656;
 	--noteBackgroundColor: #1e1e1e;
 	--embossedBackgroundColor: #151515;
 
