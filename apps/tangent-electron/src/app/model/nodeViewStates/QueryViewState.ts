@@ -7,6 +7,7 @@ import { ReadableStore, WritableStore } from 'common/stores'
 import QuerySettingsView from 'app/views/node-views/QuerySettingsView.svelte'
 import type { QueryResult } from 'common/indexing/queryResults'
 import { SelectEvent } from 'app/views/editors/selectionEvents'
+import { allChangedPaths, TreeChange } from 'common/trees'
 
 export default class QueryViewState extends BaseSetViewState {
 	readonly queryFile: DataFile
@@ -35,7 +36,7 @@ export default class QueryViewState extends BaseSetViewState {
 
 		this.queryResult = derived(this.queryInfo, (queryInfo, set) => {
 			// TODO: Improve query invalidation to reduce false positives
-			return derived([queryInfo.queryString, workspace.directoryStore], ([queryString, store], set) => {
+			return derived(queryInfo.queryString, (queryString, set) => {
 				const id = this.lastRequestID.update(i => i + 1)
 				workspace.api.query.resultsForQuery(queryString).then(queryResult => {
 					set(queryResult)
@@ -56,6 +57,18 @@ export default class QueryViewState extends BaseSetViewState {
 	get info() { return this.queryInfo }
 
 	get settingsComponent() { return QuerySettingsView }
+
+	onTreeChange(change: TreeChange) {
+		// We don't want changes to the .tangent directory to cause query refreshes.
+		const tangentFolderPath = this.queryFile.workspace.workspaceFolder.path
+		for (const changedPath of allChangedPaths(change)) {
+			if (!changedPath.startsWith(tangentFolderPath)) {
+				// Pretend the query string has changed.
+				this.queryInfo.value.queryString.notifyObservers(this.queryInfo.value.queryString.value)
+				return
+			}
+		}
+	}
 
 	focus(element: HTMLElement): boolean {
 		const article = element?.querySelector(".QueryEditor .container article") as HTMLElement;

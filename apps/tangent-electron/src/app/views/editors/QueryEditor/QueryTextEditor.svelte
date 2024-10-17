@@ -5,7 +5,7 @@ import type { Workspace } from 'app/model';
 import type { QueryResult } from 'common/indexing/queryResults'
 import { getContext, onDestroy } from 'svelte';
 import QueryEditor from './QueryEditor';
-import type { EditorChangeEvent, ShortcutEvent } from 'typewriter-editor'
+import { Source, type EditorChangeEvent, type ShortcutEvent } from 'typewriter-editor'
 import './query.scss'
 import AutoCompleteMenu from '../autocomplete/AutoCompleteMenu.svelte'
 import WikiLinkAutocompleter from '../autocomplete/WikiLinkAutocompleter'
@@ -37,7 +37,7 @@ onDestroy(() => {
 	editor.root.removeEventListener('shortcut', onKeyDown)
 })
 
-$: editor.setText(text)
+$: editor.setText(text, null, Source.api)
 $: updateQueryResult(result?.query as QueryParseResult)
 $: allErrors = collectErrors(result)
 
@@ -46,7 +46,7 @@ function updateQueryResult(result: QueryParseResult) {
 }
 
 function onEditorChanged(event: EditorChangeEvent) {
-	if (event.change && event.changedLines?.length) {
+	if (event.change && event.change.delta.length() && event.changedLines?.length) {
 		isDirty = true
 		const editorText = event.doc.getText()
 		workspace.api.query.parseQuery(editorText).then(updateQueryResult)

@@ -122,23 +122,23 @@ export default function editorModule(editor: Editor, options: {
 		const id = oldLine.id
 
 		if (!isEqual(oldIndent, newIndent)) {
-			const isGlyphCreator = isListGlyphCreationChange(delta)			
+			const isGlyphCreator = isListGlyphCreationChange(delta)
 
 			// The old indent level and the new indent level need to be verified
 			pushVerification({
 				func: verifyListContext,
 				options: {
 					id,
-					targetIndent: oldIndent,
-					basis: 'rebasis'
+					targetIndent: newIndent,
+					basis: (isGlyphCreator && newList) ? 'self' : 'rebasis'
 				}
 			})
 			pushVerification({
 				func: verifyListContext,
 				options: {
 					id,
-					targetIndent: newIndent,
-					basis: (isGlyphCreator && newList) ? 'self' : 'rebasis'
+					targetIndent: oldIndent,
+					basis: 'rebasis'
 				}
 			})
 		} 
@@ -197,10 +197,10 @@ export default function editorModule(editor: Editor, options: {
 
 		let lineText = deltaToText(targetLine.content)
 		let intendedIndent = options.targetIndent
-
+		
 		let targetRange = doc.getLineRange(targetLine)
 		let targetLineIndex = doc.lines.indexOf(targetLine)
-
+		
 		let targetListData = targetLine.attributes.list as ListDefinition
 		let targetIndent = targetLine.attributes.indent?.indent || ''
 
@@ -220,7 +220,7 @@ export default function editorModule(editor: Editor, options: {
 		}
 		else if (!targetListData || targetIndent === intendedIndent || targetIndent.length > intendedIndent.length) {
 			// Find the basis for this indent level
-			for (let lineIndex = targetLineIndex - 1; lineIndex > 0; lineIndex--) {
+			for (let lineIndex = targetLineIndex - 1; lineIndex >= 0; lineIndex--) {
 				let prevLine = doc.lines[lineIndex]
 				let prevText = deltaToText(prevLine.content)
 				let indent = prevText.match(indentMatcher)[0]

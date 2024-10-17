@@ -47,6 +47,35 @@ export enum TreePredicateResult {
 
 export type TreePredicate = (item: TreeNode) => TreePredicateResult | boolean
 
+export function* allChangedPaths(change: TreeChange) {
+	if (change.added) {
+		for (const added of change.added) {
+			yield added.path
+		}
+	}
+	if (change.removed) {
+		for (const removed of change.removed) {
+			yield removed
+		}
+	}
+	if (change.changed) {
+		for (const changed of change.changed) {
+			yield changed.path
+		}
+	}
+	if (change.moved) {
+		for (const moved of change.moved) {
+			yield moved.node.path
+			yield moved.oldPath
+		}
+	}
+	if (change.removed) {
+		for (const removed of change.removed) {
+			yield removed
+		}
+	}
+}
+
 /**
  * Gives a decent guess at the nature of a tree node from a path
  */

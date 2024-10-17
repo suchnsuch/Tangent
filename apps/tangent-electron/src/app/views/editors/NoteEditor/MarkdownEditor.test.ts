@@ -183,6 +183,38 @@ describe('List Handling', () => {
 		
 	})
 
+	test('Tabbing in the middle of an unordered list should work', async () => {
+		editor.doc = markdownToTextDocument(`
+* A simple
+* unordered
+* list`)
+		editor.select(14) // Right before "unordered"
+		editor.indent()
+
+		await wait(waitTime)
+
+		expect(editor.getText()).toEqual(`
+* A simple
+	* unordered
+* list`)
+	})
+
+	test('Tabbing in the middle of an ordered list should work', async () => {
+		editor.doc = markdownToTextDocument(`
+1. A simple
+2. ordered
+3. list`)
+		editor.select(16) // Right before "ordered"
+		editor.indent()
+
+		await wait(waitTime)
+
+		expect(editor.getText()).toEqual(`
+1. A simple
+	1. ordered
+2. list`)
+	})
+
 	test('Long numberd lists should not break when modified', async () => {
 		editor.doc = markdownToTextDocument(`
 1. One

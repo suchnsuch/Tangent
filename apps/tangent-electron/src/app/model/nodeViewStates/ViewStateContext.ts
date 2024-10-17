@@ -169,6 +169,10 @@ export default class ViewStateContext {
 			}
 		}
 
+		for (const state of this.states.values()) {
+			if (state.onTreeChange) state.onTreeChange(change)
+		}
+
 		for (const child of this.children) {
 			child.onTreeChange(change)
 		}

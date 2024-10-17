@@ -22,7 +22,7 @@ export class ReadableStore<T> {
 		return this._value
 	}
 
-	protected notifyObservers(oldValue?: T) {
+	notifyObservers(oldValue?: T) {
 		for (let observer of this.observers) {
 			observer(this.value, oldValue)
 		}

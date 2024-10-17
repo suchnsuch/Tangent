@@ -1,5 +1,5 @@
 import type { SvelteConstructor } from 'app/utils/svelte'
-import type { TreeNode } from 'common/trees'
+import type { TreeChange, TreeNode } from 'common/trees'
 import type { ReadableStore } from 'common/stores'
 import type LensViewState from './LensViewState'
 
@@ -14,4 +14,5 @@ export default interface NodeViewState {
 
 	dispose?()
 	focus?(element: HTMLElement): boolean
+	onTreeChange?(change: TreeChange)
 }
