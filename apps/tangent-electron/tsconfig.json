@@ -7,7 +7,7 @@
 		"paths": {
 			"svelte/*": ["../node_modules/svelte/src/runtime/*"]
 		},
-		"target": "ES2020",
+		"target": "ES2022",
 		"lib": ["ESNext", "DOM"],
 		"types": ["jest", "svelte"],
 		"moduleResolution": "Node",
