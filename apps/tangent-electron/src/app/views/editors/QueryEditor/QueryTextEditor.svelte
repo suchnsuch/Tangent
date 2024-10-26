@@ -1,11 +1,10 @@
 <script lang="ts">
-import asRoot from 'typewriter-editor/lib/asRoot'
 import type { QueryError, QueryParseResult } from '@such-n-such/tangent-query-parser'
 import type { Workspace } from 'app/model';
 import type { QueryResult } from 'common/indexing/queryResults'
 import { getContext, onDestroy } from 'svelte';
 import QueryEditor from './QueryEditor';
-import { Source, type EditorChangeEvent, type ShortcutEvent } from 'typewriter-editor'
+import { Source, type EditorChangeEvent, type ShortcutEvent, asRoot } from 'typewriter-editor'
 import './query.scss'
 import AutoCompleteMenu from '../autocomplete/AutoCompleteMenu.svelte'
 import WikiLinkAutocompleter from '../autocomplete/WikiLinkAutocompleter'

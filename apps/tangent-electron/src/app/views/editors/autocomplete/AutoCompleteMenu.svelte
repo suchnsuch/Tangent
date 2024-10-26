@@ -1,10 +1,10 @@
 <script lang="ts">
-import { readable } from 'svelte/store'
+import { get, Readable, readable, writable } from 'svelte/store'
 import { createPopper } from '@popperjs/core';
 
-import { Editor, EditorRange, proxy } from "typewriter-editor";
-import { editorStores } from 'typewriter-editor/lib/stores'
-import { OFFSCREEN_RECT } from 'typewriter-editor/lib/popper'
+import { Editor, type EditorRange } from "typewriter-editor"
+import { editorStores } from 'typewriter-editor/dist/stores'
+import { OFFSCREEN_RECT } from 'typewriter-editor/dist/popper'
 
 import type { AutocompleteHandler, AutocompleteModule } from './autocompleteModule'
 
@@ -14,6 +14,27 @@ export let editor: Editor
 
 export let offset = 0
 export let padding = 4
+
+export function proxy<T>(defaultValueOrStore: T | Readable<T>) {
+	const isReadable = typeof (defaultValueOrStore as Readable<T>).subscribe === 'function'
+	const defaultValue = isReadable ? get(defaultValueOrStore as Readable<T>) : (defaultValueOrStore as T)
+	const { set: write, subscribe } = writable<T>(defaultValue)
+	let unsub: Function
+
+	if (isReadable) {
+		set(defaultValueOrStore as Readable<T>)
+	}
+
+	function set(store: Readable<T>) {
+		if (unsub) unsub()
+		if (store) unsub = store.subscribe(value => write(value))
+	}
+
+	return {
+		set,
+		subscribe,
+	}
+}
 
 let menu: HTMLElement
 let popper;

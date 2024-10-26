@@ -1,5 +1,5 @@
-import type { FormatType, LineType, TypesetTypes } from 'typewriter-editor/lib/typesetting'
-import { h } from 'typewriter-editor/lib/rendering/vdom'
+import type { FormatType, LineType, TypesetTypes } from 'typewriter-editor/dist/typesetting'
+import { h } from 'typewriter-editor/dist/rendering/vdom'
 import katex from 'katex'
 import type { IndentDefinition } from './line'
 import type { AttributeMap } from '@typewriter/document'
@@ -335,7 +335,7 @@ const noteTypeset:TypesetTypes = {
 		{
 			name: 'list_format',
 			selector: 'span.list_format',
-			render: (attributes, children) => {
+			render: (attributes, children: any) => {
 				let className = 'list_format'
 
 				const listData = attributes.list_format as ListDefinition
@@ -401,7 +401,7 @@ const noteTypeset:TypesetTypes = {
 					[
 						// The text itself is a normal link
 						h('t-link', { ...attributes.t_embed }, children)
-					])
+					]) as any
 				
 				node.t_embed_props = attributes.t_embed
 

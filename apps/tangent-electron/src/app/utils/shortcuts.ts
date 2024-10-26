@@ -1,5 +1,5 @@
 import { isMac } from 'common/isMac'
-import * as twShortcuts from 'typewriter-editor/lib/modules/shortcutFromEvent'
+import * as twShortcuts from 'typewriter-editor/dist/modules/shortcutFromEvent'
 
 const modReplace = /CommandOrControl|Mod/i
 

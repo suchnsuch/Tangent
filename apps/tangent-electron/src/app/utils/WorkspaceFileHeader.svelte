@@ -2,8 +2,7 @@
 import { createEventDispatcher, onDestroy } from 'svelte';
 import type WorkspaceTreeNode from 'app/model/WorkspaceTreeNode';
 import OneLineEditor from 'app/views/editors/OneLineEditor/OneLineEditor';
-import asRoot from 'typewriter-editor/lib/asRoot';
-import { Source } from 'typewriter-editor';
+import { Source, asRoot } from 'typewriter-editor';
 import { wait } from '@such-n-such/core';
 
 const dispatch = createEventDispatcher<{

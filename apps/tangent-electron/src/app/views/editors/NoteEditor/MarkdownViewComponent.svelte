@@ -1,6 +1,6 @@
 <script lang="ts">
 import { createEventDispatcher, onDestroy } from 'svelte'
-import asRoot from 'typewriter-editor/lib/asRoot'
+import { asRoot } from 'typewriter-editor'
 import { markdownToTextDocument } from 'common/markdownModel'
 
 import type { NavigationData } from 'app/events'

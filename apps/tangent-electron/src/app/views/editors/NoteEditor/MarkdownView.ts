@@ -1,5 +1,5 @@
 import { Editor, EditorOptions } from 'typewriter-editor'
-import { copy } from 'typewriter-editor/lib/modules/copy'
+import { copy } from 'typewriter-editor/dist/modules/copy'
 
 import NoteTypes from 'common/markdownModel/typewriterTypes'
 import editorModule from "./editorModule";

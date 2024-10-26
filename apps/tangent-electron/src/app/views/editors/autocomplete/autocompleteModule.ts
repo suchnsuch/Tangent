@@ -1,6 +1,6 @@
 import { rangeContainsRange } from 'common/typewriterUtils'
 import { WritableStore } from 'common/stores'
-import { DecorateEvent, Decorator, Delta, Editor, EditorChangeEvent, EditorRange, normalizeRange, Op, proxy, Source, TextDocument } from "typewriter-editor"
+import { DecorateEvent, Decorator, Delta, Editor, EditorChangeEvent, EditorRange, Op, Source, TextDocument } from "typewriter-editor"
 
 interface AutocompleteEventData {
 	handler?: AutocompleteHandler

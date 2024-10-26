@@ -10,10 +10,10 @@ import {
 	Line,
 	normalizeRange,
 	Source,
-	TextDocument
+	TextDocument,
+	asRoot
 } from 'typewriter-editor'
 
-import asRoot from 'typewriter-editor/lib/asRoot'
 import { requestCallbackOnIdle, wait } from '@such-n-such/core'
 
 import type Workspace from "app/model/Workspace";
