@@ -14,8 +14,6 @@ interface CreateNewFolderCommandContext extends CommandContext {
 }
 
 export default class CreateNewFolderCommand extends WorkspaceCommand {
-	workspace: Workspace
-
 	constructor(workspace: Workspace) {
 		super(workspace)
 	}
