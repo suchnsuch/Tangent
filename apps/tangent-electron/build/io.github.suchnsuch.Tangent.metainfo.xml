@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Copyright 2024 Kateřina Medvědová <k8ie@mcld.eu> -->
 <component type="desktop-application">
   <id>io.github.suchnsuch.Tangent</id>
   <metadata_license>MIT</metadata_license>
