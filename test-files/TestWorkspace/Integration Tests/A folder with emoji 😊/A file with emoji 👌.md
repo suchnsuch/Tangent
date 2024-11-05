@@ -1,0 +1,1 @@
+THis file has emoji in its filename.

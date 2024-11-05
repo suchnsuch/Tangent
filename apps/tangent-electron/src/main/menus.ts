@@ -139,7 +139,7 @@ export function createMenus(interop: {
 			label: 'Paste Without Formatting',
 			accelerator: 'CommandOrControl+Shift+V',
 			click: (item, browserWindow) => {
-				const handle = interop.getWindowHandle(browserWindow)
+				const handle = interop.getWindowHandle(browserWindow as BrowserWindow)
 				if (handle) {
 					handle.sendPastePlaintext()
 				}
