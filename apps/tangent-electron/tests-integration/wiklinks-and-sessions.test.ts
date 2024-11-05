@@ -100,6 +100,7 @@ test('Creating & Fulfilling Sibling Wiki Links', async ({ tangent, workspace }) 
 	// TODO: Without the delay, the virtual map connection is not made.
 	await keyboard.type('A note linking to [[The Note It Links To]].', { delay: 7 })
 
+	await wait(100)
 	await window.shortcut('Mod+S')
 
 	const linkNotePath = 'FILES/Folder/A Note That Links.md'
