@@ -16,13 +16,9 @@ class TangentEmbed extends TangentLink {
 		super()
 		const shadow = this.attachShadow({ mode: 'open' })
 		
-		const slot = document.createElement('slot')
 		const content = document.createElement('span')
 		content.style.display = 'inline-flex'
 
-		shadow.appendChild(slot)
-		// Space buffer helps with cursor position
-		shadow.append(document.createTextNode(' '))
 		shadow.appendChild(content)
 		
 		this.content = content
