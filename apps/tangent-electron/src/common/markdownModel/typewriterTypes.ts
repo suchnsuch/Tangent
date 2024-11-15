@@ -367,6 +367,37 @@ const noteTypeset:TypesetTypes = {
 		},
 
 		{
+			name: 't_embed',
+			selector: '.t-embed',
+			render: (attributes, children) => {
+				let className = 't-embed'
+				if (attributes.revealed) {
+					className += ' revealed'
+				}
+
+				let node = h(
+					'span',
+					{
+						class: className,
+					},
+					children
+				) as any
+				
+				// forward the link information
+				node.t_embed_props = attributes.t_link
+
+				return node
+			},
+			postProcess: (node) => {
+				node.children.push(h(
+					't-embed',
+					(node as any).t_embed_props
+				))
+				return node;
+			}
+		},
+
+		{
 			name: 't_link',
 			selector: 't-link',
 			render: (attributes, children) => {
@@ -381,38 +412,6 @@ const noteTypeset:TypesetTypes = {
 						...attributes.t_link
 					},
 					children)
-			}
-		},
-
-		{
-			name: 't_embed',
-			selector: '.t-embed',
-			render: (attributes, children) => {
-				let className = 't-embed'
-				if (attributes.revealed) {
-					className += ' revealed'
-				}
-
-				let node = h(
-					'span',
-					{
-						class: className,
-					},
-					[
-						// The text itself is a normal link
-						h('t-link', { ...attributes.t_embed }, children)
-					]) as any
-				
-				node.t_embed_props = attributes.t_embed
-
-				return node
-			},
-			postProcess: (node) => {
-				node.children.push(h(
-					't-embed',
-					(node as any).t_embed_props
-				))
-				return node;
 			}
 		},
 

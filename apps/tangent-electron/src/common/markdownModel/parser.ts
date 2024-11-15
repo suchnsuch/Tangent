@@ -652,23 +652,25 @@ export function parseMarkdown(source: string | TextDocument, options?: MarkdownP
 					// Need to handle the !
 					commitSpan(-1)
 
-					const t_embed: HrefFormedLink & { block: boolean } = {
+					// An embed wraps a link to some other item
+					const t_link: HrefFormedLink & { block: boolean } = {
 						href: wikiLinkInfo.href,
 						form: 'wiki',
 						block: lineStartIndex === feed.index - 1
 					}
 					if (wikiLinkInfo.content_id) {
-						t_embed.content_id = wikiLinkInfo.content_id
+						t_link.content_id = wikiLinkInfo.content_id
 					}
 					if (wikiLinkInfo.text) {
-						t_embed.text = wikiLinkInfo.text
+						t_link.text = wikiLinkInfo.text
 					}
 					if (filepath) {
-						t_embed.from = filepath
+						t_link.from = filepath
 					}
 
 					builder.addOpenFormat('wiki-link', {
-						t_embed,
+						t_embed: true,
+						t_link,
 						hiddenGroup: true,
 						hidden: true,
 						link_internal: true
