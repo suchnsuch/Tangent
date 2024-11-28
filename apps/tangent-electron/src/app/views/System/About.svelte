@@ -38,13 +38,6 @@ function openDocumentation() {
 		or reach out at any of the socials above.
 	</p>
 	<h1>Supporters</h1>
-	<p>
-		If you would like to support the development of Tangent, please consider supporting me on
-		<a target="_blank" rel="noreferrer" href="https://ko-fi.com/taylorhadden">Ko-Fi</a>
-		or
-		<a target="_blank" rel="noreferrer" href="https://www.patreon.com/taylorhadden">Patreon</a>.
-		Tangent is free and is supported through this voluntary support.
-	</p>
 	<p style:margin-bottom="0">The following people have made exceptional contributions:</p>
 	<ul>
 		<li>Trevor Slaton</li>
