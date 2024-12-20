@@ -1,3 +1,5 @@
+import { describe, test, expect } from 'vitest'
+
 import { StructureData, StructureType } from './indexTypes'
 import { diffStructure } from './structureUtils'
 

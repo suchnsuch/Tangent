@@ -1,3 +1,5 @@
+import { describe, test, expect, beforeAll, afterAll } from 'vitest'
+
 import { installTextmate } from '@such-n-such/tangent-query-parser'
 import type Indexer from 'common/indexing/Indexer'
 import type { QueryResult } from 'common/indexing/queryResults'

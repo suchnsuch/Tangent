@@ -1,3 +1,5 @@
+import { test, expect } from 'vitest'
+
 import { StoreUndoStack, ObjectStore, WritableStore, PatchableList, PatchableMap } from './'
 
 class TextList extends PatchableList<string, string> {

@@ -11,13 +11,13 @@
 	"author": "Taylor Hadden",
 	"license": "MIT",
 	"workspaces": [
-		
 		"lib/typewriter",
-
 		"packages/tangent-query-parser",
 		"packages/tangent-html-to-markdown",
-		
 		"apps/tangent-electron",
 		"apps/tangent-test-workspace-generator"
-	]
+	],
+	"devDependencies": {
+		"vitest": "^2.1.8"
+	}
 }

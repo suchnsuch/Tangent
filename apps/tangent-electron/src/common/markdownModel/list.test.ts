@@ -1,3 +1,5 @@
+import { describe, test, expect, it } from 'vitest'
+
 import { getFormOfGlyph, getGlyphForNumber, matchList, ListForm, ListDefinition } from './list'
 
 test('Numeric Extraction', () => {

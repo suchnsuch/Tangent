@@ -1,3 +1,5 @@
+import { describe, test, expect, it } from 'vitest'
+
 import * as parser from './parser'
 import { TextDocument, Line, Delta } from '@typewriter/document'
 import { typewriterToText } from 'common/typewriterUtils'

@@ -1,3 +1,5 @@
+import { describe, test, expect, it } from 'vitest'
+
 import CharacterFeeder from './CharacterFeeder'
 
 describe('Find Behind', () => {

@@ -1,3 +1,5 @@
+import { describe, test, expect } from 'vitest'
+
 import { derived, Readable } from 'svelte/store'
 import { WritableStore, ObjectStore, PatchableList, PatchableMap } from './'
 

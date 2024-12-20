@@ -1,3 +1,5 @@
+import { describe, test, expect, it } from 'vitest'
+
 import path from 'path'
 import paths, { makeRegexPathAgnostic } from 'common/paths'
 

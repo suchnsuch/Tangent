@@ -125,7 +125,7 @@ export function getLanguage(format: string) {
 			return language
 		}
 	}
-	else {
+	else if (DomPrism === null) { // Explictly check for null so that misconfigured browser environments just fail
 		if (format in require('prismjs').languages) {
 			return format
 		}

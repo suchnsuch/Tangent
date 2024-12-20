@@ -4,7 +4,6 @@
 		"sourceMap": true,
 		"baseUrl": "../src",
 		"lib": ["ESNext", "DOM"],
-		"types": ["jest"],
 		"moduleResolution": "Node",
 		"allowJs": true,
 		"esModuleInterop": true,

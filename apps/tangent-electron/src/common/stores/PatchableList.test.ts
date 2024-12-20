@@ -1,4 +1,6 @@
-import { ObjectStore, WritableStore, PatchableList, PatchableListOptions, PatchableListPatch, PatchableListPatchType, RawValueMode } from './'
+import { test, expect } from 'vitest'
+
+import { ObjectStore, WritableStore, PatchableList, PatchableListPatch, PatchableListPatchType, RawValueMode } from './'
 
 interface SimpleTestItem {
 	id: string

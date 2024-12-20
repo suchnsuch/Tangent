@@ -1,5 +1,7 @@
+import { describe, test, expect } from 'vitest'
+
 import { getEditInfo } from '.'
-import Delta from '@typewriter/delta/dist/Delta'
+import { Delta } from '@typewriter/delta'
 
 describe('Edit Info', () => {
 	test('Raw Delta insert', () => {

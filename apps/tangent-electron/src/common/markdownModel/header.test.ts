@@ -1,3 +1,5 @@
+import { describe, expect, it } from 'vitest'
+
 import * as header from './header'
 
 describe('Safe characters', () => {

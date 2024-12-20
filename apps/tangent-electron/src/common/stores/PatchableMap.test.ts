@@ -1,3 +1,5 @@
+import { describe, test, expect, it } from 'vitest'
+
 import { ObjectStore, WritableStore, PatchableMap, PatchableMapPatch, PatchableMapPatchType } from './'
 
 interface SimpleTestItem {

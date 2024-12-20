@@ -1,4 +1,6 @@
-import { mean, percentRange } from './stats'
+import { describe, test, expect } from 'vitest'
+
+import { percentRange } from './stats'
 
 describe('Percent Range', () => {
 	test('Can find top quarter', () => {

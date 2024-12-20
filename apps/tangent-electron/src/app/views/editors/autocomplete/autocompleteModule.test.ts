@@ -1,3 +1,5 @@
+import { describe, test, expect } from 'vitest'
+
 import { Delta } from 'typewriter-editor'
 import { adjustRangeByChange } from './autocompleteModule'
 

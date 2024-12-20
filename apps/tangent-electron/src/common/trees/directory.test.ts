@@ -1,3 +1,5 @@
+import { test, expect } from 'vitest'
+
 import { validateFileSegment, validatePath } from "./directory"
 
 test('File name validation', () => {

@@ -708,7 +708,7 @@ export function parseMarkdown(source: string | TextDocument, options?: MarkdownP
 				if (isEmbed) {
 					wikiLinkInfo.start--
 					// ew
-					(wikiLinkInfo as any).type = StructureType.Embed
+					;(wikiLinkInfo as any).type = StructureType.Embed
 				}
 				structure.push(wikiLinkInfo)
 

@@ -1,3 +1,5 @@
+import { describe, expect, it } from 'vitest'
+
 import { getFileTypeRegex } from './fileExtensions'
 
 describe('File Extension Utils', () => {

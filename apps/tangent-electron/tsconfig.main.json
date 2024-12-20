@@ -8,8 +8,7 @@
 			
 		},
 		"module": "CommonJS",
-		"lib": ["ESNext", "DOM"],
-		"types": ["jest"]
+		"lib": ["ESNext", "DOM"]
 	},
 	"exclude": [ "__build", "node_modules", "out", "src/app" ]
 }

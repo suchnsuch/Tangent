@@ -1,3 +1,5 @@
+import { describe, test, expect, it } from 'vitest'
+
 import { applyAnnotation, ChildList, childrenToHTML } from './nodeAnnotations'
 
 describe('annotateWithNode()', () => {

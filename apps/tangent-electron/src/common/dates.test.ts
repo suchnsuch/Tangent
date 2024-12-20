@@ -1,3 +1,5 @@
+import { describe, test, expect, it } from 'vitest'
+
 import * as dates from './dates'
 
 test('Shortest Day Date', () => {

@@ -1,3 +1,5 @@
+import { describe, test, expect, it } from 'vitest'
+
 import type { TreeNode } from './trees'
 import { IndexData, StructureType } from './indexing/indexTypes'
 import { buildFuzzySegementMatcher, buildMatcher, compareNodeSearch, nodeSearchResults } from './search'

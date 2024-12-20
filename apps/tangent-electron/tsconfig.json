@@ -9,7 +9,7 @@
 		},
 		"target": "ES2022",
 		"lib": ["ESNext", "DOM"],
-		"types": ["jest", "svelte"],
+		"types": ["svelte"],
 		"moduleResolution": "Node",
 		"allowJs": true,
 		"esModuleInterop": true,
