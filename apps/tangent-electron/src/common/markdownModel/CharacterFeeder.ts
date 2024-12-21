@@ -23,6 +23,10 @@ export default class CharacterFeeder {
 		return this.index < this.text.length
 	}
 
+	get isStartOfDocument(): boolean {
+		return this.index === 0
+	}
+
 	get currentStepLength() {
 		return this.currentChar?.length ?? 1
 	}

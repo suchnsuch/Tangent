@@ -2,6 +2,7 @@ import { Line, deltaToText, EditorRange, TextDocument } from '@typewriter/docume
 import noteTypeset from './typewriterTypes'
 import { getGlyphForNumber, ListForm, matchList } from './list'
 import { indentMatcher } from './matches'
+import NoteParser from './NoteParser'
 
 export interface IndentDefinition {
 	indent: string,
@@ -151,4 +152,37 @@ export function lineFormatEscapeMode(line: Line) {
 		return 'single'
 	}
 	return 'none'
+}
+
+const horizontalRuleText = /^((- *){3,}|(\* *){3,}|(_ *){3,})$/
+export function parseHorizontalRule(char: string, parser: NoteParser): boolean {
+	if (parser.isStartOfContent && (char === '_' || char === '-' || char === '*')) {
+		const line = parser.feed.getLineText()
+		if (line.match(horizontalRuleText)) {
+			parser.feed.nextByLength(line.length)
+			parser.commitSpan({ line_format: true, hidden: true }, 0)
+			parser.lineData.horizontal_rule = true
+			return true
+		}
+	}
+	return false
+}
+
+export function parseBlockquote(char: string, parser: NoteParser): boolean {
+	if (char !== '>' || !parser.isStartOfContent) return false
+
+	const { feed } = parser
+	let blockDepth = 0
+	while (feed.currentChar === '>') {
+		blockDepth++
+		const next = feed.peek()
+		if (next === ' ' && feed.peek(2) === '>') {
+			feed.next()
+		}
+		feed.next()
+	}
+
+	parser.lineData.blockquote = blockDepth
+	parser.commitSpan({ line_format: true, hidden: true }, 0)
+	return true
 }

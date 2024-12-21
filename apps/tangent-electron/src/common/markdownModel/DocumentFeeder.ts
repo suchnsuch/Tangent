@@ -27,6 +27,10 @@ export default class DocumentFeeder extends CharacterFeeder {
 		return super.hasMore()
 	}
 
+	get isStartOfDocument() {
+		return this.startLine === 0 && this.index === 0
+	}
+
 	next(step=1, hard=false) {
 		if (hard && this.index + step >= this.text.length && this.endLine < this.doc.lines.length - 1) {
 			// Throw the next line into the text

@@ -14,7 +14,8 @@ import { matchMarkdownLink, matchWikiLink } from './links'
 import { safeHeaderLine } from './header'
 import { matchTag, TagSectionData } from './tag'
 import { tagNameSeperatorMatch } from '@such-n-such/tangent-query-parser'
-import { highlightEmojiMatch, highlightEmojiToClassDescriptor } from './highlight'
+import { highlightEmojiMatch, highlightEmojiToClassDescriptor } from './formatting'
+import NoteParser from './NoteParser'
 
 function isWhitespace(char: string) {
 	switch(char) {
@@ -66,6 +67,71 @@ export interface MarkdownParsingOptions {
 }
 
 export function parseMarkdown(source: string | TextDocument, options?: MarkdownParsingOptions) {
+	let feed: CharacterFeeder = null
+	if (typeof source === 'string') {
+		feed = new CharacterFeeder(source)
+	}
+	else {
+
+		let startLineIndex = options.documentStartLine ?? 0
+		let startLine = source.lines[startLineIndex]
+		let endLineIndex = options.documentEndLine ?? source.lines.length - 1
+		let endLine = source.lines[endLineIndex]
+
+		const multiLine = startLineIndex !== endLineIndex
+
+		// Code and other multi-line formatting needs to comprehend the whole thing
+		// Multi-line text can be pasted with no context, so adjacent context needs to be found
+		if (lineIsMultiLineFormat(startLine) || multiLine) {
+			while (startLineIndex > 0) {
+				const previousIndex = startLineIndex - 1
+				const previousLine = source.lines[previousIndex]
+				if (lineIsMultiLineFormat(previousLine)) {
+					startLineIndex = previousIndex
+					startLine = previousLine
+				}
+				else {
+					break
+				}
+			}
+		}
+
+		// Code and other multi-line formatting needs to comprehend the whole thing
+		// Always check the next line since a deletion could cause previous multi-line blocks to reflow
+		// Multi-line text can be pasted with no context, so adjacent context needs to be found
+		while (endLineIndex < source.lines.length - 1) {
+			const nextIndex = endLineIndex + 1
+			const nextLine = source.lines[nextIndex]
+			if (lineIsMultiLineFormat(nextLine)) {
+				endLineIndex = nextIndex
+				endLine = nextLine
+			}
+			else {
+				break
+			}
+		}
+
+		feed = new DocumentFeeder(source, startLineIndex, endLineIndex)
+	}
+
+	const parser = new NoteParser(feed, options)
+	parser.parse()
+
+	let result: ParseResult = {
+		lines: parser.builder.lines,
+		structure: parser.structure,
+		errors: parser.errors,
+		//awaiting
+	}
+
+	if (feed instanceof DocumentFeeder) {
+		result.startLineIndex = feed.startLine
+	}
+
+	return result
+}
+
+export function parseMarkdown_legacy(source: string | TextDocument, options?: MarkdownParsingOptions) {
 
 	const outputFormattingRetains = options?.asFormatting ?? false
 	const detailedLinks = options?.detailedLinks ?? false

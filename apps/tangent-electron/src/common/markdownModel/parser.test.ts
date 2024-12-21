@@ -82,12 +82,14 @@ Text`)
 var some = code;
 \`\`\`
 And some text`)
+		let codeEndLine = doc.lines[2]
+		expect(codeEndLine.attributes.code).not.toBeFalsy()
+
 		let textLine = doc.lines[3]
 
 		expect(textLine.attributes.code).toBeFalsy()
 		expect(textLine.content.ops[0].attributes).toEqual({})
 
-		let codeEndLine = doc.lines[2]
 		let [start, end] = doc.getLineRange(codeEndLine)
 		// Delete the last '`'
 		let change = doc.change.delete([end - 2, end - 1])
@@ -162,7 +164,7 @@ describe('Link parsing', () => {
 		const ops = parser.parseMarkdown(`[web link](https://google.com) and a [[Wiki Link]]`).lines[0].content.ops
 
 		// The first link should be seen as a markdown link
-		expect(ops[0].attributes.t_link).toEqual({ form: 'md', href: 'https://google.com' })
+		expect(ops[0].attributes.t_link).toEqual({ form: 'md', href: 'https://google.com', text: 'web link' })
 	})
 
 	describe('Raw Links', () => {

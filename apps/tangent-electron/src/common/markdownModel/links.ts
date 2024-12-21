@@ -1,10 +1,12 @@
-import { HrefFormedLink, LinkInfo, StructureType } from "../indexing/indexTypes"
+import { EmbedInfo, HrefFormedLink, LinkInfo, StructureType } from "../indexing/indexTypes"
 import type { TextDocument } from '@typewriter/document'
 import { lineToText } from '../typewriterUtils'
 import { TreeNode, TreePredicateResult, validatePath } from 'common/trees'
 import paths from '../paths'
 import type { DefaultIndexStore } from 'common/indexing/IndexTreeStore'
 import { getTagPath } from 'common/indexing/TagNode'
+import NoteParser from './NoteParser'
+import { ParsingContextType, ParsingProgram } from './parsingContext'
 
 export const wikiLinkMatcher = /(\[\[)([^\[\]\n|#]*)(#[^\[\]\n|#]*)?(\|[^\[\]\n|#]*)?(\]\])?/
 
@@ -168,4 +170,280 @@ export function resolveLink(store: DefaultIndexStore, link: HrefFormedLink): Tre
 			console.error('Invalid link form', link);
 			return
 	}
+}
+
+export function parseRawLink(char: string, parser: NoteParser): boolean {
+	if (char === ':' && parser.feed.checkFor('://', false)) {
+		const { feed } = parser
+		const { index: lastLetterIndex } = feed.findWhile(/[A-Za-z]/, feed.index - 1, -1)
+
+		parser.commitSpan(null, lastLetterIndex - feed.index)
+		feed.consumeUntil(' ')
+		const t_link: HrefFormedLink = {
+			href: feed.substring(lastLetterIndex, feed.index),
+			form: 'raw'
+		}
+		parser.commitSpan({ t_link }, 0)
+		return true
+	}
+	return false
+}
+
+export function parseLink(char: string, parser: NoteParser): boolean {
+	if (char !== '[') return false
+
+	const { feed, builder } = parser
+
+	const line = feed.getLineText()
+	const isEmbed = feed.peek(-1) === '!'
+
+	// Check for a wiki link
+	const wikiLinkInfo: LinkInfo | EmbedInfo = matchWikiLink(line, feed.index)
+	if (wikiLinkInfo?.start === feed.index) {
+
+		// Commit everything before the `!` in the case of an embed
+		parser.commitSpan(null, isEmbed ? -1 : 0)
+
+		const t_link: HrefFormedLink & { block?: boolean } = {
+			href: wikiLinkInfo.href,
+			form: 'wiki'
+		}
+
+		// Avoiding adding the key unless the value exists
+		// helps ensure sane-looking output
+		if (isEmbed) {
+			// TODO: Convert to allowing indentation for embeds
+			t_link.block = parser.lineStart === feed.index - 1
+		}
+		if (wikiLinkInfo.content_id) {
+			t_link.content_id = wikiLinkInfo.content_id
+		}
+		if (wikiLinkInfo.text) {
+			t_link.text = wikiLinkInfo.text
+		}
+		if (parser.filepath) {
+			t_link.from = parser.filepath
+		}
+
+		if (isEmbed) {
+			builder.addOpenFormat('wiki-link', {
+				t_embed: true,
+				t_link,
+				hiddenGroup: true,
+				hidden: true,
+				link_internal: true
+			})
+
+			parser.commitSpan({ start: true }, 0)
+		}
+		else {
+			builder.addOpenFormat('wiki-link', { t_link })
+		}
+
+		if (parser.detailedLinks) {
+			wikiLinkInfo.context = feed.getLineText(parser.lineStart)
+		}
+		if (isEmbed) {
+			wikiLinkInfo.start-- // For the `!`
+			// Mutate the info into an embed
+			;(wikiLinkInfo as any).type = StructureType.Embed
+		}
+		parser.pushStructure(wikiLinkInfo)
+
+		// Commit the `[[`
+		feed.next()
+		parser.commitSpan({
+			link_internal: true,
+			hiddenGroup: true,
+			// TODO: option to show/hide the open/close brackets for links
+			hidden: true,
+			start: true,
+			spellcheck: false
+		})
+
+		builder.addOpenFormat('wiki-link-internal', wikiLinkInfo.text || isEmbed ? {
+			// There is custom link text. Hide href and other elements.
+			link_internal: true,
+			hidden: true
+		} : {
+			// No custom text. The link must stand alone.
+			link_internal: true,
+			hiddenGroup: true
+		})
+
+		let slashIndex = wikiLinkInfo.href.lastIndexOf('/')
+		if (slashIndex >= 0) {
+			// Hide the directory section of the link
+			feed.next(slashIndex + 1)
+			// The directory section
+			parser.commitSpan({
+				link_internal: 'href directory',
+				spellcheck: false,
+				hidden: true
+			})
+
+			feed.nextByLength(wikiLinkInfo.href.length - slashIndex - 1)
+		}
+		else {
+			feed.nextByLength(wikiLinkInfo.href.length)
+		}
+
+		// Close the href portion
+		parser.commitSpan({
+			link_internal: 'href',
+			spellcheck: false
+		})
+
+		if (wikiLinkInfo.content_id != undefined) {
+			// Mark and consume the `#`
+			feed.next()
+			parser.commitSpan({ link_internal: 'id hashtag' })
+
+			// Mark the rest of the id
+			feed.nextByLength(wikiLinkInfo.content_id.length)
+			parser.commitSpan({
+				link_internal: 'id name',
+				spellcheck: false
+			})
+		}
+		
+		builder.dropOpenFormat('wiki-link-internal')
+
+		if (wikiLinkInfo.text != undefined) {
+			// There is custom link text.
+			// Chop off the '|'
+			feed.next()
+			parser.commitSpan({
+				link_internal: true,
+				hidden: true,
+				spellcheck: false
+			})
+
+			builder.addOpenFormat('wiki-link-custom', {
+				hiddenGroup: true,
+				link_internal: true
+			})
+
+			parser.pushContext({
+				type: ParsingContextType.Inline,
+				indent: parser.lineData.indent.indent,
+				programs: [
+					awaitWikiLinkAt(feed.index + feed.text.length),
+					...parser.defaultInlineFormattingPrograms
+				]
+			})
+			return true
+		}
+		else {
+			// Finish the link now
+			finishWikiLink(parser)
+		}
+		return true
+	}
+	
+	const mdLinkInfo = matchMarkdownLink(line, feed.index)
+	if (mdLinkInfo?.start === feed.index && (mdLinkInfo.text || isEmbed)) {
+		// Commit everything before the `!` in the case of an embed
+		parser.commitSpan(null, isEmbed ? -1 : 0)
+
+		const t_link: HrefFormedLink & { block?: boolean } = {
+			href: mdLinkInfo.href,
+			form: 'md'
+		}
+
+		// Avoiding adding the key unless the value exists
+		// helps ensure sane-looking output
+		if (isEmbed) {
+			// TODO: Convert to allowing indentation for embeds
+			t_link.block = parser.lineStart === feed.index - 1
+		}
+		if (mdLinkInfo.text) {
+			t_link.text = mdLinkInfo.text
+		}
+		if (parser.filepath) {
+			t_link.from = parser.filepath
+		}
+
+		if (isEmbed) {
+			builder.addOpenFormat('md-link', {
+				t_embed: true,
+				t_link,
+				hiddenGroup: true,
+				hidden: true,
+				link_internal: true
+			})
+
+			parser.commitSpan({ start: true }, 0)
+		}
+		else {
+			builder.addOpenFormat('md-link', {
+				t_link,
+				hiddenGroup: true
+			})
+		}
+
+		// Commit the `[`
+		parser.commitSpan({
+			link_internal: true,
+			hidden: true,
+			start: true
+		})
+
+		// Commit the text
+		if (mdLinkInfo.text) {
+			feed.nextByLength(mdLinkInfo.text?.length ?? 0)
+			parser.commitSpan({ link_internall: true })
+		}
+
+		// Commit the `](` and link
+		feed.next(2)
+		feed.nextByLength(mdLinkInfo.href.length)
+		parser.commitSpan({
+			link_internal: true,
+			hidden: true,
+			spellcheck: false
+		})
+
+		// Commit the ending `)`
+		feed.next()
+		parser.commitSpan({
+			link_internal: true,
+			hidden: true,
+			end: true
+		})
+
+		builder.dropOpenFormat('md-link')
+	}
+
+	return false
+}
+
+function awaitWikiLinkAt(index: number): ParsingProgram {
+	return (_, parser: NoteParser) => {
+		if (parser.feed.index === index) {
+			parser.commitSpan(null)
+			parser.builder.dropOpenFormat('wiki-link-custom')
+
+			finishWikiLink(parser)
+			return true
+		}
+		return false
+	}
+}
+
+function finishWikiLink(parser: NoteParser) {
+	const { feed, builder } = parser
+
+	// Commit the `]]`
+	feed.next(2)
+	parser.commitSpan({
+		link_internal: true,
+		hiddenGroup: true,
+		// TODO: option to show/hide the open/close brackets for links
+		hidden: true,
+		end: true,
+		spellcheck: false
+	})
+
+	builder.dropOpenFormat('wiki-link')
 }

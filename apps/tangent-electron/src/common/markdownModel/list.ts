@@ -1,4 +1,5 @@
-import { TodoState } from 'common/indexing/indexTypes'
+import { StructureType, TodoState } from 'common/indexing/indexTypes'
+import NoteParser from './NoteParser'
 
 /**
  * This is a very complicated match
@@ -166,4 +167,40 @@ export function getGlyphForNumber(form: ListForm, index: number = 1) {
 			break
 	}
 	return index.toString() + '.'
+}
+
+export function parseListItem(char: string, parser: NoteParser): boolean {
+	if (!parser.isStartOfContent) return false
+	const line = parser.feed.getLineText()
+	const listDetail = matchList(line)
+	if (!listDetail) return false
+	
+	const { feed } = parser
+	const start = feed.index
+	if (listDetail.todoState === undefined) {
+		// IMPROVE: A dirty hack to make the delta format compose
+		listDetail.todoState = null
+	}
+	else {
+		parser.pushStructure({
+			type: StructureType.Todo,
+			start,
+			end: start + line.length,
+			state: listDetail.todoState,
+			text: line.substring(ListDefinition.length(listDetail))
+		})
+	}
+
+	// Encode the list
+	parser.lineData.list = listDetail
+
+	// Consume the line glyph
+	feed.nextByLength(listDetail.glyph.length - 1)
+	parser.commitSpan({
+		line_format: 'list',
+		hiddenGroup: true,
+		list_format: listDetail
+	})
+
+	return true
 }

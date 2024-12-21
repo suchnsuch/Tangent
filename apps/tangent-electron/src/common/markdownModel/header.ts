@@ -1,4 +1,7 @@
+import { StructureType } from 'common/indexing/indexTypes'
 import { matchMarkdownLink, matchWikiLink } from './links'
+import NoteParser from './NoteParser'
+import { AttributeMap } from 'typewriter-editor'
 
 export const headerMatcher = /^(#+ )(.*)/
 
@@ -36,4 +39,33 @@ export function safeHeaderLine(text: string) {
 
 	// Condense spaces
 	return text.replace(/ +/g, ' ')
+}
+
+export function parseHeader(char: string, parser: NoteParser): boolean {
+	if (!parser.isStartOfContent || char !== '#') return false
+	
+	const { feed } = parser
+	const start = feed.index
+	const count = feed.consumeSequentialCharacters('#')
+	if (feed.peek() !== ' ') return false
+	feed.next()
+	parser.lineData.header = count
+	const nextSpan: AttributeMap = { line_format: true }
+	if (feed.peek() !== '\n') {
+		// We don't want to hide headers with no text
+		nextSpan.hidden = true
+	}
+	parser.commitSpan(nextSpan)
+
+	const line = feed.getLineText(start)
+
+	parser.pushStructure({
+		type: StructureType.Header,
+		level: count,
+		text: safeHeaderLine(line),
+		start,
+		end: start + line.length
+	})
+
+	return true
 }
