@@ -160,6 +160,56 @@ And some text`)
 })
 
 describe('Link parsing', () => {
+
+	describe('Wiki Links', () => {
+		it('Should handle simple links', () => {
+			const { lines, structure } = parser.parseMarkdown('Some [[Simple Link]]')
+			const ops = lines[0].content.ops
+
+			const t_link = ops[1].attributes.t_link
+
+			expect(t_link).toEqual({
+				form: 'wiki',
+				href: 'Simple Link'
+			})
+
+			expect(ops).toMatchObject([
+				{
+					insert: 'Some '
+				},
+				{
+					insert: '[[',
+					attributes: {
+						t_link,
+						start: true,
+						hidden: true
+					}
+				},
+				{
+					insert: 'Simple Link',
+					attributes: {
+						t_link
+					}
+				},
+				{
+					insert: ']]',
+					attributes: {
+						t_link,
+						end: true,
+						hidden: true
+					}
+				}
+			])
+
+			expect(structure).toEqual([{
+				type: StructureType.Link,
+				start: 5, end: 20,
+				form: 'wiki',
+				href: 'Simple Link'
+			}])
+		})
+	})
+	
 	test('Markdown links should not be stomped by wiki links', () => {
 		const ops = parser.parseMarkdown(`[web link](https://google.com) and a [[Wiki Link]]`).lines[0].content.ops
 
