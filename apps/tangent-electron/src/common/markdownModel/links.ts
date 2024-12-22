@@ -328,11 +328,10 @@ export function parseLink(char: string, parser: NoteParser): boolean {
 				type: ParsingContextType.Inline,
 				indent: parser.lineData.indent.indent,
 				programs: [
-					awaitWikiLinkAt(feed.index + feed.text.length),
+					awaitWikiLinkAt(feed.index + wikiLinkInfo.text.length),
 					...parser.defaultInlineFormattingPrograms
 				]
 			})
-			return true
 		}
 		else {
 			// Finish the link now
@@ -391,28 +390,24 @@ export function parseLink(char: string, parser: NoteParser): boolean {
 
 		// Commit the text
 		if (mdLinkInfo.text) {
-			feed.nextByLength(mdLinkInfo.text?.length ?? 0)
-			parser.commitSpan({ link_internall: true })
+			builder.addOpenFormat('md-link-text', {
+				link_internal: true
+			})
+
+			parser.pushContext({
+				type: ParsingContextType.Inline,
+				indent: parser.lineData.indent.indent,
+				programs: [
+					awaitMarkdownLinkAt(feed.index + mdLinkInfo.text.length, mdLinkInfo),
+					...parser.defaultInlineFormattingPrograms
+				]
+			})
+		}
+		else {
+			finishMarkdownLink(parser, mdLinkInfo)
 		}
 
-		// Commit the `](` and link
-		feed.next(2)
-		feed.nextByLength(mdLinkInfo.href.length)
-		parser.commitSpan({
-			link_internal: true,
-			hidden: true,
-			spellcheck: false
-		})
-
-		// Commit the ending `)`
-		feed.next()
-		parser.commitSpan({
-			link_internal: true,
-			hidden: true,
-			end: true
-		})
-
-		builder.dropOpenFormat('md-link')
+		return true
 	}
 
 	return false
@@ -425,6 +420,7 @@ function awaitWikiLinkAt(index: number): ParsingProgram {
 			parser.builder.dropOpenFormat('wiki-link-custom')
 
 			finishWikiLink(parser)
+			parser.popContext()
 			return true
 		}
 		return false
@@ -446,4 +442,40 @@ function finishWikiLink(parser: NoteParser) {
 	})
 
 	builder.dropOpenFormat('wiki-link')
+}
+
+function awaitMarkdownLinkAt(index: number, linkInfo: LinkInfo): ParsingProgram {
+	return (_, parser: NoteParser) => {
+		if (parser.feed.index === index) {
+			parser.commitSpan(null)
+			parser.builder.dropOpenFormat('md-link-text')
+			finishMarkdownLink(parser, linkInfo)
+			parser.popContext()
+			return true
+		}
+		return false
+	}
+}
+
+function finishMarkdownLink(parser: NoteParser, linkInfo: LinkInfo) {
+	const { feed, builder } = parser
+
+	// Commit the `](` and link
+	feed.next(2)
+	feed.nextByLength(linkInfo.href.length)
+	parser.commitSpan({
+		link_internal: true,
+		hidden: true,
+		spellcheck: false
+	})
+
+	// Commit the ending `)`
+	feed.next()
+	parser.commitSpan({
+		link_internal: true,
+		hidden: true,
+		end: true
+	})
+
+	builder.dropOpenFormat('md-link')
 }

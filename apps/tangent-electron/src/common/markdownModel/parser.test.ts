@@ -163,7 +163,7 @@ describe('Link parsing', () => {
 
 	describe('Wiki Links', () => {
 		it('Should handle simple links', () => {
-			const { lines, structure } = parser.parseMarkdown('Some [[Simple Link]]')
+			const { lines, structure } = parser.parseMarkdown('Some [[Simple Link]] in text')
 			const ops = lines[0].content.ops
 
 			const t_link = ops[1].attributes.t_link
@@ -198,6 +198,9 @@ describe('Link parsing', () => {
 						end: true,
 						hidden: true
 					}
+				},
+				{
+					insert: ' in text'
 				}
 			])
 
@@ -208,13 +211,195 @@ describe('Link parsing', () => {
 				href: 'Simple Link'
 			}])
 		})
-	})
-	
-	test('Markdown links should not be stomped by wiki links', () => {
-		const ops = parser.parseMarkdown(`[web link](https://google.com) and a [[Wiki Link]]`).lines[0].content.ops
 
-		// The first link should be seen as a markdown link
-		expect(ops[0].attributes.t_link).toEqual({ form: 'md', href: 'https://google.com', text: 'web link' })
+		it('Should allow inline formatting in override text', () => {
+			const { lines, structure } = parser.parseMarkdown('A [[Simple Link|link with _inline_ formatting]] in text')
+			const ops = lines[0].content.ops
+
+			const t_link = ops[1].attributes.t_link
+
+			expect(ops).toMatchObject([
+				{ insert: 'A '},
+				{
+					insert: '[[',
+					attributes: {
+						t_link,
+						hidden: true
+					}
+				},
+				{
+					insert: 'Simple Link',
+					attributes: {
+						t_link,
+						hidden: true
+					}
+				},
+				{
+					insert: '|',
+					attributes: {
+						t_link,
+						hidden: true
+					}
+				},
+				{
+					insert: 'link with ',
+					attributes: {
+						t_link
+					}
+				},
+				{
+					insert: '_',
+					attributes: {
+						t_link,
+						italic: true,
+						hidden: true
+					}
+				},
+				{
+					insert: 'inline',
+					attributes: {
+						t_link,
+						italic: true
+					}
+				},
+				{
+					insert: '_',
+					attributes: {
+						t_link,
+						italic: true,
+						hidden: true
+					}
+				},
+				{
+					insert: ' formatting',
+					attributes: {
+						t_link
+					}
+				},
+				{
+					insert: ']]',
+					attributes: {
+						t_link,
+						hidden: true
+					}
+				},
+				{
+					insert: ' in text'
+				}
+			])
+		})
+
+		it('Should support multiple links in a single line', () => {
+			const result = parser.parseMarkdown('A line with [[Multiple]] [[Wiki Links]]')
+
+			expect(result.structure).toMatchObject([
+				{
+					type: StructureType.Link,
+					href: 'Multiple'
+				},
+				{
+					type: StructureType.Link,
+					href: 'Wiki Links'
+				}
+			])
+		})
+
+		// Tests that links are dropping contexts correctly
+		it('Should support multiple renamed links in a single line', () => {
+			const result = parser.parseMarkdown('A line with [[Multiple|some]] [[Wiki Links|renamed links]]')
+
+			expect(result.structure).toMatchObject([
+				{
+					type: StructureType.Link,
+					href: 'Multiple',
+					text: 'some'
+				},
+				{
+					type: StructureType.Link,
+					href: 'Wiki Links',
+					text: 'renamed links'
+				}
+			])
+		})
+	})
+
+	describe('Markdown Links', () => {
+		it('Should not be stomped by wiki links', () => {
+			const ops = parser.parseMarkdown(`[web link](https://google.com) and a [[Wiki Link]]`).lines[0].content.ops
+	
+			// The first link should be seen as a markdown link
+			expect(ops[0].attributes.t_link).toEqual({ form: 'md', href: 'https://google.com', text: 'web link' })
+		})
+
+		it('Should allow for inline formatting in text', () => {
+			const { lines, structure } = parser.parseMarkdown('A [link with _inline_ formatting](https://google.com) in text')
+			const ops = lines[0].content.ops
+
+			const t_link = ops[1].attributes.t_link
+			expect(t_link).toMatchObject({
+				form: 'md',
+				href: 'https://google.com',
+				text: 'link with _inline_ formatting'
+			})
+
+			expect(ops).toMatchObject([
+				{ insert: 'A ' },
+				{
+					insert: '[',
+					attributes: {
+						t_link
+					}
+				},
+				{
+					insert: 'link with ',
+					attributes: {
+						t_link
+					}
+				},
+				{
+					insert: '_',
+					attributes: {
+						t_link,
+						italic: true
+					}
+				},
+				{
+					insert: 'inline',
+					attributes: {
+						t_link,
+						italic: true
+					}
+				},
+				{
+					insert: '_',
+					attributes: {
+						t_link,
+						italic: true
+					}
+				},
+				{
+					insert: ' formatting',
+					attributes: {
+						t_link
+					}
+				},
+				{
+					insert: '](https://google.com',
+					attributes: {
+						t_link
+					}
+				},
+				{
+					insert: ')',
+					attributes: {
+						t_link
+					}
+				},
+				{
+					insert: ' in text'
+				}
+			])
+		})
 	})
 
 	describe('Raw Links', () => {
