@@ -3,7 +3,7 @@ import { parse as parseYaml } from 'yaml'
 import CharacterFeeder from './CharacterFeeder'
 import LinesBuilder from './LinesBuilder'
 import { StructureData, StructureType } from 'common/indexing/indexTypes'
-import { parseBackslashEscape, parseEmojiHighlight, parseEmphasis, parseHighlight, parseStrikethrough } from './formatting'
+import { parseBackslashEscape, parseComment, parseEmojiHighlight, parseEmphasis, parseHighlight, parseStrikethrough } from './formatting'
 import { parseHeader } from './header'
 import { parseBlockquote, parseHorizontalRule } from './line'
 import { parseListItem } from './list'
@@ -27,7 +27,8 @@ const inlineObjectPrograms = [
 	parseInlineMath,
 	parseLink,
 	parseRawLink,
-	parseTag
+	parseTag,
+	parseComment
 ]
 
 // i.e. programs that could be inside e.g. a link
