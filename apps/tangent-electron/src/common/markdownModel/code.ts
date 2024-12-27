@@ -11,7 +11,7 @@ export function parseInlineCode(char: string, parser: NoteParser): boolean {
 
 	const start = feed.index
 	const startCount = feed.consumeSequentialCharacters(char)
-	const formatString = feed.substring(start, startCount)
+	const formatString = feed.substring(start, start + startCount)
 
 	// Close previous spans
 	parser.commitSpan(null, -startCount+1)

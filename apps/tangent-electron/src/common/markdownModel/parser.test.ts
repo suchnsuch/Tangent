@@ -159,6 +159,51 @@ And some text`)
 	})
 })
 
+describe('Formatting', () => {
+	it('Inline code should close out', () => {
+		const { lines } = parser.parseMarkdown('Some `simple code` formatting')
+		const ops = lines[0].content.ops
+
+		expect(ops).toEqual([
+			{
+				insert: 'Some ',
+				attributes: {}
+			},
+			{
+				insert: '`',
+				attributes: {
+					inline_code: true,
+					hidden: true,
+					hiddenGroup: true,
+					start: true
+				}
+			},
+			{
+				insert: 'simple code',
+				attributes: {
+					inline_code: true,
+					hiddenGroup: true,
+					afterSpace: true,
+					beforeSpace: true
+				}
+			},
+			{
+				insert: '`',
+				attributes: {
+					inline_code: true,
+					hidden: true,
+					hiddenGroup: true,
+					end: true
+				}
+			},
+			{
+				insert: ' formatting',
+				attributes: {}
+			}
+		])
+	})
+})
+
 describe('Link parsing', () => {
 
 	describe('Wiki Links', () => {
