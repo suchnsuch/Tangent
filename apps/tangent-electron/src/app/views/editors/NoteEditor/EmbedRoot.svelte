@@ -193,7 +193,7 @@ function websiteImageStyle(form: WebsiteData) {
 	<!-- svelte-ignore a11y-missing-attribute -->
 	<img src={form.src} style={imageStyle(link.text)} on:error={e => error('Image not found!')} />
 {:else if form.mode === 'audio'}
-	<audio controls src={form.src} />
+	<audio controls src={form.src} style={getBaseStyle()} />
 {:else if form.mode === 'video'}
 	<!-- svelte-ignore a11y-media-has-caption -->
 	<video controls src={form.src} style={getBaseStyle()} />
