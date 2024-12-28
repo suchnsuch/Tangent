@@ -12,11 +12,17 @@ type Form = {
 	mode: 'error'
 	message: string
 } | {
-	mode: 'image',
+	mode: 'image'
 	src: string 
 } | {
-	mode: 'youtube',
-	src: string,
+	mode: 'audio'
+	src: string
+} | {
+	mode: 'video'
+	src: string
+} | {
+	mode: 'youtube'
+	src: string
 	title: string
 } | {
 	mode: 'website'
@@ -74,6 +80,18 @@ function onNodeHandleChanged(value: HandleResult) {
 	else if (value.mediaType === 'image') {
 		form = {
 			mode: 'image',
+			src: value.url
+		}
+	}
+	else if (value.mediaType === 'audio') {
+		form = {
+			mode: 'audio',
+			src: value.url
+		}
+	}
+	else if (value.mediaType === 'video') {
+		form = {
+			mode: 'video',
 			src: value.url
 		}
 	}
@@ -174,6 +192,11 @@ function websiteImageStyle(form: WebsiteData) {
 {:else if form.mode === 'image'}
 	<!-- svelte-ignore a11y-missing-attribute -->
 	<img src={form.src} style={imageStyle(link.text)} on:error={e => error('Image not found!')} />
+{:else if form.mode === 'audio'}
+	<audio controls src={form.src} />
+{:else if form.mode === 'video'}
+	<!-- svelte-ignore a11y-media-has-caption -->
+	<video controls src={form.src} style={getBaseStyle()} />
 {:else if form.mode === 'website'}
 	<div class="website-preview" class:description={form.description} style={websiteStyle(form)}>
 		<div class="info">
