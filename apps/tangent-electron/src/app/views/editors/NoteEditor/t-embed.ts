@@ -131,7 +131,7 @@ class TangentEmbed extends TangentLink {
 
 		const href = this.getCleanedHref()
 		markAsSelectionRequest(event, { inline: attr => {
-			return attr?.t_embed?.href === href
+			return attr?.t_link?.href === href
 		}})
 	}
 
