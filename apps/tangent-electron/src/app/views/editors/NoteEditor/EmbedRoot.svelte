@@ -120,7 +120,7 @@ function error(message: string) {
 }
 
 function getBaseStyle() {
-	let style = 'max-width: 100%; border-radius: 1px;'
+	let style = 'max-width: 100%;'
 	if (block) {
 		style += 'margin: 0 auto .5em;'
 	}
@@ -129,7 +129,7 @@ function getBaseStyle() {
 
 function imageStyle(customizations: string) {
 
-	let style = getBaseStyle()
+	let style = getBaseStyle() + 'border-radius: 1px;'
 
 	if (customizations) {
 		for (let part of customizations.split(/\s+/).map(p => p.trim())) {
@@ -159,18 +159,12 @@ function imageStyle(customizations: string) {
 }
 
 function websiteStyle(form: WebsiteData) {
-	let style = getBaseStyle()
-	style += 'width: 100%;'
-
-	style += 'display: grid; grid-template-columns: auto 50%; grid-template-rows: auto auto;'
-	style += 'background: var(--backgroundColor); border-radius: var(--borderRadius);'
-
-	return style
+	return getBaseStyle()
 }
 
 function websiteImageStyle(form: WebsiteData) {
 	if (form.images.length) {
-		return 'background: url(' + form.images[0] + '); background-size: cover; min-height: 10em; border-top-right-radius: var(--borderRadius);'
+		return `background: url("${form.images[0]}"); background-size: cover;`
 	}
 	return ''
 }
@@ -182,19 +176,21 @@ function websiteImageStyle(form: WebsiteData) {
 	<!-- svelte-ignore a11y-missing-attribute -->
 	<img src={form.src} style={imageStyle(link.text)} on:error={e => error('Image not found!')} />
 {:else if form.mode === 'website'}
-	<div style={websiteStyle(form)}>
-		<div style="padding: 0 1em;">
-			<h1 style="font-size: 18px;">{form.title}</h1>
+	<div class="website-preview" class:description={form.description} style={websiteStyle(form)}>
+		<div class="info">
+			<h1>{form.title.trim()}</h1>
 			{#if form.description}
-				<p>{form.description}</p>
+				<p>
+					{form.description}
+				</p>
 			{/if}
 		</div>
-		<div style={websiteImageStyle(form)}></div>
+		<div class="image" style={websiteImageStyle(form)}></div>
 		{#if form.favicons.length}
-			<div style="grid-column-start: 1; grid-column-end: 3; display: flex; padding: .15em 1em; align-items: center; gap: .25em;">
+			<div class="link">
 				<!-- svelte-ignore a11y-missing-attribute -->
 				<img src={form.favicons[0]} width="16px" height="16px" />
-				<span style="font-size: .7em; color: var(--deemphasizedTextColor);">{form.url}</span>
+				<span>{form.url}</span>
 			</div>
 		{/if}
 	</div>
