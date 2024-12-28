@@ -2,6 +2,7 @@ import { swapRemove } from '@such-n-such/core'
 import { Workspace } from 'app/model'
 import EmbedFile from 'app/model/EmbedFile'
 import Folder from 'app/model/Folder'
+import { HandleResult } from 'app/model/NodeHandle'
 import WorkspaceTreeNode from 'app/model/WorkspaceTreeNode'
 import paths from 'common/paths'
 import { TreeNode, forAllNodes } from 'common/trees'
@@ -21,7 +22,7 @@ class StyleFileHandle {
 			.subscribe(n => this.onNodeChanged(n))
 	}
 
-	onNodeChanged(value: string | TreeNode | TreeNode[]) {
+	onNodeChanged(value: HandleResult) {
 		if (value instanceof EmbedFile) {
 			if (!this.element) {
 				const newElement = document.createElement('link')

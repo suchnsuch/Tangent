@@ -1,6 +1,6 @@
 import path from 'path'
 import fs from 'fs'
-import cheerio from 'cheerio'
+import { load } from 'cheerio'
 import { app, BrowserWindow, clipboard, dialog, ipcMain, MenuItem, MenuItemConstructorOptions, shell } from 'electron'
 import { getDocumentationPath } from 'main/documentation'
 import { getWindowHandle, getWorkspace, validateWorkspaceForHandleFilepath, hasShutdownWorkspaces, workspaceMap } from 'main/workspaces'
@@ -17,6 +17,7 @@ import { fillDateFormat } from 'common/dates'
 
 import './queries'
 import './dictionary'
+import './urlData'
 import { FileSaveResult } from 'main/File'
 import { PromiseStarter } from '@such-n-such/core'
 
@@ -633,7 +634,7 @@ ipcMain.handle('getLinkTitle', async (event, href: string) => {
 		const response = await fetch(href)
 		if (response.status === 200) {
 			const body = await response.text()
-			const $ = cheerio.load(body)
+			const $ = load(body)
 			return $('title').text()
 		}
 	}

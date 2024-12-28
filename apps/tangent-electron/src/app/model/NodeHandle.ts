@@ -3,9 +3,23 @@ import { HrefFormedLink } from 'common/indexing/indexTypes'
 import { resolveLink } from 'common/markdownModel/links'
 import { TreeChange, TreeNode } from 'common/trees'
 import WorkspaceTreeNode from './WorkspaceTreeNode'
+import { UrlData } from 'common/urlData'
+import Workspace from './Workspace'
 
 type MaybeSubscribableNode = TreeNode & { subscribe?: any }
-export type HandleResult = string | MaybeSubscribableNode | MaybeSubscribableNode[]
+export type HandleResult = string | MaybeSubscribableNode | MaybeSubscribableNode[] | UrlData
+
+export function handleIsNode(handle: HandleResult): handle is MaybeSubscribableNode {
+	return typeof handle === 'object' && !Array.isArray(handle) && isNode(handle)
+}
+
+export function isNode(obj: MaybeSubscribableNode | UrlData): obj is MaybeSubscribableNode {
+	return 'path' in obj
+}
+
+export function isUrlData(obj: MaybeSubscribableNode | UrlData): obj is UrlData {
+	return 'url' in obj
+}
 
 function pathAffectsPath(a: string, b: string): boolean {
 	if (a === b) return true
@@ -16,7 +30,7 @@ function pathAffectsPath(a: string, b: string): boolean {
 }
 
 export default class NodeHandle {
-	store: DefaultIndexStore
+	workspace: Workspace
 
 	node: WorkspaceTreeNode
 	link: HrefFormedLink
@@ -26,14 +40,15 @@ export default class NodeHandle {
 
 	private value: HandleResult
 	private targetUnobserver: () => void
+	private _requestId = 0
 
 	constructor(
-		store: DefaultIndexStore,
+		workspace: Workspace,
 		set: (value: HandleResult) => void,
 		node: WorkspaceTreeNode,
 		link: HrefFormedLink
 	) {
-		this.store = store
+		this.workspace = workspace
 		this.set = set
 		this.node = node
 		this.link = link
@@ -47,16 +62,33 @@ export default class NodeHandle {
 	}
 
 	resolve() {
-		const newValue = this.node ?? (resolveLink(this.store, this.link) || null)
+		const newValue = this.node ?? (resolveLink(this.workspace.directoryStore, this.link) || null)
+		console.log({
+			newValue,
+			value: this.value,
+			link: this.link
+		})
 		if (newValue !== this.value) {
 			if (this.targetUnobserver) {
 				this.targetUnobserver()
 				this.targetUnobserver = null
 			}
 
+			const requestId = this._requestId += 1
+
 			if (typeof newValue === 'string') {
+				console.log('setting value', newValue)
 				// external link
 				this.value = newValue
+				// Get information about the external link
+				this.workspace.api.links.getUrlData(newValue).then(result => {
+					if (this._requestId === requestId) {
+						console.log(' and now result', result)
+						this.value = result
+						this.dirty = true
+						this.pushChangesIfDirty()
+					}
+				})
 			}
 			else {
 				this.value = newValue
@@ -81,7 +113,7 @@ export default class NodeHandle {
 				yield v.path
 			}
 		}
-		else {
+		else if (isNode(this.value)) {
 			yield this.value.path
 		}
 	}

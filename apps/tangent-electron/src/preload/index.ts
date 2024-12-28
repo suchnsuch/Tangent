@@ -175,7 +175,10 @@ let bridge: WindowApi = {
 		},
 		saveFromUrl(href, contextPath) {
 			return ipcRenderer.invoke('saveFromUrl', href, contextPath)
-		}
+		},
+		getUrlData(url) {
+			return ipcRenderer.invoke('getUrlData', url)
+		},
 	},
 	query: {
 		resultsForQuery(queryString) {

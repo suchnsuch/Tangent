@@ -1,5 +1,5 @@
 import { EmbedInfo, HrefFormedLink, LinkInfo, StructureType } from "../indexing/indexTypes"
-import type { TextDocument } from '@typewriter/document'
+import type { AttributeMap, TextDocument } from '@typewriter/document'
 import { lineToText } from '../typewriterUtils'
 import { TreeNode, TreePredicateResult, validatePath } from 'common/trees'
 import paths from '../paths'
@@ -7,6 +7,7 @@ import type { DefaultIndexStore } from 'common/indexing/IndexTreeStore'
 import { getTagPath } from 'common/indexing/TagNode'
 import NoteParser from './NoteParser'
 import { ParsingContextType, ParsingProgram } from './parsingContext'
+import { isExternalLink } from 'common/links'
 
 export const wikiLinkMatcher = /(\[\[)([^\[\]\n|#]*)(#[^\[\]\n|#]*)?(\|[^\[\]\n|#]*)?(\]\])?/
 
@@ -119,7 +120,7 @@ export function findLinkAround(doc: TextDocument, position: number, linkMatcher:
 export function resolveLink(store: DefaultIndexStore, link: HrefFormedLink): TreeNode | TreeNode[] | string {
 	switch (link.form) {
 		case 'raw':
-			return store.get(link.href)
+			return store.get(link.href) || link.href
 		case 'wiki':
 			const validatedHref = validatePath(link.href)
 			if (!validatedHref) {
@@ -136,6 +137,9 @@ export function resolveLink(store: DefaultIndexStore, link: HrefFormedLink): Tre
 				root: store.files
 			})
 		case 'md':
+			if (isExternalLink(link.href)) {
+				return link.href
+			}
 			if (!link.from) {
 				console.error('Cannot resolve a md link without "from".', link)
 				return
@@ -174,16 +178,30 @@ export function resolveLink(store: DefaultIndexStore, link: HrefFormedLink): Tre
 
 export function parseRawLink(char: string, parser: NoteParser): boolean {
 	if (char === ':' && parser.feed.checkFor('://', false)) {
-		const { feed } = parser
+		const { feed, builder } = parser
 		const { index: lastLetterIndex } = feed.findWhile(/[A-Za-z]/, feed.index - 1, -1)
 
+		const isAtStartOfContent = builder.spans.length === 0 || builder.spans[0].attributes.indent
+		
 		parser.commitSpan(null, lastLetterIndex - feed.index)
 		feed.consumeUntil(' ')
-		const t_link: HrefFormedLink = {
+		const t_link: HrefFormedLink & { block?: boolean } = {
 			href: feed.substring(lastLetterIndex, feed.index),
 			form: 'raw'
 		}
-		parser.commitSpan({ t_link }, 0)
+
+		const nextSpan: AttributeMap = { t_link }
+
+		if (isAtStartOfContent && feed.currentChar === '\n') {
+			t_link.block = true
+			
+			// Allow raw links on their own lines to be implicit embeds
+			nextSpan.t_embed = true
+			nextSpan.hidden = true
+			nextSpan.link_internal = true
+		}
+
+		parser.commitSpan(nextSpan, 0)
 		return true
 	}
 	return false

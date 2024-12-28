@@ -4,6 +4,7 @@ import { TreeNode } from 'common/trees'
 import { HrefForm, HrefFormedLink, StructureType } from 'common/indexing/indexTypes'
 import { isExternalLink } from 'common/links'
 import { isMac } from 'common/isMac'
+import { HandleResult, isNode } from 'app/model/NodeHandle'
 
 type LinkState = 'uninitialized' | 'empty' | 'resolved' | 'ambiguous' | 'untracked' | 'external' | 'error'
 
@@ -17,7 +18,7 @@ function getClickMessage(name='', location='in a new pane.') {
 	return result
 }
 
-function linkStateTooltip(state: LinkState, context: string | TreeNode | TreeNode[]) {
+function linkStateTooltip(state: LinkState, context: HandleResult) {
 	switch (state) {
 		case 'uninitialized':
 			return undefined
@@ -124,7 +125,7 @@ class TangentLink extends HTMLElement {
 		}
 	}
 	
-	private onNodeHandleChanged(value: string | TreeNode | TreeNode[]) {
+	private onNodeHandleChanged(value: HandleResult) {
 		let newState: LinkState = 'empty'
 
 		if (typeof value === 'string') {
@@ -135,12 +136,17 @@ class TangentLink extends HTMLElement {
 				newState = 'ambiguous'
 			}
 		}
-		else if (value && !value.meta?.virtual) {
-			let contentId = this.getAttribute('content_id')
-			if (contentId) {
-				// TODO
+		else if (value) {
+			if (isNode(value)) {
+				let contentId = this.getAttribute('content_id')
+				if (contentId) {
+					// TODO
+				}
+				newState = 'resolved'
 			}
-			newState = 'resolved'
+			else {
+				newState = 'external'
+			}
 		}
 
 		this.setLinkState(newState, value)
@@ -157,7 +163,7 @@ class TangentLink extends HTMLElement {
 		return this.linkState
 	}
 
-	setLinkState(value: LinkState, context: string | TreeNode | TreeNode[]) {
+	setLinkState(value: LinkState, context: HandleResult) {
 		this.linkState = value
 		this.setAttribute('link-state', value)
 		this.tooltip = linkStateTooltip(value, context)

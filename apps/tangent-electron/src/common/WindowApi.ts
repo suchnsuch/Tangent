@@ -5,6 +5,7 @@ import type { ProgressInfo, UpdateInfo } from 'electron-updater'
 import type { ContextMenuTemplate } from './menus'
 import type { QueryResult } from './indexing/queryResults'
 import type { QueryParseResult } from '@such-n-such/tangent-query-parser'
+import type { UrlData } from './urlData'
 
 export interface SelectPathOptions {
 	title?: string
@@ -101,6 +102,7 @@ export default interface WindowAPI {
 		openExternal(path: string)
 		getTitle(href: string): Promise<string>
 		saveFromUrl(href: string, contextPath: string): Promise<string>
+		getUrlData(url: string): Promise<UrlData>
 	}
 
 	query: {

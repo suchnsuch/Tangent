@@ -58,6 +58,7 @@ import UnicodeAutocompleter from '../autocomplete/UnicodeAutocompleter';
 import UnicodeAutocompleteMenu from '../autocomplete/UnicodeAutocompleteMenu.svelte';
 import CodeBlockAutocompleter from '../autocomplete/CodeBlockAutoCompleter';
 import CodeBlockAutocompleteMenu from '../autocomplete/CodeBlockAutocompleteMenu.svelte';
+    import { handleIsNode } from 'app/model/NodeHandle';
 
 // Technically, this just needs to exist _somewhere_. Putting it here because of the svelte dependency
 // Force the use of the variable so that it is included in the bundle
@@ -962,7 +963,7 @@ function onContextMenu(event: MouseEvent) {
 							if (!path) return
 
 							subscribeUntil(workspace.getHandle(path), value => {
-								if (value && typeof value !== 'string' && !Array.isArray(value)) {
+								if (handleIsNode(value)) {
 									// Actually apply the new markup
 									const workspacePath = workspace.directoryStore.getPathToItem(value, {
 										length: 'short',

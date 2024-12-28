@@ -32,6 +32,7 @@ import { AttributePredicate, findWordAroundPositionInDocument, getEditInfo, getR
 import { isLeftClick, startDrag } from 'app/utils'
 import { repeatString } from '@such-n-such/core'
 import { subscribeUntil } from 'common/stores'
+import { handleIsNode } from 'app/model/NodeHandle'
 
 function clampRange(range: EditorRange, clampingRange: EditorRange): EditorRange {
 	range = normalizeRange(range)
@@ -1414,7 +1415,7 @@ export default function editorModule(editor: Editor, options: {
 					if (!path) return 
 
 					subscribeUntil(workspace.getHandle(path), value => {
-						if (value && typeof value !== 'string' && !Array.isArray(value)) {
+						if (handleIsNode(value)) {
 							const workspacePath = workspace.directoryStore.getPathToItem(value, {
 								length: 'short',
 								includeExtension: true

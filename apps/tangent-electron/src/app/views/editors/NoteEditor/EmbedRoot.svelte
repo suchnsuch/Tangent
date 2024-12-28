@@ -1,12 +1,12 @@
 <script lang="ts">
 import { createEventDispatcher } from 'svelte'
-import type { TreeNode } from 'common/trees'
-import { isExternalLink } from 'common/links'
-import type { Workspace } from 'app/model'
 import { EmbedType, getEmbedType } from 'common/embedding'
 import type { HrefFormedLink } from 'common/indexing/indexTypes'
+import type { Workspace } from 'app/model'
 import type EmbedFile from 'app/model/EmbedFile'
 import { ForwardingStore } from 'common/stores'
+import { HandleResult, isNode } from 'app/model/NodeHandle'
+import { UrlData, WebsiteData } from 'common/urlData'
 
 type Form = {
 	mode: 'error'
@@ -14,7 +14,9 @@ type Form = {
 } | {
 	mode: 'image',
 	src: string
-}
+} | {
+	mode: 'website'
+} & WebsiteData
 
 const formDispatcher = createEventDispatcher<{ 'form': Form }>()
 
@@ -26,27 +28,13 @@ export let workspace: Workspace
 export let form: Form = null
 
 $: nodeHandle = workspace?.getHandle(link)
-
-$: updateFromHref(link)
-function updateFromHref(link: HrefFormedLink) {
-	if (link) {
-		if (isExternalLink(link.href)) {
-			form = {
-				mode: 'image',
-				src: link.href
-			}
-		}
-	}
-	else {
-		error('No valid link found!')
-	}
-}
-
-$: formDispatcher('form', form)
-
 $: onNodeHandleChanged(nodeHandle ? $nodeHandle : null)
-function onNodeHandleChanged(value: string | TreeNode | TreeNode[]) {
-	if (typeof value === 'string') {
+function onNodeHandleChanged(value: HandleResult) {
+	if (!value) {
+		error('Handle resolution error')
+		console.error('Handle resolution error', link)
+	}
+	else if (typeof value === 'string') {
 		// This occurs with a bad md link
 		// Assume this is an image embed from outside the directory
 		form = {
@@ -62,11 +50,12 @@ function onNodeHandleChanged(value: string | TreeNode | TreeNode[]) {
 			error('Could not resolve the link. Is it correct?')
 		}
 	}
-	else if (value.meta?.virtual) {
-		error('Cannot embed a virtual file: it doesn\'t exist!')
-	}
-	else {
-		switch (getEmbedType(value)) {
+	else if (isNode(value)) {
+		if (value.meta?.virtual) {
+			error('Cannot embed a virtual file: it doesn\'t exist!')
+		}
+		else {
+			switch (getEmbedType(value)) {
 			case EmbedType.Image:
 				form = {
 					mode: 'image',
@@ -76,8 +65,26 @@ function onNodeHandleChanged(value: string | TreeNode | TreeNode[]) {
 			default:
 				error(`Invalid file type. Cannot embed a "${value.fileType}" file.`)
 				break
+			}
 		}
 	}
+	else if (value.mediaType === 'image') {
+		form = {
+			mode: 'image',
+			src: value.url
+		}
+	}
+	else if (value.mediaType === 'website') {
+		form = {
+			mode: 'website',
+			...value as WebsiteData
+		}
+	}
+	else {
+		console.log('unhandled form!', value)
+		error('Unhandled form! ' + value.mediaType)
+	}
+	formDispatcher('form', form)
 }
 
 function error(message: string) {
@@ -87,12 +94,17 @@ function error(message: string) {
 	}
 }
 
-function imageStyle(customizations: string) {
-
+function getBaseStyle() {
 	let style = 'max-width: 100%; border-radius: 1px;'
 	if (block) {
 		style += 'margin: 0 auto .5em;'
 	}
+	return style
+}
+
+function imageStyle(customizations: string) {
+
+	let style = getBaseStyle()
 
 	if (customizations) {
 		for (let part of customizations.split(/\s+/).map(p => p.trim())) {
@@ -120,13 +132,47 @@ function imageStyle(customizations: string) {
 
 	return style
 }
+
+function websiteStyle(form: WebsiteData) {
+	let style = getBaseStyle()
+	style += 'width: 100%;'
+
+	style += 'display: grid; grid-template-columns: auto 50%; grid-template-rows: auto auto;'
+	style += 'background: var(--backgroundColor); border-radius: var(--borderRadius);'
+
+	return style
+}
+
+function websiteImageStyle(form: WebsiteData) {
+	if (form.images.length) {
+		return 'background: url(' + form.images[0] + '); background-size: cover; min-height: 10em; border-top-right-radius: var(--borderRadius);'
+	}
+	return ''
+}
 </script>
 
 {#if form.mode === 'error'}
-	<span title={form.message}>⚠</span>
+	<span title={form.message} class="error">⚠</span>
 {:else if form.mode === 'image'}
 	<!-- svelte-ignore a11y-missing-attribute -->
 	<img src={form.src} style={imageStyle(link.text)} on:error={e => error('Image not found!')} />
+{:else if form.mode === 'website'}
+	<div style={websiteStyle(form)}>
+		<div style="padding: 0 1em;">
+			<h1 style="font-size: 18px;">{form.title}</h1>
+			{#if form.description}
+				<p>{form.description}</p>
+			{/if}
+		</div>
+		<div style={websiteImageStyle(form)}></div>
+		{#if form.favicons.length}
+			<div style="grid-column-start: 1; grid-column-end: 3; display: flex; padding: .15em 1em; align-items: center; gap: .25em;">
+				<!-- svelte-ignore a11y-missing-attribute -->
+				<img src={form.favicons[0]} width="16px" height="16px" />
+				<span style="font-size: .7em; color: var(--deemphasizedTextColor);">{form.url}</span>
+			</div>
+		{/if}
+	</div>
 {/if}
 
 <svelte:options accessors={true}/>

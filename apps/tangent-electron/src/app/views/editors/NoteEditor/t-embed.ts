@@ -6,11 +6,14 @@ import { isExternalLink } from 'common/links'
 import EmbedRoot from './EmbedRoot.svelte'
 import TangentLink from './t-link'
 import { markAsSelectionRequest } from 'app/events'
+import { deepEqual } from 'fast-equals'
 
 class TangentEmbed extends TangentLink {
 
 	private content: HTMLElement
 	private component: EmbedRoot
+
+	private willUpdateState = false
 
 	constructor() {
 		super()
@@ -54,28 +57,41 @@ class TangentEmbed extends TangentLink {
 			case 'content_id':
 			case 'text':
 			case 'block':
-				requestCallbackOnIdle(() => this.updateState(), 1000)
+				if (!this.willUpdateState) {
+					this.willUpdateState = true
+					requestCallbackOnIdle(() => {
+						this.willUpdateState = false
+						this.updateState()
+					}, 1000)
+				}
 				break
 		}
 	}
 
 	updateState() {
 		// Collect props
-		const props = {
-			link: this.getLinkInfo(),
-			block: this.getAttribute('block') === 'true',
-			workspace: (document as any).workspace as Workspace
-		}
+		const link = this.getLinkInfo()
+		const block = this.getAttribute('block') === 'true'
 
-		this.content.style.display = props.block ? 'flex' : 'inline-flex'
+		this.content.style.display = block ? 'flex' : 'inline-flex'
 
 		if (this.component) {
-			this.component.$set(props)
+			const component = this.component
+			if (component.block !== block) {
+				component.block = block
+			}
+			if (!deepEqual(component.link, link)) {
+				component.link = link
+			}
 		}
 		else {
 			this.component = new EmbedRoot({
 				target: this.content,
-				props
+				props: {
+					link,
+					block,
+					workspace: (document as any).workspace as Workspace
+				}
 			})
 
 			const handleForm = form => {

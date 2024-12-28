@@ -446,7 +446,7 @@ export default class Workspace extends EventDispatcher {
 
 		return readable<HandleResult>(null, set => {
 
-			const handle = new NodeHandle(this.directoryStore, set, node, link)
+			const handle = new NodeHandle(this, set, node, link)
 			this.activeHandles.push(handle)
 
 			handle.resolve()
