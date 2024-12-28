@@ -36,7 +36,6 @@ $: onNodeHandleChanged(nodeHandle ? $nodeHandle : null)
 function onNodeHandleChanged(value: HandleResult) {
 	if (!value) {
 		error('Handle resolution error')
-		console.error('Handle resolution error', link)
 	}
 	else if (typeof value === 'string') {
 		// This occurs with a bad md link

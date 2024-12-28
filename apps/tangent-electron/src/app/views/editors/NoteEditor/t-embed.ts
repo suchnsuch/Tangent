@@ -1,4 +1,3 @@
-import { requestCallbackOnIdle } from '@such-n-such/core'
 import type { Workspace } from 'app/model'
 import { StructureType } from 'common/indexing/indexTypes'
 import { isExternalLink } from 'common/links'
@@ -7,11 +6,16 @@ import EmbedRoot from './EmbedRoot.svelte'
 import TangentLink from './t-link'
 import { markAsSelectionRequest } from 'app/events'
 import { deepEqual } from 'fast-equals'
+import type { Readable } from 'svelte/store'
+import { HandleResult } from 'app/model/NodeHandle'
 
 class TangentEmbed extends TangentLink {
 
 	private content: HTMLElement
 	private component: EmbedRoot
+
+	private nodeHandle: Readable<HandleResult>
+	private unsubHandle: () => void
 
 	private willUpdateState = false
 
@@ -34,7 +38,7 @@ class TangentEmbed extends TangentLink {
 
 	connectedCallback() {
 		if (this.isConnected) {
-			requestCallbackOnIdle(() => this.updateState(), 1000)
+			this.requestUpdateState()
 		}
 	}
 
@@ -62,14 +66,18 @@ class TangentEmbed extends TangentLink {
 			case 'content_id':
 			case 'text':
 			case 'block':
-				if (!this.willUpdateState) {
-					this.willUpdateState = true
-					requestCallbackOnIdle(() => {
-						this.willUpdateState = false
-						this.updateState()
-					}, 1000)
-				}
+				this.requestUpdateState()
 				break
+		}
+	}
+
+	requestUpdateState() {
+		if (!this.willUpdateState) {
+			this.willUpdateState = true
+			setTimeout(() => {
+				this.willUpdateState = false
+				this.updateState()
+			}, 1);
 		}
 	}
 
