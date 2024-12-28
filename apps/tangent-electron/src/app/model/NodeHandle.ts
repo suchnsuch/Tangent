@@ -5,6 +5,7 @@ import { TreeChange, TreeNode } from 'common/trees'
 import WorkspaceTreeNode from './WorkspaceTreeNode'
 import { UrlData } from 'common/urlData'
 import Workspace from './Workspace'
+import { deepEqual } from 'fast-equals'
 
 type MaybeSubscribableNode = TreeNode & { subscribe?: any }
 export type HandleResult = string | MaybeSubscribableNode | MaybeSubscribableNode[] | UrlData
@@ -72,11 +73,9 @@ export default class NodeHandle {
 			const requestId = this._requestId += 1
 
 			if (typeof newValue === 'string') {
-				// external link
-				this.value = newValue
 				// Get information about the external link
 				this.workspace.api.links.getUrlData(newValue).then(result => {
-					if (this._requestId === requestId) {
+					if (this._requestId === requestId && !deepEqual(this.value, result)) {
 						this.value = result
 						this.dirty = true
 						this.pushChangesIfDirty()
@@ -94,8 +93,8 @@ export default class NodeHandle {
 						})
 					}
 				}
+				this.dirty = true
 			}
-			this.dirty = true
 		}
 	}
 
