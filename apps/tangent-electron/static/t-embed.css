@@ -47,15 +47,19 @@
 		gap: .25em;
 		overflow: hidden;
 		text-wrap: nowrap;
-
+		
 		&:hover {
 			grid-column: 1 / 3;
 		}
-
+		
 		span {
 			font-size: .7em;
 			color: var(--deemphasizedTextColor);
 			text-shadow: var(--backgroundColor) 0 0 4px;
+
+			overflow: hidden;
+			white-space: nowrap;
+			text-overflow: ellipsis;
 		}
 	}
 }
