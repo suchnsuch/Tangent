@@ -6,7 +6,7 @@ import { isExternalLink } from 'common/links'
 import { isMac } from 'common/isMac'
 import { HandleResult, isNode } from 'app/model/NodeHandle'
 
-type LinkState = 'uninitialized' | 'empty' | 'resolved' | 'ambiguous' | 'untracked' | 'external' | 'error'
+export type LinkState = 'uninitialized' | 'empty' | 'resolved' | 'ambiguous' | 'untracked' | 'external' | 'error'
 
 function getClickMessage(name='', location='in a new pane.') {
 	let result = isMac ? '⌘+Click' : 'Ctrl+Click'

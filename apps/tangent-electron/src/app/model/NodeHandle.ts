@@ -63,11 +63,6 @@ export default class NodeHandle {
 
 	resolve() {
 		const newValue = this.node ?? (resolveLink(this.workspace.directoryStore, this.link) || null)
-		console.log({
-			newValue,
-			value: this.value,
-			link: this.link
-		})
 		if (newValue !== this.value) {
 			if (this.targetUnobserver) {
 				this.targetUnobserver()
@@ -77,13 +72,11 @@ export default class NodeHandle {
 			const requestId = this._requestId += 1
 
 			if (typeof newValue === 'string') {
-				console.log('setting value', newValue)
 				// external link
 				this.value = newValue
 				// Get information about the external link
 				this.workspace.api.links.getUrlData(newValue).then(result => {
 					if (this._requestId === requestId) {
-						console.log(' and now result', result)
 						this.value = result
 						this.dirty = true
 						this.pushChangesIfDirty()

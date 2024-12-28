@@ -13,7 +13,11 @@ type Form = {
 	message: string
 } | {
 	mode: 'image',
-	src: string
+	src: string 
+} | {
+	mode: 'youtube',
+	src: string,
+	title: string
 } | {
 	mode: 'website'
 } & WebsiteData
@@ -78,6 +82,27 @@ function onNodeHandleChanged(value: HandleResult) {
 		form = {
 			mode: 'website',
 			...value as WebsiteData
+		}
+	}
+	else if (value.mediaType === 'video.other' && 'siteName' in value && value.siteName === 'YouTube') {
+		// Explicitly handle youtube embedding
+		const youtubePrefix = 'https://www.youtube.com/watch?v='
+		const index = value.url.indexOf(youtubePrefix)
+		if (index !== -1) {
+			let watchCode = value.url.substring(index + youtubePrefix.length)
+			const ampIndex = watchCode.indexOf('&')
+			if (ampIndex !== -1) {
+				watchCode = watchCode.substring(0, ampIndex)
+			}
+
+			form = {
+				mode: 'youtube',
+				src: 'https://www.youtube.com/embed/' + watchCode,
+				title: value.title
+			}
+		}
+		else {
+			error('Bad youtube link!')
 		}
 	}
 	else {
@@ -173,6 +198,8 @@ function websiteImageStyle(form: WebsiteData) {
 			</div>
 		{/if}
 	</div>
+{:else if form.mode === 'youtube'}
+	<iframe style={getBaseStyle()} title={form.title} src={form.src} width="480" height="270" frameborder="0" allow="encrypted-media; picture-in-picture;" allowFullScreen></iframe>
 {/if}
 
 <svelte:options accessors={true}/>

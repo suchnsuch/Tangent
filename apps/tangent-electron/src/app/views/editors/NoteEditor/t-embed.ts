@@ -21,6 +21,7 @@ class TangentEmbed extends TangentLink {
 		
 		const content = document.createElement('span')
 		content.style.display = 'inline-flex'
+		content.style.textIndent = '0' // Defeats the default "revealed" textIndent funkiness.
 
 		shadow.appendChild(content)
 		

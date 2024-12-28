@@ -181,9 +181,11 @@ export function parseRawLink(char: string, parser: NoteParser): boolean {
 		const { feed, builder } = parser
 		const { index: lastLetterIndex } = feed.findWhile(/[A-Za-z]/, feed.index - 1, -1)
 
-		const isAtStartOfContent = builder.spans.length === 0 || builder.spans[0].attributes.indent
-		
+		// Close old data
 		parser.commitSpan(null, lastLetterIndex - feed.index)
+
+		const isAtStartOfContent = builder.spans.length === 0 || builder.spans[0].attributes.line_format === 'indent'
+
 		feed.consumeUntil(' ')
 		const t_link: HrefFormedLink & { block?: boolean } = {
 			href: feed.substring(lastLetterIndex, feed.index),
@@ -192,13 +194,18 @@ export function parseRawLink(char: string, parser: NoteParser): boolean {
 
 		const nextSpan: AttributeMap = { t_link }
 
-		if (isAtStartOfContent && feed.currentChar === '\n') {
+		const restOfLine = feed.getLineText()
+
+		if (isAtStartOfContent && !restOfLine.trim()) {
 			t_link.block = true
-			
+
 			// Allow raw links on their own lines to be implicit embeds
 			nextSpan.t_embed = true
 			nextSpan.hidden = true
 			nextSpan.link_internal = true
+
+			// Consume all whitespace.
+			feed.nextByLength(restOfLine.length)
 		}
 
 		parser.commitSpan(nextSpan, 0)

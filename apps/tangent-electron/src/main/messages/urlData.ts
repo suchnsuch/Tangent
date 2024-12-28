@@ -27,14 +27,11 @@ function getOrCacheUrlData(url: string): Promise<UrlData> {
 	if (isExternalLink(url)) {
 		log.info('Loading preview for ' + chalk.grey(url))
 		promise = getLinkPreview(url, {
-			followRedirects: 'manual',
-			handleRedirects: (baseUrl: string, forwardedUrl: string) => {
-				const base = new URL(baseUrl)
-				const forward = new URL(forwardedUrl)
-				return forward.hostname === base.hostname ||
-					forward.hostname === "www." + base.hostname ||
-					"www." + forward.hostname === base.hostname
-			}
+			followRedirects: 'follow'
+		})
+
+		promise.catch(error => {
+			log.warn('Error while fetching data for ' + chalk.gray(url) + ': ' + chalk.red(error))
 		})
 	}
 	else {
