@@ -163,7 +163,7 @@ export function parseCodeBlock(char: string, parser: NoteParser): boolean {
 	if (hitEnd) {
 		parser.commitSpan({
 			line_format: 'code',
-			hiddenGroup: true,
+			hidden: true,
 			end: true
 		}, 0)
 		builder.dropOpenLineFormat('code')
