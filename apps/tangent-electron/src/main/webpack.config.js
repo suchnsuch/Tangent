@@ -45,6 +45,7 @@ module.exports = {
 		'font-list': 'commonjs font-list',
 		'yargs': 'commonjs yargs',
 		'yargs/helpers': 'commonjs yargs/helpers',
+		'link-preview-js': 'commonjs link-preview-js'
 	},
 	mode,
 	// Good source maps in prod, faster-ish maps in dev: https://webpack.js.org/configuration/devtool/#devtool
