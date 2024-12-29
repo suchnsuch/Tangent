@@ -3,7 +3,7 @@ Tangent uses a semi-custom flavor of markdown for formatting. You can:
 - Insert [[Headers]]
 - Use [[Bold and Italics]]
 - Insert [[Lists]] and [[Todos]]
-- Embed [[Images]]
+- [[Embedding|Embed Images (and other content)]]
 - Insert [[Code]]
 - Render [[KaTeX Equations]] for beautiful math
 - Add [[Tags]]
