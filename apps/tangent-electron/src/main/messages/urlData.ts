@@ -32,6 +32,7 @@ function getOrCacheUrlData(url: string): Promise<UrlData> {
 
 		promise.catch(error => {
 			log.warn('Error while fetching data for ' + chalk.gray(url) + ': ' + chalk.red(error))
+			previewCache.delete(url)
 		})
 	}
 	else {
