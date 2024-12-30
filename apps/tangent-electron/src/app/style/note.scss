@@ -586,13 +586,14 @@ t-link {
 			padding: 0 .2em;
 		}
 	}
+}
 
+t-link[form="wiki"] {
 	.revealed, :not(.hidden) {
 		&.start, &.end {
-			font-size: 50%;
+			// Shift the [[ and ]] brackets down a touch to better wrap the text
 			position: relative;
 			top: -.05em;
-			line-height: 50%;
 		}
 	}
 }
