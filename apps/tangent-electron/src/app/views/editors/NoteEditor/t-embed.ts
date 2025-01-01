@@ -3,19 +3,15 @@ import { StructureType } from 'common/indexing/indexTypes'
 import { isExternalLink } from 'common/links'
 
 import EmbedRoot from './EmbedRoot.svelte'
-import TangentLink from './t-link'
+import TangentLink, { LinkState } from './t-link'
 import { markAsSelectionRequest } from 'app/events'
 import { deepEqual } from 'fast-equals'
-import type { Readable } from 'svelte/store'
 import { HandleResult } from 'app/model/NodeHandle'
 
 class TangentEmbed extends TangentLink {
 
 	private content: HTMLElement
 	private component: EmbedRoot
-
-	private nodeHandle: Readable<HandleResult>
-	private unsubHandle: () => void
 
 	private willUpdateState = false
 
@@ -29,7 +25,6 @@ class TangentEmbed extends TangentLink {
 		shadow.appendChild(style)
 
 		const content = document.createElement('span')
-		content.style.display = 'inline-flex'
 		content.style.textIndent = '0' // Defeats the default "revealed" textIndent funkiness.
 		shadow.appendChild(content)
 		
@@ -60,6 +55,7 @@ class TangentEmbed extends TangentLink {
 				// attributes
 				if (newValue !== this.linkState) {
 					this.setAttribute(name, this.linkState)
+					this.setParentLinkStateClass(this.linkState)
 				}
 				break
 			case 'href':
@@ -69,6 +65,17 @@ class TangentEmbed extends TangentLink {
 				this.requestUpdateState()
 				break
 		}
+	}
+
+	setLinkState(value: LinkState, context: HandleResult) {
+		super.setLinkState(value, context)
+		this.setParentLinkStateClass(value)
+	}
+
+	setParentLinkStateClass(value: LinkState) {
+		const list = this.parentElement.classList
+		list.remove('uninitialized', 'empty', 'resolved', 'ambiguous', 'untracked', 'external', 'error')
+		list.add(value)
 	}
 
 	requestUpdateState() {
@@ -85,8 +92,6 @@ class TangentEmbed extends TangentLink {
 		// Collect props
 		const link = this.getLinkInfo()
 		const block = this.getAttribute('block') === 'true'
-
-		this.content.style.display = block ? 'flex' : 'inline-flex'
 
 		if (this.component) {
 			const component = this.component

@@ -637,6 +637,14 @@ t-link[form="wiki"] {
 	}
 }
 
+.t-embed.error {
+	.hidden {
+		font-size: unset;
+		line-height: unset;
+		tab-size: unset;
+	}
+}
+
 t-embed {
 	&[link-state="error"] {
 		color: var(--emptyLinkTextColor);

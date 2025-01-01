@@ -1,5 +1,9 @@
-:host {
+:host > span {
+	display: inline-flex;
+}
 
+:host-context([block="true"]:not([link-state="error"])) > span {
+	display: flex;
 }
 
 .website-preview {
