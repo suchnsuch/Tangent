@@ -61,6 +61,7 @@ export interface MarkdownParsingOptions {
 	/** Pulls in context for links */
 	detailedLinks?: boolean
 	parseFrontMatter?: boolean
+	autoEmbedRawLinks?: boolean
 
 	documentStartLine?: number
 	documentEndLine?: number

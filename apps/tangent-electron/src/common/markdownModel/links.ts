@@ -180,9 +180,15 @@ export function parseRawLink(char: string, parser: NoteParser): boolean {
 	if (char === ':' && parser.feed.checkFor('://', false)) {
 		const { feed, builder } = parser
 		const { index: lastLetterIndex } = feed.findWhile(/[A-Za-z]/, feed.index - 1, -1)
+		let firstChar = lastLetterIndex
+
+		let isEmbed = feed.peek(lastLetterIndex - 1 - feed.index) === '!'
+		if (isEmbed) {
+			firstChar--
+		}
 
 		// Close old data
-		parser.commitSpan(null, lastLetterIndex - feed.index)
+		parser.commitSpan(null, firstChar - feed.index)
 
 		const isAtStartOfContent = builder.spans.length === 0 || builder.spans[0].attributes.line_format === 'indent'
 
@@ -197,14 +203,17 @@ export function parseRawLink(char: string, parser: NoteParser): boolean {
 		const restOfLine = feed.getLineText()
 
 		if (isAtStartOfContent && !restOfLine.trim()) {
-			t_link.block = true
+			isEmbed = isEmbed || parser.autoEmbedRawLinks
+			t_link.block = isEmbed
+		}
 
-			// Allow raw links on their own lines to be implicit embeds
+		if (isEmbed) {
 			nextSpan.t_embed = true
 			nextSpan.hidden = true
 			nextSpan.link_internal = true
+		}
 
-			// Consume all whitespace.
+		if (t_link.block) {
 			feed.nextByLength(restOfLine.length)
 		}
 

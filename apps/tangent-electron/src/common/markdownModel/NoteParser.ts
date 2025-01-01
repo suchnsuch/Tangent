@@ -55,6 +55,7 @@ export interface MarkdownParsingOptions {
 	/** Pulls in context for links */
 	detailedLinks?: boolean
 	parseFrontMatter?: boolean
+	autoEmbedRawLinks?: boolean
 
 	documentStartLine?: number
 	documentEndLine?: number
@@ -66,7 +67,9 @@ export default class NoteParser {
 
 	contexts: ParsingContext[] = []
 
+	readonly options: MarkdownParsingOptions
 	readonly detailedLinks: boolean
+	readonly autoEmbedRawLinks: boolean
 	readonly filepath: string
 	readonly parseFrontMatter: boolean
 
@@ -87,7 +90,9 @@ export default class NoteParser {
 		this.feed = feed
 		this.builder = new LinesBuilder(options)
 
+		this.options = options
 		this.detailedLinks = options?.detailedLinks ?? false
+		this.autoEmbedRawLinks = options?.autoEmbedRawLinks ?? true
 		this.filepath = options?.filepath
 		this.parseFrontMatter = options?.parseFrontMatter ?? false
 

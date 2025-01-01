@@ -366,6 +366,12 @@ export default class Settings extends ObjectStore {
 		defaultValue: false
 	})
 
+	rawLinksAutoEmbed = new Setting<boolean>({
+		name: 'Auto Embed Raw Links',
+		description: 'When on, raw links on their own line are automatically treated as embed links (Requires Window Reload).',
+		defaultValue: true
+	})
+
 	// Writing
 	italicsCharacters = new Setting<string>({
 		name: 'Default Italics Characters',
