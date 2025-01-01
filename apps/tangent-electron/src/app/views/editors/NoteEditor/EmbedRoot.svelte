@@ -126,8 +126,11 @@ function onNodeHandleChanged(value: HandleResult) {
 		error((value as UrlDataError).message)
 	}
 	else {
-		console.log('unhandled form!', value)
-		error('Unhandled form! ' + value.mediaType)
+		// Fall back to website info
+		form = {
+			mode: 'website',
+			...value as WebsiteData
+		}
 	}
 	formDispatcher('form', form)
 }
@@ -201,7 +204,7 @@ function websiteImageStyle(form: WebsiteData) {
 	<!-- svelte-ignore a11y-media-has-caption -->
 	<video controls src={form.src} style={getBaseStyle()} />
 {:else if form.mode === 'website'}
-	<div class="website-preview" class:description={form.description} style={websiteStyle(form)}>
+	<div class={'website-preview ' + form.mediaType} class:description={form.description} style={websiteStyle(form)}>
 		<div class="info">
 			<h1>{form.title.trim()}</h1>
 			{#if form.description}

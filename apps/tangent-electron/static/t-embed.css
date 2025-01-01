@@ -18,6 +18,7 @@
 	.info {
 
 		padding: 0 1em;
+		white-space: normal;
 
 		h1 {
 			font-size: 1.2em;
@@ -46,7 +47,7 @@
 		grid-column: 1;
 
 		display: flex;
-		padding: .15em 1em;
+		padding: .67em 1em .15em;
 		align-items: center;
 		gap: .25em;
 		overflow: hidden;

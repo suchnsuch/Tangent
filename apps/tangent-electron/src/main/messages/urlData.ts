@@ -27,7 +27,11 @@ function getOrCacheUrlData(url: string): Promise<UrlData> {
 	if (isExternalLink(url)) {
 		log.info('Loading preview for ' + chalk.grey(url))
 		promise = getLinkPreview(url, {
-			followRedirects: 'follow'
+			followRedirects: 'follow',
+			headers: {
+				// Helps with sites blocking automated traffic
+				'user-agent': 'googlebot'
+			}
 		}).catch(error => {
 			log.warn('Error while fetching data for ' + chalk.gray(url) + ': ' + chalk.red(error))
 			previewCache.delete(url)

@@ -7,7 +7,7 @@ I should be able to get a preview for any link with markdown:
 https://developer.mozilla.org/en-US/docs/Web/CSS/text-shadow
 
 Errors should make the text visible:
-https://www.lego.com/en-us/product/tales-of-the-space-age-21340
+https://foo.bar
 
 # Media
 ## Youtube
