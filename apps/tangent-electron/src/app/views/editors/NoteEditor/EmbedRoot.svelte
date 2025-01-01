@@ -6,7 +6,7 @@ import type { Workspace } from 'app/model'
 import type EmbedFile from 'app/model/EmbedFile'
 import { ForwardingStore } from 'common/stores'
 import { HandleResult, isNode } from 'app/model/NodeHandle'
-import { UrlData, WebsiteData } from 'common/urlData'
+import type { UrlData, UrlDataError, WebsiteData } from 'common/urlData'
 
 type Form = {
 	mode: 'error'
@@ -121,6 +121,9 @@ function onNodeHandleChanged(value: HandleResult) {
 		else {
 			error('Bad youtube link!')
 		}
+	}
+	else if (value.mediaType === 'error') {
+		error((value as UrlDataError).message)
 	}
 	else {
 		console.log('unhandled form!', value)

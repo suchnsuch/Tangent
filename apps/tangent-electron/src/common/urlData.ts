@@ -11,4 +11,9 @@ export type WebsiteData = {
 	favicons: string[]
 }
 
-export type UrlData = Awaited<ReturnType<typeof getLinkPreview>>
+export type UrlDataError = {
+	mediaType: 'error',
+	message: string
+}
+
+export type UrlData = Awaited<ReturnType<typeof getLinkPreview>> | UrlDataError

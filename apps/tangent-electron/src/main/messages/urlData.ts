@@ -28,11 +28,13 @@ function getOrCacheUrlData(url: string): Promise<UrlData> {
 		log.info('Loading preview for ' + chalk.grey(url))
 		promise = getLinkPreview(url, {
 			followRedirects: 'follow'
-		})
-
-		promise.catch(error => {
+		}).catch(error => {
 			log.warn('Error while fetching data for ' + chalk.gray(url) + ': ' + chalk.red(error))
 			previewCache.delete(url)
+			return {
+				mediaType: 'error',
+				message: 'Preview ' + error
+			}
 		})
 	}
 	else {
