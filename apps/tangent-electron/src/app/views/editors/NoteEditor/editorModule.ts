@@ -415,7 +415,7 @@ export default function editorModule(editor: Editor, options: {
 			let result = parseMarkdown(doc, {
 				filepath,
 				asFormatting: true, // This gives us a line that is just attributed retains
-				autoEmbedRawLinks: workspace.settings.rawLinksAutoEmbed.value,
+				autoEmbedRawLinks: workspace?.settings.rawLinksAutoEmbed.value,
 				documentStartLine: firstIndex,
 				documentEndLine: lastIndex
 			})
