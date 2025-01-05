@@ -944,7 +944,7 @@ export function parseMarkdown_legacy(source: string | TextDocument, options?: Ma
 		}
 		else if (char === ':' && feed.checkFor('://', false)) {
 			// Handle raw links
-			const { index: lastLetterIndex, foundMatch: foundLastSpace } = feed.findWhile(/[A-Za-z]/, feed.index - 1, -1)
+			const lastLetterIndex = feed.findWhile(/[A-Za-z]/, feed.index - 1, -1)
 
 			commitSpan(lastLetterIndex - feed.index)
 

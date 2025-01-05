@@ -238,12 +238,16 @@ export default class CharacterFeeder {
 	}
 
 	/**
-	 * Searches text in a given direction so long as each character passes a regex match
+	 * Searches text in a given direction so long as each character passes a regex match.
+	 * @param match The match that each character will be checked against.
+	 * @param start The index from which checking will start. Defaults to the current index.
+	 * @param direction The direction in which checking goes.
+	 * @param stopOnNewLine Whether or not to stop looking when `\n` is found.
+	 * @returns The last index
 	 */
-	findWhile(match: RegExp, start?: number, direction:1|-1 = 1, stopOnNewLine = true) {
+	findWhile(match: RegExp, start?: number, direction:1|-1 = 1, stopOnNewLine = true): number {
 		start = start ?? this.index
 		let index = start
-		let foundMatch = false
 		while (index >= 0 && index < this.text.length) {
 			const char = this.text[index]
 			if (stopOnNewLine && char === '\n') {
@@ -251,7 +255,6 @@ export default class CharacterFeeder {
 				break
 			}
 			if (char.match(match)) {
-				foundMatch = true
 				index += direction
 			}
 			else {
@@ -260,10 +263,7 @@ export default class CharacterFeeder {
 			}
 		}
 
-		return {
-			index,
-			foundMatch
-		}
+		return index
 	}
 
 	findBehind(value: string, start?: number, stopOnNewLine=true) {

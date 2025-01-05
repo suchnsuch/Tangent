@@ -179,7 +179,7 @@ export function resolveLink(store: DefaultIndexStore, link: HrefFormedLink): Tre
 export function parseRawLink(char: string, parser: NoteParser): boolean {
 	if (char === ':' && parser.feed.checkFor('://', false)) {
 		const { feed, builder } = parser
-		const { index: lastLetterIndex } = feed.findWhile(/[A-Za-z]/, feed.index - 1, -1)
+		const lastLetterIndex = feed.findWhile(/[A-Za-z]/, feed.index - 1, -1)
 		let firstChar = lastLetterIndex
 
 		let isEmbed = feed.peek(lastLetterIndex - 1 - feed.index) === '!'
