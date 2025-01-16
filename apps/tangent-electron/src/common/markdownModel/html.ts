@@ -59,6 +59,9 @@ export function parseHtml(char: string, parser: NoteParser): boolean {
 			builder.addOpenBlockFormat('html', {
 				inline_code: 'html'
 			})
+			builder.addOpenLineFormat('html', {
+				html: true
+			})
 		}
 
 		parser.commitSpan(PUNCTUATION_ATTRIBUTES)
@@ -77,6 +80,9 @@ export function parseHtml(char: string, parser: NoteParser): boolean {
 			programs: [],
 			exit: hasBlockFormat ? null : (_, __, parser) => {
 				parser.builder.dropOpenBlockFormat('html')
+				// We want to drop the line format but ensure that this line is marked as html
+				parser.builder.dropOpenLineFormat('html')
+				parser.lineData.html = true
 			}
 		})
 		// An inner context for parsing the tag's content

@@ -30,9 +30,11 @@ export function lineHasMultiLineContext(line: Line) {
 }
 
 export function lineIsMultiLineFormat(line: Line) {
-	if ('code' in line.attributes
-		|| 'front_matter' in line.attributes
-		|| 'math' in line.attributes) {
+	if ('code' in line.attributes ||
+		'front_matter' in line.attributes ||
+		'math' in line.attributes ||
+		'html' in line.attributes
+	) {
 		return true
 	}
 	return false
