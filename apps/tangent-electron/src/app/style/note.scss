@@ -273,6 +273,10 @@ article.note {
 			// This fixes an issue where the code was shifting other text down slightly
 			line-height: 1em;
 		}
+
+		&.html {
+			color: unset;
+		}
 	}
 
 	.line_format.code.start:not(.hidden):not(.revealed) {
@@ -310,7 +314,7 @@ article.note {
 		}
 	}
 
-	span.tag {
+	span.tag:not(.token) {
 		font-size: 90%;
 		font-weight: 300;
 
@@ -502,6 +506,11 @@ article.note {
 			}
 		}
 	}
+}
+
+.code_syntax.invalid {
+	text-decoration: underline;
+	text-decoration-color: red;
 }
 
 // Options

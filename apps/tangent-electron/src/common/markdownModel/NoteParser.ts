@@ -13,6 +13,7 @@ import { ParsingContext, ParsingContextType, ParsingProgram } from './parsingCon
 import { parseTag } from './tag'
 import { parseCodeBlock, parseInlineCode, readCodeLines } from './code'
 import { getLanguage } from './codeSyntax'
+import { parseHtml } from './html'
 
 const blockPrograms: ParsingProgram[] = [
 	parseHeader,
@@ -28,7 +29,8 @@ const inlineObjectPrograms = [
 	parseLink,
 	parseRawLink,
 	parseTag,
-	parseComment
+	parseComment,
+	parseHtml
 ]
 
 // i.e. programs that could be inside e.g. a link
