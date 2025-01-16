@@ -165,7 +165,7 @@ export function parseComment(char: string, parser: NoteParser): boolean {
 
 		// Handle Comments
 		// Clear all old open formats. Comments defeat everything
-		builder.openFormats = {}
+		builder.openLineScopedFormats = {}
 		builder.addOpenFormat('comment', {
 			line_comment: true
 		})

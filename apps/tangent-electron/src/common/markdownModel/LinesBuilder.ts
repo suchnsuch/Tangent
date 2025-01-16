@@ -11,7 +11,10 @@ export default class LinesBuilder {
 	lines: Line[] = []
 	spans = []
 
-	openFormats: { [key: string]: AttributeMap } = {}
+	// Inline formats cleared by a newline
+	openLineScopedFormats: { [key: string]: AttributeMap } = {}
+	// Inline formats not cleared by a newline
+	openBlockScopedFormats: { [key: string]: AttributeMap } = {}
 	openLineFormats: { [key: string]: AttributeMap } = {}
 
 	constructor(options?: LinesBuilderOptions) {
@@ -27,7 +30,10 @@ export default class LinesBuilder {
 			Object.assign(finalAttributes, negativeInlineFormats)
 		}
 
-		Object.assign(finalAttributes, ...Object.values(this.openFormats), attributes)
+		Object.assign(finalAttributes,
+			...Object.values(this.openBlockScopedFormats),
+			...Object.values(this.openLineScopedFormats),
+			attributes)
 
 		if (this.outputFormattingRetains) {
 			this.spans.push({
@@ -59,19 +65,31 @@ export default class LinesBuilder {
 
 		this.lines.push(Line.create(new Delta(this.spans), finalAttributes))
 		this.spans = []
-		this.openFormats = {}
+		this.openLineScopedFormats = {}
 	}
 
 	addOpenFormat(key: string, attributes: AttributeMap) {
-		this.openFormats[key] = attributes
+		this.openLineScopedFormats[key] = attributes
 	}
 
 	hasOpenFormat(key: string) {
-		return key in this.openFormats
+		return key in this.openLineScopedFormats
 	}
 
 	dropOpenFormat(key: string) {
-		delete this.openFormats[key]
+		delete this.openLineScopedFormats[key]
+	}
+
+	addOpenBlockFormat(key: string, attributes: AttributeMap) {
+		this.openBlockScopedFormats[key] = attributes
+	}
+
+	hasOpenBlockFormat(key: string) {
+		return key in this.openBlockScopedFormats
+	}
+
+	dropOpenBlockFormat(key: string) {
+		delete this.openBlockScopedFormats[key]
 	}
 
 	addOpenLineFormat(key: string, attributes: AttributeMap) {

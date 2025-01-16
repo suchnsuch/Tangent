@@ -693,7 +693,7 @@ export function parseMarkdown_legacy(source: string | TextDocument, options?: Ma
 			commitSpan(0)
 			// Handle Comments
 			// Clear all old open formats. Comments defeat everything
-			builder.openFormats = {}
+			builder.openLineScopedFormats = {}
 			builder.addOpenFormat('comment', {
 				line_comment: true
 			})
