@@ -4,7 +4,7 @@
 	"copyright": "Copyright © 2022 Taylor Hadden",
 
 	"generateUpdatesFilesForAllChannels": true,
-	"electronVersion": "33.0.2",
+	"electronVersion": "34.0.0",
 
 	"files": [
 		"node_modules/**/*",
