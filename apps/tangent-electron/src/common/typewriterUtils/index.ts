@@ -339,3 +339,33 @@ export function getLineRangeWhile(
 
 	return [start, end]
 }
+
+/**
+ * Creates an ops list from a dual-typed list of insert strings and their attributes.
+ * Significantly cuts down on the number of lines needed. Great for tests.
+ * @param list A list of insert values & their attributes. Any attribute objects come after their insert strings.
+ * @param insertBlankAttributes Whether or not ops with no attributes should have a blank object added
+ * @returns 
+ */
+export function buildOpsFromInsertList(
+	list: (string | AttributeMap)[],
+	insertBlankAttributes=false
+): Op[] {
+	const result: Op[] = []
+
+	let lastOp: Op = null
+	for (const item of list) {
+		if (typeof item === 'string') {
+			if (insertBlankAttributes && lastOp && !lastOp.attributes) lastOp.attributes = {}
+			lastOp = { insert: item }
+			result.push(lastOp)
+		}
+		else {
+			lastOp.attributes = item
+		}
+	}
+
+	if (insertBlankAttributes && lastOp && !lastOp.attributes) lastOp.attributes = {}
+
+	return result
+}

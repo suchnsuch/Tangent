@@ -2,7 +2,7 @@ import { describe, test, expect, it } from 'vitest'
 
 import * as parser from './parser'
 import { TextDocument, Line, Delta } from '@typewriter/document'
-import { typewriterToText } from 'common/typewriterUtils'
+import { buildOpsFromInsertList, typewriterToText } from 'common/typewriterUtils'
 import { StructureType } from 'common/indexing/indexTypes'
 
 function ensureLine(line: Line, content: string) {
@@ -164,43 +164,28 @@ describe('Formatting', () => {
 		const { lines } = parser.parseMarkdown('Some `simple code` formatting')
 		const ops = lines[0].content.ops
 
-		expect(ops).toEqual([
-			{
-				insert: 'Some ',
-				attributes: {}
+		expect(ops).toEqual(buildOpsFromInsertList([
+			'Some ',
+			'`', {
+				inline_code: true,
+				hidden: true,
+				hiddenGroup: true,
+				start: true
 			},
-			{
-				insert: '`',
-				attributes: {
-					inline_code: true,
-					hidden: true,
-					hiddenGroup: true,
-					start: true
-				}
+			'simple code', {
+				inline_code: true,
+				hiddenGroup: true,
+				afterSpace: true,
+				beforeSpace: true
 			},
-			{
-				insert: 'simple code',
-				attributes: {
-					inline_code: true,
-					hiddenGroup: true,
-					afterSpace: true,
-					beforeSpace: true
-				}
+			'`', {
+				inline_code: true,
+				hidden: true,
+				hiddenGroup: true,
+				end: true
 			},
-			{
-				insert: '`',
-				attributes: {
-					inline_code: true,
-					hidden: true,
-					hiddenGroup: true,
-					end: true
-				}
-			},
-			{
-				insert: ' formatting',
-				attributes: {}
-			}
-		])
+			' formatting'
+		], true))
 	})
 })
 
@@ -218,36 +203,21 @@ describe('Link parsing', () => {
 				href: 'Simple Link'
 			})
 
-			expect(ops).toMatchObject([
-				{
-					insert: 'Some '
+			expect(ops).toMatchObject(buildOpsFromInsertList([
+				'Some ',
+				'[[', {
+					t_link,
+					start: true,
+					hidden: true
 				},
-				{
-					insert: '[[',
-					attributes: {
-						t_link,
-						start: true,
-						hidden: true
-					}
+				'Simple Link', { t_link },
+				']]', {
+					t_link,
+					end: true,
+					hidden: true
 				},
-				{
-					insert: 'Simple Link',
-					attributes: {
-						t_link
-					}
-				},
-				{
-					insert: ']]',
-					attributes: {
-						t_link,
-						end: true,
-						hidden: true
-					}
-				},
-				{
-					insert: ' in text'
-				}
-			])
+				' in text'
+			]))
 
 			expect(structure).toEqual([{
 				type: StructureType.Link,
@@ -263,75 +233,42 @@ describe('Link parsing', () => {
 
 			const t_link = ops[1].attributes.t_link
 
-			expect(ops).toMatchObject([
-				{ insert: 'A '},
-				{
-					insert: '[[',
-					attributes: {
-						t_link,
-						hidden: true
-					}
+			expect(ops).toMatchObject(buildOpsFromInsertList([
+				'A ',
+				'[[', {
+					t_link,
+					hidden: true
 				},
-				{
-					insert: 'Simple Link',
-					attributes: {
-						t_link,
-						hidden: true
-					}
+				'Simple Link', {
+					t_link,
+					hidden: true
 				},
-				{
-					insert: '|',
-					attributes: {
-						t_link,
-						hidden: true
-					}
+				'|', {
+					t_link,
+					hidden: true
 				},
-				{
-					insert: 'link with ',
-					attributes: {
-						t_link
-					}
+				'link with ', { t_link },
+				'_', {
+					t_link,
+					italic: true,
+					hidden: true
 				},
-				{
-					insert: '_',
-					attributes: {
-						t_link,
-						italic: true,
-						hidden: true
-					}
+				'inline', {
+					t_link,
+					italic: true
 				},
-				{
-					insert: 'inline',
-					attributes: {
-						t_link,
-						italic: true
-					}
+				'_', {
+					t_link,
+					italic: true,
+					hidden: true
 				},
-				{
-					insert: '_',
-					attributes: {
-						t_link,
-						italic: true,
-						hidden: true
-					}
+				' formatting', { t_link },
+				']]', {
+					t_link,
+					hidden: true
 				},
-				{
-					insert: ' formatting',
-					attributes: {
-						t_link
-					}
-				},
-				{
-					insert: ']]',
-					attributes: {
-						t_link,
-						hidden: true
-					}
-				},
-				{
-					insert: ' in text'
-				}
-			])
+				' in text'
+			]))
 		})
 
 		it('Should support multiple links in a single line', () => {
@@ -387,63 +324,18 @@ describe('Link parsing', () => {
 				text: 'link with _inline_ formatting'
 			})
 
-			expect(ops).toMatchObject([
-				{ insert: 'A ' },
-				{
-					insert: '[',
-					attributes: {
-						t_link
-					}
-				},
-				{
-					insert: 'link with ',
-					attributes: {
-						t_link
-					}
-				},
-				{
-					insert: '_',
-					attributes: {
-						t_link,
-						italic: true
-					}
-				},
-				{
-					insert: 'inline',
-					attributes: {
-						t_link,
-						italic: true
-					}
-				},
-				{
-					insert: '_',
-					attributes: {
-						t_link,
-						italic: true
-					}
-				},
-				{
-					insert: ' formatting',
-					attributes: {
-						t_link
-					}
-				},
-				{
-					insert: '](https://google.com',
-					attributes: {
-						t_link
-					}
-				},
-				{
-					insert: ')',
-					attributes: {
-						t_link
-					}
-				},
-				{
-					insert: ' in text'
-				}
-			])
+			expect(ops).toMatchObject(buildOpsFromInsertList([
+				'A ',
+				'[', { t_link },
+				'link with ', { t_link },
+				'_', { t_link, italic: true },
+				'inline', { t_link, italic: true },
+				'_', { t_link, italic: true },
+				' formatting', { t_link },
+				'](https://google.com', { t_link },
+				')', { t_link },
+				' in text'
+			]))
 		})
 	})
 
