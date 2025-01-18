@@ -229,6 +229,12 @@ h1 {
 			font-weight: 500;
 		}
 
+		.info {
+			color: var(--deemphasizedTextColor);
+			padding: 1em 3em;
+			margin: 0;
+		}
+
 		.settingsGroup {
 			margin-bottom: 1.5em;
 			border-spacing: .25em .5em;

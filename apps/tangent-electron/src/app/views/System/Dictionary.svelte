@@ -1,7 +1,7 @@
 <script lang="ts">
 import { getContext } from 'svelte'
 import { Workspace } from 'app/model'
-    import SvgIcon from '../smart-icons/SVGIcon.svelte';
+import SvgIcon from '../smart-icons/SVGIcon.svelte'
 
 const workspace = getContext('workspace') as Workspace
 
@@ -41,12 +41,6 @@ function deleteWord(word: string) {
 </main>
 
 <style lang="scss">
-.info {
-	color: var(--deemphasizedTextColor);
-	padding: 1em 3em;
-	margin: 0;
-}
-
 ul {
 	list-style: none;
 }

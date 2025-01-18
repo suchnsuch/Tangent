@@ -26,6 +26,8 @@ const dispatch = createEventDispatcher<{
 
 const workspace = getContext('workspace') as Workspace
 
+const needsAltToScroll = workspace.settings.cardViewCardsHoldAltToScroll
+
 export let state: CardsViewState
 export let extraTop: number = 0
 
@@ -63,11 +65,12 @@ function nodeClick(event, ref: TreeNodeOrReference) {
 }
 </script>
 
-<div class="cards" class:layout-fill={layout === 'fill'}
+<div class="cards" class:layout-fill={layout === 'fill'} class:needs-alt={$needsAltToScroll}
 	style:padding-top={`${extraTop}px`}
 	style:--noteBackgroundColor="var(--backgroundColor)"
 >
 	<!-- svelte-ignore a11y-click-events-have-key-events -->
+	<!-- svelte-ignore a11y-no-static-element-interactions -->
 	<LazyScrolledList
 		items={$items}
 		mode="append"
@@ -193,6 +196,15 @@ function nodeClick(event, ref: TreeNodeOrReference) {
 			padding: unset;
 		}
 	}	
+}
+
+// Block scrolling of note cards...
+.cards.needs-alt :global(.card) :global(.noteEditor) {
+	overflow-y: hidden;
+}
+// ...unless alt is pressed
+:global(.alt-pressed) .cards.needs-alt :global(.card) :global(.noteEditor) {
+	overflow-y: auto;
 }
 
 .folderCard {

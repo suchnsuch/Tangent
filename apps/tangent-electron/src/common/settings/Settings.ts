@@ -238,6 +238,13 @@ export default class Settings extends ObjectStore {
 		defaultValue: true
 	})
 
+	// Sets
+	cardViewCardsHoldAltToScroll = new Setting<boolean>({
+		name: 'Cards Scroll With Alt',
+		description: 'When enabled, the content of cards in a card lens will not scroll unless you hold alt. When disabled, cards will always be scrollable',
+		defaultValue: true
+	})
+
 	// Notes
 	noteMargins = new Setting<string>({
 		name: 'Margins',

@@ -161,7 +161,7 @@ function toggleItem(item) {
 	<h2
 		title={setting.description}
 		on:click={headerClick}
-	>{name ?? setting.name}</h2>
+	>{@html name ?? setting.name}</h2>
 	<!-- svelte-ignore a11y-no-static-element-interactions -->
 	<div
 		class="value grow"
@@ -284,8 +284,8 @@ h2 {
 	font-size: 1.0em;
 	font-weight: normal;
 	margin: 0;
-	line-height: 1em;
-	padding: .5em;
+	line-height: 1.25em;
+	padding: .25em;
 	white-space: pre;
 	.inline & {
 		padding-right: .25em;

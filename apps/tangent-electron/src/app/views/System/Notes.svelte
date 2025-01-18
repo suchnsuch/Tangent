@@ -55,6 +55,9 @@ async function getSpellCheckLanguages() {
 		<SettingView setting={settings.fixedTitle} />
 		<SettingView setting={settings.hangingHeaders} />
 	</div>
+	<div class="settingsGroup">
+		<SettingView setting={settings.cardViewCardsHoldAltToScroll} name="Require Alt to Scroll Cards" />
+	</div>
 
 	<h2>Editing</h2>
 	<div class="settingsGroup">
