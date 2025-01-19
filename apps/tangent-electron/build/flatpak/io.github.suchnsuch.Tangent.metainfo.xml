@@ -96,5 +96,15 @@
         <p>Initial Flatpak release</p>
       </description>
     </release>
+    <release version="0.8.4" date="2025-01-19">
+      <description>
+        <ul>
+          <li>Updated to Electron v34.0.0.</li>
+          <li>Fixed an issue where autocomplete menus were not dismissed by clicking outside of the menu.</li>
+          <li>Fixed an issue where query refreshes could be caused by routine internal file changes within the `.tangent` folder.</li>
+          <li>Removed donation links in compliance with new work terms.</li>
+        </ul>
+      </description>
+    </release>
   </releases>
 </component>
