@@ -96,19 +96,12 @@
         <p>Initial Flatpak release</p>
       </description>
     </release>
-    <release version="0.8.2" date="2024-11-05">
+    <release version="0.8.4" date="2025-01-19">
       <description>
         <ul>
-          <li>Updated Electron to 33.0.2, fixing an issue on Windows with filenames containing emoji.</li>
-          <li>Tweaked button styling on hover to be more obvious.</li>
+          <li>Updated to Electron v34.0.0.</li>
           <li>Fixed an issue where autocomplete menus were not dismissed by clicking outside of the menu.</li>
           <li>Fixed an issue where query refreshes could be caused by routine internal file changes within the `.tangent` folder.</li>
-        </ul>
-      </description>
-    </release>
-    <release version="0.8.3" date="2024-11-28">
-      <description>
-        <ul>
           <li>Removed donation links in compliance with new work terms.</li>
         </ul>
       </description>
