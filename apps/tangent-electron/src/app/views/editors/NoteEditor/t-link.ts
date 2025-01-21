@@ -137,15 +137,15 @@ class TangentLink extends HTMLElement {
 			}
 		}
 		else if (value) {
-			if (isNode(value)) {
+			if (!isNode(value)) {
+				newState = 'external'
+			}
+			else if (!value.meta?.virtual) {
 				let contentId = this.getAttribute('content_id')
 				if (contentId) {
 					// TODO
 				}
 				newState = 'resolved'
-			}
-			else {
-				newState = 'external'
 			}
 		}
 
