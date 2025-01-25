@@ -93,7 +93,8 @@ async function getSpellCheckLanguages() {
 			getValues={workspace.api.theme.getCodeThemes}
 			includeDefault={false}/>
 		<SettingView setting={settings.noteCodeBlockDarkTheme}
-			getValues={workspace.api.theme.getCodeThemes}/>
+			getValues={workspace.api.theme.getCodeThemes}
+			includeDefault={false}/>
 		<SettingView setting={settings.letCodeExpand} />
 	</div>
 </main>
