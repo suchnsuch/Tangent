@@ -111,7 +111,13 @@ export default interface WindowAPI {
 	}
 
 	settings: {
+		/** Applies a patch to the system settings */
 		patch(patch: any)
+	}
+
+	theme: {
+		getCodeThemes(): Promise<string[]>
+		getCodeTheme(name: string): Promise<{ block: string, tokens: string }>
 	}
 
 	documentation: {

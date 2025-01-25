@@ -193,6 +193,14 @@ let bridge: WindowApi = {
 			ipcRenderer.send('patchGlobalSettings', patch)
 		}
 	},
+	theme: {
+		getCodeThemes() {
+			return ipcRenderer.invoke('getCodeThemes')
+		},
+		getCodeTheme(name) {
+			return ipcRenderer.invoke('getCodeTheme', name)
+		},
+	},
 	documentation: {
 		open(name) {
 			ipcRenderer.invoke('documentation', 'open', name)

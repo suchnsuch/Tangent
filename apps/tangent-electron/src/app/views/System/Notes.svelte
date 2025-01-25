@@ -46,8 +46,6 @@ async function getSpellCheckLanguages() {
 	<div class="settingsGroup">
 		<SettingView setting={settings.noteFont}
 			getValues={workspace.api.system.getAllFonts} />
-		<SettingView setting={settings.noteCodeFont}
-			getValues={workspace.api.system.getAllFonts} />
 		<SettingView setting={settings.noteFontSize} name="Font Size" />
 		<SettingView setting={settings.lineHeight} />
 		<SettingView setting={settings.noteWidthMax} />
@@ -83,6 +81,19 @@ async function getSpellCheckLanguages() {
 
 	<h2>Code</h2>
 	<div class="settingsGroup">
+		<SettingView setting={settings.noteCodeFont}
+			getValues={workspace.api.system.getAllFonts}/>
+		<SettingView setting={settings.noteCodeInlineLightTheme}
+			getValues={workspace.api.theme.getCodeThemes}
+			includeDefault={false}/>
+		<SettingView setting={settings.noteCodeBlockLightTheme}
+			getValues={workspace.api.theme.getCodeThemes}
+			includeDefault={false}/>
+		<SettingView setting={settings.noteCodeInlineDarkTheme}
+			getValues={workspace.api.theme.getCodeThemes}
+			includeDefault={false}/>
+		<SettingView setting={settings.noteCodeBlockDarkTheme}
+			getValues={workspace.api.theme.getCodeThemes}/>
 		<SettingView setting={settings.letCodeExpand} />
 	</div>
 </main>

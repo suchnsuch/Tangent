@@ -283,6 +283,31 @@ export default class Settings extends ObjectStore {
 		defaultValue: ''
 	})
 
+	noteCodeInlineLightTheme = new Setting<string>({
+		name: 'Light Inline Code',
+		description: 'The code theme used for code integrated with other text while in light mode.',
+		form: 'select',
+		defaultValue: 'vscode-light'
+	})
+	noteCodeInlineDarkTheme = new Setting<string>({
+		name: 'Dark Inline Code',
+		description: 'The code theme used for code integrated with other text while in dark mode.',
+		form: 'select',
+		defaultValue: 'vscode-dark'
+	})
+	noteCodeBlockLightTheme = new Setting<string>({
+		name: 'Light Block Code',
+		description: 'The code theme used for code in its own block while in light mode.',
+		form: 'select',
+		defaultValue: 'vscode-light'
+	})
+	noteCodeBlockDarkTheme = new Setting<string>({
+		name: 'Dark Block Code',
+		description: 'The code theme used for code in its own block while in dark mode.',
+		form: 'select',
+		defaultValue: 'vscode-dark'
+	})
+
 	noteWidthMax = new Setting<number>({
 		name: 'Max Note Width',
 		description: 'Determines the maximum width of a note.',

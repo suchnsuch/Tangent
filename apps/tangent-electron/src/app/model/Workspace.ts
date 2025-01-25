@@ -41,6 +41,7 @@ import { HrefFormedLink } from 'common/indexing/indexTypes'
 import { Readable, derived, readable } from 'svelte/store'
 import NodeHandle, { HandleResult } from './NodeHandle'
 import { swapRemove } from '@such-n-such/core'
+import CodeThemeManager from 'app/style/CodeThemeManager'
 
 const menuContext = {}
 
@@ -74,6 +75,7 @@ export default class Workspace extends EventDispatcher {
 
 	private contextMenuCommands: Map<string, ContextMenuCommand>
 
+	codeThemeManager: CodeThemeManager
 	styleManager: CustomStyleManager
 
 	version: string
@@ -258,6 +260,7 @@ export default class Workspace extends EventDispatcher {
 
 		this.updateState = new UpdateState(api.update)
 
+		this.codeThemeManager = new CodeThemeManager(this)
 		this.styleManager = new CustomStyleManager(this)
 	}
 

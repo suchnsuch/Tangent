@@ -17,9 +17,9 @@ import { fillDateFormat } from 'common/dates'
 
 import './queries'
 import './dictionary'
+import './themes'
 import './urlData'
 import { FileSaveResult } from 'main/File'
-import { PromiseStarter } from '@such-n-such/core'
 
 const log = Logger.get('messages')
 
