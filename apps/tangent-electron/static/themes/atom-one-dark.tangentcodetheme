@@ -1,0 +1,179 @@
+<!-- Originally converted from prisms "prism-one-dark" -->
+
+<style id="block">
+code[class*="language-"],
+pre[class*="language-"] {
+	background: hsl(220, 13%, 18%);
+	color: hsl(220, 14%, 71%);
+	text-shadow: 0 1px rgba(0, 0, 0, 0.3);
+}
+
+pre[class*="language-"]::selection, pre[class*="language-"] ::selection,
+code[class*="language-"]::selection, code[class*="language-"] ::selection {
+	background: hsl(220, 13%, 28%);
+	color: inherit;
+	text-shadow: none;
+}
+</style>
+
+<style id="tokens">
+.token.comment,
+.token.prolog,
+.token.cdata {
+	color: hsl(220, 10%, 40%);
+}
+
+.token.doctype,
+.token.punctuation,
+.token.entity {
+	color: hsl(220, 14%, 71%);
+}
+
+.token.attr-name,
+.token.class-name,
+.token.boolean,
+.token.constant,
+.token.number,
+.token.atrule {
+	color: hsl(29, 54%, 61%);
+}
+
+.token.keyword {
+	color: hsl(286, 60%, 67%);
+}
+
+.token.property,
+.token.tag,
+.token.symbol,
+.token.deleted,
+.token.important {
+	color: hsl(355, 65%, 65%);
+}
+
+.token.selector,
+.token.string,
+.token.char,
+.token.builtin,
+.token.inserted,
+.token.regex,
+.token.attr-value,
+.token.attr-value > .token.punctuation {
+	color: hsl(95, 38%, 62%);
+}
+
+.token.variable,
+.token.operator,
+.token.function {
+	color: hsl(207, 82%, 66%);
+}
+
+.token.url {
+	color: hsl(187, 47%, 55%);
+}
+
+/* HTML overrides */
+.token.attr-value > .token.punctuation.attr-equals,
+.token.special-attr > .token.attr-value > .token.value.css {
+	color: hsl(220, 14%, 71%);
+}
+
+/* CSS overrides */
+.language-css .token.selector {
+	color: hsl(355, 65%, 65%);
+}
+
+.language-css .token.property {
+	color: hsl(220, 14%, 71%);
+}
+
+.language-css .token.function,
+.language-css .token.url > .token.function {
+	color: hsl(187, 47%, 55%);
+}
+
+.language-css .token.url > .token.string.url {
+	color: hsl(95, 38%, 62%);
+}
+
+.language-css .token.important,
+.language-css .token.atrule .token.rule {
+	color: hsl(286, 60%, 67%);
+}
+
+/* JS overrides */
+.language-javascript .token.operator {
+	color: hsl(286, 60%, 67%);
+}
+
+.language-javascript .token.template-string > .token.interpolation > .token.interpolation-punctuation.punctuation {
+	color: hsl(5, 48%, 51%);
+}
+
+/* JSON overrides */
+.language-json .token.operator {
+	color: hsl(220, 14%, 71%);
+}
+
+.language-json .token.null.keyword {
+	color: hsl(29, 54%, 61%);
+}
+
+/* MD overrides */
+.language-markdown .token.url,
+.language-markdown .token.url > .token.operator,
+.language-markdown .token.url-reference.url > .token.string {
+	color: hsl(220, 14%, 71%);
+}
+
+.language-markdown .token.url > .token.content {
+	color: hsl(207, 82%, 66%);
+}
+
+.language-markdown .token.url > .token.url,
+.language-markdown .token.url-reference.url {
+	color: hsl(187, 47%, 55%);
+}
+
+.language-markdown .token.blockquote.punctuation,
+.language-markdown .token.hr.punctuation {
+	color: hsl(220, 10%, 40%);
+	font-style: italic;
+}
+
+.language-markdown .token.code-snippet {
+	color: hsl(95, 38%, 62%);
+}
+
+.language-markdown .token.bold .token.content {
+	color: hsl(29, 54%, 61%);
+}
+
+.language-markdown .token.italic .token.content {
+	color: hsl(286, 60%, 67%);
+}
+
+.language-markdown .token.strike .token.content,
+.language-markdown .token.strike .token.punctuation,
+.language-markdown .token.list.punctuation,
+.language-markdown .token.title.important > .token.punctuation {
+	color: hsl(355, 65%, 65%);
+}
+
+/* General */
+.token.bold {
+	font-weight: bold;
+}
+
+.token.comment,
+.token.italic {
+	font-style: italic;
+}
+
+.token.entity {
+	cursor: help;
+}
+
+.token.namespace {
+	opacity: 0.8;
+}
+</style>

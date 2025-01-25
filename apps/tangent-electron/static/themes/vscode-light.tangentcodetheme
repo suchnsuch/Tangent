@@ -4,6 +4,7 @@
 code[class*="language-"],
 pre[class*="language-"] {
 	color: #393A34;
+	background: hsl(230, 1%, 98%);
 }
 
 pre[class*="language-"]::selection, pre[class*="language-"] ::selection,
