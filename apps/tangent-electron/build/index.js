@@ -65,23 +65,6 @@ async function buildPrism() {
 			// Svelte support
 			const prismSveltePath = path.resolve(path.join(__dirname, '../../../node_modules', 'prism-svelte', 'index.js'))
 			await fs.promises.copyFile(prismSveltePath, path.join(languageBuildPath, 'prism-svelte.min.js')) // The "min" is a lie
-
-			// Move themes
-			// TODO: Actually be able to use different themes
-			const themeBuildPath = path.join(buildPath, 'themes')
-			await fs.promises.mkdir(themeBuildPath, { recursive: true })
-			const { themesDirectory } = require('prism-themes')
-
-			let themeFiles = await fs.promises.readdir(themesDirectory)
-
-			await Promise.all(themeFiles.map(async file => {
-				if (file.endsWith('.css')) {
-					let content = await fs.promises.readFile(path.join(themesDirectory, file), 'utf-8')
-					// clean font & font-size so that it's just colors
-					content = content.replace(/(font-size|font-family):.*;/g, '')
-					await fs.promises.writeFile(path.join(themeBuildPath, file), content, 'utf-8')
-				}
-			}))
 		}
 		
 		catch (e) {
