@@ -122,7 +122,7 @@ export function parseMarkdown(source: string | TextDocument, options?: MarkdownP
 		lines: parser.builder.lines,
 		structure: parser.structure,
 		errors: parser.errors,
-		//awaiting
+		awaiting: parser.awaiting
 	}
 
 	if (feed instanceof DocumentFeeder) {
