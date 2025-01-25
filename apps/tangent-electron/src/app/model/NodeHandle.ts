@@ -15,11 +15,11 @@ export function handleIsNode(handle: HandleResult): handle is MaybeSubscribableN
 }
 
 export function isNode(obj: MaybeSubscribableNode | UrlData): obj is MaybeSubscribableNode {
-	return 'path' in obj
+	return obj && 'path' in obj
 }
 
 export function isUrlData(obj: MaybeSubscribableNode | UrlData): obj is UrlData {
-	return 'url' in obj
+	return obj && 'url' in obj
 }
 
 function pathAffectsPath(a: string, b: string): boolean {
