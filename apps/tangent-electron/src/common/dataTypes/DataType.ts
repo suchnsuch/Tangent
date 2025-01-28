@@ -13,3 +13,6 @@ export default interface DataType {
 	rawToPatch?(raw: string): any
 	saveDelay?: number
 }
+
+// A magic word that triggers resaving a file without any changes
+export const RESAVE_DATA_FILE = 'RESAVE'

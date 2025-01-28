@@ -1,5 +1,5 @@
 import { ObjectStore, PatchableList, ReadableStore, StoreUndoStack, WritableStore } from 'common/stores'
-import type { DataTypeConstructionContext } from './DataType'
+import { RESAVE_DATA_FILE, type DataTypeConstructionContext } from './DataType'
 import { DirectoryLookup, DirectoryStore, TreeChange, TreeNode, nodeFromPath } from 'common/trees'
 import { clamp } from 'common/utils'
 import TangentMap from 'common/tangentMap/TangentMap'
@@ -440,6 +440,17 @@ export default class Session extends ObjectStore {
 				this.undoStack.clear()
 				this._currentThreadItem.value = null
 				this.publishCurrentThreadItem()
+			}
+		}
+
+		if (change.moved) {
+			for (let item of change.moved) {
+				if (this.map.get(item.node.path)) {
+					// Resave the file so that the moved item's new path is correctly reserialized
+					this.sendPatch(RESAVE_DATA_FILE, null)
+					this.undoStack.clear()
+					break
+				}
 			}
 		}
 	}

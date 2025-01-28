@@ -7,6 +7,7 @@ import { ObjectStore } from 'common/stores'
 import File, { FileContent, FileSaveResult, FileWatcher } from './File'
 import type DataType from 'common/dataTypes/DataType'
 import type Workspace from './Workspace'
+import { RESAVE_DATA_FILE } from 'common/dataTypes/DataType'
 
 const log = Logger.get('file')
 log.setLevel(Logger.INFO)
@@ -152,22 +153,26 @@ export default class DataFile extends File {
 		}
 		
 		cache.timeout = setTimeout(async () => {
+			cache.saving = true
+			let result = FileSaveResult.Failed
 			try {
 				log.debug('Saving Data File:', chalk.green(this.path))
 				const payload = JSON.stringify(this.data.getRawValues('file') ?? {}, null, '\t')
 				await fs.promises.writeFile(this.path, payload, 'utf8')
 				this.savedIteration = this.iteration
-				cache.resolve(FileSaveResult.Success)
+				result = FileSaveResult.Success
 			}
 			catch (err) {
 				log.error('Could not write', this.path)
 				log.error(err)
-				cache.resolve(FileSaveResult.Failed)
 			}
-			
-			if (this.saveCache === cache) {
-				this.saveCache = null
-			}
+
+			cache.saving = false
+			this.saveCache = null
+			// Resolve after the cache has been cleared. The first task waiting on this promise
+			// should be able to create a new cache
+			cache.resolve(result)
+
 		}, this.dataType.saveDelay ?? 300)
 
 		return cache.promise
@@ -175,6 +180,9 @@ export default class DataFile extends File {
 
 	async setContents(contents: FileContent, updater?: FileWatcher): Promise<FileSaveResult> {
 		if (typeof contents === 'string') {
+			if (contents === RESAVE_DATA_FILE) {
+				return this.writeFile()
+			}
 			log.error('Invalid contents sent to ' + chalk.red(this.path))
 			return FileSaveResult.Failed
 		}
