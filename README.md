@@ -1,8 +1,6 @@
 # Tangent
-This is the monorepo for the [Tangent](https://www.tangentnotes.com) project.
+This is the monorepo for the [Tangent](https://www.tangentnotes.com) project. Pre-built binaries can be found [on the downloads page](https://www.tangentnotes.com/Download) and [on Flathub](https://flathub.org/apps/io.github.suchnsuch.Tangent).
 
-## Getting Started
-Run `npm ci` at the root level of the repository to install all dependencies across the monorepo.
 
 ## Modules
 There are multiple modules contained within this repo.
@@ -18,8 +16,16 @@ The `packages` directory contains modules that provide libraries of Tangent-rela
 * [tangent-query-parser](./packages/tangent-query-parser/README.md) – A parser for the Tangent Query language.
 
 ### Lib
-The `lib` directory contains externally-versioned libraries that have been submoduled for various reasons.
+The `lib` directory contains externally-versioned libraries that have been added as a git submodule for various reasons.
 * [typewriter](./lib/typewriter/README.md) – A tangent-specific fork of the [Typewriter](https://github.com/typewriter-editor/typewriter) project.
+
+
+## Building Locally
+1. Ensure that all submodules are synced (e.g. `git submodule update`).
+2. Run `npm ci` at the root level of the repository to install all dependencies across the monorepo.
+3. Run `npm run build` at the root level of the repository to build all dependencies.
+4. Run `npm run dev` (or `dev:win` on Windows) in `./apps/tangent-electron` to run tangent in development mode.
+
 
 ## Reporting Issues
 When creating an issues, be sure to use the appropriate label for the specific module.

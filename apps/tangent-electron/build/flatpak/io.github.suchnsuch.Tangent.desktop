@@ -1,9 +1,9 @@
 [Desktop Entry]
 Name=Tangent
-Comment=A clean and powerful open source notes app
+Comment=Record and connect your thoughts
 Type=Application
 Exec=run.sh
 Terminal=false
-Categories=Office;
-Keywords=Markdown;notes;brain;Obsidian;
+Categories=Office;Productivity;
+Keywords=markdown;notes;pkm;brain;writing;Obsidian;
 Icon=io.github.suchnsuch.Tangent
