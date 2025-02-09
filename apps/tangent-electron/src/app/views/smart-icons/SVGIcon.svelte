@@ -1,4 +1,6 @@
 <script lang="ts">
+import { sizeToStyle } from './smartIcons'
+
 /**
  * This is a convenience component for placing svg elements
 */
@@ -18,15 +20,8 @@ export let styleString: string = undefined
 
 let _style = ''
 
-function rawOrPx(value: string | number) {
-	return typeof value === 'number' ? `${value}px` : value
-}
-
 $: {
-	const realWidth = rawOrPx(width ?? size ?? 24)
-	const realHeight = rawOrPx(height ?? size ?? 24)
-
-	_style = `width: ${realWidth}; height: ${realHeight};`
+	_style = sizeToStyle(size, width, height)
 
 	if (styleString) {
 		_style += styleString

@@ -1213,6 +1213,7 @@ function onDetailsContexMenu(event: MouseEvent) {
 		{editable}
 		{focusing}
 		preventMouseUpDefault={true}
+		showIcon={false}
 		showExtension={false}
 		on:enter-exit={e => editorElement.dispatchEvent(new Event('resumeFocus'))}
 		/>

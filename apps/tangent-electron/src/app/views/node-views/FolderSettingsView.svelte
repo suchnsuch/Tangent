@@ -9,7 +9,6 @@ export let state: FolderViewState
 $: info = state.folderInfo
 </script>
 <div class="lens-settings-row">
-	<SvgIcon ref="folder.svg#folder" />
 	<WorkspaceFileHeader node={state.node} showExtension={false} />
 </div>
 <div class="lens-settings-row">

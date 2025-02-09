@@ -18,6 +18,8 @@ import { getContext } from 'svelte';
 import { onMount, tick } from 'svelte';
 import NoteEditor from '../editors/NoteEditor/NoteEditor.svelte';
 import SetCreationRules from './SetCreationRules.svelte';
+import WorkspaceTreeNode from 'app/model/WorkspaceTreeNode';
+import NodeIcon from '../smart-icons/NodeIcon.svelte';
 
 const dispatch = createEventDispatcher<{
 	navigate: NavigationData
@@ -81,11 +83,25 @@ function nodeClick(event, ref: TreeNodeOrReference) {
 			<div class="card" on:click={e => nodeClick(e, item)}>
 				{#if !isReference(item) || !isSubReference(item)}
 					{@const node = getNode(item, workspace.directoryStore)}
-					{#if node instanceof Folder}
+					
+					{#if node instanceof NoteFile}
+						<NoteEditor
+							state={{
+								note: node,
+								// A bit messy, but faster than an entire viewstate
+								annotations: item.annotations ? new WritableStore(item.annotations) : undefined,
+								detailMode
+							}}
+							background="none"
+							allowOverscroll={false}
+							editable={false}
+							fixedTitle={true}
+						/>
+					{:else if node instanceof Folder}
+						{@const children = node.children?.length ? [...node.visibleChildren()] : []}
 						<div class="folderCard">
 							<WorkspaceFileHeader {node} editable={false} showExtension={false} />
-							{#if node.children?.length}
-								{@const children = [...node.visibleChildren()]}
+							{#if children.length > 0}
 								<div class="children">
 									<ul class:long={children.length > 10}>
 										{#each children as child}
@@ -100,19 +116,6 @@ function nodeClick(event, ref: TreeNodeOrReference) {
 								</div>
 							{/if}
 						</div>
-					{:else if node instanceof NoteFile}
-						<NoteEditor
-							state={{
-								note: node,
-								// A bit messy, but faster than an entire viewstate
-								annotations: item.annotations ? new WritableStore(item.annotations) : undefined,
-								detailMode
-							}}
-							background="none"
-							allowOverscroll={false}
-							editable={false}
-							fixedTitle={true}
-						/>
 					{:else if node instanceof EmbedFile}
 						{#if node.embedType === EmbedType.Image}
 							<div class="imageCard">
@@ -120,6 +123,13 @@ function nodeClick(event, ref: TreeNodeOrReference) {
 								<div class="image" style={`background-image: url("${node.cacheBustPath}");`}></div>
 							</div>
 						{/if}
+					{:else if node instanceof WorkspaceTreeNode}
+						<div class="fallbackCard">
+							<WorkspaceFileHeader {node} editable={false} showExtension={false} />
+							<div style="text-align: center; --iconStroke: var(--deemphasizedTextColor);">
+								<NodeIcon {node} size="8em" />
+							</div>
+						</div>
 					{/if}
 				{:else}
 					Show Subreference "{item.title}" here.
@@ -242,6 +252,11 @@ function nodeClick(event, ref: TreeNodeOrReference) {
 		li {
 			margin: .25em 0;
 		}
+	}
+
+	.empty {
+		margin: 5em auto;
+		color: var(--deemphasizedTextColor);
 	}
 }
 

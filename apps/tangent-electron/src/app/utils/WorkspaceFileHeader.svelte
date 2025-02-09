@@ -4,6 +4,7 @@ import type WorkspaceTreeNode from 'app/model/WorkspaceTreeNode';
 import OneLineEditor from 'app/views/editors/OneLineEditor/OneLineEditor';
 import { Source, asRoot } from 'typewriter-editor';
 import { wait } from '@such-n-such/core';
+import NodeIcon from 'app/views/smart-icons/NodeIcon.svelte';
 
 const dispatch = createEventDispatcher<{
 	'rename': string,
@@ -25,6 +26,7 @@ export let editable = true
 export let focusing = false
 
 export let preventMouseUpDefault = false
+export let showIcon = true
 export let showExtension = true
 
 export let node: WorkspaceTreeNode
@@ -93,7 +95,7 @@ function onHeaderKeydown(event: KeyboardEvent) {
 	class:focusing
 	on:mouseup={headerMouseUp}
 	bind:this={headerElement}
-><span
+>{#if showIcon}<span class="icon"><NodeIcon {node} size="1em" /></span>{/if}<span
 	class="title"
 	bind:this={headerEditElement}
 	use:asRoot={editor}
@@ -140,6 +142,12 @@ header {
 
 :global(.margins-relaxed) header {
 	padding: calc(3em / 2.5) calc(3em / 2.5);
+}
+
+.icon {
+	position: relative;
+	top: .125em;
+	padding-right: .25em;
 }
 
 .extension {
