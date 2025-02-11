@@ -9,7 +9,7 @@
 		"build": "npm run build --workspaces --if-present"
 	},
 	"author": "Taylor Hadden",
-	"license": "MIT",
+	"license": "Apache-2.0",
 	"workspaces": [
 		"lib/typewriter",
 		"packages/tangent-query-parser",
