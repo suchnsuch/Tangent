@@ -3,7 +3,7 @@ import { Clause, ClauseGroup, ClauseType, ClauseMod, isGroup, parseQueryText, Pa
 import QueryInfo, { queryFileType } from 'common/dataTypes/QueryInfo'
 import { DirectoryStore, iterateOverChildren, TreeNode, TreePredicateResult, validatePath } from 'common/trees'
 import { getFileTypeRegex, imageFileExtensions } from 'common/fileExtensions'
-import { addPreviewToReference, Annotation, areReferencesEquivalent, cleanReference, createReference, getNode, getNodeFromReference, isNode, isReference, isSubReference, TreeNodeOrReference } from 'common/nodeReferences'
+import { addPreviewToReference, Annotation, areNodesOrReferencesEquivalent, cleanReference, createReference, getNode, getNodeFromReference, isNode, isReference, isSubReference, TreeNodeOrReference } from 'common/nodeReferences'
 import type { ObjectStore } from 'common/stores'
 import { IndexData, TodoState } from './indexTypes'
 import { getTextAnnotations } from './queryAnnotations'
@@ -315,7 +315,7 @@ export async function solveQuery(query: Query, interop: QuerySolverInterop): Pro
 					return iterator((reference, mod) => {
 						if (mod === undefined) {
 							// This is a raw "is this in the set" check
-							return areReferencesEquivalent(item, reference)
+							return areNodesOrReferencesEquivalent(item, reference)
 						}
 
 						const referenceNode = getNode(reference, directory)

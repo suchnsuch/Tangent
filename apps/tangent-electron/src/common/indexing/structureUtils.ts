@@ -1,4 +1,3 @@
-import { itemsShallowEqual } from '@such-n-such/core'
 import { ConnectionInfo, HeaderInfo, StructureData, StructureType, TagInfo, TodoInfo } from './indexTypes'
 
 /**

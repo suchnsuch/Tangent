@@ -17,7 +17,6 @@
     "url": "https://github.com/suchnsuch/tangent-public/issues"
   },
   "homepage": "https://github.com/suchnsuch/tangent-public#readme",
-
   "type": "module",
   "main": "./lib/index.js",
   "types": "./lib/index.d.ts",
@@ -34,9 +33,8 @@
     "rebuild": "npm run clean && npm run build",
     "deploy": "npm run rebuild && npm publish"
   },
-  
   "dependencies": {
-    "@such-n-such/core": "^0.1.5",
+    "@such-n-such/core": "^0.4.0",
     "@such-n-such/core-browser": "^0.1.0",
     "turndown": "^7.1.1"
   },

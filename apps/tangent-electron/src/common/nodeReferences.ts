@@ -61,20 +61,72 @@ export function isReference(item: TreeNodeOrReference): item is TreeNodeReferenc
 	return !isNode(item)
 }
 
-export function areReferencesEquivalent(a: TreeNodeOrReference, b: TreeNodeOrReference) {
-	if (a.path === b.path) {
-		const aIsSub = isSubReference(a)
-		const bIsSub = isSubReference(b)
-		if (aIsSub && bIsSub) {
-			const aSub = a as TreeNodeReference
-			const bSub = b as TreeNodeReference
+function areNodePreviewsEquivalent(a: NodePreview, b: NodePreview) {
+	if (a === b) return true
+	const aString = typeof a === 'string'
+	const bString = typeof b === 'string'
 
-			return aSub.start === bSub.start && aSub.end === bSub.end
+	if (aString || bString) return false
+
+	if (a.start != b.start) return false
+	if (a.content != b.content) return false
+	return true
+}
+
+export function isReferenceEquivalentToNode(reference: TreeNodeReference, node: TreeNode) {
+	if (reference.path !== node.path) return false
+	if (reference.annotations) return false // An annotated node has more information and is not the same
+	if (reference.start || reference.end) return false
+	return true
+}
+
+export function areReferencesEquivalent(a: TreeNodeReference, b: TreeNodeReference) {
+	if (a.path != b.path) return false
+	if (a.start !== b.start || a.end !== b.end) return false
+	if (a.title != b.title) return false
+
+	if (a.annotations != b.annotations) {
+		if (!a.annotations || !b.annotations) return false
+		if (a.annotations.length != b.annotations.length) return false
+		for (let index = 0; index < a.annotations.length; index++) {
+			const annotationA = a.annotations[index]
+			const annotationB = b.annotations[index]
+			if (annotationA.start != annotationB.start) return false
+			if (annotationA.end != annotationB.end) return false
+			if (annotationA.data != annotationB.data) return false
 		}
-		else if (aIsSub !== bIsSub) return false
-		return true
 	}
-	return false
+
+	if (a.preview != b.preview) {
+		if (!a.preview || !b.preview) return false
+		const aArray = Array.isArray(a.preview)
+		const bArray = Array.isArray(b.preview)
+		if (aArray != bArray) return false
+		if (aArray) {
+			if ((a.preview as NodePreview[]).length != (b.preview as NodePreview[]).length) return false
+			for (let index = 0; index < (a.preview as NodePreview[]).length; index++) {
+				const previewA = (a.preview as NodePreview[])[index]
+				const previewB = (b.preview as NodePreview[])[index]
+				if (!areNodePreviewsEquivalent(previewA, previewB)) return false
+			}
+		}
+		else if (!areNodePreviewsEquivalent(a.preview as NodePreview, b.preview as NodePreview)) {
+			return false
+		}
+	}
+}
+
+export function areNodesOrReferencesEquivalent(a: TreeNodeOrReference, b: TreeNodeOrReference) {
+	if (a == b) return true // Catches direct tree node comparison
+	if (!a || !b) return false // Falsy values are bad
+
+	const aIsNode = isNode(a)
+	const bIsNode = isNode(b)
+
+	if (aIsNode && !bIsNode) return isReferenceEquivalentToNode(b, a)
+	if (!aIsNode && bIsNode) return isReferenceEquivalentToNode(a, b)
+	if (aIsNode && bIsNode) return false // Tree nodes are direct compare only
+	return areReferencesEquivalent(a, b)
 }
 
 export function getNode(item: TreeNodeOrReference, directory: DirectoryStore): TreeNode {

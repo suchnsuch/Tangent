@@ -35,6 +35,9 @@ export default class QueryViewState extends BaseSetViewState {
 		})
 
 		this.queryResult = derived(this.queryInfo, (queryInfo, set) => {
+			if (!queryInfo) {
+				return null
+			}
 			// TODO: Improve query invalidation to reduce false positives
 			return derived(queryInfo.queryString, (queryString, set) => {
 				const id = this.lastRequestID.update(i => i + 1)
@@ -73,7 +76,7 @@ export default class QueryViewState extends BaseSetViewState {
 	focus(element: HTMLElement): boolean {
 		const article = element?.querySelector(".QueryEditor .container article") as HTMLElement;
 		if (article) {
-			const match = this.queryInfo.value.queryString.value.match(/Notes with ['"](.*)['"]/d)
+			const match = this.queryInfo.value?.queryString.value.match(/Notes with ['"](.*)['"]/d)
 			if (match) {
 				article.dispatchEvent(new SelectEvent('setSelection', {
 					selection: (match as any).indices[1]

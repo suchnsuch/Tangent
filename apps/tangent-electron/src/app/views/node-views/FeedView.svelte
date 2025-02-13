@@ -1,5 +1,5 @@
 <script lang="ts">
-import { last } from '@such-n-such/core'
+import { indexOfEquivalent, last } from '@such-n-such/core'
 import type { NavigationData } from 'app/events'
 import type { Workspace } from 'app/model'
 import { NoteViewState } from 'app/model/nodeViewStates'
@@ -13,7 +13,7 @@ import type { ScrollToOptions } from 'app/utils/scrollto'
 
 import type { TreeNode } from 'common/trees'
 import { ForwardingStore } from 'common/stores'
-import { getNode, TreeNodeOrReference } from 'common/nodeReferences'
+import { areNodesOrReferencesEquivalent, getNode, TreeNodeOrReference } from 'common/nodeReferences'
 
 import { createEventDispatcher, getContext, onMount, tick } from 'svelte'
 import { fly } from 'svelte/transition'
@@ -130,7 +130,7 @@ function getFeedRange(items: TreeNodeOrReference[], first: TreeNodeOrReference, 
 	$firstItem = items[start]
 	$lastItem = items[end]
 
-	let currentIndex = items.indexOf(current)
+	let currentIndex = indexOfEquivalent(current, items, areNodesOrReferencesEquivalent)
 	if (currentIndex < start) {
 		$currentItem = items[start]
 	}
@@ -295,7 +295,7 @@ function forwardNavigation(event: CustomEvent<NavigationData>, item: TreeNodeOrR
 	dispatch('navigate', {
 		target: node,
 		direction: event.detail.direction,
-		origin: state.parent.node as TreeNode
+		origin: state.parent.node
 	})
 	// Pass on the presented event
 	dispatch('navigate', {

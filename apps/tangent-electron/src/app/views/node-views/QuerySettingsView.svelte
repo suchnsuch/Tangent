@@ -9,6 +9,7 @@ import { getContext } from 'svelte';
 import type { Workspace } from 'app/model';
 import paths from 'common/paths';
 import { validateFileSegment } from 'common/trees'
+import { ForwardingStore } from 'common/stores'
 
 const workspace = getContext("workspace") as Workspace
 
@@ -17,7 +18,8 @@ export let state: QueryViewState
 let isQueryDirty = false
 
 $: info = state.queryInfo
-$: queryString = $info.queryString
+let queryString = new ForwardingStore<string>(null)
+$: queryString.forwardFrom($info?.queryString)
 $: queryResult = state.queryResult
 $: lastRequestedID = state.lastRequestID
 $: lastReceivedID = state.lastReceivedID

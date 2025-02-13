@@ -8,12 +8,11 @@ import UnhandledView from 'app/views/node-views/UnhandledView.svelte'
  * The view state to use when no proper view state can be created
  */
 export default class UnhandledViewState implements NodeViewState, LensViewState {
-	node: TreeNode
-	currentLens = new ReadableStore<LensViewState>(null)
+	readonly node: TreeNode
+	readonly currentLens: ReadableStore<LensViewState>
 	
 	constructor(node: TreeNode) {
 		this.node = node
-
 		this.currentLens = new ReadableStore<LensViewState>(this)
 	}
 

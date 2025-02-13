@@ -70,7 +70,7 @@
     "@electron/notarize": "^1.2.3",
     "@playwright/test": "^1.42.1",
     "@popperjs/core": "^2.9.2",
-    "@such-n-such/core": "^0.3.0",
+    "@such-n-such/core": "^0.4.0",
     "@such-n-such/tangent-html-to-markdown": "^0.1.1",
     "@sveltejs/vite-plugin-svelte": "^3.1.2",
     "@tsconfig/svelte": "^5.0.0",

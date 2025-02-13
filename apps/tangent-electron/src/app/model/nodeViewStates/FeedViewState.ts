@@ -11,6 +11,7 @@ import type ViewStateContext from './ViewStateContext'
 import { NoteViewState } from '.'
 import { getNode, indexOfMatch, TreeNodeOrReference } from 'common/nodeReferences'
 import { NoteDetailMode } from './NoteViewState'
+import { areNodesOrReferencesEquivalent, getNode, indexOfMatch, TreeNodeOrReference } from 'common/nodeReferences'
 
 export default class FeedViewState implements SetLensViewState {
 	
@@ -99,7 +100,7 @@ export default class FeedViewState implements SetLensViewState {
 
 	applyCurrentItemToThread(item: TreeNodeOrReference) {
 		if (!item) return
-		if (item === this.currentlyRepresenting) return
+		if (areNodesOrReferencesEquivalent(item, this.currentlyRepresenting)) return
 
 		const session = this.context.tangent.activeSession.value
 		if (!session) return
@@ -113,15 +114,18 @@ export default class FeedViewState implements SetLensViewState {
 		const oldIndex = thread.indexOf(this.parent.node)
 		if (oldIndex < 0) return
 
-		// We don't want to drop context
-		session.addThreadHistory({
-			thread: [
-				...thread.slice(0, oldIndex + 1),
-				itemNode,
-				...thread.slice(oldIndex + 2)
-			],
-			currentNode: itemNode
-		})
+		const existingIndex = thread.indexOf(itemNode)
+		if (existingIndex != oldIndex + 1) {
+			// We don't want to drop context
+			session.addThreadHistory({
+				thread: [
+					...thread.slice(0, oldIndex + 1),
+					itemNode,
+					...thread.slice(oldIndex + 2)
+				],
+				currentNode: itemNode
+			})
+		}
 	}
 
 	dispose() {

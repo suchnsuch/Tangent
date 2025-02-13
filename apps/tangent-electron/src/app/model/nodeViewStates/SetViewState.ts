@@ -10,6 +10,7 @@ import CardsViewState from './CardsViewState';
 import FeedViewState from './FeedViewState';
 import type LensViewState from './LensViewState';
 import type ViewStateContext from './ViewStateContext';
+import LoadingViewState from './LoadingViewState';
 
 export interface SetViewState extends NodeViewState, NodeSet {
 	context: ViewStateContext
@@ -36,7 +37,7 @@ export abstract class BaseSetViewState extends SelfStore implements SetViewState
 		if (!this._currentLens) {
 			this._currentLens = new CachingStore(derived(this.info, (info, set) => {
 				if (!info) {
-					set(null)
+					set(new LoadingViewState(this))
 					return null
 				}
 
@@ -67,6 +68,8 @@ export abstract class BaseSetViewState extends SelfStore implements SetViewState
 
 	dispose() {
 		super.dispose()
-		;(this._currentLens as CachingStore<LensViewState>)?.dispose()
+		if (this._currentLens instanceof CachingStore) {
+			this._currentLens.dispose()
+		}	
 	}
 }

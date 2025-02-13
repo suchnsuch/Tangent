@@ -22,7 +22,7 @@
     "deploy": "npm run clean && npm run build && npm publish"
   },
   "dependencies": {
-    "@such-n-such/core": "^0.1.2"
+    "@such-n-such/core": "^0.4.0"
   },
   "devDependencies": {
     "@types/jest": "^29.5.3",

@@ -1,12 +1,15 @@
 <script lang="ts">
-import type SetInfo from 'common/dataTypes/SetInfo';
+import type SetInfo from 'common/dataTypes/SetInfo'
+import { SetLensMode } from 'common/dataTypes/SetInfo'
+import { ForwardingStore } from 'common/stores'
 
 export let info: SetInfo
 
 // TODO: This should be pulled from the WorkspaceViewState
 const lenses = ['Cards', 'Feed']
 
-$: displayMode = info.displayMode
+let displayMode = new ForwardingStore<SetLensMode>(null)
+$: displayMode.forwardFrom(info?.displayMode)
 
 </script>
 
