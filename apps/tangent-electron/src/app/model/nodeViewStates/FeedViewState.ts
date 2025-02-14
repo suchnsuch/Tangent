@@ -9,7 +9,7 @@ import FeedView from 'app/views/node-views/FeedView.svelte'
 import FeedSettingsView from 'app/views/node-views/FeedSettingsView.svelte'
 import type ViewStateContext from './ViewStateContext'
 import { NoteViewState } from '.'
-import { getNode, indexOfMatch, TreeNodeOrReference } from 'common/nodeReferences'
+//import { getNode, indexOfMatch, TreeNodeOrReference } from 'common/nodeReferences'
 import { NoteDetailMode } from './NoteViewState'
 import { areNodesOrReferencesEquivalent, getNode, indexOfMatch, TreeNodeOrReference } from 'common/nodeReferences'
 
