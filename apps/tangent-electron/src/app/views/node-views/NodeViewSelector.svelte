@@ -32,16 +32,15 @@ export let background: 'auto' | 'none' = 'auto'
 export var extraTop: number = 0
 
 $: lensState = state.currentLens
-$: nodeState = $lensState?.parent
 $: viewComponent = $lensState?.viewComponent
-$: canShowSettings = nodeState?.settingsComponent != null ||
+$: canShowSettings = state.settingsComponent != null ||
 	$lensState?.settingsComponent != null
 
 let hintSettings = false
 let showSettingsFromMouse = false
 let showSettingsFromHover = false
-$: pinSettings = nodeState?.pinSettings
-$: willPinSettings = (pinSettings && $pinSettings) || layout === 'auto'
+$: pinSettings = state.pinSettings
+$: willPinSettings = (pinSettings && $pinSettings)
 $: showSettings = showSettingsFromMouse || showSettingsFromHover || willPinSettings
 
 let container: HTMLElement
@@ -60,7 +59,12 @@ function onMouseMoveContainer(event: MouseEvent) {
 	const hintThreshold = showThreshold * 1.75
 
 	hintSettings = clientY < hintThreshold
-	showSettingsFromMouse = clientY < showThreshold
+	if (layout === 'fill') {
+		showSettingsFromMouse = clientY < showThreshold
+	}
+	else {
+		showSettingsFromMouse = (rect.width - clientX) < showThreshold && clientY < showThreshold
+	}
 }
 
 let hoverTimeout = null
@@ -112,7 +116,7 @@ function getClassNamesForNode(node: TreeNode) {
 
 <main
 	bind:this={container}
-	class={"NodeViewSelector" + getClassNamesForNode(nodeState.node)  + ' ' + layout}
+	class={"NodeViewSelector" + getClassNamesForNode(state.node)  + ' ' + layout}
 	on:mouseenter={_ => hintSettings = true}
 	on:mouseleave={_ => hintSettings = false}
 	on:mousemove={onMouseMoveContainer}
@@ -141,10 +145,19 @@ function getClassNamesForNode(node: TreeNode) {
 
 	{#if canShowSettings}
 		{#if isCurrent && focusLevel <= FocusLevel.Thread || hintSettings}
-			<div class="settingsHint" style:top={extraTop + 'px'}
-				transition:fade={{ duration: 100 }}>
-				<SvgIcon ref="settings-hint.svg#hint2" size="16"
-					styleString="opacity: .5;"/>
+			<div class="settingsHint"
+				style:top={extraTop + 'px'}
+				transition:fade={{ duration: 100 }}
+			>
+				{#if layout=='fill'}
+					<SvgIcon ref="settings-hint.svg#hint-down"
+						size="16"
+						styleString="opacity: .5;"/>
+				{:else}
+					<SvgIcon ref="settings-hint.svg#hint-down-left"
+						size="16"
+						styleString="opacity: .5;"/>
+				{/if}
 			</div>
 		{/if}
 		{#if showSettings}
@@ -161,10 +174,10 @@ function getClassNamesForNode(node: TreeNode) {
 				out:fly={{ duration: 700, y: -100 }}
 			>
 				<div class="settings">
-					{#if nodeState?.settingsComponent}
+					{#if state.settingsComponent}
 						<svelte:component
-							this={nodeState.settingsComponent}
-							state={nodeState}
+							this={state.settingsComponent}
+							state={state}
 						>
 							{#if $lensState?.settingsComponent}
 								<svelte:component
@@ -205,6 +218,10 @@ main {
 	text-align: center;
 
 	background: linear-gradient();
+}
+
+.auto .settingsHint {
+	text-align: right;
 }
 
 .settings-container {
