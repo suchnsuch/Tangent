@@ -1,41 +1,34 @@
 import { swapRemove } from '@such-n-such/core'
-import QueryInfo from 'common/dataTypes/QueryInfo'
 import type { TreeChange, TreeNode } from 'common/trees'
-import { EmbedType } from 'common/embedding'
-import { getNodeFromReference, isNode, isReference, isSubReference, TreeNodeOrReference } from 'common/nodeReferences'
-import { FolderViewState, ImageViewState, NoteViewState } from '.'
-import DataFile from '../DataFile'
-import EmbedFile from '../EmbedFile'
-import Folder from '../Folder'
-import NoteFile from '../NoteFile'
+import { getNodeFromReference, isNode, isSubReference, TreeNodeOrReference, TreeNodeReference } from 'common/nodeReferences'
 import type Workspace from '../Workspace'
 import type NodeViewState from './NodeViewState'
-import { NoteDetailMode } from './NoteViewState'
-import QueryViewState from './QueryViewState'
-import TagViewState from './TagViewState'
-import Tag from '../Tag'
 import type { Tangent } from '..'
 import UnhandledViewState from './UnhandledViewState'
+
+export type ViewStateContextCreator = (workspace: Workspace, tangent: Tangent, parent: ViewStateContext) => ViewStateContext
+export type ViewStateCreator = (context: ViewStateContext, node: TreeNode, reference: TreeNodeReference) => NodeViewState
 
 // This would create a great "broadcast" source for ViewStates
 export default class ViewStateContext {
 
-	workspace: Workspace
-	tangent: Tangent
+	readonly workspace: Workspace
+	readonly tangent: Tangent
 
-	parent: ViewStateContext = null
+	readonly parent: ViewStateContext = null
 	children: ViewStateContext[] = []
+
+	// In theory, this would eventually let plugins define their own creation methods
+	creators: ViewStateCreator[] = null
 
 	// TODO: Replication support
 	private states: Map<string, NodeViewState> = new Map()
 
-	constructor(workspace: Workspace, tangent: Tangent) {
+	constructor(workspace: Workspace, tangent: Tangent, parent: ViewStateContext = null) {
 		this.workspace = workspace
 		this.tangent = tangent
+		this.parent = parent
 	}
-
-	// Post create
-	customizeNewState?: (state: NodeViewState) => void
 
 	dispose() {
 		if (this.parent) {
@@ -51,9 +44,12 @@ export default class ViewStateContext {
 		this.states.clear()
 	}
 
-	createChild() {
-		const child = new ViewStateContext(this.workspace, this.tangent)
-		child.parent = this
+	createChild(creator?: ViewStateContextCreator) {
+
+		const child = creator
+			? creator(this.workspace, this.tangent, this)
+			: new ViewStateContext(this.workspace, this.tangent, this)
+
 		this.children.push(child)
 		return child
 	}
@@ -65,9 +61,6 @@ export default class ViewStateContext {
 		if (createIfNone && !state) {
 			state = this.createNodeViewState(item, allowUnhandled)
 			if (state) {
-				if (this.customizeNewState) {
-					this.customizeNewState(state)
-				}
 				this.states.set(pathID, state,)
 			}
 		}
@@ -83,14 +76,16 @@ export default class ViewStateContext {
 		this.states.delete(key)
 	}
 
-	private createNodeViewState(item: TreeNodeOrReference, allowUnhandled=true) {
+	protected createNodeViewState(item: TreeNodeOrReference, allowUnhandled=true): NodeViewState {
 
 		let node: TreeNode = null
+		let reference: TreeNodeReference = null
 
 		if (isNode(item)) {
 			node = item
 		}
 		else {
+			reference = item
 			if (isSubReference(item)) {
 				throw "Taylor you dummy, you don't support sub-references yet!"
 			}
@@ -98,35 +93,16 @@ export default class ViewStateContext {
 			node = getNodeFromReference(item, this.workspace.directoryStore)
 		}
 
-		if (node instanceof NoteFile) {
-			const noteViewState = new NoteViewState(this, node, NoteDetailMode.All)
-			if (isReference(item)) {
-				if (item.annotations) {
-					noteViewState.annotations.set(item.annotations)
-				}
+		let context: ViewStateContext = this
+		while (context) {
+			if (context.creators) {
+				for (const creator of context.creators) {
+					const state = creator(this, node, reference)
+					if (state) return state
+				}		
 			}
-			return noteViewState
-		}
-		
-		if (node instanceof Folder) {
-			return new FolderViewState(this, node)
-		}
-
-		if (node instanceof Tag) {
-			return new TagViewState(this, node)
-		}
-
-		if (node instanceof EmbedFile) {
-			switch (node.embedType) {
-				case EmbedType.Image:
-					return new ImageViewState(node)
-			}
-		}
-
-		if (node instanceof DataFile) {
-			if (QueryInfo.isType(null, node)) {
-				return new QueryViewState(this, node)
-			}
+			console.log('dropping back to parent', context.parent)
+			context = context.parent
 		}
 
 		console.error('No view state created for', item, 'will fall back to empty')

@@ -4,14 +4,23 @@ import type WorkspaceViewState from "./WorkspaceViewState"
 import type { TreeChange, TreeNode } from 'common/trees'
 import type TangentMap from 'common/tangentMap/TangentMap'
 import ViewStateContext from './nodeViewStates/ViewStateContext'
-import type { NodeViewState } from './nodeViewStates'
+import { FolderViewState, ImageViewState, NoteViewState, type NodeViewState } from './nodeViewStates'
 import { derived } from 'svelte/store'
 import type LensViewState from './nodeViewStates/LensViewState'
-import type DataFile from './DataFile'
+import DataFile from './DataFile'
 import type Session from 'common/dataTypes/Session'
 import TangentInfo, { FocusLevel, filename } from 'common/dataTypes/TangentInfo'
 import paths from 'common/paths'
 import { UpdateThreadOptions, getSessionFilename } from 'common/dataTypes/Session'
+import NoteFile from './NoteFile'
+import { NoteDetailMode } from './nodeViewStates/NoteViewState'
+import Folder from './Folder'
+import Tag from './Tag'
+import TagViewState from './nodeViewStates/TagViewState'
+import EmbedFile from './EmbedFile'
+import { EmbedType } from 'common/embedding'
+import QueryInfo from 'common/dataTypes/QueryInfo'
+import QueryViewState from './nodeViewStates/QueryViewState'
 
 export default class Tangent {
 	_state: WorkspaceViewState
@@ -87,6 +96,38 @@ export default class Tangent {
 		)
 
 		this.context = new ViewStateContext(state.workspace, this)
+		this.context.creators = [
+			(context, node, reference) => {
+				if (node instanceof NoteFile) {
+					const noteViewState = new NoteViewState(context, node, NoteDetailMode.All)
+					if (reference?.annotations) {
+						noteViewState.setAnnotations(reference.annotations)
+					}
+					return noteViewState
+				}
+
+				if (node instanceof Folder) {
+					return new FolderViewState(context, node)
+				}
+		
+				if (node instanceof Tag) {
+					return new TagViewState(context, node)
+				}
+		
+				if (node instanceof EmbedFile) {
+					switch (node.embedType) {
+						case EmbedType.Image:
+							return new ImageViewState(node)
+					}
+				}
+		
+				if (node instanceof DataFile) {
+					if (QueryInfo.isType(null, node)) {
+						return new QueryViewState(context, node)
+					}
+				}
+			}
+		]
 	}
 
 	async startup() {

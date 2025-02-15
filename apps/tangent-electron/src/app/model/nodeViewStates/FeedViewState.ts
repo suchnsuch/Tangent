@@ -3,15 +3,29 @@ import { sortNodes } from 'common/settings/Sorting'
 import { WritableStore } from 'common/stores'
 import { derived, get, Readable } from 'svelte/store'
 import type { SetLensViewState } from './LensViewState'
-import type { SetViewState } from './SetViewState'
+import { BaseSetViewState, type SetViewState } from './SetViewState'
 
 import FeedView from 'app/views/node-views/FeedView.svelte'
 import FeedSettingsView from 'app/views/node-views/FeedSettingsView.svelte'
-import type ViewStateContext from './ViewStateContext'
-import { NoteViewState } from '.'
-import { getNode, indexOfMatch, TreeNodeOrReference } from 'common/nodeReferences'
-import { NoteDetailMode } from './NoteViewState'
+import ViewStateContext from './ViewStateContext'
 import { areNodesOrReferencesEquivalent, getNode, indexOfMatch, TreeNodeOrReference } from 'common/nodeReferences'
+import NoteViewState, { NoteDetailMode } from './NoteViewState'
+import NodeViewState from './NodeViewState'
+
+class FeedViewStateContext extends ViewStateContext {
+	protected createNodeViewState(item: TreeNodeOrReference, allowUnhandled?: boolean): NodeViewState {
+		const state = super.createNodeViewState(item, allowUnhandled)
+
+		if (state instanceof NoteViewState) {
+			state.detailMode = NoteDetailMode.None
+		}
+		else if (state instanceof BaseSetViewState) {
+			state.lensOverride = 'List'
+		}
+
+		return state
+	}
+}
 
 export default class FeedViewState implements SetLensViewState {
 	
@@ -33,12 +47,7 @@ export default class FeedViewState implements SetLensViewState {
 	constructor(parent: SetViewState, settings: FeedLensSettings) {
 		this.parent = parent
 
-		this.context = parent.context.createChild()
-		this.context.customizeNewState = state => {
-			if (state instanceof NoteViewState) {
-				state.detailMode = NoteDetailMode.None
-			}
-		}
+		this.context = parent.context.createChild((w, t, p) => new FeedViewStateContext(w, t, p))
 
 		this.settings = settings
 

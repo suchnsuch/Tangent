@@ -1,11 +1,13 @@
 import { CachingStore, ReadableStore, SelfStore } from 'common/stores'
 import type SetInfo from 'common/dataTypes/SetInfo';
+import { SetLensMode } from 'common/dataTypes/SetInfo';
 import type { TreeNode } from 'common/trees'
 import type { TreeNodeOrReference } from 'common/nodeReferences';
 import type NodeSet from 'common/NodeSet'
 import type { CreationRuleOrDefinition } from 'common/settings/CreationRule';
 import { derived, Readable } from 'svelte/store';
 import type { NodeViewState } from '.';
+import ListViewState from './ListViewState';
 import CardsViewState from './CardsViewState';
 import FeedViewState from './FeedViewState';
 import type LensViewState from './LensViewState';
@@ -24,6 +26,8 @@ export abstract class BaseSetViewState extends SelfStore implements SetViewState
 	protected _creationRules: Readable<CreationRuleOrDefinition[]>
 	
 	protected _currentLens: ReadableStore<LensViewState>
+
+	protected _lensOverride: SetLensMode
 
 	constructor(context) {
 		super()
@@ -57,6 +61,14 @@ export abstract class BaseSetViewState extends SelfStore implements SetViewState
 		}
 		return this._currentLens
 	}
+
+	get lensOverride() { return this._lensOverride }
+	set lensOverride(value: SetLensMode) {
+		this._lensOverride = value
+		this.notifyChanged()
+	}
+
+	get isLensOverridden() { return this._lensOverride != undefined }
 
 	focus(element: HTMLElement) {
 		const lens = this.currentLens.value

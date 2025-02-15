@@ -13,7 +13,9 @@ $: info = state.tagInfo
 	<header>{state.node.names.join('/')}</header>
 </div>
 <div class="lens-settings-row">
-	<SetLensSelector info={$info} />
+	{#if !state.isLensOverridden}
+		<SetLensSelector info={$info}/>
+	{/if}
 	<slot></slot>
 </div>
 

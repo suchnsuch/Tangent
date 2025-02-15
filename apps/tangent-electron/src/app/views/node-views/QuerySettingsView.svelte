@@ -81,7 +81,9 @@ function onRename(event: CustomEvent<string>) {
 </div>
 
 <div class="lens-settings-row">
-	<SetLensSelector info={$info} />
+	{#if !state.isLensOverridden}
+		<SetLensSelector info={$info}/>
+	{/if}
 	<slot></slot>
 </div>
 

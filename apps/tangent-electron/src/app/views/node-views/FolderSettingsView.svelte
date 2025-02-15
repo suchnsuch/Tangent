@@ -1,7 +1,6 @@
 <script lang="ts">
 import type { FolderViewState } from 'app/model/nodeViewStates'
-import WorkspaceFileHeader from 'app/utils/WorkspaceFileHeader.svelte';
-import SvgIcon from '../smart-icons/SVGIcon.svelte';
+import WorkspaceFileHeader from 'app/utils/WorkspaceFileHeader.svelte'
 import SetLensSelector from './common/SetLensSelector.svelte'
 
 export let state: FolderViewState
@@ -12,7 +11,9 @@ $: info = state.folderInfo
 	<WorkspaceFileHeader node={state.node} showExtension={false} />
 </div>
 <div class="lens-settings-row">
-	<SetLensSelector info={$info} />
+	{#if !state.isLensOverridden}
+		<SetLensSelector info={$info}/>
+	{/if}
 	<slot></slot>
 </div>
 
