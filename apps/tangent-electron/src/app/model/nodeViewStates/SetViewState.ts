@@ -41,8 +41,10 @@ export abstract class BaseSetViewState extends SelfStore implements SetViewState
 					return null
 				}
 
-				return derived(info.displayMode, mode => {
-					switch(mode) {
+				return derived([this as BaseSetViewState, info.displayMode], ([me, mode]) => {
+					switch(me.lensOverride ?? mode) {
+						case 'List':
+							return new ListViewState(this, info.list)
 						case 'Feed':
 							return new FeedViewState(this, info.feed)
 						case 'Cards':

@@ -284,8 +284,8 @@ function updateShowCreateFromScroll() {
 }
 
 function updateShowCreateFromHover(event: MouseEvent) {
+	if (!feedContainer) return
 	const height = feedContainer.getBoundingClientRect().height
-
 	showCreateFromHover = event.y > height - 115
 }
 

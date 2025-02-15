@@ -3,11 +3,10 @@ import { DirectoryStore, iterateOverChildren, TreePredicateResult } from "common
 import { getEmbedType } from 'common/embedding'
 import type CreationRule from 'common/settings/CreationRule'
 import type { CreationRuleDefinition } from 'common/settings/CreationRule'
-import { WritableStore, CachingStore } from 'common/stores'
-import { derived, readable } from 'svelte/store'
+import { WritableStore } from 'common/stores'
+import { derived } from 'svelte/store'
 import type DataFile from '../DataFile'
 import type Folder from "../Folder"
-import type LensViewState from './LensViewState'
 import { BaseSetViewState } from './SetViewState'
 import type ViewStateContext from './ViewStateContext'
 import FolderSettingsView from 'app/views/node-views/FolderSettingsView.svelte'
