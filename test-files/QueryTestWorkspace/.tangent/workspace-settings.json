@@ -1,18 +1,27 @@
 {
-	"version": 1,
-	"creationRules": [
-		{
-			"name": "📥 Inbox Note",
-			"nameTemplate": "%name%",
-			"folder": "Inbox",
-			"description": "Creates a new note for quickly capturing thoughts that are not yet completely formed."
-		},
-		{
-			"name": "📆 Daily Note",
-			"nameTemplate": "%YYYY%-%MM%-%DD%",
-			"folder": "Log",
-			"mode": "createOrOpen",
-			"description": "Creates or opens a timestamped note for the current day for journaling and quickly jotting down quick thoughts."
-		}
-	]
+"version": 1,
+"creationRules": [
+{
+"name": "📥 Inbox Note",
+"nameTemplate": "%name%",
+"folder": "Inbox",
+"description": "Creates a new note for quickly capturing thoughts that are not yet completely formed."
+},
+{
+"name": "📆 Daily Note",
+"nameTemplate": "%YYYY%-%MM%-%DD%",
+"folder": "Log",
+"mode": "createOrOpen",
+"description": "Creates or opens a timestamped note for the current day for journaling and quickly jotting down quick thoughts."
+},
+{
+"name": "📝 Project Log",
+"nameTemplate": "%YYYY%-%MM%-%DD% - %name% Project Log",
+"folder": "Projects/%name%",
+"mode": "create",
+"showInMenu": true,
+"description": "Creates a new log entry for tracking progress on a DH project.",
+"template": "---\ndate: %YYYY%-%MM%-%DD%\nproject: %name%\ntags: [project-log, %name%]\n---\n## Today's Progress:\n* [ ] Task 1\n* [ ] Task 2\n\n## Challenges Encountered:\n\n## Next Steps:"
+}
+]
 }
