@@ -5,23 +5,25 @@
       "name": "📥 Inbox Note",
       "nameTemplate": "%name%",
       "folder": "Inbox",
-      "description": "Creates a new note for quickly capturing thoughts that are not yet completely formed."
+      "description": "Creates a new note for quickly capturing thoughts that are not yet completely formed.",
+      "template": "---\ndate: %YYYY%-%MM%-%DD%\ntags: ['inbox']\n---\n\n# %name%\n\n## Quick Capture\n\n\n## Related Notes\n\n\n## Follow-up Actions\n- [ ] Process this note\n- [ ] Add relevant links\n- [ ] Move to appropriate location"
     },
     {
       "name": "📆 Daily Note",
       "nameTemplate": "%YYYY%-%MM%-%DD%",
-      "folder": "Log",
+      "folder": "Dailies",
       "mode": "createOrOpen",
-      "description": "Creates or opens a timestamped note for the current day for journaling and quickly jotting down quick thoughts."
+      "description": "Creates or opens a timestamped note for the current day for journaling and quickly jotting down quick thoughts.",
+      "template": "---\ndate: %YYYY%-%MM%-%DD%\ntype: daily-note\ntags: ['daily-log']\n---\n\n# %WeekDay%, %Month% %Do%, %YYYY%\n\n## Today's Focus\n\n\n## Notes & Thoughts\n\n\n## Tasks\n- [ ] \n\n## Review\n- What went well today?\n- What could be improved?\n- What did I learn?"
     },
     {
       "name": "📝 Project Log",
-      "nameTemplate": "%YYYY%-%MM%-%DD% - %name% Project Log",
-      "folder": "Projects/%name%",
+      "nameTemplate": "%YYYY%-%MM%-%DD% - Project Log - %name% ",
+      "folder": "Projects",
       "mode": "create",
       "showInMenu": true,
       "description": "Creates a new log entry for tracking progress on a DH project.",
-      "template": "---\ndate: %YYYY%-%MM%-%DD%\nproject: %name%\ntags: [project-log, %name%]\n---\n## Today's Progress:\n* [ ] Task 1\n* [ ] Task 2\n\n## Challenges Encountered:\n\n## Next Steps:"
+      "template": "---\ndate: \nproject: \ntags: ['project-log', %name%]\n---\n## Today's Progress:\n* [ ] Task 1\n* [ ] Task 2\n\n## Challenges Encountered:\n\n## Next Steps:"
     }
   ]
 }
