@@ -248,7 +248,16 @@ export default class CreateNewFileCommand extends WorkspaceCommand {
 
 				this.workspace.navigateTo(nav)
 			}
-	
+            if (newNode instanceof File && context?.rule) {
+                const templateValue = typeof context.rule.template === 'string' ?
+                    context.rule.template :
+                    context.rule.template.value;
+
+
+                newNode.setFileContent(templateValue);
+            }
+
+
 			return newNode
 		}
 	}

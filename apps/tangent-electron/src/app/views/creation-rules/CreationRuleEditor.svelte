@@ -9,6 +9,7 @@ export let rule: CreationRule
 $: ruleName = rule.name
 $: nameTemplate = rule.nameTemplate
 
+
 let asksForName = false
 let exampleName = ''
 
@@ -79,6 +80,10 @@ function templateDependencies(template) {
 			</figcaption>
 		</figure>
 	</details>
+    <label title="Defines the content of the new note using markdown."> 
+        <span>Template Content</span>
+        <textarea bind:value={$rule.template.value} rows="5"></textarea> 
+    </label>
 	<div class="settingsGroup">
 		<SettingView setting={rule.folder} />
 		<SettingView setting={rule.mode} />
@@ -153,5 +158,22 @@ figcaption {
 		vertical-align: top;
 	}
 }
+
+textarea { /* Add style for textarea */
+    font-family: inherit;
+    font-size: inherit;
+    -webkit-padding: 0.4em 0;
+    padding: 0.4em;
+    margin: 0 0 0 0;
+    box-sizing: border-box;
+    border: 1px solid var(--borderColor);
+    border-radius: var(--inputBorderRadius);
+    outline: none;
+    color: var(--textColor);
+    background-color: var(--buttonBackgroundColor);
+    width: 100%;
+    resize: vertical; /* Allow vertical resizing */
+}
+
 
 </style>

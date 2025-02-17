@@ -14,6 +14,7 @@ export interface CreationRuleDefinition {
 	description: string
 	showInMenu?: boolean
 	openInContext?: string
+	template?: string;
 }
 
 const nameToken = '%name%'
@@ -106,40 +107,36 @@ const creationStoreOptions: ObjectStoreOptions = {
 }
 
 export default class CreationRule extends ObjectStore {
-	id: number
+    id: number
+    name: ValidatingStore<string>
+    nameTemplate: WritableStore<string>
+    folder: Setting<string>
+    mode: Setting<CreationMode>
+    description: Setting<string>
+    showInMenu: Setting<boolean>
+    openInContext: Setting<string>
+    template: WritableStore<string>  // Add this line
 
-	name: ValidatingStore<string>
-	nameTemplate: WritableStore<string>
+    constructor(initialPatch?: any) {
+        super(creationStoreOptions)
+        this.id = creationRuleID++
+        this.name = new ValidatingStore('New Creation Rule', name => {
+            if (!name) return 'New Creation Rule'
+            return name
+        })
+        this.nameTemplate = new WritableStore('%name%')
+        this.folder = new Setting(folderStoreDefinition)
+        this.mode = new Setting(creationModeDefinition)
+        this.description = new Setting(descriptionDefinition)
+        this.showInMenu = new Setting(showInMenuDefinition)
+        this.openInContext = new Setting(openInContextDefinition)
+        this.template = new WritableStore('%template%')  // Add this line
+        
+        if (initialPatch) this.applyPatch(initialPatch)
+        this.setupObservables()
+    }
 
-	folder: Setting<string>
-	mode: Setting<CreationMode>
-
-	description: Setting<string>
-	showInMenu: Setting<boolean>
-
-	openInContext: Setting<string>
-
-	constructor(initialPatch?: any) {
-		super(creationStoreOptions)
-
-		this.id = creationRuleID++
-
-		this.name = new ValidatingStore('New Creation Rule', name => {
-			if (!name) return 'New Creation Rule'
-			return name
-		})
-		this.nameTemplate = new WritableStore('%name%')
-		this.folder = new Setting(folderStoreDefinition)
-		this.mode = new Setting(creationModeDefinition)
-		this.description = new Setting(descriptionDefinition)
-		this.showInMenu = new Setting(showInMenuDefinition)
-		this.openInContext = new Setting(openInContextDefinition)
-
-		if (initialPatch) this.applyPatch(initialPatch)
-		this.setupObservables()
-	}
-
-	getDefinition() {
-		return this.getRawValues() as CreationRuleDefinition
-	}
+    getDefinition() {
+        return this.getRawValues() as CreationRuleDefinition
+    }
 }
