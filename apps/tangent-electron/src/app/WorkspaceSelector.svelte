@@ -80,7 +80,13 @@ function openDocumentation() {
 				{/each}
 			</ul>
 		{:else}
-			<h1>Welcome To Tangent</h1>
+			<h1>Welcome To the DH Primer<br> <em>Powered by Tangent</em></h1>
+			<p>
+				The <em>DH Primer</em> is a personal learning environment for the Digital Humanities.
+				You will find resources and tutorials here in an integrated thinking environment, powered by the Tangent note making app.
+			</p>
+
+
 			<p>
 				<em>Tangent</em> is designed to work on many files within a folder.
 				This folder is called a "workspace."
@@ -88,10 +94,11 @@ function openDocumentation() {
 			</p>
 			<p>
 				You can have few or many workspaces, but you need at least one!
-				For more information, check out
+				You don't <em>have</em> to see our materials, but if you want to learn how to best use Tangent as a thinking environment, check out
 				<!-- svelte-ignore a11y-invalid-attribute -->
-				<a href="#" on:click={openDocumentation} class="local">the documentation</a>.
+				<a href="#" on:click={openDocumentation} class="local">the Tangent documentation & the DH materials</a>.
 			</p>
+			<p> Support for the DH Primer provided by a 2025 Teaching Achievement Award from the Office of the Provost and Vice-President (Academic), Carleton University. </p>
 		{/if}
 
 		<div class="newButton">
