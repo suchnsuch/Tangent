@@ -126,11 +126,12 @@ export function getOpDetailsForTextPosition(delta: Delta, position: number): {
 	return null
 }
 
-export function getEditInfo(delta: Delta): {
+export type EditInfo = {
 	offset: number
 	insert?: string
 	shift: number // positive for insert, negative for delete
-} {
+}
+export function getEditInfo(delta: Delta): EditInfo {
 	/**
 	 * This function is looking for a completely clean Delta, e.g.
 	 * ops: [

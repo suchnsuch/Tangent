@@ -674,7 +674,7 @@ export default class Workspace extends EventDispatcher {
 		const nodeState = tangent.context.getState(target)
 		if (nodeState instanceof NoteViewState) {
 			if (isReference(target) && target.annotations) {
-				nodeState.annotations.set(target.annotations)
+				nodeState.setAnnotations(target.annotations)
 			}
 			if (link) {
 				nodeState.highlightLink(link)

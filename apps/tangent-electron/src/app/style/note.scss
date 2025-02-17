@@ -431,9 +431,12 @@ article.note {
 	}
 
 	.annotation {
-		background-color: var(--accentBackgroundColor);
+		background-color: var(--accentActiveBackgroundColor);
 		&.soft {
 			background-color: var(--accentDeemphasizedBackgroundColor);
+		}
+		&.current {
+			background-color: var(--accentBackgroundColor);
 		}
 	}
 

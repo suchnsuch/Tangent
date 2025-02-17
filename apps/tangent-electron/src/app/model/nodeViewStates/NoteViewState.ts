@@ -1,4 +1,6 @@
+import { derived, Readable } from 'svelte/store'
 import type { EditorRange } from "@typewriter/document"
+import { escapeRegExp, getRegexMatchIndices } from '@such-n-such/core'
 import type NodeViewState from "./NodeViewState"
 import type NoteFile from "../NoteFile"
 import { PartialLink, StructureType } from "common/indexing/indexTypes"
@@ -12,6 +14,8 @@ import { MapStrength } from 'common/tangentMap/MapNode'
 import type { Annotation } from 'common/nodeReferences'
 import { safeHeaderLine } from 'common/markdownModel/header'
 import { lineToText } from 'common/typewriterUtils'
+import { clamp } from 'common/utils'
+import NoteSettingsView from 'app/views/node-views/NoteSettingsView.svelte'
 
 export enum NoteDetailMode {
 	None = 0,
@@ -24,19 +28,42 @@ export enum NoteDetailMode {
 	WordsAndChars = Words | Characters
 }
 
+export type NoteSearchData = {
+	enabled: boolean
+	text: string
+	mode: 'text' | 'regex'
+}
+
+function searchDataToRegex(search: NoteSearchData): RegExp {
+	if (!search.text) return null
+
+	if (search.mode === 'text') {
+		return RegExp(escapeRegExp(search.text), 'ig')
+	}
+	else if (search.mode === 'regex') {
+		return RegExp(search.text, 'ig')
+	}
+	console.warn('Unhandled search mode', search.mode)
+	return null
+}
+
 export default class NoteViewState implements NodeViewState, LensViewState {
 	readonly context: ViewStateContext
 	readonly note: NoteFile
 	selection: EditorRange
 	detailMode: NoteDetailMode
 
-	readonly linkHighlight: WritableStore<PartialLink> = new WritableStore(null)
 	readonly annotations: WritableStore<Annotation[]> = new WritableStore([])
+	readonly annotationIndex: WritableStore<number> = new WritableStore(-1)
+
+	readonly search: WritableStore<NoteSearchData> = new WritableStore(null)
+
 	readonly scrollY: WritableStore<number> = new WritableStore(0)
 
-	private structureUnobserver?: () => void
-
 	readonly currentLens: ReadableStore<LensViewState>
+	readonly pinSettings: Readable<boolean>
+
+	protected readonly unsubs: (() => void)[]
 
 	constructor(context: ViewStateContext, file: NoteFile, showDetails=NoteDetailMode.None) {
 		this.context = context
@@ -44,11 +71,19 @@ export default class NoteViewState implements NodeViewState, LensViewState {
 		this.detailMode = showDetails
 
 		this.note.loadFile()
-		this.structureUnobserver = this.note.observeStructureChanges(delta => {
-			this.onStructureChange(delta)
-		})
 
 		this.currentLens = new ReadableStore(this)
+		this.pinSettings = derived([this.search, this.annotations], ([search, annotations]) => {
+			return search?.enabled || annotations.length > 1
+		})
+
+		this.unsubs = [
+			this.note.observeStructureChanges(delta => {
+				this.onStructureChange(delta)
+			}),
+			this.search.subscribe(search => this.onSearchChanged(search)),
+			this.note.subscribe(note => this.onSearchChanged(this.search.value)),
+		]
 	}
 
 	get node() { return this.note }
@@ -104,7 +139,9 @@ export default class NoteViewState implements NodeViewState, LensViewState {
 
 	dispose() {
 		this.note.dropFile()
-		this.structureUnobserver()
+		for (const unsub of this.unsubs) {
+			unsub()
+		}
 	}
 
 	focus(element: HTMLElement) {
@@ -169,6 +206,66 @@ export default class NoteViewState implements NodeViewState, LensViewState {
 
 		if (annotation.start >= 0 || annotation.end >= 0) {
 			this.annotations.update(a => [...a, annotation])
+			this.annotationIndex.set(this.annotations.value.length - 1)
 		}
+	}
+
+	setAnnotations(annotations: Annotation[], index?: number) {
+		this.annotations.set(annotations)
+		this.annotationIndex.set(annotations.length === 0 ? -1 : clamp(index ?? this.annotationIndex.value ?? 0, 0, annotations.length - 1))
+	}
+
+	setSearch(text?: string) {
+		this.search.update(search => {
+			text = text ?? search?.text ?? ''
+			if (!search) {
+				return {
+					text,
+					enabled: true,
+					mode: 'text'
+				}
+			}
+			return {
+				text,
+				enabled: true,
+				mode: search.mode
+			}
+		})
+	}
+
+	protected onSearchChanged(search: NoteSearchData) {
+		if (!search) return
+
+		let annotations: Annotation[] = []
+
+		if (search.enabled) {
+			const matcher = searchDataToRegex(search)
+			if (matcher) {
+				let lineStart = 0
+				const message = 'Matches ' + search.text
+				for (const line of this.note.lines) {
+					const lineText = lineToText(line)
+
+					const match = lineText.matchAll(matcher)
+					if (match) {
+						for (const m of match) {
+							const start = lineStart + m.index
+							annotations.push({
+								start,
+								end: start + m[0].length,
+								data: message
+							})
+						}
+					}
+					lineStart += line.length
+				}
+			}
+		}
+
+		this.setAnnotations(annotations)
+	}
+
+	get settingsComponent() {
+		return NoteSettingsView
 	}
 }

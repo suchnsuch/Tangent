@@ -34,7 +34,7 @@ import { pluralize } from 'common/plurals'
 import arrowNavigate from 'app/utils/arrowNavigate'
 import { HrefFormedLink, StructureType } from 'common/indexing/indexTypes'
 import type { ConnectionInfo } from 'common/indexing/indexTypes'
-import { areLineArraysOpTextEquivalent, getEditInfo, getLineRangeWhile, getRangeWhile, lineToText } from 'common/typewriterUtils'
+import { areLineArraysOpTextEquivalent, EditInfo, getEditInfo, getLineRangeWhile, getRangeWhile, lineToText } from 'common/typewriterUtils'
 import { scrollTo } from 'app/utils';
 import { eventHasSelectionRequest, type NavigationData } from 'app/events'
 import WorkspaceFileHeader from 'app/utils/WorkspaceFileHeader.svelte';
@@ -58,7 +58,7 @@ import UnicodeAutocompleter from '../autocomplete/UnicodeAutocompleter';
 import UnicodeAutocompleteMenu from '../autocomplete/UnicodeAutocompleteMenu.svelte';
 import CodeBlockAutocompleter from '../autocomplete/CodeBlockAutoCompleter';
 import CodeBlockAutocompleteMenu from '../autocomplete/CodeBlockAutocompleteMenu.svelte';
-    import { handleIsNode } from 'app/model/NodeHandle';
+import { handleIsNode } from 'app/model/NodeHandle';
 
 // Technically, this just needs to exist _somewhere_. Putting it here because of the svelte dependency
 // Force the use of the variable so that it is included in the bundle
@@ -139,9 +139,13 @@ $: showBacklinks.update(detailsOpened)
 $: note = state.note
 
 let annotationHighlightTimeout: number = null
-let allowAnnotationReactions = true
+let allowAnnotationReactions = true // A flag that automatically shifts annotations when content is edited
+let ignoreNextAnnotationUpdate = false
 const annotations = new ForwardingStore<Annotation[]>([])
+const annotationIndex = new ForwardingStore<number>(-1)
 $: annotations.forwardFrom(state.annotations)
+$: annotationIndex.forwardFrom(state.annotationIndex)
+$: updateAnnotations($annotations, $annotationIndex)
 
 $: focusing = (focusLevel >= FocusLevel.Paragraph) && (layout !== 'fill' || hasSelection && !justScrolled)
 $: virtual = $note.meta?.virtual
@@ -154,10 +158,6 @@ editor.on('change', onEditorChange)
 editor.on('decorate', onEditorDecorate)
 
 editor.on('navigate', navigationForward)
-
-const unsubs = [
-	annotations.subscribe(updateAnnotations)
-]
 
 onMount(() => {
 	if (container && state?.scrollY && layout === 'fill') {
@@ -201,8 +201,6 @@ onDestroy(() => {
 		
 		editor.destroy()
 	}
-
-	unsubs.forEach(i => i())
 })
 
 $: updateExtraSpace(extraTop, extraBottom, focusLevel, container)
@@ -344,7 +342,7 @@ function initializeSelection(_h?, _e?) {
 	isInitializing = false
 }
 
-function updateAnnotations(annotations: Annotation[]) {
+function updateAnnotations(annotations: Annotation[], index=0) {
 
 	if (!editor._root || !note.isReady) {
 		return
@@ -354,11 +352,15 @@ function updateAnnotations(annotations: Annotation[]) {
 	if (annotations && annotations.length) {
 		window.clearTimeout(annotationHighlightTimeout)
 
-		if (allowAnnotationReactions) {
+		if (allowAnnotationReactions && !ignoreNextAnnotationUpdate) {
 			allowAnnotationReactions = false
 
+			if (index < 0 || index >= annotations.length) {
+				index = 0
+			}
+
 			annotationHighlightTimeout = window.setTimeout(() => {
-				const annotation = annotations[0]
+				const annotation = annotations[index]
 				const range: EditorRange = [annotation.start, annotation.end]
 				const bounds = editor.getBounds(range)
 				const containerRect = container.getBoundingClientRect()
@@ -371,10 +373,18 @@ function updateAnnotations(annotations: Annotation[]) {
 				}
 			}, 100)
 
-			editor.select(annotations[0].end)
+			const selection = annotations[index].end
+			if (document.activeElement === editorElement) {
+				editor.select(selection)
+			}
+			else {
+				state.selection = [selection, selection]
+			}
 			allowAnnotationReactions = true
 		}
 	}
+
+	ignoreNextAnnotationUpdate = false
 }
 
 export function saveFile() {
@@ -417,15 +427,23 @@ function ensureRangeInView(range: EditorRange, buffer=50, scrollTime?: number) {
 
 function onEditorChange(changeEvent: EditorChangeEvent) {
 
-	// Shift annotations around based on the change
+	// Manage annotation interactions
 	const annos = $annotations
-	if (changeEvent.change?.contentChanged && allowAnnotationReactions && annos && annos.length) {
+	if (allowAnnotationReactions && annos && annos.length) {
 		allowAnnotationReactions = false
 
-		const editInfo = getEditInfo(changeEvent.change.delta)
-		if (editInfo) {
-			const newAnnotations: Annotation[] = []
-			let edited = false
+		let editInfo: EditInfo = null
+		let invalidChange = false
+		if (changeEvent.change?.contentChanged) {
+			editInfo = getEditInfo(changeEvent.change.delta)
+			if (!editInfo && changeEvent.change.delta.ops.find(o => 'delete' in o || 'insert' in o)) {
+				invalidChange = true
+			}
+		}
+		
+		const newAnnotations: Annotation[] = []
+		let edited = false
+		if (!invalidChange) {
 
 			function getIntersection(annotation: Annotation) {
 				if (annotation.start > editInfo.offset + editInfo.shift) {
@@ -438,35 +456,42 @@ function onEditorChange(changeEvent: EditorChangeEvent) {
 			}
 
 			for (const annotation of annos) {
-				const intersection = getIntersection(annotation)
-				switch (intersection) {
-					case 'before':
-						// Basically a no-op
-						newAnnotations.push(annotation)
-						break
-					case 'after':
-						// Shift this annotation
-						newAnnotations.push({
-							start: annotation.start + editInfo.shift,
-							end: annotation.end + editInfo.shift,
-							data: annotation.data
-						})
-						edited = true
-						break
-					case 'intersects':
-						// Remove this annotation
-						edited = true
-						break
+
+				if (editable && typeof annotation.data === 'object' && 'href' in annotation.data) {
+					// Remove link-based annotations when selection changes
+					edited = true
+					continue;
+				}
+
+				if (editInfo) {
+					// Shift annotations around based on the change
+					const intersection = getIntersection(annotation)
+					switch (intersection) {
+						case 'before':
+							// Basically a no-op
+							newAnnotations.push(annotation)
+							break
+						case 'after':
+							// Shift this annotation
+							newAnnotations.push({
+								start: annotation.start + editInfo.shift,
+								end: annotation.end + editInfo.shift,
+								data: annotation.data
+							})
+							edited = true
+							break
+						case 'intersects':
+							// Remove this annotation
+							edited = true
+							break
+					}
 				}
 			}
-
-			if (edited) {
-				$annotations = newAnnotations
-			}
 		}
-		else {
-			// Clear all to be safe
-			$annotations = []
+
+		if (invalidChange || edited) {
+			ignoreNextAnnotationUpdate = true
+			state.setAnnotations(newAnnotations)
 		}
 		
 		allowAnnotationReactions = true
@@ -475,17 +500,6 @@ function onEditorChange(changeEvent: EditorChangeEvent) {
 	if (editable) {
 		if (editor.doc.selection) {
 			state.selection = editor.doc.selection
-
-			// Remove link-based annotations when selection changes
-			const annos = $annotations
-			if (allowAnnotationReactions && annos && annos.length) {
-				allowAnnotationReactions = false
-				const filtered = annos.filter(a => !('href' in a.data))
-				if (filtered.length !== annos.length) {
-					$annotations = filtered
-				}
-				allowAnnotationReactions = true
-			}
 		}
 
 		if (changeEvent.changedLines?.length > 0) {
@@ -634,9 +648,13 @@ function applyFocusDecorations(doc: TextDocument) {
 function applyAnnotations() {
 	const decorator = (editor.modules.decorations as DecorationsModule).getDecorator('annotations')
 	decorator.clear()
-	if (annotations && $annotations) {
-		for (const annotation of $annotations) {
+	if ($annotations) {
+		for (let i = 0; i < $annotations.length; i++) {
+			const annotation = $annotations[i]
 			let className = 'annotation'
+			if ($annotationIndex === i) {
+				className += ' current'
+			}
 			const groupNumber = annotation.data.group
 			if (groupNumber !== undefined) {
 				if (groupNumber === 0) {
@@ -684,8 +702,20 @@ function onNoteKeydown(event: KeyboardEventWithShortcut) {
 
 	if (event.modShortcut === 'Mod+Alt+ArrowDown') {
 		event.preventDefault()
-
 		openDetails()
+		return
+	}
+
+	if (event.modShortcut === 'Mod+F') {
+		event.preventDefault()
+		const selection = editor.doc.selection
+		if (selection && selection[0] != selection[1]) {
+			state.setSearch(editor.doc.getText(selection))
+		}
+		else {
+			state.setSearch()
+		}
+		return
 	}
 }
 

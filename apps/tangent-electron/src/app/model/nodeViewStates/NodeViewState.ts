@@ -1,3 +1,4 @@
+import { Readable } from 'svelte/store'
 import type { SvelteConstructor } from 'app/utils/svelte'
 import type { TreeChange, TreeNode } from 'common/trees'
 import type { ReadableStore } from 'common/stores'
@@ -10,7 +11,7 @@ export default interface NodeViewState {
 	readonly currentLens: ReadableStore<LensViewState>
 
 	settingsComponent?: SvelteConstructor
-	readonly pinSettings?: ReadableStore<boolean>
+	readonly pinSettings?: Readable<boolean>
 
 	dispose?()
 	focus?(element: HTMLElement): boolean
