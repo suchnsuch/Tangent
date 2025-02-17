@@ -96,6 +96,7 @@ function nodeClick(event, ref: TreeNodeOrReference) {
 							allowOverscroll={false}
 							editable={false}
 							fixedTitle={true}
+							extraBottom={20}
 						/>
 					{:else if node instanceof Folder}
 						{@const children = node.children?.length ? [...node.visibleChildren()] : []}

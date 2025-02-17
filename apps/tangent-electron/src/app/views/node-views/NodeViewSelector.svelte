@@ -1,5 +1,5 @@
 <script lang="ts">
-import { createEventDispatcher, getContext } from 'svelte'
+import { createEventDispatcher, getContext, onDestroy } from 'svelte'
 import { fly, fade } from 'svelte/transition'
 import { FocusLevel } from 'common/dataTypes/TangentInfo'
 import paths from 'common/paths'
@@ -45,6 +45,21 @@ $: showSettings = showSettingsFromMouse || showSettingsFromHover || willPinSetti
 
 let container: HTMLElement
 let settingsContainer: HTMLElement
+let settingsHeight: number = extraTop
+
+const settingsResizeObserver = new ResizeObserver(e => {
+	const entry = e[0]
+	if (entry) {
+		settingsHeight = entry.borderBoxSize[0].blockSize
+	}
+})
+
+$: if (settingsContainer) {
+	settingsResizeObserver.disconnect()
+	settingsResizeObserver.observe(settingsContainer)
+} else settingsResizeObserver.disconnect()
+
+onDestroy(() => settingsResizeObserver.disconnect())
 
 function onMouseMoveContainer(event: MouseEvent) {
 
@@ -129,7 +144,7 @@ function getClassNamesForNode(node: TreeNode) {
 			{focusLevel}
 			{layout}
 			{background}
-			extraTop={willPinSettings ? settingsContainer?.getBoundingClientRect().height ?? extraTop : extraTop}
+			extraTop={willPinSettings ? settingsHeight ?? extraTop : extraTop}
 			on:navigate={e => typedDispatch('navigate', e.detail)}
 			on:view-ready
 			on:scroll-request={e => typedDispatch('scroll-request', e.detail)}
