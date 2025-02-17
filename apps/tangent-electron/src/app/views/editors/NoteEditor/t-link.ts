@@ -23,7 +23,7 @@ function linkStateTooltip(state: LinkState, context: HandleResult) {
 		case 'uninitialized':
 			return undefined
 		case 'empty':
-			return '\"' + (context as TreeNode).name + '\" is virtual.\n' + getClickMessage('it')
+			return '\"' + (context as TreeNode)?.name + '\" is virtual.\n' + getClickMessage('it')
 		case 'resolved':
 			return context
 				? getClickMessage('\"' + (context as TreeNode).name + '\"')
