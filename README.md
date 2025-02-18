@@ -1,20 +1,3 @@
-Feb 14, 2025 - starting the DH Primer Project
-
-The goal is to integrate tutorials and lessons I've built over the years (including ODATE) into a single application. Tangent makes a fantastic base because of the way it imagines knowledge management and note taking. By integrating all of our tutorial materials as a default library/workspace in Tangent, a student could use the app as a combination textbook and zettlekasten-like notes/observation platform. ODATE pushed the reader to Binder to explore code. I want to do that locally instead through Tangent. Can I do that? Only one way to find out!
-
-Stage 1 - Text
-+ integrate all of the various tutorials etc into Tangent.
-+ develop templates for student use with the tutorials
-+ develop a teaching guide
-
-Stage 2 - Computational Notebooks
-+ integrate ipynb notebooks with Python & R packaged in as well
-+ bundle appropriate packages
-+ edit ipynb from within Tangent, bundle jupyter notebook for code execution
-
-
-# Original Readme:
-
 # Tangent
 This is the monorepo for the [Tangent](https://www.tangentnotes.com) project. Pre-built binaries can be found [on the downloads page](https://www.tangentnotes.com/Download) and [on Flathub](https://flathub.org/apps/io.github.suchnsuch.Tangent).
 
