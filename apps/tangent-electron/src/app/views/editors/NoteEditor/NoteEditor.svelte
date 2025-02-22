@@ -59,6 +59,7 @@ import UnicodeAutocompleteMenu from '../autocomplete/UnicodeAutocompleteMenu.sve
 import CodeBlockAutocompleter from '../autocomplete/CodeBlockAutoCompleter';
 import CodeBlockAutocompleteMenu from '../autocomplete/CodeBlockAutocompleteMenu.svelte';
 import { handleIsNode } from 'app/model/NodeHandle';
+    import { revealContentAroundRange } from './editorModule';
 
 // Technically, this just needs to exist _somewhere_. Putting it here because of the svelte dependency
 // Force the use of the variable so that it is included in the bundle
@@ -547,10 +548,10 @@ function onEditorChange(changeEvent: EditorChangeEvent) {
 	}
 }
 
-function onEditorDecorate (event: DecorateEvent) {
+function onEditorDecorate(event: DecorateEvent) {
 	const doc = event.doc
 	applyFocusDecorations(doc)
-	applyAnnotations()
+	applyAnnotations(event)
 
 	if ($letCodeExpand) {
 		tick().then(() => {
@@ -645,14 +646,14 @@ function applyFocusDecorations(doc: TextDocument) {
 	decorator.apply()
 }
 
-function applyAnnotations() {
+function applyAnnotations(event?: DecorateEvent) {
 	const decorator = (editor.modules.decorations as DecorationsModule).getDecorator('annotations')
 	decorator.clear()
 	if ($annotations) {
-		for (let i = 0; i < $annotations.length; i++) {
-			const annotation = $annotations[i]
+
+		function applyAnnotation(annotation: Annotation, current: boolean) {
 			let className = 'annotation'
-			if ($annotationIndex === i) {
+			if (current) {
 				className += ' current'
 			}
 			const groupNumber = annotation.data.group
@@ -664,9 +665,27 @@ function applyAnnotations() {
 					className += ' hard'
 				}
 			}
-			decorator.decorateText([annotation.start, annotation.end], {
+			const range: EditorRange = [annotation.start, annotation.end]
+			decorator.decorateText(range, {
 				class: className
 			})
+
+			if (current) {
+				// Reveal the current annotation
+				revealContentAroundRange(event?.doc ?? editor.doc, range, decorator.change)
+				decorator.change.formatText(range, { revealed: true })
+			}
+		}
+
+		for (let i = 0; i < $annotations.length; i++) {
+			if (i !== $annotationIndex) {
+				applyAnnotation($annotations[i], false)
+			}
+		}
+
+		// Apply the current annotation last so that it's on top
+		if ($annotationIndex >= 0 && $annotationIndex < $annotations.length) {
+			applyAnnotation($annotations[$annotationIndex], true)
 		}
 	}
 	decorator.apply()

@@ -13,7 +13,8 @@ import {
 	Source,
 	TextChange,
 	Decorator,
-	DecorateEvent
+	DecorateEvent,
+	TextDocument
 } from 'typewriter-editor'
 
 import { requestCallbackOnIdle, wait } from '@such-n-such/core'
@@ -60,6 +61,85 @@ interface VerifyListOptions {
 // Force the inclusion of the variable so it is included in the variable
 if (!TangentMath) {
 	console.error('I don\'t have math!')
+}
+
+export function revealContentAroundRange(doc: TextDocument, range: EditorRange, change: TextChange) {
+	const selection = normalizeRange(range)
+	const formats = doc.getTextFormat(selection)
+	const lines = doc.getLinesAt(selection)
+	
+	for (let line of lines) {
+		// Expand range to grab on either side
+		selection[0] = selection[0] - 1
+		selection[1] = selection[1] + 1
+
+		const lineRange = doc.getLineRange(line)
+		const lineSelection = clampRange(selection, lineRange)
+		const relativeSelection = [lineSelection[0] - lineRange[0], lineSelection[1] - lineRange[0]]
+		
+		let earliestUnbrokenHidden = relativeSelection[0]
+		let latestUnbrokenHidden = relativeSelection[1]
+		const isHiddenLine = line.attributes.hidden ?? false 
+		let hitLineFormat = isHiddenLine
+		let hitRevealable = hitLineFormat
+		let foundLatest = false
+		let textIndex = 0
+		let opIndex = 0
+		
+		while (textIndex < line.length && opIndex < line.content.ops.length) {
+			const op = line.content.ops[opIndex]
+			const opLength = Op.length(op)
+			const opEndIndex = textIndex + opLength
+			if (textIndex <= relativeSelection[0]) {
+				if (op.attributes?.hidden || op.attributes?.hiddenGroup) {
+					hitRevealable = true
+					if (op.attributes?.line_format) {
+						hitLineFormat = true
+					}
+					if (textIndex < earliestUnbrokenHidden) {
+						earliestUnbrokenHidden = textIndex
+					}
+				}
+				else {
+					// Continuity broken, reset
+					hitRevealable = false
+					hitLineFormat = isHiddenLine
+					earliestUnbrokenHidden = relativeSelection[0]
+				}
+			}
+			if (!foundLatest && opEndIndex >= relativeSelection[1]) {
+				if (op.attributes?.hidden || op.attributes?.hiddenGroup) {
+					hitRevealable = true
+					if (op.attributes?.line_format) {
+						hitLineFormat = true
+					}
+					if (opEndIndex > latestUnbrokenHidden) {
+						latestUnbrokenHidden = opEndIndex
+					}
+				}
+				else {
+					// Continuity broken, stop looking
+					foundLatest = true
+				}
+			}
+			
+			opIndex++
+			textIndex += opLength
+			
+			if (foundLatest && textIndex > relativeSelection[0]) {
+				break
+			}
+		}
+		
+		if (hitRevealable || formats.hidden || formats.hiddenGroup) {
+			const targetRange = [earliestUnbrokenHidden + lineRange[0], latestUnbrokenHidden + lineRange[0]] as EditorRange
+			
+			change.formatText(targetRange, { revealed: true })
+		}
+		if (hitLineFormat) {
+			change.formatLine(doc.getLineRange(line), { revealed: true}, true)
+		}
+	}
 }
 
 export default function editorModule(editor: Editor, options: {
@@ -494,82 +574,7 @@ export default function editorModule(editor: Editor, options: {
 			
 			// Apply selection reveal
 			if (doc.selection) {
-				const selection = normalizeRange(doc.selection.slice() as EditorRange)
-				const formats = doc.getTextFormat(selection)
-				const lines = doc.getLinesAt(selection)
-				
-				for (let line of lines) {
-					// Expand range to grab on either side
-					selection[0] = selection[0] - 1
-					selection[1] = selection[1] + 1
-	
-					const lineRange = doc.getLineRange(line)
-					const lineSelection = clampRange(selection, lineRange)
-					const relativeSelection = [lineSelection[0] - lineRange[0], lineSelection[1] - lineRange[0]]
-					
-					let earliestUnbrokenHidden = relativeSelection[0]
-					let latestUnbrokenHidden = relativeSelection[1]
-					const isHiddenLine = line.attributes.hidden ?? false 
-					let hitLineFormat = isHiddenLine
-					let hitRevealable = hitLineFormat
-					let foundLatest = false
-					let textIndex = 0
-					let opIndex = 0
-					
-					while (textIndex < line.length && opIndex < line.content.ops.length) {
-						const op = line.content.ops[opIndex]
-						const opLength = Op.length(op)
-						const opEndIndex = textIndex + opLength
-						if (textIndex <= relativeSelection[0]) {
-							if (op.attributes?.hidden || op.attributes?.hiddenGroup) {
-								hitRevealable = true
-								if (op.attributes?.line_format) {
-									hitLineFormat = true
-								}
-								if (textIndex < earliestUnbrokenHidden) {
-									earliestUnbrokenHidden = textIndex
-								}
-							}
-							else {
-								// Continuity broken, reset
-								hitRevealable = false
-								hitLineFormat = isHiddenLine
-								earliestUnbrokenHidden = relativeSelection[0]
-							}
-						}
-						if (!foundLatest && opEndIndex >= relativeSelection[1]) {
-							if (op.attributes?.hidden || op.attributes?.hiddenGroup) {
-								hitRevealable = true
-								if (op.attributes?.line_format) {
-									hitLineFormat = true
-								}
-								if (opEndIndex > latestUnbrokenHidden) {
-									latestUnbrokenHidden = opEndIndex
-								}
-							}
-							else {
-								// Continuity broken, stop looking
-								foundLatest = true
-							}
-						}
-						
-						opIndex++
-						textIndex += opLength
-						
-						if (foundLatest && textIndex > relativeSelection[0]) {
-							break
-						}
-					}
-					
-					if (hitRevealable || formats.hidden || formats.hiddenGroup) {
-						const targetRange = [earliestUnbrokenHidden + lineRange[0], latestUnbrokenHidden + lineRange[0]] as EditorRange
-						
-						change.formatText(targetRange, { revealed: true })
-					}
-					if (hitLineFormat) {
-						change.formatLine(doc.getLineRange(line), { revealed: true}, true)
-					}
-				}
+				revealContentAroundRange(doc, doc.selection.slice() as EditorRange, change)
 			}
 			
 			revealDecorator.apply()
