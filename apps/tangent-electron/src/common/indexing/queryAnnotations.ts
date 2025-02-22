@@ -31,11 +31,17 @@ export function getTextAnnotations(text: string, partial: PartialClauseValue): A
 					// A hack to pull out indicies indicated by the 'd' value
 					const indices = (match as any).indices[groupIndex]
 					if (!indices) throw new Error(`No indicies found for group "${groupIndex}" in regex "${regex}". Was 'd' flag not present?`)
-					result.push({
-						data: { ...partial, group: groupIndex },
-						start: indices[0],
-						end: indices[1]
-					})					
+					const start = indices[0]
+					const end = indices[1]
+
+					const last = result.at(-1)
+					if (!last || (last.start !== start || last.end !== end)) {
+						result.push({
+							data: { ...partial, group: groupIndex },
+							start,
+							end
+						})
+					}
 				}
 
 				return result
