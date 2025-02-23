@@ -261,7 +261,8 @@ export default class Tangent {
 			if (diff >= 1000 * 60 * 60 * 8) { // 8 hours later
 
 				const tangentInfo = this.tangentInfo.value
-				const previousSessionPath = tangentInfo.activeSession.value?.path ?? ''
+				const store = this._state.workspace.directoryStore
+				const previousSessionPath = store.pathToPortablePath(tangentInfo.activeSession.value?.path) ?? ''
 
 				if (options.thread === 'retain' &&
 					typeof options.currentNode !== 'number' &&

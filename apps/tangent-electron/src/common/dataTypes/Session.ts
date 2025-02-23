@@ -1,4 +1,4 @@
-import { ObjectStore, PatchableList, ReadableStore, StoreUndoStack, WritableStore } from 'common/stores'
+import { ObjectStore, PatchableList, RawValueMode, ReadableStore, StoreUndoStack, WritableStore } from 'common/stores'
 import { RESAVE_DATA_FILE, type DataTypeConstructionContext } from './DataType'
 import { DirectoryLookup, DirectoryStore, TreeChange, TreeNode, nodeFromPath } from 'common/trees'
 import { clamp } from 'common/utils'
@@ -229,26 +229,54 @@ class PlaceholderingDirectory implements DirectoryLookup {
 	}
 }
 
+// Increment this to create new session versions
+const latestSessionVersion = 1
+
+function migrateSession(context: DataTypeConstructionContext) {
+	const { json } = context
+	if (!json) return // Nothing there, nothing to migrate
+
+	let version = json.version ?? 0
+
+	if (version === 0) {
+		// `previousSession` needs to be made portable
+		if (json.previousSession && typeof json.previousSession === 'string') {
+			try {
+				const portablePath = context.store.pathToPortablePath(json.previousSession)
+				if (portablePath) {
+					console.log(context.file.name, 'changing previous session path from', json.previousSession, 'to', portablePath)
+					json.previousSession = portablePath
+				}
+			}
+			catch (e) {}
+		}
+		version++
+	}
+}
+
 export default class Session extends ObjectStore {
 
-	_store: PlaceholderingDirectory
-	_file: TreeNode
+	readonly _store: PlaceholderingDirectory
+	readonly _file: TreeNode
 
-	threadHistory: ThreadHistoryList
-	threadIndex: WritableStore<number>
+	readonly threadHistory: ThreadHistoryList
+	readonly threadIndex: WritableStore<number>
 
-	previousSession: WritableStore<string>
+	// The portable path of the previous session
+	readonly previousSession: WritableStore<string>
 
-	map: TangentMap
+	readonly map: TangentMap
 
-	undoStack: StoreUndoStack
+	readonly undoStack: StoreUndoStack
 	
-	private _currentThreadItem: WritableStore<ThreadHistoryItem>
-	private _isEmpty: WritableStore<boolean>
+	private readonly _currentThreadItem: WritableStore<ThreadHistoryItem>
+	private readonly  _isEmpty: WritableStore<boolean>
 	private _isInitializing = false
 
-	constructor({ store, json, file }: DataTypeConstructionContext) {
+	constructor(context: DataTypeConstructionContext) {
 		super()
+
+		const { store, json, file } = context
 
 		const placeholderingStore = new PlaceholderingDirectory(store)
 		this._store = placeholderingStore
@@ -262,6 +290,8 @@ export default class Session extends ObjectStore {
 		this.previousSession = new WritableStore('')
 
 		this.map = new TangentMap(placeholderingStore)
+
+		migrateSession(context)
 
 		this._store.createPlaceholders = true
 		this.applyPatch(json)
@@ -289,6 +319,12 @@ export default class Session extends ObjectStore {
 
 	static isType(store: DirectoryStore, node: TreeNode) {
 		return node.fileType === extension
+	}
+
+	getRawValues(mode?: RawValueMode) {
+		const result: any = super.getRawValues(mode) ?? {}
+		result.version = latestSessionVersion
+		return result
 	}
 
 	get currentThread(): ReadableStore<ThreadHistoryItem> {

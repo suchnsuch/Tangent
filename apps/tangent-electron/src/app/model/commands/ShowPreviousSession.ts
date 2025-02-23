@@ -22,7 +22,7 @@ export default class ShowPreviousSessionCommand extends WorkspaceCommand {
 		const previousSessionPath = session?.previousSession.value
 		if (!previousSessionPath) return
 
-		const previousSessionFile = this.workspace.directoryStore.get(previousSessionPath)
+		const previousSessionFile = this.workspace.directoryStore.getWithPortablePath(previousSessionPath)
 		if (!previousSessionFile) return
 
 		const tangentInfo = this.workspace.viewState.tangent.tangentInfo.value
