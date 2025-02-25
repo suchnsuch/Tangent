@@ -1,4 +1,4 @@
-import paths from 'common/paths';
+import paths, { normalizeSeperators } from 'common/paths';
 import { DirectoryStore, TreeNode } from 'common/trees';
 import type { TagTreeNode } from './TagNode';
 
@@ -73,7 +73,7 @@ extends DirectoryStore {
 	pathToPortablePath(workspacePath: string): string {
 		if (!workspacePath) return undefined
 		const fileChildPath = paths.getChildPath(this.files.path, workspacePath)
-		if (fileChildPath !== false) return FILES_PLACEHOLDER + fileChildPath // Files are something else
+		if (fileChildPath !== false) return normalizeSeperators(FILES_PLACEHOLDER + fileChildPath) // Files are something else
 
 		const tagChildPath = paths.getChildPath(this.tags.path, workspacePath)
 		if (tagChildPath !== false) return workspacePath // Tag paths are portable
@@ -84,7 +84,7 @@ extends DirectoryStore {
 	portablePathToPath(portablPath: string): string {
 		if (!portablPath) return undefined
 		if (portablPath.startsWith(FILES_PLACEHOLDER)) {
-			return paths.join(this.files.path, portablPath.substring(FILES_PLACEHOLDER.length))
+			return normalizeSeperators(paths.join(this.files.path, portablPath.substring(FILES_PLACEHOLDER.length)))
 		}
 
 		const tagChildPath = paths.getChildPath(this.tags.path, portablPath)
