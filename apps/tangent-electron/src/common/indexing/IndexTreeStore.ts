@@ -78,7 +78,7 @@ extends DirectoryStore {
 		const tagChildPath = paths.getChildPath(this.tags.path, workspacePath)
 		if (tagChildPath !== false) return workspacePath // Tag paths are portable
 		
-		throw new Error('Could not create a portable path from ' + workspacePath)
+		throw new Error('Could not create a portable path from ' + workspacePath + '. File root: ' + this.files.path)
 	}
 
 	portablePathToPath(portablPath: string): string {

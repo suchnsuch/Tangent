@@ -11,11 +11,11 @@ import { ObjectStore } from 'common/stores'
 import type { ProgressInfo, UpdateInfo } from 'electron-updater'
 import { getSettings, subscribeToSettings } from './settings'
 import Logger from 'js-logger'
-import migrate, { latestViewStateVersion } from './migrations/viewStateMigrator'
+import migrate, { latestViewStateVersion, migrateLegacyComputerNameWorkspaceViewState } from './migrations/viewStateMigrator'
 import type { ContextMenuTemplate } from 'common/menus'
 import type { FileContent } from './File'
 import type { HrefForm, HrefFormedLink } from 'common/indexing/indexTypes'
-import { getSafeHostName, getWorkspaceNamePrefix } from './environment'
+import { getSafeComputerName, getSafeHostName, getWorkspaceNamePrefix } from './environment'
 import type { UserMessage } from 'common/WindowApi'
 import { dropWorkspace } from './workspaces'
 
@@ -58,7 +58,7 @@ export default class WindowHandle {
 	getClientName() {
 		let prefix = getWorkspaceNamePrefix()
 		if (prefix) prefix += '_'
-		return `${prefix}${getSafeHostName()}_${this.viewID}`
+		return `${prefix}${getSafeComputerName()}_${this.viewID}`
 	}
 
 	getWorkspaceViewStateFilePath() {
@@ -66,6 +66,22 @@ export default class WindowHandle {
 			let prefix = getWorkspaceNamePrefix()
 			if (prefix) prefix += '_'
 			const filename = `${this.getClientName()}.workspace`
+			return path.join(this.assignedWorkspacePath, '.tangent', 'workspaces', filename)
+		}
+		return null
+	}
+
+	getLegacyClientName() {
+		let prefix = getWorkspaceNamePrefix()
+		if (prefix) prefix += '_'
+		return `${prefix}${getSafeHostName()}_${this.viewID}`
+	}
+
+	getLegacyWorkspaceViewStateFilePath() {
+		if (this.workspace) {
+			let prefix = getWorkspaceNamePrefix()
+			if (prefix) prefix += '_'
+			const filename = `${this.getLegacyClientName()}.workspace`
 			return path.join(this.assignedWorkspacePath, '.tangent', 'workspaces', filename)
 		}
 		return null
@@ -83,12 +99,25 @@ export default class WindowHandle {
 			this.workspace = workspace
 			this.viewID = workspace.addObserver(this)
 
-			let filepath = this.getWorkspaceViewStateFilePath()
+			const filepath = this.getWorkspaceViewStateFilePath()
 			
 			try {
-				log.info('Loading view state:', filepath)
-				let content = await fs.promises.readFile(filepath, 'utf8')
-				let rawState = JSON.parse(content)
+				let workspaceViewStateContent: string
+
+				try {
+					log.info('Loading view state:', filepath)
+					workspaceViewStateContent = await fs.promises.readFile(filepath, 'utf8')
+				}
+				catch (err) {
+					// Try loading the previous filepath
+					const legacyFilepath = this.getLegacyWorkspaceViewStateFilePath()
+					log.info('  …not found. Checking legacy name: ', legacyFilepath)
+
+					workspaceViewStateContent = await migrateLegacyComputerNameWorkspaceViewState(workspace.contentsStore, legacyFilepath, filepath)
+					await workspace.watcherIdleHandle()
+				}
+
+				let rawState = JSON.parse(workspaceViewStateContent)
 				migrate(workspace, rawState)
 				this.setViewState(rawState)
 				if (rawState.window_state) {
