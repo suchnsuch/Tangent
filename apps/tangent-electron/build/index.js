@@ -114,11 +114,26 @@ async function buildDocumentation() {
 		console.log('Documentation already built')
 	}
 	catch (e) {
+		const docPath = path.resolve(path.join(__dirname, '../../../Documentation'))
+		
+		// Copy to a new directory to do fixup
+		const docClonePath = path.resolve(path.join(__dirname, '../__build', 'Documentation'))
+		await fs.promises.cp(docPath, docClonePath, { recursive: true })
+
+		// Clean files that shouldn't be distributed
+		const rmArgs = { recursive: true, force: true }
+		await fs.promises.rm(path.join(docClonePath, '.tangent', 'generated'), rmArgs)
+		await fs.promises.rm(path.join(docClonePath, '.tangent', 'Temp'), rmArgs)
+		await fs.promises.rm(path.join(docClonePath, '.tangent', 'tangents'), rmArgs)
+		await fs.promises.rm(path.join(docClonePath, '.tangent', 'workspaces'), rmArgs)
+
 		// Create the archive
 		let zip = new AdmZip()
-		const docPath = path.resolve(path.join(__dirname, '../../../Documentation'))
-		zip.addLocalFolder(docPath)
+		zip.addLocalFolder(docClonePath)
 		zip.writeZip(buildPath)
+
+		// Remove temp directory
+		await fs.promises.rm(docClonePath, rmArgs)
 	}
 }
 
