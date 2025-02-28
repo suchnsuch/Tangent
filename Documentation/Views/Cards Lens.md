@@ -1,4 +1,4 @@
-The Cards Lens is one of several [[Lenses]] that can be used to visualize multiple files.
+The Cards Lens is one of several [[Lenses]] that can be used to visualize multiple files. It displays notes and other files as a grid of cards.
 
 # Settings
 ## Sorting

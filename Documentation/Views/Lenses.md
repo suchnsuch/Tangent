@@ -6,5 +6,6 @@ Mousing to the top of the panel will reveal the settings panel, letting you swit
 ![[Lense Selection.png|200]]
 
 Lenses are available when looking at folders and queries. The lenses available to them include:
+* The [[List Lens]]
 * The [[Cards Lens]]
 * The [[Feed Lens]]
