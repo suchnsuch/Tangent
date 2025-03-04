@@ -1,0 +1,1 @@
+This folder has some information related to [[A Note Name]].

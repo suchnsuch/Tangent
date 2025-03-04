@@ -445,6 +445,18 @@ export default class DirectoryStore extends SelfStore implements DirectoryLookup
 					result.push(item.item)
 				}
 			}
+
+			if (result.length === 2) {
+				// When a link resolves to a file and a note with the same name at the same
+				// level, prefer the file over the folder.
+				// A way for a note to also be a namespace.
+				// Original Request: https://github.com/suchnsuch/Tangent/issues/115
+				const a = result[0]
+				const b = result[1]
+				if (a.name === b.name && ((a.fileType === 'folder') !== (b.fileType === 'folder'))) {
+					result = result.filter(r => r.fileType !== 'folder')
+				}
+			}
 		}
 		else if (options.orderByDistance && result.length > 1) {
 			// Annotate the result so that distance is calculated once
