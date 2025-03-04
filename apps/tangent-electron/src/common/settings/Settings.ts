@@ -482,6 +482,23 @@ export default class Settings extends ObjectStore {
 		defaultValue: true
 	})
 
+	debug_ioQueue_enable = new Setting<boolean>({
+		name: 'Use IO Queue',
+		description: 'Whether or not to use an IO queue for reading certain files. Experimental.',
+		defaultValue: false
+	})
+
+	debug_ioQueue_maxActive = new Setting<number>({
+		name: 'Max Active IO Queue Items',
+		description: 'Sets the maximum number of files that can be processed at once.',
+		defaultValue: 100,
+		range: {
+			min: 1,
+			max: 10000,
+			step: 1
+		}
+	})
+
 	constructor() {
 		super()
 		this.setupObservables()

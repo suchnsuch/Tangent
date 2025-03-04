@@ -14,11 +14,12 @@ let settings = workspace.settings
 		These settings are intended for debugging purposes only.
 		Changing them can potentially break critical functionality!
 	</p>
-	<h2>Debug</h2>
 	<div class="settingsGroup">
 		<SettingView setting={settings.debug_sendCrashReports} />
 		<SettingView setting={settings.debug_createVirtualFiles} />
 		<SettingView setting={settings.debug_sendItemsToTrash} />
+		<SettingView setting={settings.debug_ioQueue_enable} />
+		<SettingView setting={settings.debug_ioQueue_maxActive} />
 	</div>
 </main>
 

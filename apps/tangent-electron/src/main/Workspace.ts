@@ -33,6 +33,7 @@ import { tokenizeTagName } from '@such-n-such/tangent-query-parser'
 import Tag from './Tag'
 import { isExternalLink } from 'common/links'
 import migrate from './migrations/workspaceMigrator'
+import { readFile } from './ioQueue'
 
 type WatcherEvent = 'add' | 'addDir' | 'change' | 'rename' | 'renameDir' | 'unlink' | 'unlinkDir'
 
@@ -70,6 +71,7 @@ export default class Workspace {
 
 	private createVirtualFiles = true
 	private virtualFileHrefSet = new Set<string>()
+	private useIOQueue = false
 
 	constructor(root: TreeNode) {
 		this.state = new WorkspaceState()
@@ -99,9 +101,10 @@ export default class Workspace {
 			}
 		})
 		settings.debug_createVirtualFiles.subscribe(createVirtual => {
-			if (this.createVirtualFiles !== createVirtual) {
-				this.createVirtualFiles = createVirtual
-			}
+			this.createVirtualFiles = createVirtual
+		})
+		settings.debug_ioQueue_enable.subscribe(useQuery => {
+			this.useIOQueue = useQuery
 		})
 
 		this.indexer = new Indexer({
@@ -457,7 +460,13 @@ export default class Workspace {
 		let file = this.getFile(filepath)
 		if (file) {
 			try {
-				let contents = await fs.promises.readFile(file.path, 'utf8')
+				let contents: string
+				if (this.useIOQueue) {
+					contents = await readFile(file.path)
+				}
+				else {
+					contents = await fs.promises.readFile(file.path, 'utf8')
+				}
 				if (contents) {
 					// Sanitize windows line endings
 					contents = contents.replace(/\r\n/g, '\n')
