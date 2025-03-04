@@ -1,11 +1,8 @@
-import os from 'os'
 import Logger from 'js-logger'
-import { subscribeToSettings } from './settings'
+import { getSettings } from './settings'
 import { app, crashReporter } from 'electron'
 
 const log = Logger.get('debugging')
-
-let crashReportUnsub: any = null
 
 export async function initializeDebugging() {
 	log.info('Starting crash reporter')
@@ -20,13 +17,8 @@ export async function initializeDebugging() {
 		}
 	})
 
-	subscribeToSettings(settings => {
-		if (crashReportUnsub) crashReportUnsub()
-
-		crashReportUnsub = settings.debug_sendCrashReports.subscribe(send => {
-			log.info('Upload crashes to server:', send)
-			crashReporter.setUploadToServer(send)
-		})
+	getSettings().debug_sendCrashReports.subscribe(send => {
+		log.info('Upload crashes to server:', send)
+		crashReporter.setUploadToServer(send)
 	})
-	
 }

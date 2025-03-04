@@ -21,14 +21,14 @@ export function getSettingsPath() {
 
 const log = Logger.get('settings')
 
-let settings: Settings = null
+const settings: Settings = new Settings()
+let settingsLoaded = false
 
 const settingsSubscribers: ((settings: any, patch?: any) => void)[] = []
 const latestSettingsVersion = 2 // Update this when settings need migration changes
 
 export async function loadSettings() {
-	settings = new Settings()
-
+	settingsLoaded = true
 	// If settings are loaded outside the app environment, no reason to try
 	if (app) {
 		try {
@@ -93,7 +93,7 @@ export async function saveSettings(sync=false) {
 }
 
 export function getSettings() {
-	if (!settings) loadSettings()
+	if (!settingsLoaded) loadSettings()
 	return settings
 }
 

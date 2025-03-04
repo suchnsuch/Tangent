@@ -4,7 +4,7 @@ import { autoUpdater, ProgressInfo, UpdateInfo } from 'electron-updater'
 import { mode } from './environment'
 
 import { contentsMap, saveAndCloseWorkspaces } from './workspaces'
-import { subscribeToSettings } from './settings'
+import { getSettings } from './settings'
 import Logger from 'js-logger'
 
 const log = Logger.get('updates')
@@ -150,8 +150,7 @@ ipcMain.on('update', async (event, message) => {
 	}
 })
 
-subscribeToSettings(settings => {
-	const updateChannel = settings.updateChannel.value
+getSettings().updateChannel.subscribe(updateChannel => {
 	if (updateChannel !== autoUpdater.channel) {
 		log.debug('Setting update channel to', updateChannel)
 		autoUpdater.channel = updateChannel
