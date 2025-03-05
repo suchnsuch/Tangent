@@ -234,6 +234,17 @@ describe('Resolving & Creating Partial Path Matches', () => {
 							fileType: '.md'
 						}
 					]
+				},
+				{
+					name: 'Note Name',
+					path: 'some/root/Note Name',
+					fileType: 'folder',
+					children: []
+				},
+				{
+					name: 'Note Name',
+					path: 'some/root/Note Name.md',
+					fileType: '.md'
 				}
 			]
 		}
@@ -365,7 +376,9 @@ describe('Resolving & Creating Partial Path Matches', () => {
 			.toEqual([
 				root.children[0].children[1],
 				root.children[2],
-				root.children[4]
+				root.children[4],
+				root.children[6],
+				root.children[7]
 			])
 	})
 
@@ -447,6 +460,13 @@ describe('Resolving & Creating Partial Path Matches', () => {
 
 		expect(store.getMatchesForPath('a_child/Such Depth', { bestOnly: true }))
 			.toBe(store.getRoot(0).children[0].children[2])
+	})
+
+	it('Returns a file when it share a name with a folder at the same level', () => {
+		const store = getTestStore()
+
+		expect(store.getMatchesForPath('Note Name', { bestOnly: true }))
+			.toBe(store.getRoot(0).children[7])
 	})
 })
 
