@@ -7,6 +7,7 @@ import { scrollTo } from 'app/utils'
 import type Tangent from "app/model/Tangent"
 import type Workspace from 'app/model/Workspace'
 import command from 'app/model/commands/CommandAction'
+import { resizeObserver } from 'app/utils/resizeObserver'
 
 import { FocusLevel } from 'common/dataTypes/TangentInfo'
 import { derived } from 'svelte/store'
@@ -89,8 +90,21 @@ $: currentStateIndex = $states.indexOf($currentState)
 let container: HTMLElement
 let scrollStopper: () => void = null
 
-$: scrollToCurrent(null, container, $panelWidthMin) // Only want to trigger this outside of the $lenses derived store when the container changes
-function scrollToCurrent(state: NodeViewState, _c?, _nw?) {
+let containerBasedMin = 10000
+$: trueMinWidth = Math.min(containerBasedMin, $panelWidthMin)
+function onContainerResized(entries: ResizeObserverEntry[]) {
+	const entry = entries[0]
+	if (entry) {
+		containerBasedMin = Math.max(
+			entry.contentBoxSize[0].inlineSize - collapsedWidth * ($states.length - 1),
+			260 // A fallback "true minimum"
+		)
+	}
+}
+
+
+$: scrollToCurrent(null, container, trueMinWidth) // Only want to trigger this outside of the $lenses derived store when the container changes
+function scrollToCurrent(state: NodeViewState, _c?, minWidth = trueMinWidth) {
 	state = state || $currentState
 	if (!state || !container || !$states) return
 
@@ -102,8 +116,8 @@ function scrollToCurrent(state: NodeViewState, _c?, _nw?) {
 		const containerRect = container.getBoundingClientRect()
 		const containerScroll = container.scrollLeft
 
-		const max = $panelWidthMin * lensIndex - collapsedWidth * lensIndex
-		const min = max - (containerRect.width - $panelWidthMin - collapsedWidth * ($states.length - 1))
+		const max = minWidth * lensIndex - collapsedWidth * lensIndex
+		const min = max - (containerRect.width - minWidth - collapsedWidth * ($states.length - 1))
 
 		if (containerScroll > min && containerScroll < max) {
 			return
@@ -179,6 +193,7 @@ function onWheel(event: WheelEvent, state: NodeViewState) {
 </script>
 
 <main bind:this={container}
+	use:resizeObserver={onContainerResized}
 	class="ThreadView"
 	class:multiple={$states.length > 1}>
 	{#each $states as state, index (state)}
@@ -186,7 +201,7 @@ function onWheel(event: WheelEvent, state: NodeViewState) {
 		<!-- svelte-ignore a11y-click-events-have-key-events -->
 		<!-- svelte-ignore a11y-no-static-element-interactions -->
 		<div class="nodeContainer"
-			style={getNodeContainerStyle(index, $panelWidthMin)}
+			style={getNodeContainerStyle(index, trueMinWidth)}
 			class:current={isCurrent}
 			on:click={e => onNodeContainerClicked(e, state)}
 			on:wheel={e => onWheel(e, state)}

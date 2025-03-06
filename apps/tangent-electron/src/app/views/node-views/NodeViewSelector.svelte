@@ -7,6 +7,7 @@ import { TreeNode } from 'common/trees'
 import type { NavigationData } from 'app/events'
 import type { NodeViewState } from 'app/model/nodeViewStates'
 import type { ScrollToOptions } from 'app/utils/scrollto'
+import { resizeObserver } from 'app/utils/resizeObserver'
 import Workspace from 'app/model/Workspace'
 import SvgIcon from '../smart-icons/SVGIcon.svelte'
 import './lensSettings.scss'
@@ -47,19 +48,12 @@ let container: HTMLElement
 let settingsContainer: HTMLElement
 let settingsHeight: number = extraTop
 
-const settingsResizeObserver = new ResizeObserver(e => {
-	const entry = e[0]
+function onSettingsResize(entries: ResizeObserverEntry[]) {
+	const entry = entries[0]
 	if (entry) {
 		settingsHeight = entry.borderBoxSize[0].blockSize
 	}
-})
-
-$: if (settingsContainer) {
-	settingsResizeObserver.disconnect()
-	settingsResizeObserver.observe(settingsContainer)
-} else settingsResizeObserver.disconnect()
-
-onDestroy(() => settingsResizeObserver.disconnect())
+}
 
 function onMouseMoveContainer(event: MouseEvent) {
 
@@ -180,6 +174,7 @@ function getClassNamesForNode(node: TreeNode) {
 			<!-- svelte-ignore a11y-no-static-element-interactions -->
 			<div
 				bind:this={settingsContainer}
+				use:resizeObserver={onSettingsResize}
 				class="settings-container"
 				style:padding-top={extraTop + 4 + 'px'}
 				on:mouseenter={onSettingsEnter}
