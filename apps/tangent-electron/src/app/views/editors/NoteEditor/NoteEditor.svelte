@@ -1387,7 +1387,7 @@ main {
 			position: sticky;
 			top: var(--extraTop);
 			z-index: 10;
-			background: linear-gradient(var(--noteBackgroundColor), 92%, transparent);
+			background: linear-gradient(var(--noteBackgroundColor) 92%, transparent);
 		}
 
 		> :global(header::before) {
