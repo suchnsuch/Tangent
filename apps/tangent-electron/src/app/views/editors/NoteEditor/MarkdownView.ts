@@ -20,11 +20,10 @@ export default class MarkdownView extends Editor {
 			options.modules = {
 				copy,
 				tLink: editor => tlinkModule(editor, {
-					linksNeedModClick: false
+					linkFollowRequirement: 'none'
 				}),
 				tangent: editor => editorModule(editor, {
-					workspace: null,
-					linksNeedModClick: false
+					workspace: null
 				})
 			}
 		}

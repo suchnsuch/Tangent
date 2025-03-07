@@ -189,6 +189,28 @@ export default class Settings extends ObjectStore {
 		defaultValue: 'new'
 	})
 
+	noteLinkFollowBehavior = new Setting<string>({
+		name: 'Link Following',
+		description: 'What keys need to be pressed when left clicking on a link to follow it.',
+		validValues: [
+			{
+				value: 'none',
+				displayName: 'Click',
+				description: 'Left clicking on a link follows the link. ' + (isMac
+					? 'Command clicking on a link places the cursor.'
+					: 'Ctrl clicking on a link places the cursor.')
+			},
+			{
+				value: 'mod',
+				displayName: isMac ? '⌘ Click' : 'Ctrl+Click',
+				description: isMac
+					? 'Command clicking on a link follows the link.'
+					: 'Ctrl clicking on a link follows the link.'
+			}
+		],
+		defaultValue: 'mod'
+	})
+
 	// Map
 	mapZoomScrollMode = new Setting<string>({
 		name: 'Zoom & Pan',

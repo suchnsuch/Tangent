@@ -144,11 +144,8 @@ export function revealContentAroundRange(doc: TextDocument, range: EditorRange, 
 
 export default function editorModule(editor: Editor, options: {
 	workspace: Workspace
-	linksNeedModClick?: boolean
 }) {
 	const { workspace } = options
-
-	let linksNeedModClick = options.linksNeedModClick ?? true
 
 	let allowVerification = true
 	let verificationInstructions: (VerificationInstruction<unknown>)[] = []
@@ -582,11 +579,6 @@ export default function editorModule(editor: Editor, options: {
 	}
 
 	function onMouseDown(event: MouseEvent) {
-		if ((!linksNeedModClick || event.metaKey || event.ctrlKey) && TangentLink.isTangentLinkEvent(event)) {
-			event.preventDefault()
-			return
-		}
-
 		if (isLeftClick(event)) {
 			
 			// Pause selection reveal until mouse up

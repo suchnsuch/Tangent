@@ -57,6 +57,15 @@ $: {
 	document.body.classList.add('link-cursor-' + linkCursorMode)
 }
 
+$: noteLinkFollowBehavior = workspace?.settings.noteLinkFollowBehavior
+$: {
+	const behavior = (noteLinkFollowBehavior != null) ? $noteLinkFollowBehavior : 'mod'
+	document.body.classList.remove('note-link-click-mod')
+	document.body.classList.remove('note-link-click-none')
+
+	document.body.classList.add('note-link-click-' + behavior)
+}
+
 $: linkClickPaneBehavior = workspace?.settings.linkClickPaneBehavior
 $: {
 	const linkPaneMode = (linkClickPaneBehavior != null && $linkClickPaneBehavior) ?? 'new'

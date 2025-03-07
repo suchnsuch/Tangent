@@ -606,7 +606,9 @@ t-link[form="wiki"] {
 	}
 }
 
-.meta-pressed, .ctrl-pressed, .no-mod-link-click {
+.note-link-click-mod.meta-pressed,
+.note-link-click-mod.ctrl-pressed,
+.note-link-click-none:not(.ctrl-pressed):not(.meta-pressed) {
 	t-link, t-embed {
 		cursor: pointer;
 

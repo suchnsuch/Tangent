@@ -1,7 +1,8 @@
 import { isModKey } from 'app/utils/events';
 import type { HrefFormedLink } from 'common/indexing/indexTypes';
-import type { Editor, ShortcutEvent } from 'typewriter-editor';
+import { type Editor, type ShortcutEvent } from 'typewriter-editor';
 import TangentLink from './NoteEditor/t-link';
+import { ReadableStore } from 'common/stores';
 
 interface NavigationEventData {
 	link: HrefFormedLink
@@ -33,25 +34,47 @@ function getTagFromClassList(classList: DOMTokenList): string {
 	return null
 }
 
+type LinkFollowType = 'mod' | 'none'
 export default function tlinkModule(editor: Editor, options?: {
-	linksNeedModClick?: boolean
+	/** What modifiers need to be pressed to follow a link */
+	linkFollowRequirement?: LinkFollowType | ReadableStore<LinkFollowType>
 }) {
 
-	let linksNeedModClick = options?.linksNeedModClick ?? true
+	const linkFollowType = options?.linkFollowRequirement ?? 'mod'
+
+	function isLinkFollowingEvent(event: MouseEvent) {
+		if (event.button === 0) {
+			const followType = typeof linkFollowType === 'string'
+				? linkFollowType
+				: linkFollowType.value
+			
+			switch (followType) {
+				case 'mod':
+					return isModKey(event)
+				case 'none':
+					return !isModKey(event)
+			}
+		}
+		if (event.button === 1) {
+			return true
+		}
+		return false
+	}
 
 	function onClick(event: MouseEvent) {
-		if (!linksNeedModClick || (isModKey(event) || event.button == 1)) {
+		if (isLinkFollowingEvent(event)) {
 			if (TangentLink.isTangentLinkEvent(event)) {
+				event.preventDefault()
 				let linkElement = TangentLink.getTangentLinkFromEvent(event)
 				console.log('linking', linkElement)
 				editor.dispatchEvent(new NavigationEvent('navigate', {
 					incitingEvent: event,
 					link: linkElement.getLinkInfo()
 				}))
-				event.preventDefault()
 			}
 			else if (event.target instanceof HTMLElement && event.target.classList.contains('tagSection')) {
 				// Handle tags
+				event.preventDefault()
 				const tagName = getTagFromClassList(event.target.classList)
 				console.log('linking to', tagName)
 				editor.dispatchEvent(new NavigationEvent('navigate', {
@@ -61,7 +84,6 @@ export default function tlinkModule(editor: Editor, options?: {
 						href: tagName
 					}
 				}))
-				event.preventDefault()
 			}
 		}
 	}
@@ -71,6 +93,12 @@ export default function tlinkModule(editor: Editor, options?: {
 			// On windows, middle clicking a link on a scrollable element enables windows' terrible middle click scrolling feature.
 			// Grabbing on mouse down is a bit hacky, but avoids that issue.
 			return onClick(event)
+		}
+		if (isLinkFollowingEvent(event) && TangentLink.isTangentLinkEvent(event)) {
+			// Text selection is based on mousedown rather than mouseup.
+			// If we don't stop this, clicking on a link will _always_ select text.
+			event.preventDefault()
+			return
 		}
 	}
 

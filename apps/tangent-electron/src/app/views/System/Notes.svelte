@@ -75,6 +75,7 @@ async function getSpellCheckLanguages() {
 	<h2>Links</h2>
 	<div class="settingsGroup">
 		<SettingView setting={settings.linkCursor} />
+		<SettingView setting={settings.noteLinkFollowBehavior} />
 		<SettingView setting={settings.linkClickPaneBehavior} />
 		<SettingView setting={settings.rawLinksAutoEmbed} />
 	</div>
