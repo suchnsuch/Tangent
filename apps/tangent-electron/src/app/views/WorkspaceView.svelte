@@ -21,6 +21,7 @@ import SvgIcon from './smart-icons/SVGIcon.svelte'
 import ThreadHistoryListView from './summaries/ThreadHistoryListView.svelte'
 import { PasteTextEvent } from 'app/events'
 import { createCommandHandler } from 'app/model/commands/Command'
+import { tooltip } from 'app/utils/tooltips'
 
 export let workspace:Workspace
 
@@ -509,7 +510,7 @@ function buildMainMenu() {
 			command={workspace.commands.createNewFile}
 			placement="bottom-start"
 			menuMode="low-profile"
-			title="Create New Note"
+			tooltip="Create New Note"
 			bind:showMenu={newNoteMenuIsOpen}
 			closeMenuOnClick
 		>
@@ -526,7 +527,8 @@ function buildMainMenu() {
 							use:command={{
 								command: workspace.commands.createNewFile,
 								context: { rule },
-								tooltipShortcut: false
+								tooltipShortcut: false,
+								tooltipPlacement: 'right'
 							}}
 						>
 							<CreationRuleName {rule}/>
@@ -605,7 +607,6 @@ function buildMainMenu() {
 				commandContext = {{ toggle: false }}
 				placement={'bottom-start'}
 				menuMode="low-profile"
-				title="Enable Focus Mode"
 				bind:showMenu={focusMenuIsOpen}
 				closeMenuOnClick
 			>
@@ -617,11 +618,13 @@ function buildMainMenu() {
 					<div class="buttonGroup vertical"> 
 						{#each FocusLevel.focusModeFocusLevels as level}
 							
-							<button title={FocusLevel.describeFocusLevel(level)}
+							<button
 								class="no-callout"
 								use:command={{
 									command: workspace.commands.setFocusLevel,
-									context: { targetFocusLevel: level }
+									context: { targetFocusLevel: level },
+									tooltip: FocusLevel.describeFocusLevel(level),
+									tooltipPlacement: 'right'
 								}}
 							>
 								<FocusLevelIcon focusLevel={level}/>

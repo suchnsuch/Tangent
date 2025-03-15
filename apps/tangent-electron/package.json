@@ -68,6 +68,7 @@
   },
   "devDependencies": {
     "@electron/notarize": "^1.2.3",
+    "@floating-ui/dom": "^1.6.13",
     "@playwright/test": "^1.42.1",
     "@popperjs/core": "^2.9.2",
     "@such-n-such/core": "^0.4.0",

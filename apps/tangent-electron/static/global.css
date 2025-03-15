@@ -12,6 +12,7 @@
 	tab-size: var(--indentWidth);
 
 	--backgroundColor: #f6f6f6;
+	--transparentBackgroundColor: rgb(from var(--backgroundColor) r g b / .8);
 	--textColor: #252525;
 	--deemphasizedTextColor: #575757;
 	--heavilyDeemphasizedTextColor: #858585;
@@ -77,11 +78,12 @@
 	--warningTextColor: rgb(194, 120, 9);
 
 	--dropTargetBackgroundColor: var(--accentBackgroundColor);
-	--dropTargetChildBackgroundColor: rgba(0, 0, 0, .1);
+	--dropTargetChildBackgroundColor: rgb(0 0 0 / .1);
 }
 
 :where(.dark) {
 	--backgroundColor: #323232;
+	--transparentBackgroundColor: rgb(from var(--backgroundColor) r g b / .5);
 	--textColor: #ccc;
 	--deemphasizedTextColor: #9a9a9a;
 	--heavilyDeemphasizedTextColor: #686868;

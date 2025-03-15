@@ -113,7 +113,7 @@ export default class SetFocusLevelCommand extends WorkspaceCommand {
 
 	getTooltip(context: FocusModeCommandContext) {
 		let { targetFocusLevel, toggle } = this.getApparentContext(context)
-		return `${toggle ? 'Toggles' : 'Switches to'} ${FocusLevel.getFullName(targetFocusLevel, false)}.`
+		return `${toggle ? 'Toggle' : 'Switch to'} ${FocusLevel.getFullName(targetFocusLevel, false)}`
 	}
 
 	getLabel(context: FocusModeCommandContext) {

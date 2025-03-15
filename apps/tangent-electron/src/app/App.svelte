@@ -12,12 +12,15 @@ import { Focus } from './utils/focus'
 import type { AnnotatedFocusEvent } from './utils/focus'
 import MessageToast from './views/MessageToast.svelte'
 import { isMac } from 'common/isMac'
+import { mailTo } from 'common/email'
 import { mediaQueryStore } from './utils/svelte'
 import SvgIcon from './views/smart-icons/SVGIcon.svelte'
 
+import { tooltips } from './utils/tooltips'
+
 // Doing this here so that mhchem is loaded
 import 'katex/contrib/mhchem/mhchem'
-    import { mailTo } from 'common/email';
+    import Tooltip from './utils/Tooltip.svelte';
 
 let applicationState: 'initializing' | 'choosingWorkspace' | 'buildingWorkspace' | 'usingWorkspace' | 'error' = 'initializing'
 let showLoading = false
@@ -332,6 +335,10 @@ Below is a stack trace of the error. Please provide any additional details above
 {/if}
 
 <MessageToast {api} />
+
+{#each $tooltips as {origin, config} (origin)}
+	<Tooltip {origin} {config} />
+{/each}
 
 <style lang="scss">
 .loading {

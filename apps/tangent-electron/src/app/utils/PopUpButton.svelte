@@ -16,6 +16,7 @@ import { focusLayer } from './focus'
 import { onMount, tick } from 'svelte';
 import type { ContextMenuConstructorOptions } from 'app/model/contextmenu';
 import Menu from './Menu.svelte'
+import { tooltip as tooltipHelper, TooltipDefOrConfig } from './tooltips';
 	
 export let name = ''
 export let placement: Placement = 'bottom'
@@ -35,7 +36,7 @@ export let commandContext: AnyCommandContet = null
  */
 export let template: ContextMenuConstructorOptions[] | (() => ContextMenuConstructorOptions[]) = null
 
-export let title: string = ''
+export let tooltip: TooltipDefOrConfig = null
 
 // Exported so that binding back up can be used
 export let showMenu = false
@@ -64,7 +65,8 @@ let popper = null
 let commandParams: CommandActionOptions = command ? {
 	command,
 	context: commandContext,
-	includeClick: false
+	includeClick: false,
+	tooltip
 } : null
 
 $: update(buttonElement, menuElement, showMenu)
@@ -183,7 +185,7 @@ function windowKey(event: KeyboardEvent) {
 	on:contextmenu={buttonContext}
 	use:commandAction={commandParams}
 	use:focusLayer={'PopUpButton'}
-	{title}
+	use:tooltipHelper={commandParams ? null : tooltip}
 >
 	<span class="buttonContent"><slot name="button">{name}</slot></span>
 	{#if command && !hidePopUpIndicator}

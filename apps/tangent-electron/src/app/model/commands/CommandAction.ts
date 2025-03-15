@@ -1,5 +1,7 @@
-import { shortcutDisplayString, shortcutsDisplayString } from 'app/utils/shortcuts';
+import { shortcutsDisplayString } from 'app/utils/shortcuts';
 import Command, { AnyCommandContet, CommandContext } from "./Command";
+import { dropTooltip, requestTooltip, TooltipDefOrConfig, TooltipFunction, tooltipToConfig } from 'app/utils/tooltips';
+import { Placement } from '@floating-ui/dom';
 
 export interface CommandActionOptions {
 	command: Command
@@ -19,6 +21,9 @@ export interface CommandActionOptions {
 	labelShortcut?: boolean
 	/** Whether to include the shortcut in the tooltip. Default true. */
 	tooltipShortcut?: boolean
+	/** A tooltip override */
+	tooltip?: TooltipDefOrConfig
+	tooltipPlacement?: Placement
 }
 
 const defaultOptions: CommandActionOptions = {
@@ -36,7 +41,8 @@ export default function command(node: HTMLElement, params: commandParams) {
 	let context: CommandContext = null
 
 	let applyLabel = node.childNodes.length === 0
-	let applyToolTip = !node.hasAttribute('title') || !node.getAttribute('title')
+
+	let tooltip: TooltipFunction = null
 
 	let isFirstPass = true
 
@@ -73,20 +79,18 @@ export default function command(node: HTMLElement, params: commandParams) {
 			node.replaceChildren(...labelChildren)
 		}
 
-		if (applyToolTip) {
-			let tooltip = (options.labelAsTooltip && command.getLabel(context)) ?? command.getTooltip(context)
+		tooltip = () => {
+			let tooltip: TooltipDefOrConfig = options.tooltip ?? (options.labelAsTooltip && command.getLabel(context)) ?? command.getTooltip(context)
 			if (tooltip) {
+				tooltip = tooltipToConfig(tooltip)
 				if (shortcutText && options.tooltipShortcut !== false) {
-					tooltip += ' – ' + shortcutText
+					tooltip.shortcut = shortcutText
 				}
-
-				node.setAttribute('title', tooltip)
+				if (options.tooltipPlacement) {
+					tooltip.placement = options.tooltipPlacement
+				}
 			}
-		}
-		else if (isFirstPass && shortcutText) {
-			let tooltip = node.getAttribute('title')
-			tooltip += ' – ' + shortcutText
-			node.setAttribute('title', tooltip)
+			return tooltip
 		}
 
 		const checked = command.getChecked(context)
@@ -118,9 +122,24 @@ export default function command(node: HTMLElement, params: commandParams) {
 		}
 	}
 
+	function onEnter(event: MouseEvent) {
+		if (tooltip) {
+			requestTooltip(node, tooltip())
+		}
+	}
+
+	function onLeave(event: MouseEvent) {
+		if (tooltip) {
+			dropTooltip(node)
+		}
+	}
+
 	if (options.includeClick ?? true) {
 		node.addEventListener('click', clickHandler)
 	}
+
+	node.addEventListener('mouseenter', onEnter)
+	node.addEventListener('mouseleave', onLeave)
 
 	let unsub = command.subscribe(() => {
 		updateFromContext()
@@ -131,6 +150,8 @@ export default function command(node: HTMLElement, params: commandParams) {
 		destroy() {
 			unsub()
 			node.removeEventListener('click', clickHandler)
+			node.removeEventListener('mouseenter', onEnter)
+			node.removeEventListener('mouseleave', onLeave)
 		}
 	}
 }

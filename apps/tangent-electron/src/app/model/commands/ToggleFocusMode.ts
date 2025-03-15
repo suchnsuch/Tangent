@@ -61,6 +61,7 @@ export default class ToggleFocusModeCommand extends SetFocusLevelCommand {
 	}
 
 	getTooltip(context: ToggleFocusModeCommandContext) {
+		console.log('Getting toggle tooltip?')
 		return super.getTooltip(Object.assign(
 			{},
 			{ targetFocusLevel: this.targetFocusLevel.value },
