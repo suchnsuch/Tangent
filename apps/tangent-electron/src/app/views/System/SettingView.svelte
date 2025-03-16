@@ -4,6 +4,7 @@ import Setting, { getValue, getDescription, getDisplayName, SettingType, Setting
 import type Workspace from 'app/model/Workspace'
 import SvgIcon from '../smart-icons/SVGIcon.svelte'
 import PopUpButton from 'app/utils/PopUpButton.svelte'
+import { tooltip } from 'app/utils/tooltips'
 
 const workspace = getContext('workspace') as Workspace
 
@@ -159,7 +160,7 @@ function toggleItem(item) {
 	<!-- svelte-ignore a11y-click-events-have-key-events -->
 	<!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
 	<h2
-		title={setting.description}
+		use:tooltip={setting.description}
 		on:click={headerClick}
 	>{@html name ?? setting.name}</h2>
 	<!-- svelte-ignore a11y-no-static-element-interactions -->
@@ -184,7 +185,7 @@ function toggleItem(item) {
 				{#if form === 'select'}
 					<select
 						bind:value={$setting}
-						title={setting.description}
+						use:tooltip={setting.description}
 					>
 						{#each effectiveValueList as item}
 							<option value={getValue(item)}>{getDisplayName(item) || 'Default'}</option>
@@ -194,7 +195,7 @@ function toggleItem(item) {
 					<div class="values buttonGroup grow">
 						{#each effectiveValueList as validValue}
 							<button class:active={getValue(validValue) === $setting}
-								title={getDescription(validValue)}
+								use:tooltip={getDescription(validValue)}
 								class="grow"
 								on:click={() => applyValue(getValue(validValue))}>
 								{getDisplayName(validValue)}
@@ -204,7 +205,7 @@ function toggleItem(item) {
 				{/if}
 			{/if}
 		{:else if typeof $setting === 'number' && setting.range}
-			<div class="range group" title={setting.description}>
+			<div class="range group" use:tooltip={setting.description}>
 				<input type="number"
 					bind:value={softValue}
 					min={setting.range.min}
@@ -220,7 +221,7 @@ function toggleItem(item) {
 					bind:value={$setting}/>
 			</div>
 		{:else if typeof $setting === 'string'}
-			<div class="buttonGroup" title={setting.description}>
+			<div class="buttonGroup" use:tooltip={setting.description}>
 				{#if form === 'textarea'}
 					<textarea
 						bind:value={$setting}
@@ -243,7 +244,7 @@ function toggleItem(item) {
 		{:else if typeof $setting === 'boolean'}
 			<input
 				type="checkbox"
-				title={setting.description}
+				use:tooltip={setting.description}
 				bind:checked={$setting}
 				on:click|stopPropagation
 			/>
@@ -251,7 +252,7 @@ function toggleItem(item) {
 		{/if}
 		{#if showReset}
 			<button
-				title={"Reset \"" + setting.name + "\" to its default value."}
+				use:tooltip={"Reset \"" + setting.name + "\" to its default value."}
 				class="reset subtle"
 				on:click={() => $setting = setting.defaultValue}
 				disabled={$setting === setting.defaultValue}

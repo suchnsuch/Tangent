@@ -1,4 +1,5 @@
 <script lang="ts">
+    import { tooltip } from 'app/utils/tooltips';
     import { onMount } from 'svelte';
 
 
@@ -29,7 +30,7 @@ onMount(() => {
 		{#each buttons as button}
 			<button
 				class="relaxed focusable"
-				title={button.tooltip}
+				use:tooltip={button.tooltip}
 				on:click={button.click}
 			>
 				{button.text}

@@ -11,6 +11,7 @@ import SvgIcon from '../smart-icons/SVGIcon.svelte';
 import paths, { dirname, normalizeSeperators } from 'common/paths';
 import { applyAnnotation, ChildList, childrenToHTML } from 'common/annotations/nodeAnnotations';
 import { isTagTreeNode } from 'common/indexing/TagNode';
+import { tooltip } from 'app/utils/tooltips'
 
 const workspace = getContext('workspace') as Workspace
 
@@ -119,7 +120,7 @@ function getContent(node: TreeNode, relativeTo: string | TreeNode, showFileType:
 	{#if showIcon}<SvgIcon ref={iconForNode(node)} size="1em" />{/if}
 	<span class="path" class:highlightName>{@html content}</span>
 	{#if showModDate}
-		<span class="date" title={"Last modified " + simpleTimestamp(node.modified)}>{shortestDayDate(node.modified)}</span>
+		<span class="date" use:tooltip={"Last modified " + simpleTimestamp(node.modified)}>{shortestDayDate(node.modified)}</span>
 	{/if}
 </div>
 

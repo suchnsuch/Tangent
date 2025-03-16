@@ -136,7 +136,7 @@ function _onPointerLeave(event: PointerEvent) {
 	placement="left-start"
 	menuMode="low-profile"
 	bind:showMenu={inMenuOpen}
-	title="Add or connect an incoming link"
+	tooltip="Add or connect an incoming link"
 >
 	<svelte:fragment slot="button">
 		<SVGIcon size={20} ref="mapNode.svg#plus"/>
@@ -158,7 +158,7 @@ function _onPointerLeave(event: PointerEvent) {
 	placement="right-start"
 	menuMode="low-profile"
 	bind:showMenu={outMenuOpen}
-	title="Add or connect an outgoing link"
+	tooltip="Add or connect an outgoing link"
 >
 	<svelte:fragment slot="button">
 		<SVGIcon size={20} ref="mapNode.svg#plus"/>

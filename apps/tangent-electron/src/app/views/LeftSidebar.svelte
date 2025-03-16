@@ -14,6 +14,7 @@ import FileTree from './FileTree/FileTree.svelte'
 import SortingOptions from './FileTree/SortingOptions.svelte'
 import SortModeIcon from './smart-icons/SortModeIcon.svelte'
 import SvgIcon from './smart-icons/SVGIcon.svelte'
+import { tooltip } from 'app/utils/tooltips'
 
 const workspace = getContext('workspace') as Workspace
 
@@ -123,7 +124,7 @@ function onWorkspaceNameContextMenu(event: MouseEvent) {
 	<header>
 		<div
 			class="workspace-name"
-			title={workspace.directoryStore.files.path}
+			use:tooltip={workspace.directoryStore.files.path}
 			on:contextmenu={onWorkspaceNameContextMenu}
 		>
 			{workspace.directoryStore.files.name}
@@ -134,7 +135,7 @@ function onWorkspaceNameContextMenu(event: MouseEvent) {
 				<button
 					class:active={tab.key === $currentTab}
 					on:click={e => $currentTab = tab.key}
-					title="Shows {tab.name}"
+					use:tooltip={"Shows {tab.name}"}
 				>
 					<SvgIcon ref={tab.icon} />
 					<span class="name">
@@ -149,7 +150,7 @@ function onWorkspaceNameContextMenu(event: MouseEvent) {
 				<PopUpButton
 					buttonClass="subtle"
 					placement="bottom-start"
-					title={`Sorting by ${getSortModeDisplayName($directoryViewSort, true)}`}
+					tooltip={`Sorting by ${getSortModeDisplayName($directoryViewSort, true)}`}
 					bind:showMenu={sortMenuIsOpen}
 				>
 					<svelte:fragment slot="button">
@@ -175,7 +176,7 @@ function onWorkspaceNameContextMenu(event: MouseEvent) {
 				<PopUpButton
 					buttonClass="subtle"
 					placement="bottom-start"
-					title={`Sorting by ${getSortModeDisplayName($tagTreeViewSort, true)}`}
+					tooltip={`Sorting by ${getSortModeDisplayName($tagTreeViewSort, true)}`}
 					bind:showMenu={sortMenuIsOpen}
 				>
 					<svelte:fragment slot="button">

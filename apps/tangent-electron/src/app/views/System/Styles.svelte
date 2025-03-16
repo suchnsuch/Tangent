@@ -4,6 +4,7 @@ import { Workspace } from 'app/model'
 import { TreeNode } from 'common/trees'
 import NodeLine from '../summaries/NodeLine.svelte'
 import SvgIcon from '../smart-icons/SVGIcon.svelte'
+import { tooltip } from 'app/utils/tooltips'
 
 const workspace = getContext('workspace') as Workspace
 const store = workspace.directoryStore
@@ -90,12 +91,12 @@ function createNewStyle() {
 <nav class="buttonBar">
 	<button
 		on:click={disableAll}
-		title="Disable all custom styles."
+		use:tooltip={"Disable all custom styles."}
 	>Disable All</button>
 
 	<button class="stylesFolderButton"
 		on:click={openStylesFolder}
-		title="Opens the 'styles' folder within the workspaces '.tangent' configuration folder."
+		use:tooltip={"Opens the 'styles' folder within the workspaces '.tangent' configuration folder."}
 	>
 		Open Styles Folder
 	</button>
@@ -112,7 +113,7 @@ function createNewStyle() {
 				<NodeLine node={style} relativeTo={'.tangent/styles/'} showFileType={true} showIcon={false} />
 			</span>
 			<button on:click={e => gotoFileClicked(style)}
-				title="Edit this CSS file."
+				use:tooltip={"Edit this CSS file."}
 			>
 				<SvgIcon ref="arrows.svg#forward" size={16} />
 			</button>

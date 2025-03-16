@@ -95,6 +95,7 @@ $: currentMenu = menus.find(m => m.name === $section) ?? menus[0]
 <PopUpButton buttonClass="subtle"
 	bind:showMenu={detailsOpen}
 	menuMode="low-profile"
+	tooltip="Options"
 >
 	<svelte:fragment slot="button">
 		<div class={'buttonContent ' + $mode} class:supressed={supressUpdates}>

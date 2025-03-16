@@ -1,22 +1,63 @@
 <script lang="ts">
-import { computePosition, flip, offset } from '@floating-ui/dom'
+import { computePosition, flip, offset, VirtualElement } from '@floating-ui/dom'
 import { cubicInOut } from 'svelte/easing'
 import { TooltipConfig } from './tooltips'
 
 export let origin: HTMLElement
 export let config: TooltipConfig
+export let moveEvent: MouseEvent
 
+let tooltipElement: HTMLElement
 
-function positionedFly(element: HTMLElement) {
+$: if (!config.placement && moveEvent) {
+	mouseRelativePosition(moveEvent, tooltipElement)
+}
 
-	computePosition(origin, element, {
+function mouseRelativePosition(moveEvent: MouseEvent, element: HTMLElement) {
+
+	if (!element) return
+
+	const virtualOrigin: VirtualElement = {
+		getBoundingClientRect() {
+			return {
+				width: 0,
+				height: 0,
+				x: moveEvent.clientX,
+				y: moveEvent.clientY,
+				top: moveEvent.clientY,
+				left: moveEvent.clientX,
+				right: moveEvent.clientX,
+				bottom: moveEvent.clientY
+			}
+		},
+		contextElement: origin
+	}
+
+	computePosition(virtualOrigin, element, {
 		strategy: 'fixed',
-		placement: config.placement,
-		middleware: [flip(), offset(4)]
+		placement: 'bottom-start',
+		middleware: [flip(), offset({
+			mainAxis: 12,
+			alignmentAxis: 8
+		})]
 	}).then(result => {
 		element.style.left = result.x + 'px'
 		element.style.top = result.y + 'px'
 	})
+}
+
+function positionedFly(element: HTMLElement) {
+
+	if (config.placement) {
+		computePosition(origin, element, {
+			strategy: 'fixed',
+			placement: config.placement,
+			middleware: [flip(), offset(4)]
+		}).then(result => {
+			element.style.left = result.x + 'px'
+			element.style.top = result.y + 'px'
+		})
+	}
 	
 	return {
 		delay: 0,
@@ -31,15 +72,16 @@ function positionedFly(element: HTMLElement) {
 </script>
 
 <main
+	bind:this={tooltipElement}
 	transition:positionedFly
 >
 	{#if typeof config.tooltip === 'string'}
-		<div>
-			{config.tooltip}
+		<p>
+			{@html config.tooltip}
 			{#if config.shortcut}
 				<span class="shortcut">{config.shortcut}</span>
 			{/if}
-		</div>
+		</p>
 	{:else}
 		<svelte:component this={config.tooltip} {...config.args}/>
 	{/if}
@@ -65,6 +107,10 @@ main {
 	border: 1px solid var(--borderColor);
 	
 	box-shadow: 0 0 5px rgba(0, 0, 0, .3);
+}
+
+p {
+	margin: 0 .25em;
 }
 
 .shortcut {

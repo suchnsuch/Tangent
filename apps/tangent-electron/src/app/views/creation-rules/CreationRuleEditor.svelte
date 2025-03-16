@@ -3,6 +3,7 @@ import type CreationRule from 'common/settings/CreationRule'
 import { nameFromRule, willPromptForName } from 'common/settings/CreationRule'
 import editable from 'app/utils/editable'
 import SettingView from '../System/SettingView.svelte'
+import { tooltip } from 'app/utils/tooltips'
 
 export let rule: CreationRule
 
@@ -24,9 +25,12 @@ function templateDependencies(template) {
 	<header>
 		<slot name="header-left"></slot>
 		<!-- svelte-ignore a11y-missing-content -->
-		<h2 class="name" use:editable={ruleName} title="Define the name of the rule. Set an emoji as the first character of the name to make an icon."></h2>
+		<h2 class="name"
+			use:editable={ruleName}
+			use:tooltip={"Define the name of the rule. Set an emoji as the first character of the name to make an icon."}
+		></h2>
 	</header>
-	<label title="Defines how the note will be named. Refer to the Template Token list for available dynamic values.">
+	<label use:tooltip={"Defines how the note will be named. Refer to the Template Token list for available dynamic values."}>
 		<span>Name Template</span>
 		<input type="text" bind:value={$nameTemplate} />
 	</label>

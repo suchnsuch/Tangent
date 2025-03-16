@@ -4,8 +4,9 @@ import type { TreeNode } from 'common/trees'
 import { File, Tangent, Workspace } from 'app/model'
 
 import command from 'app/model/commands/CommandAction'
-import SvgIcon from '../smart-icons/SVGIcon.svelte';
-import WorkspaceTreeNode from 'app/model/WorkspaceTreeNode';
+import SvgIcon from '../smart-icons/SVGIcon.svelte'
+import WorkspaceTreeNode from 'app/model/WorkspaceTreeNode'
+import { tooltip } from 'app/utils/tooltips'
 
 export let node: TreeNode
 export let tangent: Tangent
@@ -36,7 +37,7 @@ const {
 			}}
 			class="close subtle"
 			class:dirty={isDirty}
-			title={isDirty ? 'This file has not been saved.' : 'Close this file.'}
+			use:tooltip={isDirty ? 'This file has not been saved.' : 'Close this file.'}
 		><SvgIcon
 			ref={isDirty ? 'close.svg#close-dirty' : 'close.svg#close'}
 		/></button>

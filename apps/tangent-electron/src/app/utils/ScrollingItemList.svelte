@@ -4,6 +4,7 @@ import { tick } from 'svelte';
 import LazyScrolledList from './LazyScrolledList.svelte'
 import scrollTo from './scrollto'
 import { classesToSelector } from './style';
+import { tooltip } from './tooltips'
 
 export let containerClass = ''
 let containerElement: HTMLElement
@@ -76,18 +77,20 @@ function itemTitle(item, index) {
 
 </script>
 
+<!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
 <main
 	bind:this={containerElement}
 	class={containerClass}
 	on:keydown={mainKeydown}
 	tabindex="-1">
+	<!-- svelte-ignore a11y-no-static-element-interactions -->
 	<LazyScrolledList {items} {itemID}>
 		<svelte:fragment slot="item" let:item let:index>
 			<!-- svelte-ignore a11y-click-events-have-key-events -->
 			<div
 				class={itemClass}
 				class:selected={index === selectedIndex}
-				title={itemTitle(item, index)}
+				use:tooltip={itemTitle(item, index)}
 				on:click={e => onItemEvent && onItemEvent(item, e) }>
 				<slot name="item" {item}>{item}</slot>
 			</div>

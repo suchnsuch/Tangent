@@ -6,6 +6,7 @@ import paths from 'common/paths'
 import WindowBar from './WindowBar.svelte'
 import PopUpButton from './utils/PopUpButton.svelte'
 import SvgIcon from './views/smart-icons/SVGIcon.svelte'
+import { tooltip } from './utils/tooltips'
 
 export let api: WindowAPI
 
@@ -67,11 +68,11 @@ function openDocumentation() {
 						<PopUpButton name="…" placement="right" menuMode="low-profile">
 							<div class="workspaceMenu buttonGroup vertical">
 								<button
-									title="Reveal this workspace in the file browser."
-									on:click={() => api.showInFileBrowser(workspace)}
+									use:tooltip={"Reveal this workspace in the file browser."}
+									on:click={() => api.file.showInFileBrowser(workspace)}
 									>Show Workspace</button>
 								<button
-									title="Remove this workspace from this list"
+									use:tooltip={"Remove this workspace from this list"}
 									on:click={() => forgetWorkspace(workspace)}
 								>Forget Workspace</button>
 							</div>

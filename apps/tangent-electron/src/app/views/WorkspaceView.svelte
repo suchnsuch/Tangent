@@ -486,6 +486,7 @@ function buildMainMenu() {
 			<PopUpButton
 				buttonClass="subtle"
 				placement="bottom-start"
+				tooltip="Menus"
 				template={buildMainMenu}>
 				<svg slot="button" style={`width: 24px; height: 24px;`}>
 					<use href="tangent-icon-nocolor.svg#icon"/>
@@ -496,7 +497,7 @@ function buildMainMenu() {
 
 		<button class="subtle"
 			on:click={() => setLeftSidebarPinned($leftSidebarMode !== SidebarMode.pinned)}
-			title={$leftSidebarMode === SidebarMode.pinned ? 'Close the left sidebar' : 'Pin the left sidebar'}
+			use:tooltip={$leftSidebarMode === SidebarMode.pinned ? 'Close the left sidebar' : 'Pin the left sidebar'}
 		><svg style={`width: 24px; height: 24px; --sidebarStroke: var(--${$leftSidebarMode !== SidebarMode.pinned ? 'iconStroke' : 'backgroundColor'})`}>
 			<use href="sidebar.svg#sidebar-left-fill"
 				style={`opacity: ${$leftSidebarMode !== SidebarMode.pinned ? 0 : 1}; transition: opacity .5s;`}/>
@@ -528,7 +529,6 @@ function buildMainMenu() {
 								command: workspace.commands.createNewFile,
 								context: { rule },
 								tooltipShortcut: false,
-								tooltipPlacement: 'right'
 							}}
 						>
 							<CreationRuleName {rule}/>
@@ -624,7 +624,6 @@ function buildMainMenu() {
 									command: workspace.commands.setFocusLevel,
 									context: { targetFocusLevel: level },
 									tooltip: FocusLevel.describeFocusLevel(level),
-									tooltipPlacement: 'right'
 								}}
 							>
 								<FocusLevelIcon focusLevel={level}/>

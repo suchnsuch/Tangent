@@ -16,7 +16,7 @@ import { focusLayer } from './focus'
 import { onMount, tick } from 'svelte';
 import type { ContextMenuConstructorOptions } from 'app/model/contextmenu';
 import Menu from './Menu.svelte'
-import { tooltip as tooltipHelper, TooltipDefOrConfig } from './tooltips';
+import { tooltip as tooltipHelper, TooltipDefOrConfig, dropTooltip } from './tooltips';
 	
 export let name = ''
 export let placement: Placement = 'bottom'
@@ -118,6 +118,8 @@ function isEventMarked(event) {
 }
 
 function buttonClick(event: MouseEvent) {
+	dropTooltip(buttonElement)
+
 	if (isEventMarked(event)) {
 		// This has already been handled
 		return
@@ -144,6 +146,7 @@ function buttonClick(event: MouseEvent) {
 }
 
 function buttonContext(event: MouseEvent) {
+	dropTooltip(buttonElement)
 	openPopUp(event)
 }
 

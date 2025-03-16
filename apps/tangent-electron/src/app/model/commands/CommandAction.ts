@@ -114,14 +114,6 @@ export default function command(node: HTMLElement, params: commandParams) {
 	update(params)
 	isFirstPass = false
 
-	function clickHandler(event: MouseEvent) {
-		if (event.defaultPrevented) return
-		command.execute(Object.assign({ event }, context))
-		if (options.preventDefault) {
-			event.preventDefault()
-		}
-	}
-
 	function onEnter(event: MouseEvent) {
 		if (tooltip) {
 			requestTooltip(node, tooltip())
@@ -131,6 +123,15 @@ export default function command(node: HTMLElement, params: commandParams) {
 	function onLeave(event: MouseEvent) {
 		if (tooltip) {
 			dropTooltip(node)
+		}
+	}
+
+	function clickHandler(event: MouseEvent) {
+		onLeave(event) // Disable tooltips
+		if (event.defaultPrevented) return
+		command.execute(Object.assign({ event }, context))
+		if (options.preventDefault) {
+			event.preventDefault()
 		}
 	}
 

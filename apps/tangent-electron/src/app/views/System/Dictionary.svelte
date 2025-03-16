@@ -2,6 +2,7 @@
 import { getContext } from 'svelte'
 import { Workspace } from 'app/model'
 import SvgIcon from '../smart-icons/SVGIcon.svelte'
+import { tooltip } from 'app/utils/tooltips'
 
 const workspace = getContext('workspace') as Workspace
 
@@ -28,7 +29,7 @@ function deleteWord(word: string) {
 				<li>
 					<button
 						class="delete"
-						title={`Remove "${item}" from the dictionary`}
+						use:tooltip={`Remove "${item}" from the dictionary`}
 						on:click={e => deleteWord(item)}
 					>
 						<SvgIcon ref="close.svg#close" size={16} />

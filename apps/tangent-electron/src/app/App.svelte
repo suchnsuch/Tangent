@@ -17,10 +17,10 @@ import { mediaQueryStore } from './utils/svelte'
 import SvgIcon from './views/smart-icons/SVGIcon.svelte'
 
 import { tooltips } from './utils/tooltips'
+import Tooltip from './utils/Tooltip.svelte'
 
 // Doing this here so that mhchem is loaded
 import 'katex/contrib/mhchem/mhchem'
-    import Tooltip from './utils/Tooltip.svelte';
 
 let applicationState: 'initializing' | 'choosingWorkspace' | 'buildingWorkspace' | 'usingWorkspace' | 'error' = 'initializing'
 let showLoading = false
@@ -267,6 +267,11 @@ function onFocusOut(event: AnnotatedFocusEvent) {
 	
 }
 
+let moveEvent: MouseEvent
+function onMouseMove(event: MouseEvent) {
+	moveEvent = event
+}
+
 function getErrorEmail() {
 
 	const { state, error } = errorDetails
@@ -291,6 +296,7 @@ Below is a stack trace of the error. Please provide any additional details above
 
 </script>
 
+<svelte:document on:mousemove={onMouseMove} />
 <svelte:head>
 	<title>{title}</title>
 </svelte:head>
@@ -337,7 +343,7 @@ Below is a stack trace of the error. Please provide any additional details above
 <MessageToast {api} />
 
 {#each $tooltips as {origin, config} (origin)}
-	<Tooltip {origin} {config} />
+	<Tooltip {origin} {config} {moveEvent} />
 {/each}
 
 <style lang="scss">

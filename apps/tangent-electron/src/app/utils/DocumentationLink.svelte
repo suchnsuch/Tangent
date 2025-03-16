@@ -1,6 +1,7 @@
 <script lang="ts">
-import type { Workspace } from 'app/model';
-import { getContext } from 'svelte';
+import type { Workspace } from 'app/model'
+import { getContext } from 'svelte'
+import { tooltip } from './tooltips'
 
 const workspace: Workspace = getContext('workspace')
 export let pageName
@@ -15,7 +16,7 @@ function title() {
 }
 </script>
 
-<button class="doc-link" on:click={click} {style} title={title()}></button>
+<button class="doc-link" on:click={click} {style} use:tooltip={title()}></button>
 
 <style lang="scss">
 button {

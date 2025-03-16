@@ -25,31 +25,47 @@ type TooltipItem = {
 
 export const tooltips = new WritableStore<TooltipItem[]>([])
 
+/** Timeout for whether or not a tooltip shows up or is hidden */
 let tooltipTimeout: any = null
 
-export function requestTooltip(element: HTMLElement, config: TooltipDefOrConfig) {
-	// TODO: Detect if this tooltip request is being made from within an existing tooltip
+let requireDelay = true
+/**
+ * Timeout for turning requiring a delay back on.
+ * These are separate so that you can mouse from one tooltip trigger to another over a gap.
+ */
+let requireTimeout: any = null
 
-	// New input always resets timers
+function clearTimeouts() {
 	if (tooltipTimeout) {
 		clearTimeout(tooltipTimeout)
 		tooltipTimeout = null
 	}
+	if (requireTimeout) {
+		clearTimeout(requireTimeout)
+		requireTimeout = null
+	}
+}
+
+export function requestTooltip(element: HTMLElement, config: TooltipDefOrConfig) {
+	// TODO: Detect if this tooltip request is being made from within an existing tooltip
+
+	clearTimeouts()
 
 	const requestedTooltip = {
 		origin: element,
 		config: tooltipToConfig(config)
 	}
 
-	if (tooltips.value.length === 0) {
+	if (tooltips.value.length === 0 && requireDelay) {
 		// No active tooltips
 		tooltipTimeout = setTimeout(() => {
+			requireDelay = false
 			tooltips.value.push(requestedTooltip)
 			tooltips.notifyObservers()
 		}, 800)
 	}
 	else {
-		// TODO: Something something children
+		// TODO: Something something children & multiple tooltips
 
 		// Immediately swap open tooltips
 		tooltips.set([requestedTooltip])
@@ -57,19 +73,23 @@ export function requestTooltip(element: HTMLElement, config: TooltipDefOrConfig)
 }
 
 export function dropTooltip(element: HTMLElement) {
+
+	clearTimeouts()
+
 	const itemIndex = tooltips.value.findIndex(i => i.origin === element)
 	if (itemIndex < 0) return
-	
-	if (tooltipTimeout) {
-		clearTimeout(tooltipTimeout)
-		tooltipTimeout = null
-	}
+
+	// Placed tooltips stick around a little longer. Mouse-relative ones do not.
+	const delay = tooltips.value[itemIndex].config.placement ? 300 : 0
 
 	tooltipTimeout = setTimeout(() => {
-		console.log('Dropping tooltip', tooltips.value[itemIndex])
 		tooltips.value.splice(itemIndex, 1)
 		tooltips.notifyObservers()
-	}, 300)
+	}, delay)
+
+	requireTimeout = setTimeout(() => {
+		requireDelay = true
+	}, 500)
 }
 
 export function tooltipToConfig(configIsh: TooltipDefOrConfig) {
@@ -102,11 +122,16 @@ export function tooltip(node: HTMLElement, def: TooltipDefOrConfig) {
 
 	node.addEventListener('mouseenter', onEnter)
 	node.addEventListener('mouseleave', onLeave)
+	node.addEventListener('click', onLeave)
 
 	return {
+		update(def: TooltipDefOrConfig) {
+			config = tooltipToConfig(def)
+		},
 		destroy() {
 			node.removeEventListener('mouseenter', onEnter)
 			node.removeEventListener('mouseleave', onLeave)
+			node.removeEventListener('click', onLeave)
 		}
 	}
 }
