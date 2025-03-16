@@ -126,6 +126,7 @@ $: currentMenu = menus.find(m => m.name === $section) ?? menus[0]
 			{#if currentMenu.documentation !== false}
 				<DocumentationLink
 					pageName={currentMenu.documentation ?? currentMenu.name}
+					pagePath={'Configuration/' + (currentMenu.documentation ?? currentMenu.name)}
 					style="position: absolute;
 						top: .5em;
 						right: 10px;"

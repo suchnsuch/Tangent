@@ -5,18 +5,19 @@ import { tooltip } from './tooltips'
 
 const workspace: Workspace = getContext('workspace')
 export let pageName
+export let pagePath = null
 export let style = ''
 
 function click() {
-	workspace.api.documentation.open(pageName)
-}
-
-function title() {
-	return `Documentation for ${pageName}`
+	workspace.api.documentation.open(pagePath ?? pageName)
 }
 </script>
 
-<button class="doc-link" on:click={click} {style} use:tooltip={title()}></button>
+<button class="doc-link"
+	on:click={click}
+	{style}
+	use:tooltip={`Documentation for ${pageName}`}
+></button>
 
 <style lang="scss">
 button {
