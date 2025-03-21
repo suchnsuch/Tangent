@@ -114,9 +114,9 @@ export default function command(node: HTMLElement, params: commandParams) {
 	update(params)
 	isFirstPass = false
 
-	function onEnter(event: MouseEvent) {
+	function makeTooltipRequest(event: MouseEvent) {
 		if (tooltip) {
-			requestTooltip(node, tooltip())
+			requestTooltip(node, tooltip(), event)
 		}
 	}
 
@@ -139,7 +139,8 @@ export default function command(node: HTMLElement, params: commandParams) {
 		node.addEventListener('click', clickHandler)
 	}
 
-	node.addEventListener('mouseenter', onEnter)
+	node.addEventListener('mouseenter', makeTooltipRequest)
+	node.addEventListener('mousemove', makeTooltipRequest)
 	node.addEventListener('mouseleave', onLeave)
 
 	let unsub = command.subscribe(() => {
@@ -151,7 +152,8 @@ export default function command(node: HTMLElement, params: commandParams) {
 		destroy() {
 			unsub()
 			node.removeEventListener('click', clickHandler)
-			node.removeEventListener('mouseenter', onEnter)
+			node.removeEventListener('mouseenter', makeTooltipRequest)
+			node.removeEventListener('mousemove', makeTooltipRequest)
 			node.removeEventListener('mouseleave', onLeave)
 		}
 	}

@@ -6,7 +6,6 @@ import { onDestroy, setContext } from 'svelte'
 
 export let origin: HTMLElement
 export let config: TooltipConfig
-export let moveEvent: MouseEvent
 
 export let injectContext: (injector: ((name: string, value: any) => void)) => void = null
 
@@ -16,58 +15,41 @@ if (injectContext) {
 
 let cleanup: () => void = null
 
-let tooltipElement: HTMLElement
-
-$: if (!config.placement && moveEvent) {
-	mouseRelativePosition(moveEvent, tooltipElement)
-}
-
-function mouseRelativePosition(moveEvent: MouseEvent, element: HTMLElement) {
-
-	if (!element) return
-
-	const virtualOrigin: VirtualElement = {
-		getBoundingClientRect() {
-			return {
-				width: 0,
-				height: 0,
-				x: moveEvent.clientX,
-				y: moveEvent.clientY,
-				top: moveEvent.clientY,
-				left: moveEvent.clientX,
-				right: moveEvent.clientX,
-				bottom: moveEvent.clientY
-			}
-		},
-		contextElement: origin
-	}
-
-	computePosition(virtualOrigin, element, {
-		strategy: 'fixed',
-		placement: 'bottom-start',
-		middleware: [
-			flip(),
-			offset({
-				mainAxis: 12,
-				alignmentAxis: 8
-			}),
-			shift()
-		]
-	}).then(result => {
-		element.style.left = result.x + 'px'
-		element.style.top = result.y + 'px'
-	})
-}
+let tooltipElement: HTMLElement = null
 
 function positionedFly(element: HTMLElement) {
 
 	if (config.placement) {
-		cleanup = autoUpdate(origin, element, () => {
-			computePosition(origin, element, {
+
+		let effectiveOrigin: HTMLElement | VirtualElement = origin
+		let placement = config.placement
+
+		if (typeof placement !== 'string') {
+			const event = placement
+			console.log(event.clientX, event.clientY)
+			effectiveOrigin = {
+				getBoundingClientRect() {
+					return {
+						width: 0,
+						height: 0,
+						x: event.clientX,
+						y: event.clientY,
+						top: event.clientY,
+						left: event.clientX,
+						right: event.clientX,
+						bottom: event.clientY
+					}
+				},
+				contextElement: origin
+			}
+			placement = 'bottom-start'
+		}
+
+		cleanup = autoUpdate(effectiveOrigin, element, () => {
+			computePosition(effectiveOrigin, element, {
 				strategy: 'fixed',
-				placement: config.placement,
+				placement,
 				middleware: [
-					inline({ x: moveEvent.x, y: moveEvent.y }),
 					flip(),
 					offset(4),
 					shift()
@@ -98,6 +80,8 @@ onDestroy(() => {
 <main
 	bind:this={tooltipElement}
 	transition:positionedFly
+	on:introstart={() => tooltipElement.style.pointerEvents = 'none'}
+	on:introend={() => tooltipElement.style.pointerEvents = ''}
 	style:max-width={config.maxWidth ?? '300px'}
 >
 	{#if typeof config.tooltip === 'string'}

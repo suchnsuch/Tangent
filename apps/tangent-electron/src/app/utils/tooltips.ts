@@ -11,7 +11,7 @@ export type TooltipConfig = {
 	/** Any arguments to be passed to a component */
 	args?: any
 	shortcut?: string
-	placement?: Placement
+	placement?: MouseEvent | Placement
 	maxWidth?: string
 }
 
@@ -47,14 +47,19 @@ function clearTimeouts() {
 	}
 }
 
-export function requestTooltip(element: HTMLElement, config: TooltipDefOrConfig) {
+export function requestTooltip(element: HTMLElement, config: TooltipDefOrConfig, event?: MouseEvent) {
 	// TODO: Detect if this tooltip request is being made from within an existing tooltip
 
 	clearTimeouts()
 
+	config = tooltipToConfig(config)
+	if (!config.placement) {
+		config.placement = event
+	}
+
 	const requestedTooltip = {
 		origin: element,
-		config: tooltipToConfig(config)
+		config
 	}
 
 	if (tooltips.value.length === 0 && requireDelay) {
@@ -79,13 +84,10 @@ export function dropTooltip(element: HTMLElement) {
 	const itemIndex = tooltips.value.findIndex(i => i.origin === element)
 	if (itemIndex < 0) return
 
-	// Placed tooltips stick around a little longer. Mouse-relative ones do not.
-	const delay = tooltips.value[itemIndex].config.placement ? 300 : 0
-
 	tooltipTimeout = setTimeout(() => {
 		tooltips.value.splice(itemIndex, 1)
 		tooltips.notifyObservers()
-	}, delay)
+	}, 100)
 
 	requireTimeout = setTimeout(() => {
 		requireDelay = true
@@ -109,18 +111,19 @@ export function tooltip(node: HTMLElement, def: TooltipDefOrConfig) {
 
 	let config = tooltipToConfig(def)
 
-	function onEnter() {
+	function makeTooltipRequest(event: MouseEvent) {
 		if ('tooltip' in node) {
 			config = tooltipToConfig(node.tooltip as any)
 		}
-		requestTooltip(node, config)
+		requestTooltip(node, config, event)
 	}
 
 	function onLeave() {
 		dropTooltip(node)
 	}
 
-	node.addEventListener('mouseenter', onEnter)
+	node.addEventListener('mouseenter', makeTooltipRequest)
+	node.addEventListener('mousemove', makeTooltipRequest)
 	node.addEventListener('mouseleave', onLeave)
 	node.addEventListener('click', onLeave)
 
@@ -129,7 +132,8 @@ export function tooltip(node: HTMLElement, def: TooltipDefOrConfig) {
 			config = tooltipToConfig(def)
 		},
 		destroy() {
-			node.removeEventListener('mouseenter', onEnter)
+			node.removeEventListener('mouseenter', makeTooltipRequest)
+			node.removeEventListener('mousemove', makeTooltipRequest)
 			node.removeEventListener('mouseleave', onLeave)
 			node.removeEventListener('click', onLeave)
 		}

@@ -267,11 +267,6 @@ function onFocusOut(event: AnnotatedFocusEvent) {
 	
 }
 
-let moveEvent: MouseEvent
-function onMouseMove(event: MouseEvent) {
-	moveEvent = event
-}
-
 // Do this so that child tooltips can have workspace context
 function tooltipContextInjection(injector) {
 	injector('workspace', workspace)
@@ -301,7 +296,6 @@ Below is a stack trace of the error. Please provide any additional details above
 
 </script>
 
-<svelte:document on:mousemove={onMouseMove} />
 <svelte:head>
 	<title>{title}</title>
 </svelte:head>
@@ -348,7 +342,7 @@ Below is a stack trace of the error. Please provide any additional details above
 <MessageToast {api} />
 
 {#each $tooltips as {origin, config} (origin)}
-	<Tooltip {origin} {config} {moveEvent} injectContext={tooltipContextInjection} />
+	<Tooltip {origin} {config} injectContext={tooltipContextInjection} />
 {/each}
 
 <style lang="scss">

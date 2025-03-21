@@ -24,7 +24,8 @@ class TangentLink extends HTMLElement {
 		this.addEventListener('mousedown', this.onClick)
 		this.addEventListener('mouseup', this.onClick)
 		this.addEventListener('contextmenu', this.onClick)
-		this.addEventListener('mouseenter', this.onMouseEnter)
+		this.addEventListener('mouseenter', this.makeTooltipRequest)
+		this.addEventListener('mousemove', this.makeTooltipRequest)
 		this.addEventListener('mouseleave', this.onMouseLeave)
 	}
 
@@ -130,7 +131,7 @@ class TangentLink extends HTMLElement {
 		event.tLink = this
 	}
 
-	onMouseEnter() {
+	makeTooltipRequest(event: MouseEvent) {
 		if (this.linkState === 'uninitialized') return
 
 		requestTooltip(this, {
@@ -141,7 +142,7 @@ class TangentLink extends HTMLElement {
 				state: this.linkState,
 				context: this.context
 			}
-		})
+		}, event)
 	}
 
 	onMouseLeave() {
