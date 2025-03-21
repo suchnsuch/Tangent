@@ -117,7 +117,7 @@ header {
 
 	font-family: var(--noteFontFamily);
 	padding: calc(1.5em / 2.5) calc(2em / 2.5);
-	font-size: calc(var(--fontSize) * 2.5);
+	font-size: calc(var(--fontSize) * var(--headerFontSizeFactor));
 	font-weight: 500;
 	padding-bottom: calc(1em / 2.5);
 

@@ -5,52 +5,15 @@ import { HrefForm, HrefFormedLink, StructureType } from 'common/indexing/indexTy
 import { isExternalLink } from 'common/links'
 import { isMac } from 'common/isMac'
 import { HandleResult, isNode } from 'app/model/NodeHandle'
+import { dropTooltip, requestTooltip } from 'app/utils/tooltips'
+import TLinkTooltip from '../TLinkTooltip.svelte'
 
 export type LinkState = 'uninitialized' | 'empty' | 'resolved' | 'ambiguous' | 'untracked' | 'external' | 'error'
-
-function getClickMessage(name='', location='in a new pane.') {
-	let result = isMac ? '⌘+Click' : 'Ctrl+Click'
-	result += ' or middle-click to open '
-	if (name) {
-		result += name + ' '
-	}
-	result += location
-	return result
-}
-
-function linkStateTooltip(state: LinkState, context: HandleResult) {
-	switch (state) {
-		case 'uninitialized':
-			return undefined
-		case 'empty':
-			return '\"' + (context as TreeNode)?.name + '\" is virtual.\n' + getClickMessage('it')
-		case 'resolved':
-			return context
-				? getClickMessage('\"' + (context as TreeNode).name + '\"')
-				: getClickMessage()
-		case 'ambiguous':
-			const workspace = (document as any).workspace as Workspace
-			const nodePaths = (context as TreeNode[]).map(n => workspace.directoryStore.pathToPortablePath(n.path))
-			return `This link is ambigious between ${nodePaths.length} files:\n`
-				+ nodePaths.map(p => '    - ' + p).join('\n')
-		case 'external':
-			return getClickMessage('', 'in your default browser.')
-		case 'untracked':
-			const store  = ((document as any).workspace as Workspace).directoryStore
-			let target = store.pathToRelativePath(context as string)
-			if (target === false) {
-				target = context as string
-			}
-			return getClickMessage(`\"${target}\"`, 'in its default application.')
-		case 'error':
-			return 'Something went wrong resolving this link.'
-	}
-}
 
 class TangentLink extends HTMLElement {
 
 	protected linkState: LinkState
-	protected tooltip: string
+	protected context: HandleResult
 	handleUnsub: () => void
 
 	constructor() {
@@ -61,6 +24,8 @@ class TangentLink extends HTMLElement {
 		this.addEventListener('mousedown', this.onClick)
 		this.addEventListener('mouseup', this.onClick)
 		this.addEventListener('contextmenu', this.onClick)
+		this.addEventListener('mouseenter', this.onMouseEnter)
+		this.addEventListener('mouseleave', this.onMouseLeave)
 	}
 
 	connectedCallback() {
@@ -74,7 +39,7 @@ class TangentLink extends HTMLElement {
 	}
 
 	static get observedAttributes() {
-		return ['link-state', 'title', 'href', 'content_id', 'form', 'from']
+		return ['link-state', 'href', 'content_id', 'form', 'from']
 	}
 
 	attributeChangedCallback(name: string, oldValue: string, newValue: string) {
@@ -87,14 +52,6 @@ class TangentLink extends HTMLElement {
 					this.setAttribute(name, this.linkState)
 				}
 				break
-			case 'title':
-				// This is a hack to ensure that the link state values *alwasy* remain, even if
-				// a silly virtual dom thinks it's better than us and wants to override the
-				// attributes
-				if (newValue !== this.tooltip) {
-					this.setAttribute(name, this.tooltip)
-				}
-				break;
 			case 'href':
 			case 'content_id':
 				requestCallbackOnIdle(() => this.updateState(), 1000)
@@ -165,13 +122,30 @@ class TangentLink extends HTMLElement {
 
 	setLinkState(value: LinkState, context: HandleResult) {
 		this.linkState = value
+		this.context = context
 		this.setAttribute('link-state', value)
-		this.tooltip = linkStateTooltip(value, context)
-		this.setAttribute('title', this.tooltip)
 	}
 
 	onClick(event) {
 		event.tLink = this
+	}
+
+	onMouseEnter() {
+		if (this.linkState === 'uninitialized') return
+
+		requestTooltip(this, {
+			tooltip: TLinkTooltip,
+			maxWidth: '500px',
+			args: {
+				link: this.getLinkInfo(),
+				state: this.linkState,
+				context: this.context
+			}
+		})
+	}
+
+	onMouseLeave() {
+		dropTooltip(this)
 	}
 
 	getCleanedHref() {

@@ -106,6 +106,7 @@ export let extraTop: number = 0
 export let extraBottom: number = 0
 
 export let fixedTitle: boolean = null
+export let showHeaderIcon = false
 
 let container: HTMLElement
 
@@ -1262,7 +1263,7 @@ function onDetailsContexMenu(event: MouseEvent) {
 		{editable}
 		{focusing}
 		preventMouseUpDefault={true}
-		showIcon={false}
+		showIcon={showHeaderIcon}
 		showExtension={false}
 		on:enter-exit={e => editorElement.dispatchEvent(new Event('resumeFocus'))}
 		/>
@@ -1280,6 +1281,17 @@ function onDetailsContexMenu(event: MouseEvent) {
 		class="note"
 		class:focusing
 	></article>
+	{#if (!editorIsFocused || !editable) && virtual}
+		<div
+			class="noContentMessage"
+			style={'--noContentOffset: ' + (headerElement?.clientHeight + 150) + 'px;'}
+		>
+			This note is virtual and has no content.
+			{#if editable}
+				<br/>Click to add content.
+			{/if}
+		</div>
+	{/if}
 	<div style={`height: ${effectiveExtraBottom}px;`}></div>
 	<AutoCompleteMenu {editor} offset={4} let:handler>
 		{#if handler instanceof WikiLinkAutocompleter}
@@ -1292,11 +1304,6 @@ function onDetailsContexMenu(event: MouseEvent) {
 			<CodeBlockAutocompleteMenu {handler} />
 		{/if}
 	</AutoCompleteMenu>
-	{#if !editorIsFocused && virtual}
-		<div class="noContentMessage" style:top={headerElement?.clientHeight + 150 + 'px'}>
-			This note has no content. Click to add content.
-		</div>
-	{/if}
 </main>
 
 {#if state.detailMode}
@@ -1426,12 +1433,16 @@ article, .detailsBlock {
 }
 
 .noContentMessage {
-	position: absolute;
-	left: 0;
-	right: 0;
 	text-align: center;
 	color: var(--deemphasizedTextColor);
 	opacity: .5;
+
+	.layout-fill & {
+		position: absolute;
+		left: 0;
+		right: 0;
+		top: var(--noContentOffset);
+	}
 }
 
 .details {
