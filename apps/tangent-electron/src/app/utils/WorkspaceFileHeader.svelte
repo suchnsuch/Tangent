@@ -137,7 +137,7 @@ header {
 }
 
 :global(.margins-tight) header {
-	padding: calc(.5em / 2.5) calc(.5em / 2.5) 0;
+	padding: calc(.5em / 2.5) calc(.5em / 2.5);
 }
 
 :global(.margins-relaxed) header {
