@@ -6,6 +6,7 @@ import { Workspace } from 'app/model'
 import WorkspaceTreeNode from 'app/model/WorkspaceTreeNode'
 import WorkspaceFileHeader from 'app/utils/WorkspaceFileHeader.svelte'
 import ListViewState from 'app/model/nodeViewStates/ListViewState'
+import { BaseSetViewState } from 'app/model/nodeViewStates/SetViewState'
 import NodeIcon from '../smart-icons/NodeIcon.svelte'
 
 const dispatch = createEventDispatcher<{
@@ -16,6 +17,7 @@ const dispatch = createEventDispatcher<{
 const workspace = getContext('workspace') as Workspace
 
 export let state: ListViewState
+export let extraTop: number = 0
 $: items = state.items
 
 function nodeClick(event, ref: TreeNodeOrReference) {
@@ -30,8 +32,10 @@ function nodeClick(event, ref: TreeNodeOrReference) {
 
 </script>
 
-<main>
-	{#if state.parent.node instanceof WorkspaceTreeNode}
+<main
+	style:padding-top={`${extraTop}px`}
+>
+	{#if (state.parent instanceof BaseSetViewState && state.parent.isLensOverridden) && state.parent.node instanceof WorkspaceTreeNode}
 		<WorkspaceFileHeader node={state.parent.node} showExtension={false} editable={false} />
 	{/if}
 	<article>
