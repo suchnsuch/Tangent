@@ -12,6 +12,7 @@ export type TooltipConfig = {
 	args?: any
 	shortcut?: string
 	placement?: Placement
+	maxWidth?: string
 }
 
 export type TooltipDefOrConfig = TooltipLiteral | TooltipConfig
@@ -73,7 +74,6 @@ export function requestTooltip(element: HTMLElement, config: TooltipDefOrConfig)
 }
 
 export function dropTooltip(element: HTMLElement) {
-
 	clearTimeouts()
 
 	const itemIndex = tooltips.value.findIndex(i => i.origin === element)

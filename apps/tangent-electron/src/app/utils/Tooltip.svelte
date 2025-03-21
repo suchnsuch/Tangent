@@ -1,11 +1,20 @@
 <script lang="ts">
-import { computePosition, flip, offset, VirtualElement } from '@floating-ui/dom'
+import { autoUpdate, computePosition, flip, inline, offset, shift, VirtualElement } from '@floating-ui/dom'
 import { cubicInOut } from 'svelte/easing'
 import { TooltipConfig } from './tooltips'
+import { onDestroy, setContext } from 'svelte'
 
 export let origin: HTMLElement
 export let config: TooltipConfig
 export let moveEvent: MouseEvent
+
+export let injectContext: (injector: ((name: string, value: any) => void)) => void = null
+
+if (injectContext) {
+	injectContext(setContext)
+}
+
+let cleanup: () => void = null
 
 let tooltipElement: HTMLElement
 
@@ -36,10 +45,14 @@ function mouseRelativePosition(moveEvent: MouseEvent, element: HTMLElement) {
 	computePosition(virtualOrigin, element, {
 		strategy: 'fixed',
 		placement: 'bottom-start',
-		middleware: [flip(), offset({
-			mainAxis: 12,
-			alignmentAxis: 8
-		})]
+		middleware: [
+			flip(),
+			offset({
+				mainAxis: 12,
+				alignmentAxis: 8
+			}),
+			shift()
+		]
 	}).then(result => {
 		element.style.left = result.x + 'px'
 		element.style.top = result.y + 'px'
@@ -49,13 +62,20 @@ function mouseRelativePosition(moveEvent: MouseEvent, element: HTMLElement) {
 function positionedFly(element: HTMLElement) {
 
 	if (config.placement) {
-		computePosition(origin, element, {
-			strategy: 'fixed',
-			placement: config.placement,
-			middleware: [flip(), offset(4)]
-		}).then(result => {
-			element.style.left = result.x + 'px'
-			element.style.top = result.y + 'px'
+		cleanup = autoUpdate(origin, element, () => {
+			computePosition(origin, element, {
+				strategy: 'fixed',
+				placement: config.placement,
+				middleware: [
+					inline({ x: moveEvent.x, y: moveEvent.y }),
+					flip(),
+					offset(4),
+					shift()
+				]
+			}).then(result => {
+				element.style.left = result.x + 'px'
+				element.style.top = result.y + 'px'
+			})
 		})
 	}
 	
@@ -69,11 +89,16 @@ function positionedFly(element: HTMLElement) {
 	}
 }
 
+onDestroy(() => {
+	if (cleanup) cleanup()
+})
+
 </script>
 
 <main
 	bind:this={tooltipElement}
 	transition:positionedFly
+	style:max-width={config.maxWidth ?? '300px'}
 >
 	{#if typeof config.tooltip === 'string'}
 		<p>

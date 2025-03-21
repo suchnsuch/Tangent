@@ -272,6 +272,11 @@ function onMouseMove(event: MouseEvent) {
 	moveEvent = event
 }
 
+// Do this so that child tooltips can have workspace context
+function tooltipContextInjection(injector) {
+	injector('workspace', workspace)
+}
+
 function getErrorEmail() {
 
 	const { state, error } = errorDetails
@@ -343,7 +348,7 @@ Below is a stack trace of the error. Please provide any additional details above
 <MessageToast {api} />
 
 {#each $tooltips as {origin, config} (origin)}
-	<Tooltip {origin} {config} {moveEvent} />
+	<Tooltip {origin} {config} {moveEvent} injectContext={tooltipContextInjection} />
 {/each}
 
 <style lang="scss">
