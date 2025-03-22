@@ -43,6 +43,7 @@ export default function tlinkModule(editor: Editor, options?: {
 	const linkFollowType = options?.linkFollowRequirement ?? 'mod'
 
 	function isLinkFollowingEvent(event: MouseEvent) {
+		if (TangentLink.isNavigationLinkOverride(event)) return true
 		if (event.button === 0) {
 			const followType = typeof linkFollowType === 'string'
 				? linkFollowType

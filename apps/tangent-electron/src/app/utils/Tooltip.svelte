@@ -1,7 +1,7 @@
 <script lang="ts">
 import { autoUpdate, computePosition, flip, inline, offset, shift, VirtualElement } from '@floating-ui/dom'
 import { cubicInOut } from 'svelte/easing'
-import { TooltipConfig } from './tooltips'
+import { dropTooltip, pinTooltip, TooltipConfig } from './tooltips'
 import { onDestroy, setContext } from 'svelte'
 
 export let origin: HTMLElement
@@ -75,6 +75,18 @@ onDestroy(() => {
 	if (cleanup) cleanup()
 })
 
+function onMouseEnter() {
+	if (config.interactive) {
+		pinTooltip(origin)
+	}
+}
+
+function onMouseLeave() {
+	if (config.interactive) {
+		dropTooltip(origin)
+	}
+}
+
 </script>
 
 <main
@@ -82,6 +94,8 @@ onDestroy(() => {
 	transition:positionedFly
 	on:introstart={() => tooltipElement.style.pointerEvents = 'none'}
 	on:introend={() => tooltipElement.style.pointerEvents = ''}
+	on:mouseenter={onMouseEnter}
+	on:mouseleave={onMouseLeave}
 	style:max-width={config.maxWidth ?? '300px'}
 >
 	{#if typeof config.tooltip === 'string'}

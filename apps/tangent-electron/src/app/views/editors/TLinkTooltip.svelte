@@ -5,15 +5,18 @@ import { TreeNode } from 'common/trees'
 import { isMac } from 'common/isMac'
 import { Workspace } from 'app/model'
 import { HandleResult } from 'app/model/NodeHandle'
+import { dropTooltip } from 'app/utils/tooltips'
 import type { LinkState } from './NoteEditor/t-link'
 import NodePreview from '../summaries/NodePreview.svelte'
 import NodeLine from '../summaries/NodeLine.svelte'
+import type TangentLink from './NoteEditor/t-link'
 
 const workspace = getContext('workspace') as Workspace
 
 const linkFollow = workspace.settings.noteLinkFollowBehavior
 const linkPane = workspace.settings.linkClickPaneBehavior
 
+export let origin: TangentLink
 export let link: HrefFormedLink
 export let state: LinkState
 export let context: HandleResult
@@ -37,29 +40,22 @@ function getLinkPane(flip=false) {
 	}
 }
 
-function getClickMessage(name='', location: string = null) {
-	let result = getClickPrefix() + 'Click'
-	result += ' or Middle-Click to open '
-	if (name) {
-		result += name + ' '
-	}
+function onClick(event: MouseEvent) {
+	const newEvent = new MouseEvent('click', event)
+	origin.onClick(newEvent)
+	;(newEvent as any).tNavigationOverride = true
+	origin.dispatchEvent(newEvent)
 
-	if (location === null) {
-		if ($linkPane === 'new') {
-			location = 'in a new pane.'
-		}
-		else {
-			location = 'in this pane.'
-		}
-	}
-
-	result += location
-	return result
+	dropTooltip(origin, false)
 }
 
 </script>
 
-<main>
+<!-- svelte-ignore a11y-click-events-have-key-events -->
+<!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
+<main
+	on:click={onClick}
+>
 	{#if state === 'resolved' || state === 'empty'}
 		{#if node}
 			<div class="preview margins-tight">
@@ -102,11 +98,12 @@ function getClickMessage(name='', location: string = null) {
 	--fontSize: calc(var(--noteFontSize) * .8);
 	--headerFontSizeFactor: 2.25;
 
-	overflow: hidden;
+	overflow-x: hidden;
+	overflow-y: auto;
 	margin-bottom: 1em;
 
-	:global(.imageCard .image) {
-		border-radius: var(--borderRadius);
+	:global(*) {
+		pointer-events: none;
 	}
 }
 

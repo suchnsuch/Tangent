@@ -137,7 +137,9 @@ class TangentLink extends HTMLElement {
 		requestTooltip(this, {
 			tooltip: TLinkTooltip,
 			maxWidth: '500px',
+			interactive: true,
 			args: {
+				origin: this,
 				link: this.getLinkInfo(),
 				state: this.linkState,
 				context: this.context
@@ -168,6 +170,10 @@ class TangentLink extends HTMLElement {
 
 	static isTangentLinkEvent(event: Event) {
 		return this.getTangentLinkFromEvent(event) !== undefined
+	}
+
+	static isNavigationLinkOverride(event: Event) {
+		return (event as any).tNavigationOverride === true
 	}
 
 	static getTangentLinkFromEvent(event: Event) {

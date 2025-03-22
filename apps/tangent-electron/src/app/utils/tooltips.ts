@@ -12,6 +12,7 @@ export type TooltipConfig = {
 	args?: any
 	shortcut?: string
 	placement?: MouseEvent | Placement
+	interactive?: boolean
 	maxWidth?: string
 }
 
@@ -22,6 +23,8 @@ type TooltipItem = {
 	origin: HTMLElement
 	/** The configuration of the tooltip */
 	config: TooltipConfig
+	/** The number of things keepig the item alive */
+	liveCount: number
 }
 
 export const tooltips = new WritableStore<TooltipItem[]>([])
@@ -59,7 +62,8 @@ export function requestTooltip(element: HTMLElement, config: TooltipDefOrConfig,
 
 	const requestedTooltip = {
 		origin: element,
-		config
+		config,
+		liveCount: 1
 	}
 
 	if (tooltips.value.length === 0 && requireDelay) {
@@ -68,7 +72,7 @@ export function requestTooltip(element: HTMLElement, config: TooltipDefOrConfig,
 			requireDelay = false
 			tooltips.value.push(requestedTooltip)
 			tooltips.notifyObservers()
-		}, 800)
+		}, 1000)
 	}
 	else {
 		// TODO: Something something children & multiple tooltips
@@ -78,16 +82,36 @@ export function requestTooltip(element: HTMLElement, config: TooltipDefOrConfig,
 	}
 }
 
-export function dropTooltip(element: HTMLElement) {
+export function pinTooltip(element: HTMLElement) {
+	clearTimeouts()
+
+	const item = tooltips.value.find(i => i.origin === element)
+	if (item) {
+		item.liveCount += 1
+	}
+}
+
+export function dropTooltip(element: HTMLElement, delay=true) {
 	clearTimeouts()
 
 	const itemIndex = tooltips.value.findIndex(i => i.origin === element)
 	if (itemIndex < 0) return
+	const item = tooltips.value[itemIndex]
 
-	tooltipTimeout = setTimeout(() => {
+	item.liveCount -= 1
+	if (item.liveCount > 0) return
+
+	const drop = () => {
 		tooltips.value.splice(itemIndex, 1)
 		tooltips.notifyObservers()
-	}, 100)
+	}
+
+	if (delay) {
+		tooltipTimeout = setTimeout(drop, 100)
+	}
+	else {
+		drop()
+	}
 
 	requireTimeout = setTimeout(() => {
 		requireDelay = true
