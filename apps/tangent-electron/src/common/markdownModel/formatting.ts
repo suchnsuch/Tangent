@@ -142,7 +142,7 @@ export function parseEmojiHighlight(char: string, parser: NoteParser): boolean {
 }
 
 const backslashEscapes = [
-	'_', '*', '-', '+', '$', '#', "~", '`', '[', ']', '(', ')'
+	'_', '*', '-', '+', '$', '#', "~", '`', '[', ']', '(', ')', '<', '>'
 ]
 export function parseBackslashEscape(char: string, parser: NoteParser): boolean {
 	if (char === '\\' && backslashEscapes.includes(parser.feed.peek())) {
