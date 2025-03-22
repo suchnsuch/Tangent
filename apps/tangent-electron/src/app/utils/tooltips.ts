@@ -11,8 +11,9 @@ export type TooltipConfig = {
 	/** Any arguments to be passed to a component */
 	args?: any
 	shortcut?: string
-	placement?: MouseEvent | Placement
+	placement?: Placement | 'mouse-below' | 'mouse-below-origin'
 	interactive?: boolean
+	minWidth?: string
 	maxWidth?: string
 }
 
@@ -21,6 +22,8 @@ export type TooltipDefOrConfig = TooltipLiteral | TooltipConfig
 type TooltipItem = {
 	/** The element that spawned this tooltip */
 	origin: HTMLElement
+	/** The event that kicked off the tooltip */
+	originEvent: MouseEvent
 	/** The configuration of the tooltip */
 	config: TooltipConfig
 	/** The number of things keepig the item alive */
@@ -56,12 +59,13 @@ export function requestTooltip(element: HTMLElement, config: TooltipDefOrConfig,
 	clearTimeouts()
 
 	config = tooltipToConfig(config)
-	if (!config.placement) {
-		config.placement = event
+	if (!config.placement && event) {
+		config.placement = 'mouse-below-origin'
 	}
 
 	const requestedTooltip = {
 		origin: element,
+		originEvent: event,
 		config,
 		liveCount: 1
 	}

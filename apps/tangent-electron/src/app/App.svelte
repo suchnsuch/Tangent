@@ -341,8 +341,8 @@ Below is a stack trace of the error. Please provide any additional details above
 
 <MessageToast {api} />
 
-{#each $tooltips as {origin, config} (origin)}
-	<Tooltip {origin} {config} injectContext={tooltipContextInjection} />
+{#each $tooltips as {origin, originEvent, config} (origin)}
+	<Tooltip {origin} {originEvent} {config} injectContext={tooltipContextInjection} />
 {/each}
 
 <style lang="scss">

@@ -496,8 +496,11 @@ function buildMainMenu() {
 		{/if}
 
 		<button class="subtle"
-			on:click={() => setLeftSidebarPinned($leftSidebarMode !== SidebarMode.pinned)}
-			use:tooltip={$leftSidebarMode === SidebarMode.pinned ? 'Close the left sidebar' : 'Pin the left sidebar'}
+			use:command={{
+				command: workspace.commands.toggleLeftSidebar,
+				getToolTip: () => $leftSidebarMode === SidebarMode.pinned ? 'Close the left sidebar' : 'Pin the left sidebar'
+			}}
+			
 		><svg style={`width: 24px; height: 24px; --sidebarStroke: var(--${$leftSidebarMode !== SidebarMode.pinned ? 'iconStroke' : 'backgroundColor'})`}>
 			<use href="sidebar.svg#sidebar-left-fill"
 				style={`opacity: ${$leftSidebarMode !== SidebarMode.pinned ? 0 : 1}; transition: opacity .5s;`}/>

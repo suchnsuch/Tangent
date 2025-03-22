@@ -1,5 +1,6 @@
 <script lang="ts">
 import { getContext } from 'svelte';
+import { isMac } from 'common/isMac'
 import type Workspace from 'app/model/Workspace'
 import PopUpButton from 'app/utils/PopUpButton.svelte'
 
@@ -95,7 +96,10 @@ $: currentMenu = menus.find(m => m.name === $section) ?? menus[0]
 <PopUpButton buttonClass="subtle"
 	bind:showMenu={detailsOpen}
 	menuMode="low-profile"
-	tooltip="Options"
+	tooltip={{
+		tooltip: "Open settings",
+		shortcut: isMac ? '⌘ ,' : 'Ctrl+,'
+	}}
 >
 	<svelte:fragment slot="button">
 		<div class={'buttonContent ' + $mode} class:supressed={supressUpdates}>

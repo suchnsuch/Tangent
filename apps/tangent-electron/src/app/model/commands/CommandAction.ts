@@ -22,7 +22,9 @@ export interface CommandActionOptions {
 	/** Whether to include the shortcut in the tooltip. Default true. */
 	tooltipShortcut?: boolean
 	/** A tooltip override */
-	tooltip?: TooltipDefOrConfig
+	tooltip?: TooltipDefOrConfig,
+	/** A function that returns a tooltip */
+	getToolTip?: () => TooltipDefOrConfig,
 	tooltipPlacement?: Placement
 }
 
@@ -80,7 +82,11 @@ export default function command(node: HTMLElement, params: commandParams) {
 		}
 
 		tooltip = () => {
-			let tooltip: TooltipDefOrConfig = options.tooltip ?? (options.labelAsTooltip && command.getLabel(context)) ?? command.getTooltip(context)
+			let tooltip: TooltipDefOrConfig = (options.getToolTip ? options.getToolTip() : null)
+				?? options.tooltip
+				?? (options.labelAsTooltip && command.getLabel(context))
+				?? command.getTooltip(context)
+			
 			if (tooltip) {
 				tooltip = tooltipToConfig(tooltip)
 				if (shortcutText && options.tooltipShortcut !== false) {

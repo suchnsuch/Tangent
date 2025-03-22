@@ -1,11 +1,9 @@
 import { requestCallbackOnIdle } from '@such-n-such/core'
 import type { Workspace } from 'app/model'
-import { TreeNode } from 'common/trees'
 import { HrefForm, HrefFormedLink, StructureType } from 'common/indexing/indexTypes'
 import { isExternalLink } from 'common/links'
-import { isMac } from 'common/isMac'
 import { HandleResult, isNode } from 'app/model/NodeHandle'
-import { dropTooltip, requestTooltip } from 'app/utils/tooltips'
+import { dropTooltip, requestTooltip, TooltipConfig } from 'app/utils/tooltips'
 import TLinkTooltip from '../TLinkTooltip.svelte'
 
 export type LinkState = 'uninitialized' | 'empty' | 'resolved' | 'ambiguous' | 'untracked' | 'external' | 'error'
@@ -13,7 +11,6 @@ export type LinkState = 'uninitialized' | 'empty' | 'resolved' | 'ambiguous' | '
 class TangentLink extends HTMLElement {
 
 	protected linkState: LinkState
-	protected context: HandleResult
 	handleUnsub: () => void
 
 	constructor() {
@@ -123,7 +120,6 @@ class TangentLink extends HTMLElement {
 
 	setLinkState(value: LinkState, context: HandleResult) {
 		this.linkState = value
-		this.context = context
 		this.setAttribute('link-state', value)
 	}
 
@@ -131,20 +127,22 @@ class TangentLink extends HTMLElement {
 		event.tLink = this
 	}
 
-	makeTooltipRequest(event: MouseEvent) {
-		if (this.linkState === 'uninitialized') return
-
-		requestTooltip(this, {
+	getTooltip(): TooltipConfig {
+		return {
 			tooltip: TLinkTooltip,
 			maxWidth: '500px',
 			interactive: true,
 			args: {
 				origin: this,
 				link: this.getLinkInfo(),
-				state: this.linkState,
-				context: this.context
+				state: this.linkState
 			}
-		}, event)
+		}
+	}
+
+	makeTooltipRequest(event: MouseEvent) {
+		if (this.linkState === 'uninitialized') return
+		requestTooltip(this, this.getTooltip(), event)
 	}
 
 	onMouseLeave() {

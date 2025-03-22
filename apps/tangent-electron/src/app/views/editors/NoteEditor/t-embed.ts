@@ -1,12 +1,13 @@
 import type { Workspace } from 'app/model'
 import { StructureType } from 'common/indexing/indexTypes'
-import { isExternalLink } from 'common/links'
 
 import EmbedRoot from './EmbedRoot.svelte'
 import TangentLink, { LinkState } from './t-link'
 import { markAsSelectionRequest } from 'app/events'
 import { deepEqual } from 'fast-equals'
 import { HandleResult } from 'app/model/NodeHandle'
+import { TooltipConfig } from 'app/utils/tooltips'
+import { isExternalLink } from 'common/links'
 
 class TangentEmbed extends TangentLink {
 
@@ -113,11 +114,11 @@ class TangentEmbed extends TangentLink {
 			})
 
 			const handleForm = form => {
-				if (!form || form?.mode === 'error') {
+				if (!form || form.mode === 'error') {
 					this.setLinkState('error', null)
 				}
 				else {
-					if (form.mode === 'image') {
+					if (form.src) {
 						if (isExternalLink(form.src)) {
 							return this.setLinkState('external', null)
 						}
@@ -144,6 +145,12 @@ class TangentEmbed extends TangentLink {
 		const result = super.getLinkInfo()
 		result.type = StructureType.Embed
 		return result
+	}
+
+	getTooltip(): TooltipConfig {
+		const tooltip = super.getTooltip()
+		tooltip.placement = 'mouse-below'
+		return tooltip
 	}
 }
 

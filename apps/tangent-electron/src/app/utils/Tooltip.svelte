@@ -1,10 +1,11 @@
 <script lang="ts">
-import { autoUpdate, computePosition, flip, inline, offset, shift, VirtualElement } from '@floating-ui/dom'
+import { autoUpdate, computePosition, flip, offset, Placement, VirtualElement } from '@floating-ui/dom'
 import { cubicInOut } from 'svelte/easing'
 import { dropTooltip, pinTooltip, TooltipConfig } from './tooltips'
 import { onDestroy, setContext } from 'svelte'
 
 export let origin: HTMLElement
+export let originEvent: MouseEvent
 export let config: TooltipConfig
 
 export let injectContext: (injector: ((name: string, value: any) => void)) => void = null
@@ -24,35 +25,51 @@ function positionedFly(element: HTMLElement) {
 		let effectiveOrigin: HTMLElement | VirtualElement = origin
 		let placement = config.placement
 
-		if (typeof placement !== 'string') {
-			const event = placement
-			console.log(event.clientX, event.clientY)
-			effectiveOrigin = {
-				getBoundingClientRect() {
-					return {
-						width: 0,
-						height: 0,
-						x: event.clientX,
-						y: event.clientY,
-						top: event.clientY,
-						left: event.clientX,
-						right: event.clientX,
-						bottom: event.clientY
-					}
-				},
-				contextElement: origin
+		if (placement.startsWith('mouse')) {
+			if (originEvent) {
+				
+				const newRect = {
+					width: 0,
+					height: 0,
+					x: originEvent.clientX,
+					y: originEvent.clientY,
+					top: originEvent.clientY,
+					left: originEvent.clientX,
+					right: originEvent.clientX,
+					bottom: originEvent.clientY
+				}
+
+				const originRect = origin.getBoundingClientRect()
+
+				if (placement === 'mouse-below-origin') {
+					console.log('Placing below element')
+					newRect.height = originRect.height
+					newRect.y = Math.min(newRect.y, originRect.y)
+					newRect.top = Math.min(newRect.top, originRect.y)
+					newRect.bottom = Math.max(newRect.bottom, originRect.bottom)
+				}
+
+				effectiveOrigin = {
+					getBoundingClientRect() {
+						return newRect
+					},
+					contextElement: origin
+				}
+
+				placement = 'bottom-start'
 			}
-			placement = 'bottom-start'
+			else {
+				placement = 'bottom-start'
+			}
 		}
 
 		cleanup = autoUpdate(effectiveOrigin, element, () => {
 			computePosition(effectiveOrigin, element, {
 				strategy: 'fixed',
-				placement,
+				placement: placement as Placement,
 				middleware: [
-					flip(),
 					offset(4),
-					shift()
+					flip(),
 				]
 			}).then(result => {
 				element.style.left = result.x + 'px'
@@ -96,6 +113,7 @@ function onMouseLeave() {
 	on:introend={() => tooltipElement.style.pointerEvents = ''}
 	on:mouseenter={onMouseEnter}
 	on:mouseleave={onMouseLeave}
+	style:min-width={config.minWidth ?? ''}
 	style:max-width={config.maxWidth ?? '300px'}
 >
 	{#if typeof config.tooltip === 'string'}

@@ -4,12 +4,12 @@ import { HrefFormedLink } from 'common/indexing/indexTypes'
 import { TreeNode } from 'common/trees'
 import { isMac } from 'common/isMac'
 import { Workspace } from 'app/model'
-import { HandleResult } from 'app/model/NodeHandle'
 import { dropTooltip } from 'app/utils/tooltips'
 import type { LinkState } from './NoteEditor/t-link'
 import NodePreview from '../summaries/NodePreview.svelte'
 import NodeLine from '../summaries/NodeLine.svelte'
 import type TangentLink from './NoteEditor/t-link'
+import { isNode } from 'app/model/NodeHandle'
 
 const workspace = getContext('workspace') as Workspace
 
@@ -19,10 +19,10 @@ const linkPane = workspace.settings.linkClickPaneBehavior
 export let origin: TangentLink
 export let link: HrefFormedLink
 export let state: LinkState
-export let context: HandleResult
 
-$:node = (context != null && !Array.isArray(context)) ? context as TreeNode : null
-$:nodes = (context != null && Array.isArray(context)) ? context as TreeNode[] : null
+$: context = workspace.getHandle(link)
+$:node = ($context != null && !Array.isArray($context) && typeof $context !== 'string' && isNode($context)) ? $context as TreeNode : null
+$:nodes = ($context != null && Array.isArray($context)) ? $context as TreeNode[] : null
 
 function getClickPrefix() {
 	if ($linkFollow === 'mod') {
@@ -72,7 +72,7 @@ function onClick(event: MouseEvent) {
 			</p>
 		{/if}
 	{:else if state === 'external' || state === 'untracked'}
-		<p>
+		<p class="external">
 			{link.href}
 		</p>
 		<p class="action">
@@ -107,8 +107,13 @@ function onClick(event: MouseEvent) {
 	}
 }
 
+.external {
+	word-wrap: break-word;
+}
+
 .action {
 	color: var(--deemphasizedTextColor);
 	margin-bottom: 0;
+	padding-right: 1.5em;
 }
 </style>
