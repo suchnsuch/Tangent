@@ -239,10 +239,9 @@ describe('Indexing', () => {
 		})
 
 		test('Virtual links that collide with virtual folders should not rename folders as files', async () => {
-			const results = workspace.contentsStore.getMatchesForPath('Some Virtual Folder', {
-				bestOnly: true
-			})
+			const results = workspace.contentsStore.getMatchesForPath('Some Virtual Folder')
 			expect(results[0].fileType).toEqual('folder')
+			expect(results[1].fileType).toEqual('.md')
 		})
 	})
 
