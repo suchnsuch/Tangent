@@ -4,9 +4,14 @@ import { HrefForm, HrefFormedLink, StructureType } from 'common/indexing/indexTy
 import { isExternalLink } from 'common/links'
 import { HandleResult, isNode } from 'app/model/NodeHandle'
 import { dropTooltip, requestTooltip, TooltipConfig } from 'app/utils/tooltips'
-import TLinkTooltip from '../TLinkTooltip.svelte'
+import { SvelteConstructor } from 'app/utils/svelte'
 
 export type LinkState = 'uninitialized' | 'empty' | 'resolved' | 'ambiguous' | 'untracked' | 'external' | 'error'
+
+let tooltipComponent: SvelteConstructor = null
+export function setTLinkTooltipComponent(component: SvelteConstructor) {
+	tooltipComponent = component
+}
 
 class TangentLink extends HTMLElement {
 
@@ -129,7 +134,7 @@ class TangentLink extends HTMLElement {
 
 	getTooltip(): TooltipConfig {
 		return {
-			tooltip: TLinkTooltip,
+			tooltip: tooltipComponent ?? 'Use `setTLinkTooltipComponent()` to define the component',
 			maxWidth: '500px',
 			interactive: true,
 			args: {

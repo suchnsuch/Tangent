@@ -18,6 +18,8 @@ import SvgIcon from './views/smart-icons/SVGIcon.svelte'
 
 import { tooltips } from './utils/tooltips'
 import Tooltip from './utils/Tooltip.svelte'
+import { setTLinkTooltipComponent } from './views/editors/NoteEditor/t-link'
+import TLinkTooltip from './views/editors/TLinkTooltip.svelte'
 
 // Doing this here so that mhchem is loaded
 import 'katex/contrib/mhchem/mhchem'
@@ -39,6 +41,8 @@ if (isMac) {
 else {
 	document.body.classList.add('win')
 }
+
+setTLinkTooltipComponent(TLinkTooltip)
 
 let selectionHistory: ({ element: HTMLElement, layer: string })[] = []
 let reselectionTimeout: number

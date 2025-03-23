@@ -6,9 +6,9 @@ import { isMac } from 'common/isMac'
 import { Workspace } from 'app/model'
 import { dropTooltip } from 'app/utils/tooltips'
 import type { LinkState } from './NoteEditor/t-link'
+import type TangentLink from './NoteEditor/t-link'
 import NodePreview from '../summaries/NodePreview.svelte'
 import NodeLine from '../summaries/NodeLine.svelte'
-import type TangentLink from './NoteEditor/t-link'
 import { isNode } from 'app/model/NodeHandle'
 
 const workspace = getContext('workspace') as Workspace
