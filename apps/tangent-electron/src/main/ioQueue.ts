@@ -21,7 +21,6 @@ const queue = new SparseRingBuffer<QueueItem>
 let MAX_ACTIVE = 100 // This is entirely made up
 
 getSettings().debug_ioQueue_maxActive.subscribe(max => {
-	console.log('Max active queue', max)
 	MAX_ACTIVE = max
 })
 
