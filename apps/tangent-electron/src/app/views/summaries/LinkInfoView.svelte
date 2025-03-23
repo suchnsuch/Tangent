@@ -68,6 +68,8 @@ function onContextMenu(event: MouseEvent) {
 
 </script>
 
+<!-- svelte-ignore a11y-no-noninteractive-tabindex -->
+<!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
 <main
 	class={className}
 	tabindex="0"

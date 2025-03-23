@@ -87,6 +87,8 @@ function onNavigate(event: CustomEvent<NavigationData>) {
 		{#if visibleRecentVersions.length > 0}
 			<h1>Recent Changes</h1>
 			{#each visibleRecentVersions as version}
+				<!-- svelte-ignore a11y-click-events-have-key-events -->
+				<!-- svelte-ignore a11y-no-static-element-interactions -->
 				<div
 					class:selected={selectedVersions.includes(version)}
 					on:click={e => versionClicked(e, version)}
@@ -95,6 +97,8 @@ function onNavigate(event: CustomEvent<NavigationData>) {
 		{/if}
 		<h1>Previous Changes</h1>
 		{#each visibleOldVersions as version}
+			<!-- svelte-ignore a11y-click-events-have-key-events -->
+			<!-- svelte-ignore a11y-no-static-element-interactions -->
 			<div
 				class:selected={selectedVersions.includes(version)}
 				on:click={e => versionClicked(e, version)}

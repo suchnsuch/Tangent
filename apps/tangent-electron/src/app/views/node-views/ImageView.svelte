@@ -78,6 +78,7 @@ function resetTransform() {
 }
 </script>
 
+<!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
 <main bind:this={container}
 	class:layout-fill={layout === 'fill'}
 	on:wheel={onWheel}

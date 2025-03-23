@@ -48,6 +48,7 @@ function onNameInput() {
 
 </script>
 
+<!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
 <main
 	class="ModalContainer"
 	on:keydown={onMainKeyDown}
@@ -58,6 +59,7 @@ function onNameInput() {
 		<div>
 			<div class="label">Named:</div>
 			<!-- svelte-ignore a11y-click-events-have-key-events -->
+			<!-- svelte-ignore a11y-no-static-element-interactions -->
 			<div class="name" on:click={e => nameElement.focus()}>
 				<span>{preName}</span>
 				<span
