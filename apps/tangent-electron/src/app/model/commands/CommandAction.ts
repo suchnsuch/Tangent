@@ -82,7 +82,7 @@ export default function command(node: HTMLElement, params: commandParams) {
 		}
 
 		tooltip = () => {
-			let tooltip: TooltipDefOrConfig = (options.getToolTip ? options.getToolTip() : null)
+			let tooltip: TooltipDefOrConfig = (options.getToolTip && options.getToolTip())
 				?? options.tooltip
 				?? (options.labelAsTooltip && command.getLabel(context))
 				?? command.getTooltip(context)

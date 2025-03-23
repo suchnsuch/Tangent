@@ -27,12 +27,6 @@ $: navigateFrom = (state as any).node
 
 $: isSingle = shortList.length === 1
 
-$: commandParams = isSingle ? {
-	command: workspace.commands.createNewFile,
-	context: { rule: shortList[0], navigateFrom },
-	preventDefault: true
-} : null
-
 $: willCreateNewFiles = determineWillCreateNewFiles($rules)
 function determineWillCreateNewFiles(rules: (CreationRule | CreationRuleDefinition)[]) {
 	for (const rule of rules) {
@@ -50,7 +44,12 @@ function determineWillCreateNewFiles(rules: (CreationRule | CreationRuleDefiniti
 	class={"SetCreationRules " + _class + ' ' + direction}
 	class:single={isSingle}
 	class:multiple={!isSingle}
-	use:CommandAction={commandParams}
+	use:CommandAction={isSingle ? {
+		command: workspace.commands.createNewFile,
+		context: { rule: shortList[0], navigateFrom },
+		preventDefault: true,
+		tooltipShortcut: false
+	} : null}
 	style:flex-direction={direction}
 >
 	<span class="label">Create</span>
