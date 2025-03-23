@@ -133,7 +133,7 @@ export default class MarkdownEditor extends Editor {
 				...trimmedDefaultModules,
 
 				tLink: editor => tlinkModule(editor, {
-					linkFollowRequirement: workspace?.settings.noteLinkFollowBehavior as any
+					linkFollowRequirement: workspace?.settings?.noteLinkFollowBehavior as any ?? 'mod'
 				}),
 				tCheckbox: tCheckboxModule,
 				autoWrap: autoWrapping,
