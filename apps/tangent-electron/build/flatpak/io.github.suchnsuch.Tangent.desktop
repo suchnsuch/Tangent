@@ -4,6 +4,6 @@ Comment=Record and connect your thoughts
 Type=Application
 Exec=run.sh
 Terminal=false
-Categories=Office;Productivity;
+Categories=Office;
 Keywords=markdown;notes;pkm;brain;writing;Obsidian;
 Icon=io.github.suchnsuch.Tangent
