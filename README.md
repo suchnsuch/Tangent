@@ -1,6 +1,7 @@
 # Tangent
 This is the monorepo for the [Tangent](https://www.tangentnotes.com) project. Pre-built binaries can be found [on the downloads page](https://www.tangentnotes.com/Download) and [on Flathub](https://flathub.org/apps/io.github.suchnsuch.Tangent).
 
+Pre-release versions are also available on [Flathub Beta](https://docs.flathub.org/docs/for-users/installation#flathub-beta-repository).
 
 ## Modules
 There are multiple modules contained within this repo.
