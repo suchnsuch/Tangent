@@ -5,6 +5,7 @@ import { wait } from '@such-n-such/core'
 import { markdownToTextDocument } from 'common/markdownModel'
 import MarkdownEditor from './MarkdownEditor'
 import { Workspace } from 'app/model'
+import { getSelectedLines } from 'common/typewriterUtils'
 
 describe('List Handling', () => {
 
@@ -968,5 +969,52 @@ a
 			redo: false,
 			undo: true
 		})
+	})
+})
+
+describe('Line Swapping', () => {
+	let editor: MarkdownEditor
+	const waitTime = 1
+
+	beforeEach(() => {
+		editor = new MarkdownEditor(null)
+		editor.setRoot(document.createElement('div'))
+		editor.select(0)
+	})
+
+	it('Moves one line up', () => {
+		editor.doc = markdownToTextDocument(`Line one
+line two
+line three`)
+
+		editor.select(13)
+		editor.modules.tangent.shiftLines(new Event('test'), getSelectedLines(editor.doc), -1)
+		const result = `line two
+Line one
+line three`
+		expect(editor.getText()).toEqual(result)
+		expect(editor.doc.selection).toEqual([4, 4])
+
+		// Swapping up behond the doc should do nothing
+		editor.modules.tangent.shiftLines(new Event('test'), getSelectedLines(editor.doc), -1)
+		expect(editor.getText()).toEqual(result)
+	})
+
+	it('Moves one line down', () => {
+		editor.doc = markdownToTextDocument(`Line one
+line two
+line three`)
+
+		editor.select(13)
+		editor.modules.tangent.shiftLines(new Event('test'), getSelectedLines(editor.doc), 1)
+		const result = `Line one
+line three
+line two`
+		expect(editor.getText()).toEqual(result)
+		expect(editor.doc.selection).toEqual([24, 24])
+
+		// Swapping up behond the doc should do nothing
+		editor.modules.tangent.shiftLines(new Event('test'), getSelectedLines(editor.doc), 1)
+		expect(editor.getText()).toEqual(result)
 	})
 })

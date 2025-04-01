@@ -29,7 +29,7 @@ import type { HrefFormedLink } from 'common/indexing/indexTypes'
 import type { Workspace } from 'app/model'
 import type { AutocompleteModule } from '../autocomplete/autocompleteModule'
 import { findLinkAround, matchMarkdownLink, matchWikiLink, resolveLink } from 'common/markdownModel/links'
-import { AttributePredicate, findWordAroundPositionInDocument, getEditInfo, getRangeWhile, getRangesIntersecting, intersectRanges, rangeIsCollapsed } from 'common/typewriterUtils'
+import { AttributePredicate, findWordAroundPositionInDocument, getEditInfo, getRangeWhile, getRangesIntersecting, getSelectedLines, intersectRanges, rangeIsCollapsed } from 'common/typewriterUtils'
 import { isLeftClick, startDrag } from 'app/utils'
 import { repeatString } from '@such-n-such/core'
 import { subscribeUntil } from 'common/stores'
@@ -1222,7 +1222,8 @@ export default function editorModule(editor: Editor, options: {
 		editor.update(change)
 	}
 
-	function swapLines(event: ShortcutEvent, direction: 1 | -1) {
+	function shiftLines(event: ShortcutEvent, lines: Line[], shift: 1 | -1) {
+		if (!lines) return
 		const { doc } = editor
 		const selection = normalizeRange(doc.selection)
 		if (!selection) return
@@ -1230,7 +1231,6 @@ export default function editorModule(editor: Editor, options: {
 
 		event.preventDefault()
 
-		const lines = doc.getLinesAt(selection)
 		const firstLine = lines[0]
 		const lastLine = lines[lines.length - 1]
 		const movingRange: EditorRange = [
@@ -1253,9 +1253,9 @@ export default function editorModule(editor: Editor, options: {
 
 		const movingRangeSize = movingOps.length()
 
-		if (direction > 0) {
+		if (shift > 0) {
 			// Moving down
-			const nextIndex = doc.lines.indexOf(lastLine) + 1
+			const nextIndex = doc.lines.indexOf(lastLine) + shift
 			if (nextIndex >= doc.lines.length) return
 
 			const targetLine = doc.lines[nextIndex]
@@ -1277,7 +1277,7 @@ export default function editorModule(editor: Editor, options: {
 		}
 		else {
 			// Moving up
-			const nextIndex = doc.lines.indexOf(firstLine) - 1
+			const nextIndex = doc.lines.indexOf(firstLine) + shift
 			if (nextIndex < 0) return
 
 			const targetLine = doc.lines[nextIndex]
@@ -1373,10 +1373,12 @@ export default function editorModule(editor: Editor, options: {
 			case 'Mod+0':
 				return setLinePrefix(event, '')
 
-			case 'Alt+ArrowUp':
-				return swapLines(event, -1)
-			case 'Alt+ArrowDown':
-				return swapLines(event, 1)
+			case 'Alt+ArrowUp': {
+				return shiftLines(event, getSelectedLines(editor.doc), -1)
+			}
+			case 'Alt+ArrowDown': {
+				return shiftLines(event, getSelectedLines(editor.doc), 1)
+			}
 			case 'Escape':
 				return onEscape(event)
 		}
@@ -1486,6 +1488,7 @@ export default function editorModule(editor: Editor, options: {
 				updateSelectionReveal = true
 			})
 		},
+		shiftLines,
 		toggleLineComment,
 		toggleItalic,
 		toggleBold,

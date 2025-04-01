@@ -370,3 +370,9 @@ export function buildOpsFromInsertList(
 
 	return result
 }
+
+export function getSelectedLines(doc: TextDocument): Line[] | null {
+	const selection = normalizeRange(doc.selection)
+	if (!selection) return null
+	return doc.getLinesAt(selection)
+}
