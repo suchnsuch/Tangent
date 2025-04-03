@@ -152,8 +152,10 @@ export function parseCodeBlock(char: string, parser: NoteParser): boolean {
 		start: true
 	}, 0)
 
+	const codeData = { language: codeFormat }
+
 	builder.addOpenLineFormat('code', {
-		code: codeFormat || true
+		code: codeData
 	})
 
 	parser.moveNext()
@@ -168,7 +170,7 @@ export function parseCodeBlock(char: string, parser: NoteParser): boolean {
 		}, 0)
 		builder.dropOpenLineFormat('code')
 		
-		parser.lineData.code = codeFormat || true
+		parser.lineData.code = codeData
 
 		if (feed instanceof DocumentFeeder && !feed.hasMore()) {
 			feed.injectAdjacentLinesWhile(line => 'code' in line.attributes)

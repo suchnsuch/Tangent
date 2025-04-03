@@ -213,8 +213,8 @@ const noteTypeset:TypesetTypes = {
 					
 					return h('div', props, children)
 				})
-				const codeFormat = lineData[0][0].code
-				const className = typeof codeFormat === 'string' ? `language-${codeFormat}` : 'language-none'
+				const codeLanguage = lineData[0][0].code.language
+				const className = codeLanguage ? `language-${codeLanguage}` : 'language-none'
 				return h('pre', { className, spellcheck: false }, h('code', { className }, children))
 			}
 		},
