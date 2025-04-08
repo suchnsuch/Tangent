@@ -29,11 +29,13 @@ import type { HrefFormedLink } from 'common/indexing/indexTypes'
 import type { Workspace } from 'app/model'
 import type { AutocompleteModule } from '../autocomplete/autocompleteModule'
 import { findLinkAround, matchMarkdownLink, matchWikiLink, resolveLink } from 'common/markdownModel/links'
-import { AttributePredicate, findWordAroundPositionInDocument, getEditInfo, getRangeWhile, getRangesIntersecting, getSelectedLines, intersectRanges, rangeIsCollapsed } from 'common/typewriterUtils'
+import { AttributePredicate, findWordAroundPositionInDocument, getEditInfo, getRangeWhile, getRangesIntersecting, getSelectedLines, intersectRanges, lineToText, rangeIsCollapsed } from 'common/typewriterUtils'
 import { isLeftClick, startDrag } from 'app/utils'
 import { repeatString } from '@such-n-such/core'
 import { subscribeUntil } from 'common/stores'
 import { handleIsNode } from 'app/model/NodeHandle'
+import { findSectionLines } from 'common/markdownModel/sections'
+import { isMac } from 'common/isMac'
 
 function clampRange(range: EditorRange, clampingRange: EditorRange): EditorRange {
 	range = normalizeRange(range)
@@ -1307,6 +1309,38 @@ export default function editorModule(editor: Editor, options: {
 		}
 	}
 
+	function shiftSection(event: ShortcutEvent, direction: -1 | 1) {
+		const { doc } = editor
+		const selection = normalizeRange(doc.selection)
+		if (!selection) return
+		const [at, to] = doc.selection
+
+		const { lines } = findSectionLines(
+			doc, selection,
+			direction === -1 ? 'take-parent' : true
+		)
+
+		// Find the next insertion point to jump the next section.
+		let shift = 0
+		if (direction === -1) {
+			const firstIndex = doc.lines.indexOf(lines[0])
+			if (firstIndex === 0) return // Can't move up!
+			const up = findSectionLines(doc, [doc.lines[firstIndex - 1], lines[0]], true, false)
+			console.log(up.lines.map(lineToText))
+			shift = -(up.lines.length - 1)
+		}
+		else {
+			const lastIndex = doc.lines.indexOf(lines.at(-1))
+			if (lastIndex === doc.lines.length - 1) return // Can't move down!
+			const down = findSectionLines(doc, [lines.at(-1), doc.lines[lastIndex + 1]], false, true)
+			shift = (down.lines.length - 1)	
+		}
+
+		if (shift === 0) return // Can't move!
+
+		return shiftLines(event, lines, shift)
+	}
+
 	function toStartOfLine(event: ShortcutEvent, addToSelection=false) {
 		const { doc } = editor
 		if (!doc.selection) return
@@ -1382,14 +1416,30 @@ export default function editorModule(editor: Editor, options: {
 			case 'Mod+0':
 				return setLinePrefix(event, '')
 
-			case 'Alt+ArrowUp': {
+			case 'Alt+ArrowUp':
 				return shiftLines(event, getSelectedLines(editor.doc), -1)
-			}
-			case 'Alt+ArrowDown': {
+			case 'Alt+ArrowDown':
 				return shiftLines(event, getSelectedLines(editor.doc), 1)
-			}
+
 			case 'Escape':
 				return onEscape(event)
+		}
+
+		if (isMac) {
+			switch (event.shortcut) {
+				case 'Ctrl+Alt+ArrowUp':
+					return shiftSection(event, -1)
+				case 'Ctrl+Alt+ArrowDown':
+					return shiftSection(event, 1)
+			}
+		}
+		else {
+			switch (event.modShortcut) {
+				case 'Alt+Shift+ArrowUp':
+					return shiftSection(event, -1)
+				case 'Alt+Shift+ArrowDown':
+					return shiftSection(event, 1)
+			}
 		}
 			
 		switch(event.shortcut) {
