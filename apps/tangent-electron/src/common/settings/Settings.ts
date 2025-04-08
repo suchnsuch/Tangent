@@ -414,6 +414,24 @@ export default class Settings extends ObjectStore {
 	})
 	
 	// Links
+	linkAutocompleteForm = new Setting<string>({
+		name: 'Link Autocomplete',
+		description: 'How wikilinks will autocomplete',
+		defaultValue: 'short',
+		validValues: [
+			{
+				value: 'short',
+				displayName: 'Unique Path',
+				description: 'Links will only include as much path information as is necessary to have a unique identifier in the workspace.'
+			},
+			{
+				value: 'full',
+				displayName: 'Full Path',
+				description: 'Links will always autocomplete with their full path relative to the workspace.'
+			}
+		]
+	})
+
 	areLinksCaseSensitive = new Setting<boolean>({
 		name: 'Case Sensitive Links',
 		description: 'Whether the casing of wiki links must match the casing of note names for a link to resolve.',

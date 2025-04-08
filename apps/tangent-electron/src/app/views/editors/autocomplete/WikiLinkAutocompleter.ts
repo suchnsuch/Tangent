@@ -2,7 +2,7 @@ import type Workspace from "app/model/Workspace";
 import { TextDocument, EditorRange, Editor, normalizeRange, ShortcutEvent } from "typewriter-editor";
 import type { AutocompleteHandler, AutocompleteModule } from "./autocompleteModule";
 import { iterateOverChildren, TreeNode, TreePredicate, TreePredicateResult } from 'common/trees'
-import { WritableStore } from 'common/stores'
+import { ReadableStore, WritableStore } from 'common/stores'
 import { matchWikiLink, wikiLinkMatcher } from 'common/markdownModel/links'
 import { HeaderInfo, IndexData } from "common/indexing/indexTypes";
 import { safeHeaderLine } from "common/markdownModel/header";
@@ -208,9 +208,16 @@ export default class WikiLinkAutocompleter implements AutocompleteHandler {
 			pathText = ''
 		}
 		else if (selectedNode) {
+
+			const form = this.workspace?.settings?.linkAutocompleteForm.value ?? 'short'
+			let length: 'short'|'full' = 'short'
+			if (form === 'full') {
+				length = form
+			}
+
 			pathText = this.workspace.directoryStore.getPathToItem(selectedNode.node, {
 				includeExtension: showFileType,
-				length: 'short'
+				length
 			})
 		}
 		result += pathText

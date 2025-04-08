@@ -16,6 +16,9 @@ let settings = workspace.settings
 	</div>	
 	<h2>Links</h2>
 	<div class="settingsGroup">
+		<SettingView setting={settings.linkAutocompleteForm} />
+	</div>
+	<div class="settingsGroup">
 		<SettingView setting={settings.areLinksCaseSensitive} />
 	</div>
 </main>
