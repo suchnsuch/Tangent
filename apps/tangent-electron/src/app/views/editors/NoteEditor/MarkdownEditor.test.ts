@@ -1017,4 +1017,42 @@ line two`
 		editor.modules.tangent.shiftLines(new Event('test'), getSelectedLines(editor.doc), 1)
 		expect(editor.getText()).toEqual(result)
 	})
+
+	it('Can shift multiple lines by multiple lines up', () => {
+		editor.doc = markdownToTextDocument(`One
+two
+three
+four
+five`)
+		editor.select([10, 16])
+		editor.modules.tangent.shiftLines(new Event('test'), getSelectedLines(editor.doc), -2)
+		const result = `three
+four
+One
+two
+five`
+		expect(editor.getText()).toEqual(result)
+		expect(editor.doc.selection).toEqual([2, 8])
+	})
+
+	it('Can shift multiple lines by multiple lines down', () => {
+		editor.doc = markdownToTextDocument(`One
+two
+three
+four
+five
+six
+seven`)
+		editor.select([10, 16])
+		editor.modules.tangent.shiftLines(new Event('test'), getSelectedLines(editor.doc), 2)
+		const result = `One
+two
+five
+six
+three
+four
+seven`
+		expect(editor.getText()).toEqual(result)
+		expect(editor.doc.selection).toEqual([19, 25])
+	})
 })

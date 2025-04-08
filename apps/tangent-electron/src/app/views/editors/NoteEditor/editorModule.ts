@@ -1222,8 +1222,9 @@ export default function editorModule(editor: Editor, options: {
 		editor.update(change)
 	}
 
-	function shiftLines(event: ShortcutEvent, lines: Line[], shift: 1 | -1) {
+	function shiftLines(event: ShortcutEvent, lines: Line[], shift: number) {
 		if (!lines) return
+		if (shift === 0) return
 		const { doc } = editor
 		const selection = normalizeRange(doc.selection)
 		if (!selection) return
@@ -1255,16 +1256,20 @@ export default function editorModule(editor: Editor, options: {
 
 		if (shift > 0) {
 			// Moving down
-			const nextIndex = doc.lines.indexOf(lastLine) + shift
-			if (nextIndex >= doc.lines.length) return
+			const lastIndex = doc.lines.indexOf(lastLine)
+			const jumpStartIndex = lastIndex + 1
+			const jumpEndIndex = lastIndex + shift
+			if (jumpEndIndex >= doc.lines.length) return
 
-			const targetLine = doc.lines[nextIndex]
-			const insertionPoint = doc.getLineRange(targetLine)[1]
+			const jumpStartLine = doc.lines[jumpStartIndex]
+			const jumpEndLine = doc.lines[jumpEndIndex]
+			const insertionPoint = doc.getLineRange(jumpEndLine)[1]
+			const jumpLength = insertionPoint - doc.getLineRange(jumpStartLine)[0]
 
 			let delta = new Delta()
 				.retain(movingRange[0])		// Everything prior
 				.delete(movingRangeSize)	// Where the content was
-				.retain(targetLine.length)	// The line we're swapping with
+				.retain(jumpLength)	// The line we're swapping with
 				.concat(movingOps)			// Where the content is now
 				.retain(doc.length)			// I could be more accurate here, this is easier
 
@@ -1277,23 +1282,27 @@ export default function editorModule(editor: Editor, options: {
 		}
 		else {
 			// Moving up
-			const nextIndex = doc.lines.indexOf(firstLine) + shift
-			if (nextIndex < 0) return
+			const firstIndex = doc.lines.indexOf(firstLine)
+			const jumpStartIndex = firstIndex + shift
+			const jumpEndIndex = firstIndex - 1
+			if (jumpStartIndex < 0) return
 
-			const targetLine = doc.lines[nextIndex]
-			const insertionPoint = doc.getLineRange(targetLine)[0]
-
+			const jumpStartLine = doc.lines[jumpStartIndex]
+			const jumpEndLine = doc.lines[jumpEndIndex]
+			const insertionStart = doc.getLineRange(jumpStartLine)[0]
+			const jumpLength = doc.getLineRange(jumpEndLine)[1] - insertionStart
+			
 			let delta = new Delta()
-				.retain(insertionPoint)		// Everything prior
+				.retain(insertionStart)		// Everything prior
 				.concat(movingOps)			// Where the content is now
-				.retain(targetLine.length)	// The line we're swapping with
+				.retain(jumpLength)			// The line we're swapping with
 				.delete(movingRangeSize)	// Where the content was
 				.retain(doc.length)			// I could be more accurate here, this is easier
 
 			editor.change.setDelta(delta)
 				.select([
-					insertionPoint + (at - movingRange[0]),
-					insertionPoint + (to - movingRange[0])
+					insertionStart + (at - movingRange[0]),
+					insertionStart + (to - movingRange[0])
 				]).apply()
 		}
 	}
