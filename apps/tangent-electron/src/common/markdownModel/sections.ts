@@ -1,4 +1,5 @@
-import { Line } from '@typewriter/document'
+import { EditorRange, Line, normalizeRange, TextDocument } from '@typewriter/document'
+import { lineToText } from 'common/typewriterUtils'
 
 /**
  * 
@@ -71,4 +72,79 @@ export function compareSectionDepth(lineA: Line, lineB: Line): number | true {
 	}
 
 	return 0
+}
+
+export function findHighestLine(lines: Line[]): Line {
+	let highest = lines[0]
+	for (let i = 1; i < lines.length; i++) {
+		const comparison = compareSectionDepth(highest, lines[i])
+		if (typeof comparison === 'number' && comparison > 0) {
+			highest = lines[i]
+		}
+	}
+	return highest
+}
+
+export function findSectionLines(
+	doc: TextDocument,
+	selection?: EditorRange | Line[],
+	expandUp: boolean | 'take-parent' = true,
+	expandDown = true
+) {
+	selection = selection ?? doc.selection
+	if (!selection || selection.length === 0) return null
+
+	const lines = typeof selection[0] === 'number'
+		? doc.getLinesAt(normalizeRange(selection as EditorRange))
+		: selection as Line[]
+
+	let highest = findHighestLine(lines)
+
+	if (expandUp) {
+		let trailingIndex = doc.lines.indexOf(lines[0]) - 1
+		while (trailingIndex >= 0) {
+			const line = doc.lines[trailingIndex]
+			const comparison = compareSectionDepth(highest, line)
+
+			if (comparison === true	// Take same section
+				// Take lower or equal sections if the first part of the starting lines is an incomplete section
+				|| (comparison <= 0 && doc.lines[trailingIndex + 1] !== highest) 
+			) {
+				// Shift to include this earlier line
+				lines.unshift(line)
+
+				// Let this be the highest
+				if (comparison === true || comparison === 0) {
+					highest = line
+				}
+				
+				trailingIndex--
+			}
+			else if (expandUp === 'take-parent' && comparison > 0) {
+				// Special case: if we're moving up and the next item is higher, inherit that section
+				// e.g. shifting a paragraph up into a header moves the _whole header section_
+				highest = line
+				lines.unshift(highest)
+				break
+			}
+			else break
+		}
+	}
+	
+	if (expandDown) {
+		let leadingIndex = doc.lines.indexOf(lines.at(-1)) + 1
+		while (leadingIndex < doc.lines.length) {
+			const comparison = compareSectionDepth(highest, doc.lines[leadingIndex])
+			if (comparison === true || comparison < 0) {
+				lines.push(doc.lines[leadingIndex])
+				leadingIndex++
+			}
+			else break
+		}
+	}
+	
+	return {
+		lines,
+		highest
+	}
 }

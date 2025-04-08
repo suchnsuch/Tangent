@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest'
 
-import { compareSectionDepth } from './sections'
+import { compareSectionDepth, findSectionLines } from './sections'
 import { markdownToTextDocument } from './parser'
 
 describe('Section Depth', () => {
@@ -126,6 +126,67 @@ $$`)
 		it('Treats two different math block lines as equivalent', () => {
 			expect(compareSectionDepth(doc.lines[1], doc.lines[5])).toEqual(0)
 			expect(compareSectionDepth(doc.lines[2], doc.lines[6])).toEqual(0)
+		})
+	})
+})
+
+describe('Section Detection', () => {
+	describe('Headers & Lists', () => {
+		const doc = markdownToTextDocument(`# My Big Header
+Some text.
+
+## Child Header
+Some other text.
+- A list
+	- A sub list
+	- With children
+- A list sibling
+- And another sibling
+	- And a child
+
+## Under header
+And some more paragraph text.`)
+			
+		it('Does not expand single-paragraph sections', () => {
+			expect(findSectionLines(doc, [20, 20])).toEqual({
+				lines: [doc.lines[1]],
+				highest: doc.lines[1]
+			})
+		})
+	
+		it('Expands a list item to include its children', () => {
+			expect(findSectionLines(doc, [66, 66])).toEqual({
+				lines: doc.lines.slice(5, 8),
+				highest: doc.lines[5]
+			})
+		})
+	
+		it('Does not expand a single list item with no children', () => {
+			expect(findSectionLines(doc, [110, 110])).toEqual({
+				lines: [doc.lines[8]],
+				highest: doc.lines[8]
+			})
+		})
+	
+		it('Expands a list with the children of its earlier sibling to include its sibling', () => {
+			// Selection across line 7 and 8
+			expect(findSectionLines(doc, [90, 110])).toEqual({
+				lines: doc.lines.slice(5, 9),
+				highest: doc.lines[5]
+			})
+		})
+	})
+
+	it('Expands to select an entire code block', () => {
+		const doc = markdownToTextDocument(`Here is some code:
+\`\`\`js
+var foo = boo()
+foo++
+\`\`\``)
+		
+		expect(findSectionLines(doc, [25, 25])).toEqual({
+			lines: doc.lines.slice(1, 5),
+			highest: doc.lines[1]
 		})
 	})
 })
