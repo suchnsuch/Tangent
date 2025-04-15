@@ -54,8 +54,9 @@ function openOrCloseFormatting(formatting: string, attributes: AttributeMap, par
 	const leftTouchingText = !isWhitespace(feed.peek(-formatting.length))
 	const rightTouchingText = !isWhitespace(feed.peek())
 
-	if (leftTouchingText || !rightTouchingText) {
-		parser.commitSpan(null, -1)
+	if (leftTouchingText || rightTouchingText) {
+		if (!parser.isStartOfContent) parser.commitSpan(null, -1)
+		
 		if (leftTouchingText && builder.hasOpenFormat(formatting)) {
 			parser.commitSpan(endAttributes)
 			builder.dropOpenFormat(formatting)
@@ -85,7 +86,7 @@ export function parseStrikethrough(char: string, parser: NoteParser): boolean {
 const highlightAttributes = { highlight: true }
 export function parseHighlight(char: string, parser: NoteParser): boolean {
 	if (char === '=' && parser.feed.checkFor('==')) {
-		return openOrCloseFormatting('~~', highlightAttributes, parser)
+		return openOrCloseFormatting('==', highlightAttributes, parser)
 	}
 	return false
 }
