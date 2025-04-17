@@ -403,10 +403,17 @@ export default class Workspace extends EventDispatcher {
 			}
 			this.directoryStore.notifyChanged()
 
+			const start = performance.now()
 			for (const handle of this.activeHandles) {
-				handle.resolve()
 				handle.checkTreeChange(change)
+				if (handle.dirty) {
+					handle.resolve()
+				}
 				handle.pushChangesIfDirty()
+			}
+			const end = performance.now()
+			if (this.debug.treeChanges) {
+				console.log(`Updated ${this.activeHandles.length} node handles in ${end - start}ms`)
 			}
 		}
 	}
