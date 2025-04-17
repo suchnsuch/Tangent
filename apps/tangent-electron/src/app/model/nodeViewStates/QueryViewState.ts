@@ -41,7 +41,11 @@ export default class QueryViewState extends BaseSetViewState {
 			// TODO: Improve query invalidation to reduce false positives
 			return derived(queryInfo.queryString, (queryString, set) => {
 				const id = this.lastRequestID.update(i => i + 1)
+				const start = performance.now()
+				console.log(`Making query ${id}: "${queryString}"`)
 				workspace.api.query.resultsForQuery(queryString).then(queryResult => {
+					const end = performance.now()
+					console.log(`Received query ${id} in ${end - start}ms`)
 					set(queryResult)
 					this.lastReceivedID.update(i => {
 						if (i < id) return id
@@ -61,13 +65,23 @@ export default class QueryViewState extends BaseSetViewState {
 
 	get settingsComponent() { return QuerySettingsView }
 
+	private _treeChangeTimeout: any = null
+
 	onTreeChange(change: TreeChange) {
 		// We don't want changes to the .tangent directory to cause query refreshes.
 		const tangentFolderPath = this.queryFile.workspace.workspaceFolder.path
 		for (const changedPath of allChangedPaths(change)) {
 			if (!changedPath.startsWith(tangentFolderPath)) {
-				// Pretend the query string has changed.
-				this.queryInfo.value.queryString.notifyObservers(this.queryInfo.value.queryString.value)
+
+				if (this._treeChangeTimeout) {
+					clearTimeout(this._treeChangeTimeout)
+				}
+
+				this._treeChangeTimeout = setTimeout(() => {
+					// Pretend the query string has changed.
+					this.queryInfo.value.queryString.notifyObservers(this.queryInfo.value.queryString.value)
+				}, 500)
+
 				return
 			}
 		}
