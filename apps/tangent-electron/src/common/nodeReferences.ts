@@ -4,6 +4,7 @@ export interface TreeNodeReference {
 	path: string
 
 	// Values for caching
+	id?: string
 	node?: TreeNode
 	content?: string
 	lines?: string[]
@@ -129,6 +130,47 @@ export function areNodesOrReferencesEquivalent(a: TreeNodeOrReference, b: TreeNo
 	return areReferencesEquivalent(a, b)
 }
 
+/**
+ * Returns an id that provides a unique identifier for a node or reference.
+ * Nodes are id'd by identity (object).
+ * References are id'd by string. Equivalent references should have the same id.
+ */
+export function getNodeOrReferenceId(item: TreeNodeOrReference): any {
+	if (isNode(item)) return item
+
+	if (!item.id) {
+		let id = item.path
+
+		const additions = []
+
+		if (item.title) {
+			additions.push('title=' + item.title)
+		}
+		if (item.start) {
+			additions.push('start=' + item.start)
+		}
+		if (item.end) {
+			additions.push('end=' + item.end)
+		}
+
+		if (item.annotations) {
+			for (const annotation of item.annotations) {
+				additions.push('a_start=', annotation.start)
+				additions.push('a_end=', annotation.end)
+				additions.push('a_data=', annotation.data)
+			}
+		}
+
+		if (additions.length) {
+			id += '?' + additions.join('&')
+		}
+		
+		item.id = id
+	}
+
+	return item.id
+}
+
 export function getNode(item: TreeNodeOrReference, directory: DirectoryStore): TreeNode {
 	if (isNode(item)) return item
 	return getNodeFromReference(item, directory)
@@ -150,6 +192,7 @@ export function createReference(node: TreeNode, includeNode=false, other?: Parti
  * @param reference 
  */
 export function cleanReference(reference: TreeNodeReference) {
+	delete reference.id
 	delete reference.node
 	delete reference.content
 	delete reference.lines

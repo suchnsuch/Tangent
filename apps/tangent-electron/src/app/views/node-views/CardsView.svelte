@@ -11,7 +11,7 @@ import LazyScrolledList from 'app/utils/LazyScrolledList.svelte';
 import WorkspaceFileHeader from 'app/utils/WorkspaceFileHeader.svelte';
 import { EmbedType } from 'common/embedding';
 import { WritableStore, ForwardingStore } from 'common/stores'
-import { getNode, isReference, isSubReference, TreeNodeOrReference } from 'common/nodeReferences';
+import { getNode, getNodeOrReferenceId, isReference, isSubReference, TreeNodeOrReference } from 'common/nodeReferences';
 import { pluralize } from 'common/plurals';
 import { createEventDispatcher } from 'svelte';
 import { getContext } from 'svelte';
@@ -76,6 +76,7 @@ function nodeClick(event, ref: TreeNodeOrReference) {
 	<!-- svelte-ignore a11y-no-static-element-interactions -->
 	<LazyScrolledList
 		items={$items}
+		itemID={getNodeOrReferenceId}
 		mode="append"
 		groupStep={10}
 		on:range-updated={e => dispatch('view-ready')}
