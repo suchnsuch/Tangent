@@ -9,6 +9,8 @@ Typing the first two brackets `[[` will bring up the autocomplete menu. You can 
 ![[Wiki Link Autocomplete Example.png|250]]
 The autocomplete menu will present a series of notes that you have recently edited. You can type to search for a note by name. You can autocomplete a link to the note by clicking on an option or using the cursor keys to select and the enter key to accept.
 
+You can customize whether wiki links autocomplete with a short path or with a full, workspace-relative path in the [[Database]] settings.
+
 ## Custom Wiki Link Text
 Linking to notes by name is convenient, but sometimes it's not good enough. You can change the text that a wiki link appears as by adding a `|` character to the end of the note name and typing whatever text you please. For example: `[[Note Name|the text you want]]`.
 
