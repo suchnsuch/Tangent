@@ -108,7 +108,7 @@ And some text`)
 		expect(parseResult.lines.length).toEqual(4)
 
 		let newTextLine = parseResult.lines[3]
-		expect(newTextLine.attributes.code).toEqual('js')
+		expect(newTextLine.attributes.code).toEqual({ language: 'js' })
 	})
 
 	test('Multi Code consumption', () => {
@@ -146,7 +146,7 @@ And some text`)
 
 		// Don't expect "And some text" to be included; it's not code
 		let newTextLine = parseResult.lines[3] 
-		expect(newTextLine.attributes.code).toEqual('js')
+		expect(newTextLine.attributes.code).toEqual({ language: 'js' })
 
 		// This tests for a bug where ending the code run could
 		// apply its formatting to following lines
