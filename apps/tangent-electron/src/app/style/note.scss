@@ -41,9 +41,18 @@ article.note {
 	}
 
 	p {
-		margin: 0;
 		line-height: rhythmUnit(1); // to defeat default styling
 		min-height: rhythmUnit(1);
+	}
+
+	s {
+		&.hidden {
+			text-decoration: none;
+		}
+	}
+
+	h1, h2, h3, h4, h5, h6, p {
+		margin: 0;
 
 		--lineIndent: 0; // Modified by the target
 
@@ -53,19 +62,10 @@ article.note {
 		}
 	}
 
-	s {
-		&.hidden {
-			text-decoration: none;
-		}
-	}
-
-	h1, h2, h3, h4, h5, h6 {
-		margin: 0;
-	}
-
 	h1.line {
 		padding: 0;
 		font-size: 200%;
+		--spaceWidth: calc(.25em / 2);
 		line-height: rhythmUnit(1.5);
 		margin-bottom: rhythmUnit(.5);
 		font-weight: 600;
@@ -74,12 +74,38 @@ article.note {
 	h2.line {
 		padding: 0;
 		font-size: 150%;
+		--spaceWidth: calc(.25em / 1.5);
 		line-height: rhythmUnit(1.25);
 		margin-bottom: rhythmUnit(.25);
 	}
 
 	h3.line {
 		padding: 0;
+		line-height: rhythmUnit(1);
+		font-size: 120%;
+		--spaceWidth: calc(.25em / 1.20);
+	}
+
+	h4.line {
+		padding: 0;
+		font-size: 100%;
+		line-height: rhythmUnit(1);
+	}
+
+	h5.line {
+		font-size: 85%;
+		font-weight: 600;
+		text-decoration: underline;
+		--spaceWidth: calc(.25em / .85);
+		line-height: rhythmUnit(1);
+	}
+
+	h6.line {
+		font-size: 85%;
+		font-weight: 500;
+		font-style: italic;
+		text-decoration: underline;
+		--spaceWidth: calc(.25em / .85);
 		line-height: rhythmUnit(1);
 	}
 
@@ -544,8 +570,11 @@ article.note {
 	.line {
 		padding-left: fontUnit(.5);
 	}
-	h1.line, h2.line, h3.line {
-		padding: 0;
+	
+	h1, h2, h3, h4, h5, h6 {
+		&.line {
+			padding: 0;
+		}
 	}
 
 	// Oh dear…

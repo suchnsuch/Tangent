@@ -48,12 +48,8 @@ export function lineIsMultiLineFormat(line: Line) {
 export function getLineFormattingPrefix(line: Line, forNextLine = false): string {
 	const attr = line.attributes
 	const lineString = deltaToText(line.content)
-	if (attr.header) {
-		if (forNextLine) {
-			return ''
-		}
-		
-		const match = lineString.match(/^#+ /)
+	if (attr.header && !forNextLine) {
+		const match = lineString.match(/^\s*#+ /)
 		if (match) {
 			return match[0]
 		}
