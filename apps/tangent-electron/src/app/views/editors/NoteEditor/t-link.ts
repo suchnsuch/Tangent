@@ -39,6 +39,7 @@ class TangentLink extends HTMLElement {
 
 	disconnectedCallback() {
 		this.dropNodeHandle()
+		dropTooltip(this, false)
 	}
 
 	static get observedAttributes() {

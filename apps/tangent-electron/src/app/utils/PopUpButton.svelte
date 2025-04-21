@@ -55,6 +55,10 @@ onMount(() => {
 		if (menuElement && menuElement.isConnected) {
 			menuElement.parentElement.removeChild(menuElement)
 		}
+
+		if (buttonElement && tooltip) {
+			dropTooltip(buttonElement, false)
+		}
 	}
 })
 

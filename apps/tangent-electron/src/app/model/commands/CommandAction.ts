@@ -157,6 +157,9 @@ export default function command(node: HTMLElement, params: commandParams) {
 		update,
 		destroy() {
 			unsub()
+			if (tooltip) {
+				dropTooltip(node, false)
+			}
 			node.removeEventListener('click', clickHandler)
 			node.removeEventListener('mouseenter', makeTooltipRequest)
 			node.removeEventListener('mousemove', makeTooltipRequest)

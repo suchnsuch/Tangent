@@ -112,14 +112,14 @@ export function dropTooltip(element: HTMLElement, delay=true) {
 
 	if (delay) {
 		tooltipTimeout = setTimeout(drop, 100)
+		requireTimeout = setTimeout(() => {
+			requireDelay = true
+		}, 500)
 	}
 	else {
+		requireDelay = true;
 		drop()
 	}
-
-	requireTimeout = setTimeout(() => {
-		requireDelay = true
-	}, 500)
 }
 
 export function tooltipToConfig(configIsh: TooltipDefOrConfig) {
@@ -160,6 +160,7 @@ export function tooltip(node: HTMLElement, def: TooltipDefOrConfig) {
 			config = tooltipToConfig(def)
 		},
 		destroy() {
+			dropTooltip(node)
 			node.removeEventListener('mouseenter', makeTooltipRequest)
 			node.removeEventListener('mousemove', makeTooltipRequest)
 			node.removeEventListener('mouseleave', onLeave)
