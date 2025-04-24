@@ -204,7 +204,7 @@ const noteTypeset:TypesetTypes = {
 				return result
 			},
 			shouldCombine: (prev, next) => {
-				return prev.code === next.code
+				return isEqual(prev.code, next.code)
 			},
 			renderMultiple: lineData => {
 				const children = lineData.map(([attributes, children, id]) => {
