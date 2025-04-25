@@ -70,7 +70,7 @@ export default class CharacterFeeder {
 		return { index, text }
 	}
 
-	private setIndex(index: number, stepLength=1) {
+	protected setIndex(index: number, stepLength=1) {
 		this.index = index
 		this.currentChar = index + stepLength <= this.text.length
 			? this.text.substring(index, index + stepLength)
@@ -303,11 +303,8 @@ export default class CharacterFeeder {
 	getLineText(from = this.index, consume=false) {
 		let next = this.text.indexOf('\n', from)
 		if (next < 0) {
-			if (consume) {
-				// There is no more text
-				this.setIndex(this.text.length)
-			}
-			return this.text.substring(from)
+			// There is no more text, consume everything
+			next = this.text.length
 		}
 		if (consume) {
 			this.setIndex(next)

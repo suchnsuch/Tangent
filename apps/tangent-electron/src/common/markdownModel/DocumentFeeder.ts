@@ -33,11 +33,21 @@ export default class DocumentFeeder extends CharacterFeeder {
 
 	next(step=1, hard=false) {
 		if (hard && this.index + step >= this.text.length && this.endLine < this.doc.lines.length - 1) {
-			// Throw the next line into the text
-			this.endLine += 1
-			this.text += '\n' + lineToText(this.doc.lines[this.endLine])
+			this.extendEnd()
 		}
 		return super.next(step)
+	}
+
+	protected setIndex(index: number, stepLength=1) {
+		if (index + stepLength >= this.text.length && this.endLine < this.doc.lines.length - 1) {
+			this.extendEnd()
+		}
+		return super.setIndex(index, stepLength)
+	}
+
+	private extendEnd() {
+		this.endLine += 1
+		this.text += '\n' + lineToText(this.doc.lines[this.endLine])
 	}
 
 	injectAdjacentLinesWhile(predicate: (line: Line) => boolean) {
