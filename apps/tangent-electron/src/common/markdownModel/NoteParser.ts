@@ -5,7 +5,7 @@ import LinesBuilder from './LinesBuilder'
 import { StructureData, StructureType } from 'common/indexing/indexTypes'
 import { parseBackslashEscape, parseComment, parseEmojiHighlight, parseEmphasis, parseHighlight, parseStrikethrough } from './formatting'
 import { parseHeader } from './header'
-import { parseBlockquote, parseHorizontalRule } from './line'
+import { IndentDefinition, parseBlockquote, parseHorizontalRule } from './line'
 import { parseListItem } from './list'
 import { parseInlineMath, parseMathBlock } from './math'
 import { parseLink, parseRawLink } from './links'
@@ -218,23 +218,37 @@ export default class NoteParser {
 		if (!this.awaiting) this.awaiting = [message]
 		else this.awaiting.push(message)
 	}
+
+	/**
+	 * Gets the indent of the line currently being built
+	 */
+	getCurrentIndent(): IndentDefinition {
+		return this.lineData.indent as IndentDefinition
+	}
 }
 
 function parseIndent(char: string, parser: NoteParser) {
 	const { feed } = parser
 	
 	let indentSize = 0
-	let indentChars = 0
+	let indent = ''
+
+	const lastContext = parser.contexts.at(-1)
 
 	while (true) {
+		if (lastContext.indentBlock && lastContext.indent === indent) {
+			// Allow contexts to specify their own sub-indent parsing behavior
+			break
+		}
+
 		if (char === '\t') {
 			indentSize += 8 // TODO: make tab width configurable
-			indentChars++
+			indent += char
 			char = feed.next()
 		}
 		else if (char === ' ') {
 			indentSize++
-			indentChars++
+			indent += char
 			char = feed.next()
 		}
 		else {
@@ -242,11 +256,7 @@ function parseIndent(char: string, parser: NoteParser) {
 		}
 	}
 
-	let indent = ''
-
 	if (indentSize) {
-		indent = feed.substring(feed.index - indentChars, feed.index)
-
 		// Encode the indent information into the line
 		parser.lineData.indent = {
 			indent,

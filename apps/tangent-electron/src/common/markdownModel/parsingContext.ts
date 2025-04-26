@@ -11,6 +11,11 @@ export type ParsingContext = {
 	programs: ParsingProgram[]
 	/** The minimum indent level of this context. Differing indents exit the context. */
 	indent: string
+	/**
+	 * While this is the leaf context and true, indent larger than the defined indent 
+	 * will not be consumed by the standard indent processor.
+	 */
+	indentBlock?: boolean
 	/** A program that runs when this context is dropped. */
 	exit?: ExitProgram
 }
