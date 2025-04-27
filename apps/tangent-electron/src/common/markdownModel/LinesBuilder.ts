@@ -1,4 +1,4 @@
-import { Line, Delta, AttributeMap } from '@typewriter/document'
+import { Line, Delta, AttributeMap, Op } from '@typewriter/document'
 import { negativeInlineFormats } from './typewriterTypes'
 
 export interface LinesBuilderOptions {
@@ -9,7 +9,7 @@ export default class LinesBuilder {
 	outputFormattingRetains: boolean
 
 	lines: Line[] = []
-	spans = []
+	spans: Op[] = []
 
 	// Inline formats cleared by a newline
 	openLineScopedFormats: { [key: string]: AttributeMap } = {}

@@ -5,6 +5,7 @@
 import config from 'prismjs/components'
 import type { TokenStream } from 'prismjs'
 import { wait } from '@such-n-such/core'
+import { AttributeMap, Op } from '@typewriter/delta'
 
 import type LinesBuilder from './LinesBuilder'
 
@@ -160,4 +161,48 @@ export function parseTokens(tokens: TokenStream, builder: LinesBuilder) {
 	})
 	parseTokens(tokens.content, builder)
 	builder.dropOpenFormat('code_syntax')
+}
+
+export function tokensToOps(tokens: TokenStream, type: string = null, ops: Op[] = null): Op[] {
+	if (!ops) ops = []
+
+	if (typeof tokens === 'string') {
+		while (tokens) {
+			let end = tokens.indexOf('\n')
+			if (end < 0) end = tokens.length
+
+			if (end > 0) {
+				const op: Op = {
+					insert: tokens.substring(0, end)
+				}
+
+				if (type) {
+					op.attributes = {
+						code_syntax: type
+					}
+				}
+
+				ops.push(op)
+			}
+			
+			if (tokens.length > end) {
+				// Inject newline
+				ops.push({ insert: '\n' })
+				tokens = tokens.substring(end + 1)
+			}
+			else {
+				break
+			}
+		}
+	}
+	else if (Array.isArray(tokens)) {
+		for (const token of tokens) {
+			tokensToOps(token, type, ops)
+		}
+	}
+	else {
+		tokensToOps(tokens.content, tokens.type, ops)
+	}
+
+	return ops
 }

@@ -83,17 +83,15 @@ export function parseMarkdown(source: string | TextDocument, options?: MarkdownP
 
 		// Code and other multi-line formatting needs to comprehend the whole thing
 		// Multi-line text can be pasted with no context, so adjacent context needs to be found
-		if (lineIsMultiLineFormat(startLine) || multiLine) {
-			while (startLineIndex > 0) {
-				const previousIndex = startLineIndex - 1
-				const previousLine = source.lines[previousIndex]
-				if (lineIsMultiLineFormat(previousLine)) {
-					startLineIndex = previousIndex
-					startLine = previousLine
-				}
-				else {
-					break
-				}
+		while (startLineIndex > 0) {
+			const previousIndex = startLineIndex - 1
+			const previousLine = source.lines[previousIndex]
+			if (lineIsMultiLineFormat(previousLine)) {
+				startLineIndex = previousIndex
+				startLine = previousLine
+			}
+			else {
+				break
 			}
 		}
 

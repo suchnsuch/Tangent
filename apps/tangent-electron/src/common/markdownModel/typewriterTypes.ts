@@ -2,10 +2,11 @@ import type { FormatType, LineType, TypesetTypes } from 'typewriter-editor/dist/
 import { h } from 'typewriter-editor/dist/rendering/vdom'
 import katex from 'katex'
 import type { IndentDefinition } from './line'
-import type { AttributeMap } from '@typewriter/document'
+import { isEqual, type AttributeMap } from '@typewriter/document'
 import { isMac } from '../isMac'
 import type { ListDefinition } from './list'
 import type { TagSectionData } from './tag'
+import { CodeData } from './code'
 
 const defaultOptions = {}
 
@@ -207,15 +208,46 @@ const noteTypeset:TypesetTypes = {
 				return isEqual(prev.code, next.code)
 			},
 			renderMultiple: lineData => {
+				let isRevealed = false
 				const children = lineData.map(([attributes, children, id]) => {
+					if (attributes.revealed) {
+						isRevealed = true
+					}
 					let props = getCoreLineProperties(attributes, 'codeLine')
 					props.key = id
-					
+
 					return h('div', props, children)
 				})
-				const codeLanguage = lineData[0][0].code.language
+
+				const codeData = lineData[0][0].code as CodeData
+				const codeLanguage = codeData.language
 				const className = codeLanguage ? `language-${codeLanguage}` : 'language-none'
-				return h('pre', { className, spellcheck: false }, h('code', { className }, children))
+
+				let preClass = className
+				let preStyle = ''
+				if (codeData.indent) {
+					preStyle += '--lineIndent: ' + codeData.indent + ';'
+					preClass += ' indented'
+				}
+				if (isRevealed) {
+					preClass += ' revealed'
+				}
+
+				return h(
+					'pre',
+					{
+						className: preClass,
+						spellcheck: false,
+						style: preStyle
+					},
+					h(
+						'code',
+						{
+							className
+						},
+						children
+					)
+				)
 			}
 		},
 		{

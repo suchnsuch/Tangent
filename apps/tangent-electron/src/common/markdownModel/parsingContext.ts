@@ -16,6 +16,10 @@ export type ParsingContext = {
 	 * will not be consumed by the standard indent processor.
 	 */
 	indentBlock?: boolean
+	/**
+	 * While any active context is marked true, the parser will continue to pull in data if possible.
+	 */
+	extendContext?: boolean
 	/** A program that runs when this context is dropped. */
 	exit?: ExitProgram
 }

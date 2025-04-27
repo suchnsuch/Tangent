@@ -126,7 +126,9 @@ export default class NoteParser {
 			parseFrontMatter(this, this.parseFrontMatter)
 		}
 
-		for (; this.feed.hasMore(); this.moveNext()) {
+		for (;
+			this.feed.hasMore(this.contexts.at(-1).extendContext ?? false);
+			this.moveNext(true, this.contexts.at(-1).extendContext ?? false)) {
 			
 			if (this._isStartOfLine) {
 				// Parse indentation
@@ -134,13 +136,13 @@ export default class NoteParser {
 				this._isStartOfContent = true
 			}
 
-			const char = this.feed.currentChar
-			if (char === undefined) {
+			if (!this.feed.hasMore(this.contexts.at(-1).extendContext ?? false)) {
 				// No more processing to do
 				break
 			}
 
 			const context = this.contexts.at(-1)
+			const char = this.feed.currentChar
 
 			for (const program of context.programs) {
 				const result = program(char, this, context)
@@ -148,14 +150,28 @@ export default class NoteParser {
 			}
 		}
 
+		if (this._isStartOfLine) {
+			// Parsing stopped on an empty newline.
+			// Need to drop all contexts that are indented.
+			while (this.contexts.at(-1).indent !== '') {
+				this.popContext(this.lineStart - 1)
+			}
+		}
+
 		// Push the last line
 		this.commitLine()
+
+		// Let contexts clean themselves out
+		while (this.contexts.length) {
+			this.popContext()
+		}
 	}
 
 	moveNext(shouldCommitLine=true, hard=false) {
 		this._isStartOfLine = false
 		this._isStartOfContent = false
-		if (this.feed.currentChar === '\n') {
+		const char = this.feed.currentChar
+		if (char === '\n' || (char === undefined && this.feed.hasMore(hard))) {
 			if (shouldCommitLine) this.commitLine()
 			this._isStartOfLine = true
 			this._lineStart = this.feed.index + 1
@@ -181,7 +197,7 @@ export default class NoteParser {
 	commitSpan(attributes: AttributeMap, spanOffset=this.feed.currentStepLength, nextStartOffset=0) {
 		let content = this.feed.text.substring(this.spanStart, this.feed.index + spanOffset)
 		if (content === '\n') {
-			console.error('building span with \n!', {
+			console.error('building span with "\\n"!', {
 				content,
 				index: this.feed.index,
 				spanStart: this.spanStart,

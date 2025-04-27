@@ -2,7 +2,7 @@ import { describe, test, expect, it } from 'vitest'
 
 import * as parser from './parser'
 import { TextDocument, Line, Delta } from '@typewriter/document'
-import { buildOpsFromInsertList, typewriterToText } from 'common/typewriterUtils'
+import { buildOpsFromInsertList, lineToText, typewriterToText } from 'common/typewriterUtils'
 import { StructureType } from 'common/indexing/indexTypes'
 
 function ensureLine(line: Line, content: string) {
@@ -74,11 +74,13 @@ Text`)
 			documentEndLine: 1
 		})
 
+		console.log(parseResult.lines.map(lineToText))
+
 		expect(parseResult.lines.length).toEqual(1)
 	})
 
 	test('Code consumption', () => {
-		let doc = parser.markdownToTextDocument(`\`\`\`js
+		let doc = ensureRoundTrip(`\`\`\`js
 var some = code;
 \`\`\`
 And some text`)
@@ -108,7 +110,10 @@ And some text`)
 		expect(parseResult.lines.length).toEqual(4)
 
 		let newTextLine = parseResult.lines[3]
-		expect(newTextLine.attributes.code).toEqual({ language: 'js' })
+		expect(newTextLine.attributes.code).toEqual({
+			language: 'js',
+			indent: 0
+		})
 	})
 
 	test('Multi Code consumption', () => {
@@ -146,7 +151,10 @@ And some text`)
 
 		// Don't expect "And some text" to be included; it's not code
 		let newTextLine = parseResult.lines[3] 
-		expect(newTextLine.attributes.code).toEqual({ language: 'js' })
+		expect(newTextLine.attributes.code).toEqual({
+			language: 'js',
+			indent: 0
+		})
 
 		// This tests for a bug where ending the code run could
 		// apply its formatting to following lines
@@ -156,6 +164,61 @@ And some text`)
 
 			expect(parsedLine.length).toEqual(originalLine.length)
 		}
+	})
+
+	describe('Indented code', () => {
+		it('Drops code styling with a closing block', () => {
+			const text = `Here is some indented code
+	\`\`\`js
+	var foo = bar()
+	\`\`\`
+	Text
+`
+			const doc = parser.markdownToTextDocument(text)
+			expect(doc.lines[2].attributes.code).toEqual({
+				language: 'js',
+				indent: 8
+			})
+			expect(doc.lines[4].attributes.code).toBeFalsy()
+		})
+
+		it('Drops code styling when no longer indented', () => {
+			const text = `Here is some indented code
+	\`\`\`js
+	var foo = bar()
+Text`
+			const doc = parser.markdownToTextDocument(text)
+			expect(doc.lines[2].attributes.code).toEqual({
+				language: 'js',
+				indent: 8
+			})
+			expect(doc.lines[3].attributes.code).toBeFalsy()
+		})
+
+		it('Formats code on the last line of the doc', () => {
+			const text = `Here is some indented code
+	\`\`\`js
+	var foo = bar()`
+			const doc = parser.markdownToTextDocument(text)
+			expect(doc.lines[2].attributes.code).toEqual({
+				language: 'js',
+				indent: 8
+			})
+			expect(doc.lines[2].content.ops.find(o => o.attributes?.codePlaceholder)).toBeFalsy()
+		})
+
+		it('Does not grab an empty last line of the doc', () => {
+			const text = `Here is some indented code
+	\`\`\`js
+	var foo = bar()
+`
+			const doc = parser.markdownToTextDocument(text)
+			expect(doc.lines[2].attributes.code).toEqual({
+				language: 'js',
+				indent: 8
+			})
+			expect(doc.lines[3].attributes.code).toBeFalsy()
+		})
 	})
 })
 

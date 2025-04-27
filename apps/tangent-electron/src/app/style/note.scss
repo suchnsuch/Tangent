@@ -322,6 +322,24 @@ article.note {
 
 		color: var(--codeColor);
 		caret-color: var(--codeColor);
+
+		&.indented {
+			transition: none;
+			margin-left: calc(var(--spaceWidth) * var(--lineIndent) - .5em);
+
+			&.revealed {
+				margin-left: 0;
+
+				.line.codeLine {
+					margin-left: -.5em;
+					.indent {
+						font-size: unset;
+						line-height: unset;
+						tab-size: unset;
+					}
+				}
+			}
+		}
 	}
 
 	figure {

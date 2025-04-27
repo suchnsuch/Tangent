@@ -1091,12 +1091,12 @@ else {
 
 function updateCodeBlockSizing() {
 	// Do code funkery
-	const codeWrappers = editorElement?.querySelectorAll('pre')
+	const codeWrappers = editorElement?.querySelectorAll('pre:not(.indented)')
 	if (codeWrappers?.length) {
 		const containerRect = container.getBoundingClientRect()
 
 		for (let i = 0; i < codeWrappers.length; i++) {
-			const pre = codeWrappers[i]
+			const pre = codeWrappers[i] as HTMLElement
 			if (pre.scrollWidth > pre.clientWidth || pre.clientWidth > editorElement.clientWidth || pre.clientWidth > containerRect.width) {
 				// I attempted multiple versions of caching here, but even a map of elements wasn't working correctly with the vdom malarky
 				// This is probably slower than all of those, but it's working.

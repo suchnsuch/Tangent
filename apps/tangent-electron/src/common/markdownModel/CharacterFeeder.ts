@@ -66,7 +66,7 @@ export default class CharacterFeeder {
 		
 		const text = index + stepLength <= this.text.length
 			? this.text.substring(index, index + stepLength)
-			: undefined
+			: this.getTextEndChar()
 		return { index, text }
 	}
 
@@ -74,7 +74,14 @@ export default class CharacterFeeder {
 		this.index = index
 		this.currentChar = index + stepLength <= this.text.length
 			? this.text.substring(index, index + stepLength)
-			: undefined
+			: this.getTextEndChar()
+	}
+
+	/**
+	 * @returns The character that should appear when the index is just out of scope of the text
+	 */
+	protected getTextEndChar() {
+		return undefined
 	}
 
 	/**
