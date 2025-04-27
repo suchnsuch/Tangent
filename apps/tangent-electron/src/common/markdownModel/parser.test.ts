@@ -220,6 +220,22 @@ Text`
 			expect(doc.lines[3].attributes.code).toBeFalsy()
 		})
 	})
+
+	describe('Math', () => {
+		it('Scopes to the $$ characters', () => {
+			const text = `Here is some math
+$$
+y = x^2
+$$
+End`
+			const doc = parser.markdownToTextDocument(text)
+			expect(doc.lines[2].attributes.math).toEqual({
+				indent: 0,
+				source: 'y = x^2\n'
+			})
+			expect(doc.lines[4].attributes.math).toBeFalsy()
+		})
+	})
 })
 
 describe('Formatting', () => {

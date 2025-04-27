@@ -7,6 +7,7 @@ import { isMac } from '../isMac'
 import type { ListDefinition } from './list'
 import type { TagSectionData } from './tag'
 import { CodeData } from './code'
+import { MathData } from './math'
 
 const defaultOptions = {}
 
@@ -280,7 +281,7 @@ const noteTypeset:TypesetTypes = {
 				return prev.math.source === next.math.source
 			},
 			renderMultiple: lineData => {
-				let math: any = null
+				let math: MathData = null
 				let revealed = false
 				const codeChildren = lineData.map(([attributes, children, id]) => {
 					if (!math) math = attributes.math
@@ -290,11 +291,44 @@ const noteTypeset:TypesetTypes = {
 
 					return h('div', props, children)
 				})
-				let className = 'language-latext hidden'
-				if (revealed) className += ' revealed'
+
+				const codeClass = 'language-latext'
+				let preClass = codeClass + ' hidden'
+
+				let mathClass = ''
+				let mathStyle = ''
+
+				if (math.indent) {
+					mathStyle += '--lineIndent: ' + math.indent + ';'
+					mathClass += ' indented'
+				}
+				if (revealed) {
+					preClass += ' revealed'
+					mathClass += ' revealed'
+				}
+
 				return h('figure', { }, [
-					h('pre', { className, spellcheck: false }, h('code', { className }, codeChildren)),
-					h('t-math', { 'math-source': math.source, 'block': '', className: revealed ? 'revealed' : '' })
+					h('pre',
+						{
+							className: preClass,
+							spellcheck: false
+						},
+						h(
+							'code',
+							{
+								className: codeClass
+							},
+							codeChildren
+						)
+					),
+					h('t-math',
+						{
+							'math-source': math.source,
+							'block': '',
+							className: mathClass,
+							style: mathStyle
+						}
+					)
 				])
 			}
 		},

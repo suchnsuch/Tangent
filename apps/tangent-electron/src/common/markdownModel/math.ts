@@ -1,7 +1,17 @@
-import { readCodeLines } from './code'
+import { applyCodeFormat, CodeParsingContext, parseCodeLine, readCodeLines } from './code'
 import DocumentFeeder from './DocumentFeeder'
 import { isWhitespace } from './matches'
 import NoteParser from './NoteParser'
+import { ParsingContext, ParsingContextType } from './parsingContext'
+
+export type MathData = {
+	source?: string
+	indent: number
+}
+
+type MathBlockContext = CodeParsingContext & {
+	mathData: MathData
+}
 
 export function parseInlineMath(char: string, parser: NoteParser): boolean {
 	if (char !== '$') return false
@@ -55,36 +65,78 @@ export function parseMathBlock(char: string, parser: NoteParser): boolean {
 		hidden: true,
 		start: true
 	}, 0)
+
+	const indent = parser.getCurrentIndent()
 	
-	// Declare here so it can be updated after the fact
-	const mathContent = {} as any
+	// Declare here so its source can be updated after the fact
+	const mathData: MathData = {
+		indent: indent.indentSize
+	}
 
 	builder.addOpenLineFormat('math-block', {
-		math: mathContent,
+		math: mathData,
 		hidden: true
 	})
 
-	parser.moveNext() // Jump the new line
+	const context: MathBlockContext = {
+		type: ParsingContextType.Block,
+		programs: [parseCodeLine],
+		indent: indent.indent,
+		indentBlock: true,
+		extendContext: true,
+		exit: finishMathBlock,
 
-	const { hitEnd, allCode } = readCodeLines(parser, 'latex', '$$')
+		data: {
+			indent: indent.indentSize,
+			language: 'latex'
+		},
+		mathData,
+		firstLine: builder.lines.length + 1,
+		resolvedLanguage: 'latex',
+		code: '',
+		isAtEnd: (char, parser, context) => {
+			const line = parser.feed.getLineText()
+			if (line.trimEnd() === '$$') {
+				console.log('  exiting')
+				parser.feed.nextByLength(line.length)
+				
+				return true
+			}
+			return false
+		},
+		reachedEnd: false
+	}
 
-	if (hitEnd) {
+	parser.pushContext(context)
+
+	return true
+}
+
+function finishMathBlock(lastIndex: number, ctxt: ParsingContext, parser: NoteParser) {
+	const { feed, builder } = parser
+	const context = ctxt as MathBlockContext
+
+	applyCodeFormat(parser, context)
+	builder.dropOpenLineFormat('math-block')
+
+	context.mathData.source = context.code
+
+	if (context.reachedEnd) {
 		parser.commitSpan({
 			line_format: 'math',
 			hidden: true,
 			end: true
 		}, 0)
 
-		builder.dropOpenLineFormat('math-block')
-		parser.lineData.math = mathContent
+		parser.lineData.math = context.mathData
 		parser.lineData.hidden = true
 	}
-
-	mathContent.source = allCode
+	else if (lastIndex === feed.index) {
+		parser.lineData.math = context.mathData
+		parser.lineData.hidden = true
+	}
 
 	if (feed instanceof DocumentFeeder && !feed.hasMore()) {
 		feed.injectAdjacentLinesWhile(line => 'math' in line)
 	}
-
-	return true
 }

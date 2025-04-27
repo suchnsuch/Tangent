@@ -61,7 +61,7 @@ export function parseInlineCode(char: string, parser: NoteParser): boolean {
 	return true
 }
 
-type CodeParsingContext = ParsingContext & {
+export type CodeParsingContext = ParsingContext & {
 	/** The data for the code being parsed */
 	data: CodeData
 	/** The index of the first line */
@@ -183,6 +183,7 @@ export function applyCodeFormat(parser: NoteParser, context: CodeParsingContext)
 		const tokens = tokenize(context.code, context.resolvedLanguage)
 		if (!tokens) {
 			console.error('No tokens for', context.resolvedLanguage)
+			return
 		}
 
 		const lines = parser.builder.lines
@@ -252,6 +253,8 @@ export function finishCodeBlock(lastIndex: number, ctxt: ParsingContext, parser:
 
 	applyCodeFormat(parser, context)
 
+	builder.dropOpenLineFormat('code')
+
 	if (context.reachedEnd) {
 		parser.commitSpan({
 			line_format: 'code',
@@ -259,15 +262,10 @@ export function finishCodeBlock(lastIndex: number, ctxt: ParsingContext, parser:
 			end: true
 		}, 0)
 
-		builder.dropOpenLineFormat('code')
-	
 		parser.lineData.code = context.data
 	}
-	else {
-		if (lastIndex === feed.index) {
-			parser.lineData.code = context.data
-		}
-		builder.dropOpenLineFormat('code')
+	else if (lastIndex === feed.index) {
+		parser.lineData.code = context.data
 	}
 
 	if (feed instanceof DocumentFeeder && !feed.hasMore()) {

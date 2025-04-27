@@ -217,8 +217,10 @@ article.note {
 		margin-top: .5em;
 	}
 
-	.hidden, .line_format {
-		color: green;
+	.line {
+		.hidden, .line_format {
+			color: green;
+		}
 	}
 
 	.hidden {
@@ -463,11 +465,16 @@ article.note {
 		}
 	}
 
-	t-math[block].revealed {
+	t-math[block] {
 		display: block;
-		background: var(--backgroundColor);
-		border-radius: var(--borderRadius);
-		padding: 2px;
+		&.indented {
+			margin-left: calc(var(--spaceWidth) * var(--lineIndent));
+		}
+		&.revealed {
+			background: var(--backgroundColor);
+			border-radius: var(--borderRadius);
+			padding: 2px;
+		}
 	}
 
 	t-math.revealed {
