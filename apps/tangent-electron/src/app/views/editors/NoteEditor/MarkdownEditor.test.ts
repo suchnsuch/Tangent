@@ -963,10 +963,7 @@ a
 		// The active text should just be marked as an empty code line.
 		expect(editor.getActive()).toEqual({
 			empty: true,
-			code: {
-				language: 'js',
-				indent: 0
-			},
+			code: { language: 'js' },
 			indent: {
 				indent: '',
 				indentSize: 0

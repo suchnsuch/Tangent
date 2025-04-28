@@ -207,13 +207,15 @@ const noteTypeset:TypesetTypes = {
 			},
 			shouldCombine: (prev, next) => {
 				return isEqual(prev.code, next.code)
+					&& prev.indent.indent === next.indent.indent
 			},
 			renderMultiple: lineData => {
 				let isRevealed = false
+				let indent = -1
 				const children = lineData.map(([attributes, children, id]) => {
-					if (attributes.revealed) {
-						isRevealed = true
-					}
+					if (attributes.revealed) isRevealed = true
+					if (indent === -1) indent = attributes.indent.indentSize
+
 					let props = getCoreLineProperties(attributes, 'codeLine')
 					props.key = id
 
@@ -226,8 +228,8 @@ const noteTypeset:TypesetTypes = {
 
 				let preClass = className
 				let preStyle = ''
-				if (codeData.indent) {
-					preStyle += '--lineIndent: ' + codeData.indent + ';'
+				if (indent) {
+					preStyle += '--lineIndent: ' + indent + ';'
 					preClass += ' indented'
 				}
 				if (isRevealed) {
@@ -279,12 +281,15 @@ const noteTypeset:TypesetTypes = {
 			defaultFollows: true,
 			shouldCombine: (prev, next) => {
 				return prev.math.source === next.math.source
+					&& prev.indent.indent === next.indent.indent
 			},
 			renderMultiple: lineData => {
 				let math: MathData = null
+				let indent = -1
 				let revealed = false
 				const codeChildren = lineData.map(([attributes, children, id]) => {
 					if (!math) math = attributes.math
+					if (indent === -1) indent = attributes.indent.indentSize
 					if (attributes.revealed) revealed = true
 					let props = getCoreLineProperties(attributes, 'mathLine')
 					props.key = id
@@ -298,8 +303,8 @@ const noteTypeset:TypesetTypes = {
 				let mathClass = ''
 				let mathStyle = ''
 
-				if (math.indent) {
-					mathStyle += '--lineIndent: ' + math.indent + ';'
+				if (indent) {
+					mathStyle += '--lineIndent: ' + indent + ';'
 					mathClass += ' indented'
 				}
 				if (revealed) {

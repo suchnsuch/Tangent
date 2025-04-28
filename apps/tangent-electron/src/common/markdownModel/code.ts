@@ -77,7 +77,6 @@ export type CodeParsingContext = ParsingContext & {
 
 export type CodeData = {
 	language: string
-	indent: number
 }
 
 export function parseCodeBlock(char: string, parser: NoteParser): boolean {
@@ -103,8 +102,7 @@ export function parseCodeBlock(char: string, parser: NoteParser): boolean {
 	}, 0)
 
 	const codeData: CodeData = {
-		language: codeFormat,
-		indent: indent.indentSize
+		language: codeFormat
 	}
 
 	builder.addOpenLineFormat('code', {

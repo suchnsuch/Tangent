@@ -6,7 +6,6 @@ import { ParsingContext, ParsingContextType } from './parsingContext'
 
 export type MathData = {
 	source?: string
-	indent: number
 }
 
 type MathBlockContext = CodeParsingContext & {
@@ -69,9 +68,7 @@ export function parseMathBlock(char: string, parser: NoteParser): boolean {
 	const indent = parser.getCurrentIndent()
 	
 	// Declare here so its source can be updated after the fact
-	const mathData: MathData = {
-		indent: indent.indentSize
-	}
+	const mathData: MathData = {}
 
 	builder.addOpenLineFormat('math-block', {
 		math: mathData,
@@ -87,7 +84,6 @@ export function parseMathBlock(char: string, parser: NoteParser): boolean {
 		exit: finishMathBlock,
 
 		data: {
-			indent: indent.indentSize,
 			language: 'latex'
 		},
 		mathData,

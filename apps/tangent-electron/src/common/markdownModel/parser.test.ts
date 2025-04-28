@@ -110,10 +110,7 @@ And some text`)
 		expect(parseResult.lines.length).toEqual(4)
 
 		let newTextLine = parseResult.lines[3]
-		expect(newTextLine.attributes.code).toEqual({
-			language: 'js',
-			indent: 0
-		})
+		expect(newTextLine.attributes.code).toEqual({ language: 'js' })
 	})
 
 	test('Multi Code consumption', () => {
@@ -151,10 +148,7 @@ And some text`)
 
 		// Don't expect "And some text" to be included; it's not code
 		let newTextLine = parseResult.lines[3] 
-		expect(newTextLine.attributes.code).toEqual({
-			language: 'js',
-			indent: 0
-		})
+		expect(newTextLine.attributes.code).toEqual({ language: 'js' })
 
 		// This tests for a bug where ending the code run could
 		// apply its formatting to following lines
@@ -175,10 +169,7 @@ And some text`)
 	Text
 `
 			const doc = parser.markdownToTextDocument(text)
-			expect(doc.lines[2].attributes.code).toEqual({
-				language: 'js',
-				indent: 8
-			})
+			expect(doc.lines[2].attributes.code).toEqual({ language: 'js' })
 			expect(doc.lines[4].attributes.code).toBeFalsy()
 		})
 
@@ -188,10 +179,7 @@ And some text`)
 	var foo = bar()
 Text`
 			const doc = parser.markdownToTextDocument(text)
-			expect(doc.lines[2].attributes.code).toEqual({
-				language: 'js',
-				indent: 8
-			})
+			expect(doc.lines[2].attributes.code).toEqual({ language: 'js' })
 			expect(doc.lines[3].attributes.code).toBeFalsy()
 		})
 
@@ -200,10 +188,7 @@ Text`
 	\`\`\`js
 	var foo = bar()`
 			const doc = parser.markdownToTextDocument(text)
-			expect(doc.lines[2].attributes.code).toEqual({
-				language: 'js',
-				indent: 8
-			})
+			expect(doc.lines[2].attributes.code).toEqual({ language: 'js' })
 			expect(doc.lines[2].content.ops.find(o => o.attributes?.codePlaceholder)).toBeFalsy()
 		})
 
@@ -213,10 +198,7 @@ Text`
 	var foo = bar()
 `
 			const doc = parser.markdownToTextDocument(text)
-			expect(doc.lines[2].attributes.code).toEqual({
-				language: 'js',
-				indent: 8
-			})
+			expect(doc.lines[2].attributes.code).toEqual({ language: 'js' })
 			expect(doc.lines[3].attributes.code).toBeFalsy()
 		})
 	})
@@ -230,7 +212,6 @@ $$
 End`
 			const doc = parser.markdownToTextDocument(text)
 			expect(doc.lines[2].attributes.math).toEqual({
-				indent: 0,
 				source: 'y = x^2\n'
 			})
 			expect(doc.lines[4].attributes.math).toBeFalsy()
