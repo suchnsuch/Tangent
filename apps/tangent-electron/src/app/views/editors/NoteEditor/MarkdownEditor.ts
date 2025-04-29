@@ -42,22 +42,26 @@ function indentLines(editor: MarkdownEditor, direction: -1 | 1) {
 	}
 	else {
 		const ranges = doc.getLineRanges(selection)
-		let offset = 0
-		for (const range of ranges) {
+		let startOffset = 0
+		let endOffset = 0
+
+		for (let rangeIndex = 0; rangeIndex < ranges.length; rangeIndex++) {
+			const range = ranges[rangeIndex]
 			if (direction === 1) {
 				change.insert(range[0], '\t')
-				offset += 1
+				if (rangeIndex === 0) startOffset += 1
+				endOffset += 1
 			}
 			else if (direction === -1) {
 				let text = doc.getText(range)
 				if (text.startsWith('\t')) {
 					change.delete([range[0], range[0] + 1])
-					offset -= 1
+					if (rangeIndex === 0) startOffset -= 1
+					endOffset -= 1
 				}
 			}
 		}
-
-		change.select([selection[0] + offset, selection[1] + offset])
+		change.select([selection[0] + startOffset, selection[1] + endOffset])
 	}
 
 	editor.update(change)

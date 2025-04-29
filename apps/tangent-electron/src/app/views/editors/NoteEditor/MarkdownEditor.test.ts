@@ -7,16 +7,16 @@ import MarkdownEditor from './MarkdownEditor'
 import { Workspace } from 'app/model'
 import { getSelectedLines } from 'common/typewriterUtils'
 
+let editor: MarkdownEditor
+const waitTime = 10
+
+beforeEach(() => {
+	editor = new MarkdownEditor(null)
+	editor.setRoot(document.createElement('div'))
+	editor.select(0)
+})
+
 describe('List Handling', () => {
-
-	let editor: MarkdownEditor
-	const waitTime = 10
-
-	beforeEach(() => {
-		editor = new MarkdownEditor(null)
-		editor.setRoot(document.createElement('div'))
-		editor.select(0)
-	})
 
 	it('Should transform list prefixes', async () => {
 
@@ -419,16 +419,6 @@ describe('List Handling', () => {
 })
 
 describe('Comment Toggling', () => {
-
-	let editor: MarkdownEditor
-	const waitTime = 1
-
-	beforeEach(() => {
-		editor = new MarkdownEditor(null)
-		editor.setRoot(document.createElement('div'))
-		editor.select(0)
-	})
-
 	it('Should toggle on an entire line if no comment is present', async () => {
 		editor.doc = markdownToTextDocument(`
 This is an uncommented line`)
@@ -528,15 +518,6 @@ This is line 2`)
 })
 
 describe('Inline formatting', () => {
-	let editor: MarkdownEditor
-	const waitTime = 1
-
-	beforeEach(() => {
-		editor = new MarkdownEditor(null)
-		editor.setRoot(document.createElement('div'))
-		editor.select(0)
-	})
-
 	it('Should toggle inline formatting on when selection is touching a word', async () => {
 		editor.doc = markdownToTextDocument(`This is a line of text.`)
 		editor.select(12)
@@ -802,15 +783,6 @@ async function setClipboard(text: string) {
 }
 
 describe('Link toggling', () => {
-	let editor: MarkdownEditor
-	const waitTime = 1
-
-	beforeEach(() => {
-		editor = new MarkdownEditor(null)
-		editor.setRoot(document.createElement('div'))
-		editor.select(0)
-	})
-
 	// TODO: Fix clipboard injections
 	it.skip('Should convert selected text to a markdown link with a url in the clipboard', async () => {
 		await setClipboard('https://duckduckgo.com/)')
@@ -941,16 +913,6 @@ describe('Link toggling', () => {
 })
 
 describe('Code Formatting & Editing', () => {
-
-	let editor: MarkdownEditor
-	const waitTime = 1
-
-	beforeEach(() => {
-		editor = new MarkdownEditor(null)
-		editor.setRoot(document.createElement('div'))
-		editor.select(0)
-	})
-
 	// This (somewhat awkwardly) catches this issue: https://github.com/suchnsuch/Tangent/issues/72
 	it('Should correctly handle empty code blocks', () => {
 		editor.doc = markdownToTextDocument(`
@@ -977,15 +939,6 @@ a
 })
 
 describe('Line Swapping', () => {
-	let editor: MarkdownEditor
-	const waitTime = 1
-
-	beforeEach(() => {
-		editor = new MarkdownEditor(null)
-		editor.setRoot(document.createElement('div'))
-		editor.select(0)
-	})
-
 	it('Moves one line up', () => {
 		editor.doc = markdownToTextDocument(`Line one
 line two
@@ -1058,5 +1011,77 @@ four
 seven`
 		expect(editor.getText()).toEqual(result)
 		expect(editor.doc.selection).toEqual([19, 25])
+	})
+})
+
+describe('Indentation', () => {
+	it('Indents a single line', () => {
+		editor.doc = markdownToTextDocument(`Line one
+line two
+line three
+line four`)
+		editor.select(9).indent()
+
+		expect(editor.getText()).toEqual(`Line one
+	line two
+line three
+line four`)
+		expect(editor.doc.selection).toEqual([10, 10])
+	})
+
+	it('Indents multiple lines at once', () => {
+		editor.doc = markdownToTextDocument(`Line one
+line two
+line three
+line four`)
+		editor.select([13, 22]).indent()
+
+		expect(editor.getText()).toEqual(`Line one
+	line two
+	line three
+line four`)
+		expect(editor.doc.selection).toEqual([14, 24])
+	})
+
+	it('Outdents a single line', () => {
+		editor.doc = markdownToTextDocument(`Line one
+	line two
+	line three
+line four`)
+		editor.select(14).outdent()
+
+		expect(editor.getText()).toEqual(`Line one
+line two
+	line three
+line four`)
+		expect(editor.doc.selection).toEqual([13, 13])
+	})
+
+	it('Outdents multiple lines at once', () => {
+		editor.doc = markdownToTextDocument(`Line one
+	line two
+	line three
+line four`)
+		editor.select([14, 24]).outdent()
+
+		expect(editor.getText()).toEqual(`Line one
+line two
+line three
+line four`)
+		expect(editor.doc.selection).toEqual([13, 22])
+	})
+
+	it('Outdents only lines that can', () => {
+		editor.doc = markdownToTextDocument(`Line one
+line two
+	line three
+line four`)
+		editor.select([13, 23]).outdent()
+
+		expect(editor.getText()).toEqual(`Line one
+line two
+line three
+line four`)
+		expect(editor.doc.selection).toEqual([13, 22])
 	})
 })
