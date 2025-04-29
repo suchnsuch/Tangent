@@ -100,7 +100,7 @@ function getCoreLineProperties(attributes, baseClass = ''): AttributeMap {
 	const indent = attributes.indent as IndentDefinition
 	let style = ''
 	if (indent) {
-		style += `--lineIndent: ${indent.indentSize};`
+		style += getLineIndentStyle(indent.indentSize)
 	}
 
 	let props: AttributeMap = {
@@ -125,6 +125,10 @@ function getCoreLineProperties(attributes, baseClass = ''): AttributeMap {
 	}
 	
 	return props
+}
+
+function getLineIndentStyle(indent: number) {
+	return '--lineIndent: ' + indent + ';'
 }
 
 function codeFormatAltClass(type: string) {
@@ -178,18 +182,35 @@ const noteTypeset:TypesetTypes = {
 			},
 			shouldCombine: (prev, next) => {
 				return prev.blockquote === next.blockquote
+					&& isEqual(prev.indent, next.indent)
 			},
 			renderMultiple: lineData => {
 				let depth = lineData[0][0].blockquote
+				let revealed = false
+				let indent = -1
 
 				const children = lineData.map(([attributes, children, id]) => {
+					if (indent === -1) indent = attributes.indent.indentSize
+					if (attributes.revealed) revealed = true
 
 					let props = getCoreLineProperties(attributes, 'blockquote')
+					props.style = `--innerLineIndent: ${indent};` // Replace indent
 					props.key = id
 
 					return h('p', props, children)
 				})
-				return h('blockquote', { className: `depth-${depth}` }, children)
+
+				let className = 'depth-' + depth
+				if (revealed) {
+					className += ' revealed'
+				}
+
+				let style = ''
+				if (indent) {
+					style += getLineIndentStyle(indent)
+				}
+
+				return h('blockquote', { className, style }, children)
 			}
 		},
 		{
@@ -229,7 +250,7 @@ const noteTypeset:TypesetTypes = {
 				let preClass = className
 				let preStyle = ''
 				if (indent) {
-					preStyle += '--lineIndent: ' + indent + ';'
+					preStyle += getLineIndentStyle(indent)
 					preClass += ' indented'
 				}
 				if (isRevealed) {
@@ -304,7 +325,7 @@ const noteTypeset:TypesetTypes = {
 				let mathStyle = ''
 
 				if (indent) {
-					mathStyle += '--lineIndent: ' + indent + ';'
+					mathStyle += getLineIndentStyle(indent)
 					mathClass += ' indented'
 				}
 				if (revealed) {

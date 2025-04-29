@@ -129,6 +129,25 @@ article.note {
 			border-left-width: 16px;
 		}
 
+		--lineIndent: 0;
+
+		margin-left: calc(var(--spaceWidth) * (var(--lineIndent) + 8));
+		&.revealed {
+			margin-left: calc(var(--spaceWidth) * 8);
+			text-indent: 0;
+
+			.line {
+				margin-left: calc(var(--spaceWidth) * var(--innerLineIndent));
+				text-indent: calc(-1 * var(--spaceWidth) * var(--innerLineIndent));
+			}
+
+			.indent {
+				font-size: unset;
+				line-height: unset;
+				tab-size: unset;
+			}
+		}
+
 		p {
 			line-height: rhythmUnit(1);
 			&:after {

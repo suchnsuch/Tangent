@@ -55,7 +55,7 @@ export function getLineFormattingPrefix(line: Line, forNextLine = false): string
 		}
 	}
 	else if (attr.blockquote) {
-		const match = lineString.match(/^(> ?)+/)
+		const match = lineString.match(/^\s*(> ?)+/)
 		if (match) {
 			let result = match[0]
 			if (!result.endsWith(' ')) {
@@ -179,6 +179,8 @@ export function parseBlockquote(char: string, parser: NoteParser): boolean {
 		}
 		feed.next()
 	}
+
+	if (feed.currentChar === ' ') feed.next()
 
 	parser.lineData.blockquote = blockDepth
 	parser.commitSpan({ line_format: true, hidden: true }, 0)
