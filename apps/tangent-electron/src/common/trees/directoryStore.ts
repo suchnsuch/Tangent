@@ -150,8 +150,26 @@ export default class DirectoryStore extends SelfStore implements DirectoryLookup
 		return this.lookup.get(node.path) === node
 	}
 
-	get(path: string): TreeNode {
-		return this.lookup.get(path)
+	/**
+	 * Get a TreeNode with the given path
+	 * @param path The full path of the tree node
+	 * @param caseInsensitive If true and an exact match is not found, the directory will be searched without case sensitivity. This is much slower.
+	 * @returns The found tree node
+	 */
+	get(path: string, caseInsensitive = false): TreeNode {
+		const result = this.lookup.get(path)
+		if (result) return result
+		
+		if (caseInsensitive) {
+			const args: Intl.CollatorOptions = { sensitivity: 'base' }
+			for (const key of this.lookup.keys()) {
+				if (key.localeCompare(path, undefined, args)) {
+					return this.lookup.get(key)
+				}
+			}
+		}
+
+		return undefined
 	}
 	
 	getWithPortablePath(portablePath: string): TreeNode {

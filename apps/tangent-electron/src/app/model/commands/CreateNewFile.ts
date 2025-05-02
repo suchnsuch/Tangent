@@ -211,8 +211,8 @@ export default class CreateNewFileCommand extends WorkspaceCommand {
 		folderPath = paths.dirname(newPath)
 		name = paths.basename(newPath, extension)
 
-		const existingNode = directoryStore.get(newPath)
-		if (creationMode === 'createOrOpen') {
+		const existingNode = directoryStore.get(newPath, creationMode === 'createOrOpenCaseInsensitive')
+		if (creationMode && creationMode.startsWith('createOrOpen')) {
 			if (existingNode instanceof File) {
 				return existingNode
 			}

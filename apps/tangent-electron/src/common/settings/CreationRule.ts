@@ -2,7 +2,7 @@ import { ObjectStore, ObjectStoreOptions, WritableStore, ValidatingStore, rawOrS
 import { fillDateFormat } from '../dates'
 import Setting, { SettingDefinition } from './Setting'
 
-export type CreationMode = 'create' | 'createOrOpen'
+export type CreationMode = 'create' | 'createOrOpen' | 'createOrOpenCaseInsensitive'
 
 export type CreationRuleOrDefinition = CreationRule | CreationRuleDefinition
 

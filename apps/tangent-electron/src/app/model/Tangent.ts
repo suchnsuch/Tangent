@@ -142,7 +142,8 @@ export default class Tangent {
 		
 		this.tangentInfoFile = workspace.commands.createNewFile.execute({
 			relativePath: paths.join(relativeTangentDir, filename),
-			creationMode: 'createOrOpen',
+			// Use case insensitivity so that case differences in the tangent name have no effect
+			creationMode: 'createOrOpenCaseInsensitive',
 			updateSelection: false
 		}) as DataFile
 
