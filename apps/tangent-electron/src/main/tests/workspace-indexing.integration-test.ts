@@ -218,6 +218,7 @@ describe('Indexing', () => {
 			expect(nonVirtualFolder.meta?.virtual).not.toBeTruthy()
 
 			await workspace.watcherIdleHandle()
+			await wait(0) // HACK: extra wait time for CLI-exectuted tests
 
 			let stats = null
 			const getStats = fs.promises.stat(nonVirtualFolder.path).then(s => stats = s)
