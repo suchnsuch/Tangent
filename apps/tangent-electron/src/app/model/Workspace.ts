@@ -597,6 +597,7 @@ export default class Workspace extends EventDispatcher {
 
 				const newFile = this.commands.createNewFile.execute({
 					relativePath: link.href,
+					extension: 'default-md',
 					// Will modify selection later
 					updateSelection: false
 				})

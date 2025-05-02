@@ -9,19 +9,33 @@ import CreateFileDialog from '../../modal/CreateFileDialog.svelte'
 import CreationRule, { CreationMode, CreationRuleDefinition, nameFromRule, willPromptForName } from 'common/settings/CreationRule'
 import type { NavigationData } from 'app/events'
 import { isModKey } from 'app/utils/events'
+import { knownExtensionsMatch } from 'common/fileExtensions'
 
 type CreationRuleOrDefinition = CreationRule | CreationRuleDefinition
 
 export interface CreateNewFileCommandContext extends CommandContext {
 	rule?: CreationRuleDefinition | CreationRule
 	name?: string
-	extension?: string | false // Pass in false for no extension
+	/**
+	 * The extension to be used for the name.
+	 * - If `undefined`, ".md" will be used if no extension can be found.
+	 * - If `false`, no extension will be applied.
+	 * - If `"default-md"`, the ".md" extension will be added if any discovered extension is not in the known extension list.
+	 */
+	extension?: string | 'default-md' | false
 	folder?: TreeNode
 	path?: string
 	relativePath?: string
 	updateSelection?: boolean
 	navigateFrom?: TreeNode
 	creationMode?: CreationMode
+}
+
+type CreationValues = {
+	folderPath: string
+	name: string
+	extension: string
+	creationMode: CreationMode
 }
 
 export default class CreateNewFileCommand extends WorkspaceCommand {
@@ -60,7 +74,8 @@ export default class CreateNewFileCommand extends WorkspaceCommand {
 		return existingNode instanceof File
 	}
 
-	private createNode(context: CreateNewFileCommandContext) {
+	private resolveContext(context: CreateNewFileCommandContext): CreationValues {
+
 		let { rule, path, relativePath, folder, name, extension, updateSelection, creationMode } = context || {}
 		const { directoryStore, viewState } = this.workspace
 
@@ -117,8 +132,16 @@ export default class CreateNewFileCommand extends WorkspaceCommand {
 			// Split the relative path elements back into their component parts
 			folderPath = paths.dirname(relativePath)
 			const derivedExtension = paths.extname(relativePath)
-			name = paths.basename(relativePath, derivedExtension)
-			extension = extension ?? derivedExtension
+
+			if (extension === 'default-md' && !derivedExtension.match(knownExtensionsMatch)) {
+				// The derived extension was not recognized, so we're going to prefer .md
+				name = paths.basename(relativePath)
+				extension = '.md'
+			}
+			else {
+				name = paths.basename(relativePath, derivedExtension)
+				extension = derivedExtension
+			}
 		}
 
 		// Last ditch attempts to determine critical elements
@@ -163,6 +186,17 @@ export default class CreateNewFileCommand extends WorkspaceCommand {
 			extension = extension || '.md'
 		}
 
+		return {
+			folderPath,
+			name,
+			extension,
+			creationMode: creationMode || rule?.mode
+		}
+	}
+
+	private createNode(values: CreationValues) {
+		const { directoryStore } = this.workspace
+		let { folderPath, name, extension, creationMode } = values
 		// Make the thing!
 
 		// The "name" might contain path information
@@ -176,8 +210,6 @@ export default class CreateNewFileCommand extends WorkspaceCommand {
 		// Extract the folder & name from the newly created path
 		folderPath = paths.dirname(newPath)
 		name = paths.basename(newPath, extension)
-
-		creationMode = creationMode || rule?.mode
 
 		const existingNode = directoryStore.get(newPath)
 		if (creationMode === 'createOrOpen') {
@@ -220,7 +252,7 @@ export default class CreateNewFileCommand extends WorkspaceCommand {
 		if (debug) console.log('Creating file', context)
 		
 		// Forward to createNode for easy post-creation handling here
-		let newNode = this.createNode(context) 
+		let newNode = this.createNode(this.resolveContext(context)) 
 		if (newNode) {
 			if (context?.updateSelection ?? true) {
 				const nav: NavigationData = {

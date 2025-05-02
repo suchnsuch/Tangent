@@ -66,12 +66,14 @@ export const mscExtensions = [
 	'.json'
 ]
 
-export const knownExtensionsMatch = getExtensionRegex([
+export const knownExtensions = [
 	...noteFileExtensions,
 	...imageFileExtensions,
 	...codeExtensions,
 	...mscExtensions
-])
+]
+
+export const knownExtensionsMatch = getExtensionRegex(knownExtensions)
 
 /**
  * These are the file types that users can interact with
