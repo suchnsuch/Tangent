@@ -8,7 +8,7 @@
 		<line x1="9" y1="14" x2="15" y2="14" style="fill: none; stroke: var(--iconStroke, black); stroke-width: 2px; stroke-linecap: round;"/>
 	</symbol>
 	<symbol id="toggleMaximize" viewBox="0 0 24 24">
-		<rect x="9" y="8" width="8" height="8"
+		<rect x="8" y="8" width="8" height="8"
 			style="fill: none; stroke: var(--iconStroke, black); stroke-width: 1.5px; stroke-linejoin: round;"/>
 	</symbol>
 </svg>

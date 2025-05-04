@@ -76,6 +76,10 @@ nav {
 	.windowButtons {
 		margin-left: .5em;
 		-webkit-app-region: no-drag;
+		button {
+			border-radius: 0;
+			padding: 6px;
+		}
 		.close {
 			&:hover {
 				background-color: #bb0000;
