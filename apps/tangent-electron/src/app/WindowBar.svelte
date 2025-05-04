@@ -6,7 +6,7 @@ import { isMac } from 'common/platform'
 import { Workspace } from './model'
 
 const workspace: Workspace = getContext('workspace')
-const { titlebar } = workspace.settings
+const titlebar = workspace?.settings?.titlebar
 const api: WindowAPI = getContext('api')
 
 export let showBorder = false
@@ -23,7 +23,7 @@ export let visible = true
 	<slot name="right"></slot>
 
 	<!--Explicitly avoiding reactive syntax to push home the need to restart the titlebar var to change-->
-	{#if !isMac && titlebar.value === 'condensed'}
+	{#if !isMac && titlebar?.value === 'condensed'}
 		<div class="windowButtons buttonGroup">
 			<button class="minimize subtle" on:click={e => api.window.minimize()}><svg>
 				<use href="window.svg#minimize" />

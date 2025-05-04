@@ -1,5 +1,7 @@
 The appearance options for Tangent are found in the [[System Menu]].
 
+The **Titlebar** option is available on Windows and Linux. It lets you choose whether Tangent uses the native titlebar or pulls the window controls into its own titlebar. The default on Windows is to use the condensed titlebar. The default on Linux is to use the native titlebar.
+
 The __Appearance__ option lets you choose whether Tangent runs in light mode or dark mode. By default, Tangent takes on the setting of your operating system, if available.
 
 __Accent Hue__ and __Accent Saturation__ let you customize the color used for highlighting [[Wiki Links]], [[Code|inline code]], and some button states. Adjustments to these values are made depending on how the color is used. Light and Dark mode also affect the final color used.
