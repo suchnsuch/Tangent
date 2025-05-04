@@ -35,7 +35,7 @@ import { repeatString } from '@such-n-such/core'
 import { subscribeUntil } from 'common/stores'
 import { handleIsNode } from 'app/model/NodeHandle'
 import { findSectionLines } from 'common/markdownModel/sections'
-import { isMac } from 'common/isMac'
+import { isMac } from 'common/platform'
 
 function clampRange(range: EditorRange, clampingRange: EditorRange): EditorRange {
 	range = normalizeRange(range)

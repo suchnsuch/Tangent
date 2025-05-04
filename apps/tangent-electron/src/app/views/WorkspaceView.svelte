@@ -12,7 +12,7 @@ import System from './System/System.svelte'
 import command from 'app/model/commands/CommandAction'
 import FocusLevelIcon from './smart-icons/FocusLevelIcon.svelte'
 import { appendContextTemplate, ContextMenuConstructorOptions, ExtendedContextEvent, extractRawTemplate } from 'app/model/contextmenu';
-import { isMac } from 'common/isMac'
+import { isMac } from 'common/platform'
 import CreationRuleName from './summaries/CreationRuleName.svelte'
 import PopUpButton from 'app/utils/PopUpButton.svelte'
 import ModalStateView from 'app/modal/ModalStateView.svelte'

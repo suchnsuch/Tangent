@@ -2,7 +2,7 @@
 import { getContext } from 'svelte'
 import { HrefFormedLink } from 'common/indexing/indexTypes'
 import { TreeNode } from 'common/trees'
-import { isMac } from 'common/isMac'
+import { isMac } from 'common/platform'
 import { Workspace } from 'app/model'
 import { dropTooltip } from 'app/utils/tooltips'
 import type { LinkState } from './NoteEditor/t-link'

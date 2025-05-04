@@ -2,7 +2,7 @@ import { app, BrowserWindow, Menu, MenuItem, shell, WebContents, screen } from '
 import type { MenuItemConstructorOptions } from 'electron/main'
 import { checkForUpdates } from './updates'
 import type WindowHandle from './WindowHandle'
-import { isMac } from '../common/isMac'
+import { isMac } from '../common/platform'
 import { mode } from './environment'
 import { initDocumentation } from './documentation'
 

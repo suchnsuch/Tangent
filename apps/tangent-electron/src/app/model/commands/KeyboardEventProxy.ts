@@ -1,7 +1,7 @@
 import type Workspace from '../Workspace';
 import WorkspaceCommand from './WorkspaceCommand'
 
-import { isMac } from 'common/isMac'
+import { isMac } from 'common/platform'
 import type { CommandContext, CommandOptions } from './Command';
 
 export interface KeyboardEventProxyCommandOptions extends CommandOptions {

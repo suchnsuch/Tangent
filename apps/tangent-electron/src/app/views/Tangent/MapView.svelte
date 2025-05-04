@@ -24,7 +24,7 @@ import { markEventAsShortcutable } from 'app/utils/shortcuts'
 import SvgIcon from '../smart-icons/SVGIcon.svelte'
 import type { RemoveFromMapCommandContext } from 'app/model/commands/RemoveFromMap'
 import { ThreadHistoryItem, UpdateThreadOptions } from 'common/dataTypes/Session'
-import { isMac } from 'common/isMac'
+import { isMac } from 'common/platform'
 import { createCommandHandler } from 'app/model/commands/Command'
 
 const workspace = getContext('workspace') as Workspace

@@ -1,7 +1,7 @@
 import scrollTo from './scrollto'
 
 import { focusLayer, Focus } from './focus'
-import { isMac } from 'common/isMac'
+import { isMac } from 'common/platform'
 export * from './dragging'
 
 export {

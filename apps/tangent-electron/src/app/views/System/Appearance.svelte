@@ -1,6 +1,6 @@
 <script lang="ts">
 import { getContext } from 'svelte'
-import { isMac } from 'common/isMac'
+import { isMac } from 'common/platform'
 import type Workspace from 'app/model/Workspace'
 
 import SettingView from './SettingView.svelte'

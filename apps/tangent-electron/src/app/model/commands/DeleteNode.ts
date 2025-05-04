@@ -2,7 +2,7 @@ import type { TreeNode } from 'common/trees'
 import type { Workspace } from "..";
 import type { CommandContext } from "./Command";
 import WorkspaceCommand from "./WorkspaceCommand";
-import { isMac } from 'common/isMac';
+import { isMac } from 'common/platform';
 
 interface DeleteNodeCommandContext extends CommandContext {
 	target?: TreeNode | string

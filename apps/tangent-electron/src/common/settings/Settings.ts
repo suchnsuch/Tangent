@@ -1,7 +1,7 @@
 import { ObjectStore } from 'common/stores'
 import Setting, { SettingDefinition } from './Setting'
 
-import { isMac } from '../isMac'
+import { isLinux, isMac } from '../platform'
 
 /**
  * Windows does not properly render `cursor: e-resize | w-resize;` css, instead showing a bi-directional cursor.

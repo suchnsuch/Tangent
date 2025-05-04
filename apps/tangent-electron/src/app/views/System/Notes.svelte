@@ -4,7 +4,7 @@ import { getLangNameFromCode } from 'language-name-map'
 import type Workspace from 'app/model/Workspace'
 
 import SettingView from './SettingView.svelte'
-import { isMac } from 'common/isMac'
+import { isMac } from 'common/platform'
 
 let workspace = getContext('workspace') as Workspace
 let settings = workspace.settings

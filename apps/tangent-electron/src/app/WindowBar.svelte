@@ -2,7 +2,7 @@
 import type WindowAPI from "common/WindowApi";
 
 import { getContext } from "svelte";
-import { isMac } from 'common/isMac'
+import { isMac } from 'common/platform'
 
 let api: WindowAPI = getContext('api')
 

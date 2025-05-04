@@ -1,5 +1,5 @@
 import type { Keyboard } from 'playwright'
-import { isMac } from '../src/common/isMac'
+import { isMac } from '../src/common/platform'
 
 const modReplacement = isMac ? 'Meta' : 'Control'
 

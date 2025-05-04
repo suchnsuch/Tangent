@@ -2,7 +2,7 @@ import { BrowserWindow, Menu, MenuItemConstructorOptions, shell } from 'electron
 import path from 'path'
 import os from 'os'
 import { mode } from './environment'
-import { isMac } from '../common/isMac'
+import { isMac } from '../common/platform'
 import { disableRendererActions } from './menus'
 import { checkForUpdatesThrottled } from './updates'
 import WindowHandle from './WindowHandle'
