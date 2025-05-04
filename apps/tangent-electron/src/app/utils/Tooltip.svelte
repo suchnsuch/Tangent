@@ -152,6 +152,7 @@ main {
 
 p {
 	margin: 0 .25em;
+	white-space-collapse: preserve;
 }
 
 .shortcut {
