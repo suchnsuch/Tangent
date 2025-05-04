@@ -14,6 +14,12 @@ import { addShutDownTask } from './shutdown'
 
 let defaultLanguages = null
 
+function getTitleBarStyle() {
+	if (isMac) return 'hiddenInset'
+	if (getSettings().titlebar.value === 'condensed') return 'hidden'
+	return 'default'
+}
+
 export function createWindow(assignedWorkspace?: string) {
 	// Create the browser window.
 
@@ -26,7 +32,8 @@ export function createWindow(assignedWorkspace?: string) {
 			preload: path.join(__dirname, 'preload.js')
 		},
 		show: false,
-		titleBarStyle: isMac ? 'hiddenInset' : 'hidden'
+		autoHideMenuBar: getTitleBarStyle() == 'default',
+		titleBarStyle: getTitleBarStyle()
 	}
 
 	if (os.platform() === 'linux') {

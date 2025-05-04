@@ -12,6 +12,9 @@ let settings = workspace.settings
 
 <main>
 	<div class="settingsGroup">
+		{#if !isMac}
+			<SettingView setting={settings.titlebar} />
+		{/if}
 		<SettingView setting={settings.appearance} />
 		<SettingView setting={settings.accentHue} />
 		<SettingView setting={settings.accentSaturation} />

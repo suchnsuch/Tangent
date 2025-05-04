@@ -88,6 +88,24 @@ export default class Settings extends ObjectStore {
 		]
 	})
 
+	titlebar = new Setting<string>({
+		name: 'Titlebar',
+		description: 'Controsl the appearance of the titlebars of Tangent\'s windows. (Requires restart.)',
+		validValues: [
+			{
+				value: 'system',
+				displayName: 'System',
+				description: 'Tangent will use the native titlebar of your OS. (Requires restart.)'
+			},
+			{
+				value: 'condensed',
+				displayName: 'Condensed',
+				description: 'Tangent will place window controls within its own navigation bar. (Requires restart.)'
+			}
+		],
+		defaultValue: isLinux ? 'system' : 'condensed'
+	})
+
 	accentHue = new Setting<number>({
 		name: 'Accent Hue',
 		description: 'The hue of Tangent\'s button and link color.',
