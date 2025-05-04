@@ -25,20 +25,13 @@ export function createWindow(assignedWorkspace?: string) {
 		webPreferences: {
 			preload: path.join(__dirname, 'preload.js')
 		},
-		show: false
+		show: false,
+		titleBarStyle: isMac ? 'hiddenInset' : 'hidden'
 	}
 
 	if (os.platform() === 'linux') {
 		// To work around an icon issue, apply the icon to the window directly
 		windowOptions.icon = path.join(__dirname, '../../static/tangent_256.png')
-	}
-
-	// Customize different framing settings`
-	if (isMac) {
-		windowOptions.titleBarStyle = 'hiddenInset'
-	}
-	else {
-		windowOptions.frame = false
 	}
 
 	const newWindow = new BrowserWindow(windowOptions)
