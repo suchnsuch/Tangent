@@ -127,6 +127,15 @@ export function createWindow(assignedWorkspace?: string) {
 						newWindow.webContents.paste()
 					}
 				},
+				{
+					label: 'Paste and Match Style',
+					accelerator: 'CommandOrControl+Shift+V',
+					registerAccelerator: false,
+					enabled: input.editFlags.canPaste,
+					click: () => {
+						newWindow.webContents.pasteAndMatchStyle()
+					}
+				},
 				{ type: 'separator' }
 			)
 		}
