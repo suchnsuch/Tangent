@@ -93,8 +93,7 @@ export default interface WindowAPI {
 	}
 
 	edit: {
-		nativeAction(action: 'cut' | 'copy' | 'paste' | 'pastePlaintext' | 'selectAll' | 'undo' | 'redo')
-		onPastePlaintext(handler: (plaintext: string) => void)
+		nativeAction(action: 'cut' | 'copy' | 'paste' | 'pasteAndMatchStyle' | 'selectAll' | 'undo' | 'redo')
 	}
 
 	links: {

@@ -27,8 +27,6 @@ export let workspace:Workspace
 
 setContext('workspace', workspace)
 
-workspace.api.edit.onPastePlaintext(onPastePlaintext)
-
 $: focusLevel = workspace.viewState.tangent.focusLevel
 $: targetFocusModeLevel = workspace.viewState.targetFocusModeLevel
 $: topCommandHandler = createCommandHandler(Object.values(workspace.commands).filter(c => c.isTopShortcutCommand))
@@ -225,21 +223,10 @@ function onViewContextMenu(event: MouseEvent) {
 	], 'bottom')
 }
 
-function onPastePlaintext(text: string) {
-	const element = document.querySelector('.nodeContainer.current main.noteEditor article')
-	if (element && element instanceof HTMLElement) {
-		element.focus()
-	}
-	element.dispatchEvent(new PasteTextEvent('pastePlaintext', {
-		bubbles: true,
-		text
-	}))
-}
-
 function buildMainMenu() {
 	const cmds = workspace.commands
 
-	const editClick = (command: string) => {
+	const editClick = (command: 'cut' | 'copy' | 'paste' | 'pasteAndMatchStyle' | 'selectAll' | 'undo' | 'redo') => {
 		return () => {
 			const element = document.querySelector('.nodeContainer.current main.noteEditor article')
 			if (element && element instanceof HTMLElement) {
@@ -305,8 +292,8 @@ function buildMainMenu() {
 					accelerator: 'Mod+V'
 				},
 				{
-					label: 'Paste Without Formatting',
-					click: editClick('pastePlaintext'),
+					label: 'Paste and Match Style',
+					click: editClick('pasteAndMatchStyle'),
 					accelerator: 'Mod+Shift+V'
 				},
 				{

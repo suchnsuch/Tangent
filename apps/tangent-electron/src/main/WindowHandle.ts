@@ -331,11 +331,4 @@ export default class WindowHandle {
 		}
 		this.window?.webContents?.send('message', message)
 	}
-
-	sendPastePlaintext() {
-		const plainText = clipboard.readText()
-		if (plainText) {
-			this.window.webContents.send('pastePlaintext', plainText)
-		}
-	}
 }

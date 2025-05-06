@@ -136,14 +136,9 @@ export function createMenus(interop: {
 		{ role: 'copy' },
 		{ role: 'paste' },
 		{
-			label: 'Paste Without Formatting',
-			accelerator: 'CommandOrControl+Shift+V',
-			click: (item, browserWindow) => {
-				const handle = interop.getWindowHandle(browserWindow as BrowserWindow)
-				if (handle) {
-					handle.sendPastePlaintext()
-				}
-			}
+			role: 'pasteAndMatchStyle',
+			// Normalize the shortcut across mac/win/linux
+			accelerator: 'CommandOrControl+Shift+V'
 		},
 		{ role: 'selectAll' },
 		{ type: 'separator' },

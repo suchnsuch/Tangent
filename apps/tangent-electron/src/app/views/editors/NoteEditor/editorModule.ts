@@ -1499,21 +1499,6 @@ export default function editorModule(editor: Editor, options: {
 		}
 	}
 
-	function onPastePlaintext(event) {
-		const doc = editor.doc
-		const selection = doc.selection
-		if (!selection) return
-		const [start, end] = normalizeRange(selection)
-
-		const change = editor.change
-		if (start !== end) {
-			change.delete([start, end])
-		}
-		change.insert(start, event.text)
-		change.select(start + event.text.length)
-		change.apply()
-	}
-
 	return {
 		init() {
 			editor.on('error', onError)
@@ -1523,7 +1508,6 @@ export default function editorModule(editor: Editor, options: {
 			editor.root.addEventListener('shortcut', onKeyDown)
 			editor.root.addEventListener('mousedown', onMouseDown)
 			editor.root.addEventListener('paste', onPaste)
-			editor.root.addEventListener('pastePlaintext', onPastePlaintext)
 		},
 		destroy() {
 			editor.off('error', onError)
@@ -1533,7 +1517,6 @@ export default function editorModule(editor: Editor, options: {
 			editor.root.removeEventListener('shortcut', onKeyDown)
 			editor.root.removeEventListener('mousedown', onMouseDown)
 			editor.root.removeEventListener('paste', onPaste)
-			editor.root.removeEventListener('pastePlaintext', onPastePlaintext)
 		},
 		setNotePath(path) {
 			filepath = path

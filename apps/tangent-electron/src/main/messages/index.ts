@@ -536,12 +536,7 @@ ipcMain.on('showContextMenu', (event, template: ContextMenuTemplate) => {
 ipcMain.on('edit-native', (event, action) => {
 	const windowHandle = getWindowHandle(event.sender)
 	if (windowHandle) {
-		if (action === 'pastePlaintext') {
-			windowHandle.sendPastePlaintext()
-		}
-		else {
-			windowHandle.window.webContents[action]()
-		}
+		windowHandle.window.webContents[action]()
 	}
 })
 

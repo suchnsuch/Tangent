@@ -161,9 +161,6 @@ let bridge: WindowApi = {
 	edit: {
 		nativeAction(action) {
 			ipcRenderer.send('edit-native', action)
-		},
-		onPastePlaintext(handler) {
-			on('pastePlaintext', handler)
 		}
 	},
 	links: {
