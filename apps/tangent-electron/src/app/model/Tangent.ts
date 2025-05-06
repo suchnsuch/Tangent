@@ -44,6 +44,10 @@ export default class Tangent {
 	threadLenses: CachingStore<LensViewState[]>
 	currentThreadState: CachingStore<NodeViewState>
 
+	debug = {
+		sessionTimeout: -1
+	}
+
 	constructor(state: WorkspaceViewState, tangentName: string) {
 		this._state = state
 		this.tangentName = tangentName
@@ -258,23 +262,37 @@ export default class Tangent {
 			
 			// `last` can be null if there is no content!
 			const diff = now.getTime() - (last ?? now).getTime()
+			const newSessionDelta = this.debug.sessionTimeout > 0
+				? this.debug.sessionTimeout
+				: 1000 * 60 * 60 * 8 // 8 Hours
 
-			if (diff >= 1000 * 60 * 60 * 8) { // 8 hours later
+			if (diff >= newSessionDelta) {
 
 				const tangentInfo = this.tangentInfo.value
 				const store = this._state.workspace.directoryStore
 				const previousSessionPath = store.pathToPortablePath(tangentInfo.activeSession.value?.path) ?? ''
 
-				if (options.thread === 'retain' &&
-					typeof options.currentNode !== 'number' &&
-					this.thread.value.includes(options.currentNode)) {
-					// Since the request was to retain the thread, we pull in the current thread.
-					// The new session won't have that thread, and we need to maintain continuity.
-					options.thread = this.thread.value
-				}
+				// Seed the new session with the current state if the update request requires continuity
+				const injectedHistory = (() => {
+					const currentThread = this.thread.value
+
+					if (options.thread && Array.isArray(options.thread)) return false
+
+					if (options.from !== 'retain' && currentThread.includes(options.from)) return true
+					if (options.to !== 'retain' && currentThread.includes(options.to)) return true
+
+					if (typeof options.currentNode !== 'number' && currentThread.includes(options.currentNode)) {
+						return true
+					}
+
+					return false
+				})() ? this.activeSession.value.currentThread.value : null
 
 				const newSessionFile = this.createSession(newSession => {
 					newSession.previousSession.set(previousSessionPath)
+					if (injectedHistory) {
+						newSession.addThreadHistory(injectedHistory)
+					}
 					newSession.updateThread(options)
 				})
 				
