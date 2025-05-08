@@ -216,7 +216,7 @@ export default function workspaceCommands(workspace: Workspace): WorkspaceComman
 			shortcut: 'Mod+Alt+Down',
 			label: 'Show Incoming Links',
 			focus: true,
-			tooltip: 'Opens the information panel of the current not, revealing any links to that note from other notes.'
+			tooltip: 'Opens the information panel of the current note, revealing any links to that note from other notes.'
 		}),
 
 		goTo: new ShowCommandPaletteCommand(workspace, { shortcut: 'Mod+O' }),
