@@ -1,4 +1,5 @@
 import { defaultModules, Editor, EditorOptions, h } from 'typewriter-editor'
+import { selectionBusterModule } from '../selectionBuster'
 
 export default class OneLineEditor extends Editor {
 	constructor(options?: EditorOptions) {
@@ -28,7 +29,8 @@ export default class OneLineEditor extends Editor {
 			options.modules = {
 				...trimmedDefaultModules,
 				copy: editor => copy(editor, { copyPlainText: true }),
-				paste: editor => paste(editor, { allowHTMLPaste: false })
+				paste: editor => paste(editor, { allowHTMLPaste: false }),
+				selectionBusterModule
 			}
 		}
 

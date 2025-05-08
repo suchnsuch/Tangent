@@ -36,6 +36,7 @@ import { subscribeUntil } from 'common/stores'
 import { handleIsNode } from 'app/model/NodeHandle'
 import { findSectionLines } from 'common/markdownModel/sections'
 import { isMac } from 'common/platform'
+import { bustIntoSelection } from '../selectionBuster'
 
 function clampRange(range: EditorRange, clampingRange: EditorRange): EditorRange {
 	range = normalizeRange(range)
@@ -586,18 +587,8 @@ export default function editorModule(editor: Editor, options: {
 			// Pause selection reveal until mouse up
 			updateSelectionReveal = false
 
-			const bounds = editor.getBounds(editor.doc.selection)
-			if (bounds &&
-				bounds.top < event.clientY && bounds.bottom > event.clientY &&
-				bounds.left < event.clientX && bounds.right > event.clientX
-			) {
-				// When clicking within a selection, force a selection reset.
-				// This allows you to click inside an existing selection.
-				// This needs to happen while selection reveal is paused or reveal can flicker.
-				if (!rangeIsCollapsed(editor.doc.selection)) {
-					editor.select(null)
-				}
-			}
+			// This needs to happen while selection reveal is paused or reveal can flicker.
+			bustIntoSelection(editor, event)
 
 			startDrag({
 				end: () => {
