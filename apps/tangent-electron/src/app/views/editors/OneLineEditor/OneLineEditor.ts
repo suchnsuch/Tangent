@@ -1,8 +1,11 @@
 import { defaultModules, Editor, EditorOptions, h } from 'typewriter-editor'
 import { selectionBusterModule } from '../selectionBuster'
+import { Workspace } from 'app/model'
+import UnicodeAutocompleter from '../autocomplete/UnicodeAutocompleter'
+import autocompleteWithHandlers from '../autocomplete/autocompleteModule'
 
 export default class OneLineEditor extends Editor {
-	constructor(options?: EditorOptions) {
+	constructor(workspace: Workspace, options?: EditorOptions) {
 		options = options ?? {}
 
 		if (!options.types) {
@@ -27,6 +30,11 @@ export default class OneLineEditor extends Editor {
 			} = defaultModules
 
 			options.modules = {
+
+				autocomplete: autocompleteWithHandlers([
+					new UnicodeAutocompleter(workspace)
+				]),
+
 				...trimmedDefaultModules,
 				copy: editor => copy(editor, { copyPlainText: true }),
 				paste: editor => paste(editor, { allowHTMLPaste: false }),

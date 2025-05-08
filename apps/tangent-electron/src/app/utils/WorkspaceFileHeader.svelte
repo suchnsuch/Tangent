@@ -1,10 +1,13 @@
 <script lang="ts">
-import { createEventDispatcher, onDestroy } from 'svelte';
+import { createEventDispatcher, getContext, onDestroy } from 'svelte';
 import type WorkspaceTreeNode from 'app/model/WorkspaceTreeNode';
 import OneLineEditor from 'app/views/editors/OneLineEditor/OneLineEditor';
 import { Source, asRoot } from 'typewriter-editor';
 import { wait } from '@such-n-such/core';
 import NodeIcon from 'app/views/smart-icons/NodeIcon.svelte';
+import AutoCompleteMenu from 'app/views/editors/autocomplete/AutoCompleteMenu.svelte';
+import UnicodeAutocompleter from 'app/views/editors/autocomplete/UnicodeAutocompleter';
+import UnicodeAutocompleteMenu from 'app/views/editors/autocomplete/UnicodeAutocompleteMenu.svelte';
 
 const dispatch = createEventDispatcher<{
 	'rename': string,
@@ -12,7 +15,7 @@ const dispatch = createEventDispatcher<{
 }>()
 
 // Using an editor here to have full control over paste behavior.
-const editor = new OneLineEditor();
+const editor = new OneLineEditor(getContext('workspace'));
 editor.on('root', bindEditor)
 
 onDestroy(() => {
@@ -75,6 +78,8 @@ function renameFile() {
 }
 
 function onHeaderKeydown(event: KeyboardEvent) {
+	if (event.defaultPrevented) return
+
 	if (event.key === 'Enter') {
 		event.preventDefault()
 		headerEditElement.blur()
@@ -103,6 +108,11 @@ function onHeaderKeydown(event: KeyboardEvent) {
 	></span>{#if showExtension}<span class="extension"
 	>{$node.fileType}</span>{/if}
 </header>
+<AutoCompleteMenu {editor} offset={4} let:handler>
+	{#if handler instanceof UnicodeAutocompleter}
+		<UnicodeAutocompleteMenu {handler} />
+	{/if}
+</AutoCompleteMenu>
 
 
 <style lang="scss">
