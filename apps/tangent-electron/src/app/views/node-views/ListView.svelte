@@ -17,6 +17,7 @@ const dispatch = createEventDispatcher<{
 const workspace = getContext('workspace') as Workspace
 
 export let state: ListViewState
+export let layout: 'fill' | 'auto' = 'fill'
 export let extraTop: number = 0
 $: items = state.items
 
@@ -33,6 +34,7 @@ function nodeClick(event, ref: TreeNodeOrReference) {
 </script>
 
 <main
+	class={`layout-${layout}`}
 	style:padding-top={`${extraTop}px`}
 >
 	{#if (state.parent instanceof BaseSetViewState && state.parent.isLensOverridden) && state.parent.node instanceof WorkspaceTreeNode}
@@ -57,12 +59,19 @@ function nodeClick(event, ref: TreeNodeOrReference) {
 	</article>
 </main>
 
-<style>
+<style lang="scss">
 main {
-	max-width: 40em;
-	margin: 0 auto;
+	
+	&.layout-fill {
+		position: absolute;
+		inset: 0;
+		overflow-x: hidden;
+		overflow-y: auto;
+	}
 }
 article {
+	max-width: 40em;
+	margin: 0 auto;
 	padding: 1em 2em;
 }
 
