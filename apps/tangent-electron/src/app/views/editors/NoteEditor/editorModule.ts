@@ -1061,7 +1061,7 @@ export default function editorModule(editor: Editor, options: {
 			for (const lineRange of lineRanges) {
 				const [lineStart, lineEnd] = lineRange
 
-				if (doc.getText(lineRange).trim() === '') {
+				if (lineRanges.length > 1 && doc.getText(lineRange).trim() === '') {
 					// skip empty lines
 					continue
 				}
