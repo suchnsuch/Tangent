@@ -198,6 +198,13 @@ export function parseRawLink(char: string, parser: NoteParser): boolean {
 			form: 'raw'
 		}
 
+		// Rewind back from invalid terminating characters
+		let lastChar = feed.peek(-1)
+		while (lastChar.match(/[\.,;]/)) {
+			feed.next(-1)
+			lastChar = feed.peek(-1)
+		}
+
 		const nextSpan: AttributeMap = { t_link }
 
 		const restOfLine = feed.getLineText()
