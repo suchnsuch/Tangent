@@ -376,6 +376,7 @@ function parseFrontMatter(parser: NoteParser, parseFrontMatter=false): boolean {
 		}, 0)
 		builder.dropOpenLineFormat('front_matter')
 		parser.lineData.front_matter = true
+		parser.lineData.end = true
 
 		if (feed.hasMore()) parser.moveNext()
 	}

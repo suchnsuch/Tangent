@@ -287,7 +287,7 @@ const noteTypeset:TypesetTypes = {
 					if (index === 0) {
 						props.className += ' start'
 					}
-					else if (index === lineData.length - 1) {
+					else if (attributes.end) {
 						props.className += ' end'
 					}
 					return h('div', props, children)
