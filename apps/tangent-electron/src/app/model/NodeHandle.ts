@@ -111,7 +111,14 @@ export default class NodeHandle {
 	}
 
 	checkTreeChange(change: TreeChange) {
-		if (this.dirty || !this.value) return
+		if (this.dirty) return
+		if (!this.value || Array.isArray(this.value) && this.value.length == 0) {
+			if (change.added || change.moved) {
+				// Empty results must always consider new & moved nodes
+				this.dirty = true
+			}
+			return
+		}
 		
 		for (const path of this.iterPaths()) {
 			if (change.removed) {
