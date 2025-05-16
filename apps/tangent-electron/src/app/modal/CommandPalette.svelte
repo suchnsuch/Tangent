@@ -110,9 +110,9 @@ function updateOptions(text: string) {
 			}
 			options = nodes
 
-			if (options.length === 0) {
-				// Default to creating a new file given the text
-				options = [{
+			if (text) {
+				// Always allow users to create a file with the given text
+				options.push({
 					action: {
 						name: 'Create "' + text + '"',
 						command: workspace.commands.createNewFile,
@@ -121,7 +121,7 @@ function updateOptions(text: string) {
 						},
 						shortcuts: null
 					}
-				}]
+				})
 			}
 		}
 		

@@ -2,9 +2,9 @@ import { queryFileType } from './dataTypes/QueryInfo';
 import type { TreeNode } from 'common/trees'
 import { codeExtensions, imageFileExtensions, mscExtensions, noteFileExtensions } from './fileExtensions';
 
-const docIcon = ['file.svg#document']
-const noteIcon = ['file.svg#document', 'file.svg#text']
-const imageIcon = ['file.svg#document', 'file.svg#image']
+export const docIcon = ['file.svg#document']
+export const noteIcon = ['file.svg#document', 'file.svg#text']
+export const imageIcon = ['file.svg#document', 'file.svg#image']
 
 const icons = {
 	'folder': ['folder.svg#folder'],

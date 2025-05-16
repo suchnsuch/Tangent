@@ -5,6 +5,8 @@ import type WikiLinkAutocompleter from "./WikiLinkAutocompleter"
 import SearchSegmentHighlight from 'app/utils/SearchSegmentHighlight.svelte'
 import ScrollingItemList from 'app/utils/ScrollingItemList.svelte'
 import { showFileType } from './WikiLinkAutocompleter';
+import SvgIcon from 'app/views/smart-icons/SVGIcon.svelte';
+import { noteIcon } from 'common/icons';
 
 export let handler: WikiLinkAutocompleter
 
@@ -45,18 +47,22 @@ function nodeOptionEvent(option: any, event: Event) {
 			itemClass="option wikilink"
 			onItemEvent={nodeOptionEvent}>
 			<svelte:fragment slot="item" let:item={option}>
-				<NodeLine node={option.node} showFileType={showFileType(option.node.fileType)} nameMatch={option.match} />
+				{#if option.node}
+					<NodeLine node={option.node} showFileType={showFileType(option.node.fileType)} nameMatch={option.match} />
+				{:else if $pathText}
+					{#if $isEmbed}
+						Nothing found to embed.
+					{:else}
+						<!-- Create a fake node line -->
+						<div style="display: flex; align-items: center; gap: .4em;">
+							<SvgIcon ref={noteIcon} size="1em" />
+							<span>Create link to new note "{$pathText}"...</span>
+						</div>
+					{/if}
+				{/if}
 			</svelte:fragment>
 			<svelte:fragment slot="empty">
-				{#if $pathText}
-					{#if $isEmbed}
-						<div class="option">Nothing found to embed.</div>
-					{:else}
-						<div class="option selected">Create link to new note "{$pathText}"...</div>
-					{/if}
-				{:else}
-					<div class="option placeholder">Type to link to file...</div>
-				{/if}
+				<div class="option placeholder">Type to link to file...</div>
 			</svelte:fragment>
 		</ScrollingItemList>
 	{:else if $mode === 'content'}

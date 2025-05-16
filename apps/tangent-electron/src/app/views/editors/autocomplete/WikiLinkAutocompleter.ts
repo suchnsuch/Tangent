@@ -202,7 +202,7 @@ export default class WikiLinkAutocompleter implements AutocompleteHandler {
 		const mode = this.mode.value
 		let pathText = null
 		const selectedNode = this.selectedNode.value
-		if (!hard && mode === 'node' || !selectedNode){
+		if (!hard && mode === 'node' || !selectedNode || !selectedNode.node){
 			pathText = this.pathText.value
 		}
 		else if (selectedNode.node === this.currentTangentNode) {
@@ -274,7 +274,15 @@ export default class WikiLinkAutocompleter implements AutocompleteHandler {
 		}
 		nodes.sort(orderTreeNodesForSearch)
 		if (!pathText) {
+			// Limit the results to something reasonable
 			nodes = nodes.slice(0, 10)
+		}
+		else {
+			// Always allow the option to create a new note with the given text
+			nodes.push({
+				node: null,
+				match: null
+			})
 		}
 
 		this.nodeOptions.set(nodes)
@@ -289,7 +297,7 @@ export default class WikiLinkAutocompleter implements AutocompleteHandler {
 		if (selectedNode && contentText) {
 			let searchMatcher = buildFuzzySegementMatcher(contentText.substring(1))
 
-			for (let header of IndexData.headers(selectedNode.node.meta)) {
+			for (let header of IndexData.headers(selectedNode.node?.meta)) {
 				const match = header.text.match(searchMatcher)
 				if (match) {
 					options.push({
