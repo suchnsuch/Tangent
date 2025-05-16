@@ -576,6 +576,13 @@ article.note {
 			}
 		}
 	}
+
+	.error {
+		border-bottom: 2px solid red;
+	}
+	.warning {
+		border-bottom: 2px solid orange;
+	}
 }
 
 .code_syntax.invalid {

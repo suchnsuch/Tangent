@@ -1,5 +1,5 @@
-import { AttributeMap } from '@typewriter/document'
-import { parse as parseYaml } from 'yaml'
+import { AttributeMap, Delta } from '@typewriter/document'
+import { parseDocument as parseYaml } from 'yaml'
 import CharacterFeeder from './CharacterFeeder'
 import LinesBuilder from './LinesBuilder'
 import { StructureData, StructureType } from 'common/indexing/indexTypes'
@@ -56,7 +56,6 @@ export interface MarkdownParsingOptions {
 	asFormatting?: boolean
 	/** Pulls in context for links */
 	detailedLinks?: boolean
-	parseFrontMatter?: boolean
 	autoEmbedRawLinks?: boolean
 
 	documentStartLine?: number
@@ -73,7 +72,6 @@ export default class NoteParser {
 	readonly detailedLinks: boolean
 	readonly autoEmbedRawLinks: boolean
 	readonly filepath: string
-	readonly parseFrontMatter: boolean
 
 	readonly structure: StructureData[] = []
 
@@ -96,7 +94,6 @@ export default class NoteParser {
 		this.detailedLinks = options?.detailedLinks ?? false
 		this.autoEmbedRawLinks = options?.autoEmbedRawLinks ?? true
 		this.filepath = options?.filepath
-		this.parseFrontMatter = options?.parseFrontMatter ?? false
 
 		this.spanStart = 0
 		this._lineStart = 0
@@ -123,7 +120,7 @@ export default class NoteParser {
 		})
 
 		if (this.feed.isStartOfDocument) {
-			parseFrontMatter(this, this.parseFrontMatter)
+			parseFrontMatter(this)
 		}
 
 		for (;
@@ -299,7 +296,7 @@ function parseIndent(char: string, parser: NoteParser) {
 	}
 }
 
-function parseFrontMatter(parser: NoteParser, parseFrontMatter=false): boolean {
+function parseFrontMatter(parser: NoteParser): boolean {
 	const { feed, builder } = parser
 
 	if (!feed.checkFor('---')) return false
@@ -316,53 +313,67 @@ function parseFrontMatter(parser: NoteParser, parseFrontMatter=false): boolean {
 	parser.moveNext()
 	parser.moveNext()
 
+	const startIndex = feed.index
+
 	const { allCode, hitEnd } = readCodeLines(parser, getLanguage('yaml'), '---')
 	
-	if (parseFrontMatter) {
+	// Yaml doesn't like tabs for indentation
+	let translated = allCode.replace(/\t+/g, '    ')
+	const document = parseYaml(translated, {
+		strict: false
+	})
 
-		// Yaml doesn't like tabs for indentation
-		let translated = allCode.replace(/\t+/g, '    ')
-		let data: any = null
-		try {
-			data = parseYaml(translated, {
-				strict: false
+	for (const error of document.errors) {
+		const delta = new Delta()
+			.retain(startIndex + error.pos[0])
+			.retain(error.pos[1] - error.pos[0], {
+				error: error.toString()
 			})
-		}
-		catch (e) {
-			// TODO: make issues user-facing
-			parser.errors.push(e)
-		}
 
-		parser.pushStructure({
-			type: StructureType.FrontMatter,
-			start: 0,
-			end: feed.index,
-			data
+		builder.applyFormatting(delta)
+	}
+
+	for (const warning of document.warnings) {
+		const delta = new Delta()
+		.retain(startIndex + warning.pos[0])
+		.retain(warning.pos[1] - warning.pos[0], {
+			warning: warning.toString()
 		})
 
-		if (data) {
-			// Push links
-			if (data.tags) {
-				const tags = data.tags
-				if (typeof tags === 'string') {
-					// Technically not correct, but we'll allow it
-					parser.pushStructure({
-						type: StructureType.Tag,
-						form: 'front-matter',
-						start: 0, end: 0,
-						href: tags
-					})
-				}
-				else if (Array.isArray(tags)) {
-					for (const item of tags) {
-						if (typeof item === 'string') {
-							parser.pushStructure({
-								type: StructureType.Tag,
-								form: 'front-matter',
-								start: 0, end: 0,
-								href: item
-							})
-						}
+	builder.applyFormatting(delta)
+	}
+
+	const data = document.toJS()
+
+	parser.pushStructure({
+		type: StructureType.FrontMatter,
+		start: 0,
+		end: feed.index,
+		data
+	})
+
+	if (data) {
+		// Push links
+		if (data.tags) {
+			const tags = data.tags
+			if (typeof tags === 'string') {
+				// Technically not correct, but we'll allow it
+				parser.pushStructure({
+					type: StructureType.Tag,
+					form: 'front-matter',
+					start: 0, end: 0,
+					href: tags
+				})
+			}
+			else if (Array.isArray(tags)) {
+				for (const item of tags) {
+					if (typeof item === 'string') {
+						parser.pushStructure({
+							type: StructureType.Tag,
+							form: 'front-matter',
+							start: 0, end: 0,
+							href: item
+						})
 					}
 				}
 			}

@@ -99,4 +99,26 @@ export default class LinesBuilder {
 	dropOpenLineFormat(key: string) {
 		delete this.openLineFormats[key]
 	}
+
+	/**
+	 * Applies a delta transformation across already-processed lines.
+	 * Delta _must_ only be retains.
+	 * This is inherently slower than just building content serially. Prefer the normal process if possible.
+	 */
+	applyFormatting(delta: Delta) {
+		let index = 0
+
+		for (const line of this.lines) {
+			// Need to slice one less than the line length as line.length includes the implicit newline
+			const lineDelta = delta.slice(index, index + line.length - 1)
+			if (lineDelta.length()) {
+				line.content = line.content.compose(lineDelta)
+			}
+			else {
+				break
+			}
+
+			index += line.length // Include the implicit newline
+		}
+	}
 }

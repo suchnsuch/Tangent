@@ -507,6 +507,30 @@ const noteTypeset:TypesetTypes = {
 		},
 
 		{
+			name: 'error',
+			selector: 'span.error',
+			render: (attributes, children) => {
+
+				const className = 'error'
+				const title = attributes.error
+
+				return h('span', { className, title }, children)
+			}
+		},
+
+		{
+			name: 'warning',
+			selector: 'span.warning',
+			render: (attributes, children) => {
+
+				const className = 'warning'
+				const title = attributes.warning
+
+				return h('span', { className, title }, children)
+			}
+		},
+
+		{
 			name: 'code_syntax',
 			selector: 'span.code_syntax',
 			render: (attributes, children) => {
