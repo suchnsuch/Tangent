@@ -491,9 +491,7 @@ describe('Indentation', () => {
 })
 
 describe('Front matter parsing', () => {
-	const parsingOptions: parser.MarkdownParsingOptions = {
-		parseFrontMatter: true
-	}
+	const parsingOptions: parser.MarkdownParsingOptions = {}
 
 	it('Should translate YAML', () => {
 		// Note the tabs used for indentation

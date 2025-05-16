@@ -56,8 +56,7 @@ export default class Indexer {
 	linkCache: Map<string, TreeNode>
 
 	parsingOptions: MarkdownParsingOptions = {
-		detailedLinks: true,
-		parseFrontMatter: true
+		detailedLinks: true
 	}
 
 	constructor(options: IndexerOptions) {

@@ -58,6 +58,9 @@ export interface MarkdownParsingOptions {
 	detailedLinks?: boolean
 	autoEmbedRawLinks?: boolean
 
+	/** When true, makes it possible to apply emphasis in the middle of words with underscores */
+	allowInterTextUnderscoreFormatting?: boolean
+
 	documentStartLine?: number
 	documentEndLine?: number
 }

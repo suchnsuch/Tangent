@@ -32,14 +32,20 @@ export function parseEmphasis(char: string, parser: NoteParser): boolean {
 
 	if (!leftTouchingText && !rightTouchingText) return false
 
-	let formatString = feed.text.substring(start, feed.index + 1)
-		
-	if (builder.hasOpenFormat(formatString)) {
+	if (char === '_' && !parser.options.allowInterTextUnderscoreFormatting && leftTouchingText && rightTouchingText) {
+		// Block formatting for things like em_pha_sis (requiring em*pha*sis instead)
+		return false
+	}
+
+	const formatString = feed.text.substring(start, feed.index + 1)
+	const isOpen = builder.hasOpenFormat(formatString)
+
+	if (isOpen && leftTouchingText) {
 		parser.commitSpan(null, -count+1)
 		parser.commitSpan(endAttributes)
 		builder.dropOpenFormat(formatString)
 	}
-	else {
+	else if (!isOpen && rightTouchingText) {
 		parser.commitSpan(null, -count+1)
 
 		builder.addOpenFormat(formatString, boldAndInlineFormatting(count))

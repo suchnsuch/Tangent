@@ -494,6 +494,12 @@ export default class Settings extends ObjectStore {
 		defaultValue: '**'
 	})
 
+	allowInterTextUnderscoreFormatting = new Setting<boolean>({
+		name: 'Inter-Text Underscore Emphasis',
+		description: 'Whether or not you can use "_" characters to apply emphasis within a word, e.g. em_pha_sis.',
+		defaultValue: false
+	})
+
 	smartParagraphBreaks = new Setting<boolean>({
 		name: 'Smart Paragraph Breaks',
 		description: 'When enabled, pressing Enter in a paragraph will insert an extra blank line, ensuring correct markdown behavior.',

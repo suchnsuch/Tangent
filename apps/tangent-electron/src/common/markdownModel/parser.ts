@@ -15,7 +15,9 @@ import { safeHeaderLine } from './header'
 import { matchTag, TagSectionData } from './tag'
 import { tagNameSeperatorMatch } from '@such-n-such/tangent-query-parser'
 import { highlightEmojiMatch, highlightEmojiToClassDescriptor } from './formatting'
-import NoteParser from './NoteParser'
+import NoteParser, { MarkdownParsingOptions } from './NoteParser'
+
+export { MarkdownParsingOptions } from './NoteParser'
 
 function isWhitespace(char: string) {
 	switch(char) {
@@ -51,20 +53,6 @@ function boldAndInlineFormatting(length: number) {
 
 export function markdownToTextDocument(text: string): TextDocument {
 	return new TextDocument(parseMarkdown(text).lines)
-}
-
-export interface MarkdownParsingOptions {
-	filepath?: string
-
-	/** Instructs the parser to output content as formatted retains */
-	asFormatting?: boolean
-	/** Pulls in context for links */
-	detailedLinks?: boolean
-	parseFrontMatter?: boolean
-	autoEmbedRawLinks?: boolean
-
-	documentStartLine?: number
-	documentEndLine?: number
 }
 
 export function parseMarkdown(source: string | TextDocument, options?: MarkdownParsingOptions) {
@@ -332,7 +320,7 @@ export function parseMarkdown_legacy(source: string | TextDocument, options?: Ma
 
 			const { allCode, hitEnd } = readCodeLinesUntil(getLanguage('yaml'), '---')
 
-			if (options?.parseFrontMatter) {
+			if (false) {
 
 				// Yaml doesn't like tabs for indentation
 				let translated = allCode.replace(/\t+/g, '    ')
