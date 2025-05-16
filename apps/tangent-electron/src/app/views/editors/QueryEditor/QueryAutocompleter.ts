@@ -9,6 +9,7 @@ import type { IToken } from 'vscode-textmate'
 import type { AutocompleteHandler, AutocompleteModule } from '../autocomplete/autocompleteModule'
 import WikiLinkAutocompleter from '../autocomplete/WikiLinkAutocompleter'
 import TagAutocompleter from '../autocomplete/TagAutocompleter'
+import { wrappedIndex } from 'common/collections'
 
 const NON_ACTIVATE_VALUES = [
 	KEYWORD.VALUE.STRING_DOUBLE,
@@ -350,7 +351,7 @@ export default class QueryAutocompleter implements AutocompleteHandler {
 	// Invoked by arrow key presses
 	shiftSelection(shift: number) {
 		const items = this.expects.value
-		this.selectedItemIndex.update(i => clamp(i + shift, 0, items.length - 1))
+		this.selectedItemIndex.update(i => wrappedIndex(items, i + shift))
 	}
 
 	get isActive() { return this.autocomplete.activeHandler.value === this }

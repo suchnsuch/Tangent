@@ -6,6 +6,7 @@ import { tick } from 'svelte'
 import { SearchMatchResult, buildFuzzySegementMatcher, compareNodeSearch } from 'common/search'
 import { clamp } from 'common/utils'
 import { getLanguageAliases } from 'common/markdownModel/codeSyntax'
+import { wrappedIndex } from 'common/collections'
 
 export interface CodeBlockLanguageAutocompleteItem {
 	language: string
@@ -112,7 +113,7 @@ export default class CodeBlockAutocompleter implements AutocompleteHandler {
 			index = 0
 		}
 		
-		index = clamp(index += shift, 0, this.options.value.length - 1)
+		index = wrappedIndex(this.options.value, index + shift)
 
 		this.selectedOption.set(this.options.value[index])
 	}

@@ -8,6 +8,7 @@ import { TextDocument, EditorRange, Editor, normalizeRange, ShortcutEvent } from
 import type { AutocompleteHandler, AutocompleteModule } from './autocompleteModule';
 import { iterateOverChildren } from 'common/trees';
 import type { TagTreeNode } from 'common/indexing/TagNode';
+import { wrappedIndex } from 'common/collections';
 
 export type TagOption = {
 	node: TagTreeNode,
@@ -224,7 +225,7 @@ export default class TagAutocompleter implements AutocompleteHandler {
 	}
 
 	shiftSelection(shift: number) {
-		this.setSelection(this.selectedTagIndex.value + shift)
+		this.setSelection(wrappedIndex(this.tagOptions.value, this.selectedTagIndex.value + shift))
 	}
 
 	applyAndFullExit() {

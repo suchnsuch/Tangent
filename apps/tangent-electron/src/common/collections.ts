@@ -238,14 +238,17 @@ export class SparseRingBuffer<T> {
 	}
 
 	getWrappedIndex(index: number): number {
-		if (this.data.length === 0) return -1
-
-		while (index < 0) {
-			index += this.data.length
-		}
-		while (index >= this.data.length) {
-			index -= this.data.length
-		}
-		return index
+		return wrappedIndex(this.data, index)
 	}
+}
+
+export function wrappedIndex(array: any[], index: number): number {
+	if (array.length === 0) return -1
+	while (index < 0) {
+		index += array.length
+	}
+	while (index >= array.length) {
+		index -= array.length
+	}
+	return index
 }

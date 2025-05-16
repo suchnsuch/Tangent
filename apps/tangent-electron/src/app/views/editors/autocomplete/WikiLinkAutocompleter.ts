@@ -11,6 +11,7 @@ import { EmbedType, getEmbedType } from 'common/embedding';
 import { buildFuzzySegementMatcher, buildMatcher, orderTreeNodesForSearch, SegmentSearchNodePair, SearchMatchResult } from 'common/search';
 import { implicitExtensionsMatch } from 'common/fileExtensions';
 import paths, { normalizeSeperators } from "common/paths";
+import { wrappedIndex } from 'common/collections';
 
 export interface WikiLinkAutocompleteNodeItem {
 	node: TreeNode
@@ -306,16 +307,7 @@ export default class WikiLinkAutocompleter implements AutocompleteHandler {
 		const options = this.currentOptions
 		if (!options) return
 
-		const shiftedIndex = this.currentSelectedIndex + shift
-		if (shiftedIndex < 0) {
-			this.currentSelectedIndex = 0
-		}
-		else if (shiftedIndex >= options.value.length) {
-			this.currentSelectedIndex = options.value.length - 1
-		}
-		else {
-			this.currentSelectedIndex = shiftedIndex
-		}
+		this.currentSelectedIndex = wrappedIndex(options.value, this.currentSelectedIndex + shift)
 	}
 
 	get currentOptions() {

@@ -1,6 +1,7 @@
 <script lang="ts">
 import { focusLayer } from 'app/utils'
 import ScrollingItemList from 'app/utils/ScrollingItemList.svelte'
+import { wrappedIndex } from 'common/collections'
 import { createEventDispatcher } from 'svelte'
 
 type T = $$Generic
@@ -39,15 +40,11 @@ function onInputKey(event: KeyboardEvent) {
 	switch (event.key) {
 		case 'ArrowUp':
 			event.preventDefault()
-			if (selectedIndex > 0) {
-				selectedIndex--
-			}
+			selectedIndex = wrappedIndex(options, selectedIndex - 1)
 			break
 		case 'ArrowDown':
 			event.preventDefault()
-			if (selectedIndex < options.length - 1) {
-				selectedIndex++
-			}
+			selectedIndex = wrappedIndex(options, selectedIndex + 1)
 			break
 		case 'Tab':
 			event.preventDefault()

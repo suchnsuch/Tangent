@@ -5,6 +5,7 @@ import { findCharactersBetweenWhiteSpaceAtPositionInDocument, findWordAroundPosi
 import { WritableStore } from 'common/stores'
 import { clamp } from 'common/utils'
 import { findCharactersBetweenWhitespace } from 'common/stringUtils'
+import { wrappedIndex } from 'common/collections'
 
 type MatcherItem = {
 	match: RegExp,
@@ -163,7 +164,7 @@ export default class UnicodeAutocompleter implements AutocompleteHandler {
 			index = 0
 		}
 		
-		index = clamp(index += shift, 0, this.options.value.length - 1)
+		index = wrappedIndex(this.options.value, index + shift)
 
 		this.selectedOption.set(this.options.value[index])
 	}
