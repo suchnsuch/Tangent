@@ -290,17 +290,33 @@ function updateShowCreateFromHover(event: MouseEvent) {
 }
 
 function forwardNavigation(event: CustomEvent<NavigationData>, item: TreeNodeOrReference) {
-	const node = getNode(item, workspace.directoryStore)
-	// Inject a navigation event from the feed to the feed child
-	dispatch('navigate', {
-		target: node,
-		direction: event.detail.direction,
-		origin: state.parent.node
-	})
-	// Pass on the presented event
-	dispatch('navigate', {
-		...event.detail
-	})
+	if (event.detail.direction === 'out') {
+		// Inject a navigation event from the feed to the feed child
+		const node = getNode(item, workspace.directoryStore)
+		dispatch('navigate', {
+			target: node,
+			direction: 'out',
+			origin: state.parent.node
+		})
+
+		// Pass on the event from the feed child to the target
+		dispatch('navigate', {
+			...event.detail
+		})
+	}
+	else if (event.detail.direction === 'in') {
+		// Replace origin with self so that feed lens is maintained
+		dispatch('navigate', {
+			...event.detail,
+			origin: state.parent.node
+		})
+	}
+	else if (event.detail.direction === 'replace') {
+		// Pass on the normal event
+		dispatch('navigate', {
+			...event.detail
+		})
+	}
 }
 
 function onScrollRequest(event: CustomEvent<ScrollToOptions>, item: TreeNodeOrReference) {

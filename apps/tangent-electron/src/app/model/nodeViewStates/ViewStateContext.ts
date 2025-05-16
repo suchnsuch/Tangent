@@ -101,7 +101,6 @@ export default class ViewStateContext {
 					if (state) return state
 				}		
 			}
-			console.log('dropping back to parent', context.parent)
 			context = context.parent
 		}
 

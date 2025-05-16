@@ -640,16 +640,20 @@ export default class Workspace extends EventDispatcher {
 
 		direction = direction ?? 'out'
 		if (direction === 'replace' && origin) {
-			const thread = tangent.thread.value
-			const sourceIndex = thread.indexOf(origin)
+			// Replacement operate on lens views rather than raw threads
+			const thread = tangent.threadLenses.value
+			const sourceIndex = thread.findIndex(lens => {
+				return lens.currentlyRepresenting === origin ||
+					lens.parent.node === origin
+			})
 			if (sourceIndex !== undefined) {
 				const from = thread[sourceIndex - 1]
 				const to = thread[sourceIndex + 1]
 
 				tangent.updateThread({
-					from,
+					from: from?.parent.node,
 					currentNode: targetNode,
-					to
+					to: to?.parent.node
 				})
 
 				if (!from && !to) {
