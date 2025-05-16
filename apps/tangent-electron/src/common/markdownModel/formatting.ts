@@ -32,7 +32,7 @@ export function parseEmphasis(char: string, parser: NoteParser): boolean {
 
 	if (!leftTouchingText && !rightTouchingText) return false
 
-	if (char === '_' && !parser.options.allowInterTextUnderscoreFormatting && leftTouchingText && rightTouchingText) {
+	if (char === '_' && !parser.options?.allowInterTextUnderscoreFormatting && leftTouchingText && rightTouchingText) {
 		// Block formatting for things like em_pha_sis (requiring em*pha*sis instead)
 		return false
 	}
