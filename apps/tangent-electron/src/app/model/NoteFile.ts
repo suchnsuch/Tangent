@@ -47,7 +47,18 @@ export default class NoteFile extends File implements TreeNode {
 		if (lines) {
 			return typewriterToText(lines)
 		}
-	} 
+	}
+
+	integrateFrom(node: TreeNode): void {
+
+		if (!this.meta?.virtual && node.meta?.virtual) {
+			// This node is being deleted but is still referenced by other notes
+			console.log('Reverting to virtual')
+			this._lines = []
+		}
+
+		super.integrateFrom(node)
+	}
 
 	onFileContentChanged(text: string) {
 		console.log(`${this.name} got new text`)

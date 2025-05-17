@@ -275,7 +275,10 @@ function onFileChanged(note: NoteFile) {
 		if (saveTimeout) {
 			clearTimeout(saveTimeout)
 		}
-		if (note.lines.length > 0) {
+
+		const lines = note.lines
+
+		if (lines.length > 0) {
 			if (_lastFileLoadState !== note.loadState) {
 				if (note.isReady) {
 					if (_lastFileLoadState === 'unloaded') {
@@ -297,18 +300,20 @@ function onFileChanged(note: NoteFile) {
 				
 				_lastFileLoadState = note.loadState
 			}
+		}
 
-			const textDocument = new TextDocument(note.lines)
+		const textDocument = new TextDocument(lines)
 
-			if (editable) {
-				isInitializing = true
-				editor.set(textDocument, Source.api)
-				isInitializing = false
-			}
-			else {
-				editor.set(textDocument, Source.api)
-			}
-			
+		if (editable) {
+			isInitializing = true
+			editor.set(textDocument, Source.api)
+			isInitializing = false
+		}
+		else {
+			editor.set(textDocument, Source.api)
+		}
+
+		if (lines.length) {
 			if (isCurrent) {
 				initializeSelection()
 			}
