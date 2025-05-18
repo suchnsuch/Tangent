@@ -76,9 +76,11 @@ export async function loadSettings() {
 export async function saveSettings(sync=false) {
 	try {
 		const data = settings.getRawValues('file') as any
-		data.version = latestSettingsVersion
+		if (data) {
+			data.version = latestSettingsVersion
+		}
 
-		const text = JSON.stringify(data, null, '\t')
+		const text = JSON.stringify(data ?? {}, null, '\t')
 		if (sync) {
 			fs.writeFileSync(getSettingsPath(), text)
 		}
