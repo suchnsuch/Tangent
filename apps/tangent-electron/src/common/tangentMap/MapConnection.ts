@@ -66,12 +66,19 @@ export class MapConnectionList extends PatchableList<MapConnection, any> {
 			if (deleted) {
 				try {
 					for (const deletedItem of deleted) {
-						swapRemove(deletedItem.from.value.outgoing, deletedItem)
-						swapRemove(deletedItem.to.value.incoming, deletedItem)
+						const outgoing = deletedItem?.from?.value?.outgoing
+						if (outgoing) swapRemove(outgoing, deletedItem)
+						const incoming = deletedItem?.to?.value?.incoming
+						if (incoming) swapRemove(incoming, deletedItem)
 					}	
 				}
 				catch (e) {
-					log.error('Could not handle deletion of ', deleted)
+					log.error('Could not handle deletion of ', deleted.map(c => {
+						return {
+							from: c.fromTreeNode.path,
+							to: c.toTreeNode.path
+						}
+					}), e)
 					throw new Error('Could not handle deletion of deleted items', { cause: e})
 				}
 			}
