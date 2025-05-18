@@ -6,6 +6,7 @@ import WorkspaceTreeNode from './WorkspaceTreeNode'
 import { UrlData } from 'common/urlData'
 import Workspace from './Workspace'
 import { deepEqual } from 'fast-equals'
+import { isExternalLink } from 'common/links'
 
 type MaybeSubscribableNode = TreeNode & { subscribe?: any }
 export type HandleResult = string | MaybeSubscribableNode | MaybeSubscribableNode[] | UrlData
@@ -73,14 +74,19 @@ export default class NodeHandle {
 			const requestId = this._requestId += 1
 
 			if (typeof newValue === 'string') {
-				// Get information about the external link
-				this.workspace.api.links.getUrlData(newValue).then(result => {
-					if (this._requestId === requestId && !deepEqual(this.value, result)) {
-						this.value = result
-						this.dirty = true
-						this.pushChangesIfDirty()
-					}
-				})
+				if (isExternalLink(newValue)) {
+					// Get information about the external link
+					this.workspace.api.links.getUrlData(newValue).then(result => {
+						if (this._requestId === requestId && !deepEqual(this.value, result)) {
+							this.value = result
+							this.dirty = true
+							this.pushChangesIfDirty()
+						}
+					})
+				}
+				else {
+					this.value = newValue
+				}
 			}
 			else {
 				this.value = newValue
@@ -99,7 +105,11 @@ export default class NodeHandle {
 	}
 
 	*iterPaths() {
-		if (!this.value || typeof this.value === 'string') return
+		if (!this.value) return
+		if (typeof this.value === 'string') {
+			yield this.value
+			return
+		}
 		if (Array.isArray(this.value)) {
 			for (const v of this.value) {
 				yield v.path
