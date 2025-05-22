@@ -936,6 +936,18 @@ a
 			undo: true
 		})
 	})
+
+	it('Inserts indent on all code blocks', async () => {
+		const doc = markdownToTextDocument(`
+\`\`\`js
+var foo = boo()
+\`\`
+`)
+		expect(doc.lines.at(-1).attributes.indent).toEqual({
+			indent: '',
+			indentSize: 0
+		})
+	})
 })
 
 describe('Line Swapping', () => {

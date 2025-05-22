@@ -156,6 +156,11 @@ export default class NoteParser {
 			while (this.contexts.at(-1).indent !== '') {
 				this.popContext(this.lineStart - 1)
 			}
+			// Also need to inject blank indent data
+			this.lineData.indent = {
+				indent: '',
+				indentSize: 0
+			}
 		}
 
 		// Push the last line
