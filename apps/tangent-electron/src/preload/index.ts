@@ -1,4 +1,5 @@
 import type WindowApi from 'common/WindowApi'
+import { UserMessage } from 'common/WindowApi'
 import { contextBridge, ipcRenderer } from 'electron'
 
 function on(channel:string,  handler: (...args) => void) {
@@ -13,7 +14,18 @@ function on(channel:string,  handler: (...args) => void) {
 	})
 }
 
-let bridge: WindowApi = {
+type MessageHandler = (message: UserMessage) => void
+const messageHandlers: MessageHandler[] = []
+
+function onMessages(message: UserMessage) {
+	for (const handler of messageHandlers) {
+		handler(message)
+	}
+}
+
+on('message', onMessages)
+
+const bridge: WindowApi = {
 
 	getKnownWorkspaces() {
 		return ipcRenderer.invoke('getKnownWorkspaces')
@@ -76,8 +88,11 @@ let bridge: WindowApi = {
 		on('workspaceAction', handler)
 	},
 
-	onMessage(handler) {
-		on('message', handler)
+	postMessage(message: UserMessage) {
+		onMessages(message)
+	},
+	onMessage(handler: MessageHandler) {
+		messageHandlers.push(handler)
 	},
 
 	window: {

@@ -48,6 +48,7 @@ export default interface WindowAPI {
 	showContextMenu(template: ContextMenuTemplate)
 
 	// Messages
+	postMessage(message: UserMessage)
 	onMessage(handler: (message: UserMessage) => void)
 
 	window: {
