@@ -34,7 +34,7 @@ import { pluralize } from 'common/plurals'
 import arrowNavigate from 'app/utils/arrowNavigate'
 import { HrefFormedLink, StructureType } from 'common/indexing/indexTypes'
 import type { ConnectionInfo } from 'common/indexing/indexTypes'
-import { areLineArraysOpTextEquivalent, EditInfo, getEditInfo, getLineRangeWhile, getRangeWhile, lineToText } from 'common/typewriterUtils'
+import { areLineArraysOpTextEquivalent, EditInfo, getEditInfo, getLineRangeWhile, getRangeWhile, lineToText, stripDocumentAttributes } from 'common/typewriterUtils'
 import { scrollTo } from 'app/utils';
 import { eventHasSelectionRequest, type NavigationData } from 'app/events'
 import WorkspaceFileHeader from 'app/utils/WorkspaceFileHeader.svelte';
@@ -158,6 +158,7 @@ editor.enabled = editable
 editor.on('root', onEditorRoot)
 editor.on('change', onEditorChange)
 editor.on('decorate', onEditorDecorate)
+editor.on('error', onEditorError)
 
 editor.on('navigate', navigationForward)
 
@@ -198,12 +199,31 @@ onDestroy(() => {
 		editor.off('root', onEditorRoot)
 		editor.off('change', onEditorChange)
 		editor.off('decorate', onEditorDecorate)
+		editor.off('error', onEditorError)
 
 		editor.off('navigate', navigationForward)
 		
 		editor.destroy()
 	}
 })
+
+function onEditorError(error) {
+	console.error("Tangent encountered a text editor error and will fall back to safe mode.", error)
+	console.error(error.error)
+
+	// Fall back to a safe mode
+	editor.set(stripDocumentAttributes(editor.doc))
+
+	if (workspace?.api) {
+		workspace.api.postMessage({
+			type: 'error',
+			title: 'Critical Editor Error',
+			message: `Tangent encountered an error while editing "${workspace.directoryStore.pathToRelativePath(note?.path)}". The editor will fall back to safe mode.
+
+Please report this to the developers. Apologies for the inconvenience.`
+		})
+	}
+}
 
 $: updateExtraSpace(extraTop, extraBottom, focusLevel, container)
 function updateExtraSpace(et?, eb?, fl?, ct?) {
@@ -304,15 +324,20 @@ function onFileChanged(note: NoteFile) {
 
 		const textDocument = new TextDocument(lines)
 
-		if (editable) {
-			isInitializing = true
-			editor.set(textDocument, Source.api)
-			isInitializing = false
+		try {
+			if (editable) {
+				isInitializing = true
+				editor.set(textDocument, Source.api)
+				isInitializing = false
+			}
+			else {
+				editor.set(textDocument, Source.api)
+			}
 		}
-		else {
-			editor.set(textDocument, Source.api)
+		catch (error) {
+			onEditorError(error)
 		}
-
+		
 		if (lines.length) {
 			if (isCurrent) {
 				initializeSelection()

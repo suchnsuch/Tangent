@@ -29,7 +29,7 @@ import type { HrefFormedLink } from 'common/indexing/indexTypes'
 import type { Workspace } from 'app/model'
 import type { AutocompleteModule } from '../autocomplete/autocompleteModule'
 import { findLinkAround, matchMarkdownLink, matchWikiLink, resolveLink } from 'common/markdownModel/links'
-import { AttributePredicate, findWordAroundPositionInDocument, getEditInfo, getRangeWhile, getRangesIntersecting, getSelectedLines, intersectRanges, lineToText, rangeIsCollapsed } from 'common/typewriterUtils'
+import { AttributePredicate, findWordAroundPositionInDocument, getEditInfo, getRangeWhile, getRangesIntersecting, getSelectedLines, intersectRanges, lineToText } from 'common/typewriterUtils'
 import { isLeftClick, startDrag } from 'app/utils'
 import { repeatString } from '@such-n-such/core'
 import { subscribeUntil } from 'common/stores'
@@ -42,11 +42,6 @@ function clampRange(range: EditorRange, clampingRange: EditorRange): EditorRange
 	range = normalizeRange(range)
 	clampingRange = normalizeRange(clampingRange)
 	return [Math.max(range[0], clampingRange[0]), Math.min(range[1], clampingRange[1])]
-}
-
-function onError(error) {
-	console.error(error)
-	console.error(error.error)
 }
 
 interface VerificationInstruction<T> {
@@ -1493,7 +1488,6 @@ export default function editorModule(editor: Editor, options: {
 
 	return {
 		init() {
-			editor.on('error', onError)
 			editor.on('changing', onChanging)
 			editor.on('decorate', onDecorate)
 			
@@ -1502,7 +1496,6 @@ export default function editorModule(editor: Editor, options: {
 			editor.root.addEventListener('paste', onPaste)
 		},
 		destroy() {
-			editor.off('error', onError)
 			editor.off('changing', onChanging)
 			editor.off('decorate', onDecorate)
 			

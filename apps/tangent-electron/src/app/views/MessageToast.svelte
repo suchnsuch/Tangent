@@ -70,9 +70,9 @@ function cancelTimeout(message: Message) {
 					<use href="close.svg#close"/>
 			</svg></button>
 			{#if message.title}
-				<h1>{message.title}</h1>
+				<h1>{@html message.title}</h1>
 			{/if}
-			<p>{message.message}</p>
+			<p>{@html message.message}</p>
 		</article>
 	{/each}
 </main>
@@ -166,6 +166,7 @@ article {
 
 	p {
 		margin: 1em 0;
+		white-space: pre-wrap;
 		&:last-child {
 			margin-bottom: 0;
 		}
