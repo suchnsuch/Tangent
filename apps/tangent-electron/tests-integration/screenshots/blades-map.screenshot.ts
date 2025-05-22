@@ -143,10 +143,6 @@ test('Blades Map', async ({ tangent, workspace}) => {
 		]
 	})
 
-	await window.page.evaluate(() => {
-		document.querySelector('.MapsView').scroll({ top: 800, behavior: 'instant' })
-	})
-
 	await wait(300)
 
 	await screenshot(window, {

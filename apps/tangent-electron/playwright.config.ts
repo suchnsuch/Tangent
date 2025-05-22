@@ -17,7 +17,7 @@ export default defineConfig<TangentOptions>({
 			testMatch: /.*tests-integration.*\.screenshot\.ts/,
 			use: {
 				workspace: path.resolve(path.join(
-					__dirname, '../TestFiles/ScreenshotWorkspace/My Workspace'
+					__dirname, '../../test-files/ScreenshotWorkspace/My Workspace'
 				)),
 				resetWorkspace: 'test'
 			}
