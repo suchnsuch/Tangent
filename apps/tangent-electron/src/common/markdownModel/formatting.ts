@@ -26,15 +26,20 @@ export function parseEmphasis(char: string, parser: NoteParser): boolean {
 	const { feed, builder } = parser
 
 	const start = feed.index
-	const leftTouchingText = !isWhitespace(feed.peek(-1))
+	const last = feed.peek(-1)
+	const leftTouchingText = !isWhitespace(last)
 	const count = feed.consumeSequentialCharacters(char, 3)
-	const rightTouchingText = !isWhitespace(feed.peek())
+	const next = feed.peek()
+	const rightTouchingText = !isWhitespace(next)
 
 	if (!leftTouchingText && !rightTouchingText) return false
 
 	if (char === '_' && !parser.options?.allowInterTextUnderscoreFormatting && leftTouchingText && rightTouchingText) {
 		// Block formatting for things like em_pha_sis (requiring em*pha*sis instead)
-		return false
+		// This should only be triggered by word & number characters
+		if (last.match(/[\w\d]/) && next.match(/[\w\d]/)) {
+			return false
+		}
 	}
 
 	const formatString = feed.text.substring(start, feed.index + 1)
