@@ -773,6 +773,90 @@ This **is line one.**
 		expect(editor.doc.selection).toEqual([5, 9])
 	})
 
+	it('Should block inline formatting for inter-text underscores', () => {
+		const doc = markdownToTextDocument(`Em_pha_sis`)
+		expect(doc.lines[0].content.ops).toEqual([
+			{
+				attributes: {},
+				insert: 'Em_pha_sis'
+			}
+		])
+	})
+
+	it('Should allow inline formatting for inter-text asterisks', () => {
+		const doc = markdownToTextDocument(`Em*pha*sis`)
+		expect(doc.lines[0].content.ops).toEqual([
+			{
+				attributes: {},
+				insert: 'Em'
+			},
+			{
+				attributes: {
+					hidden: true,
+					hiddenGroup: true,
+					italic: true,
+					start: true
+				},
+				insert: '*'
+			},
+			{
+				attributes: {
+					hiddenGroup: true,
+					italic: true
+				},
+				insert: 'pha'
+			},
+			{
+				attributes: {
+					hidden: true,
+					hiddenGroup: true,
+					italic: true,
+					end: true
+				},
+				insert: '*'
+			},
+			{
+				attributes: {},
+				insert: 'sis'
+			},
+		])
+	})
+
+	it('Should not block inline formatting for inter-text underscores adacent to punctuation', () => {
+		const doc = markdownToTextDocument(`_Well_,`)
+		expect(doc.lines[0].content.ops).toEqual([
+			{
+				attributes: {
+					hidden: true,
+					hiddenGroup: true,
+					italic: true,
+					start: true
+				},
+				insert: '_'
+			},
+			{
+				attributes: {
+					hiddenGroup: true,
+					italic: true
+				},
+				insert: 'Well'
+			},
+			{
+				attributes: {
+					hidden: true,
+					hiddenGroup: true,
+					italic: true,
+					end: true
+				},
+				insert: '_'
+			},
+			{
+				attributes: {},
+				insert: ','
+			}
+		])
+	})
+
 })
 
 async function setClipboard(text: string) {
