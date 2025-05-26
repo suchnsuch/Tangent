@@ -34,7 +34,7 @@ import { pluralize } from 'common/plurals'
 import arrowNavigate from 'app/utils/arrowNavigate'
 import { HrefFormedLink, StructureType } from 'common/indexing/indexTypes'
 import type { ConnectionInfo } from 'common/indexing/indexTypes'
-import { areLineArraysOpTextEquivalent, EditInfo, getEditInfo, getLineRangeWhile, getRangeWhile, lineToText, stripDocumentAttributes } from 'common/typewriterUtils'
+import { areLineArraysOpTextEquivalent, EditInfo, getEditInfo, getLineRangeWhile, getRangeWhile, lineToText, stripLineAttributes } from 'common/typewriterUtils'
 import { scrollTo } from 'app/utils';
 import { eventHasSelectionRequest, type NavigationData } from 'app/events'
 import WorkspaceFileHeader from 'app/utils/WorkspaceFileHeader.svelte';
@@ -59,7 +59,8 @@ import UnicodeAutocompleteMenu from '../autocomplete/UnicodeAutocompleteMenu.sve
 import CodeBlockAutocompleter from '../autocomplete/CodeBlockAutoCompleter';
 import CodeBlockAutocompleteMenu from '../autocomplete/CodeBlockAutocompleteMenu.svelte';
 import { handleIsNode } from 'app/model/NodeHandle';
-    import { revealContentAroundRange } from './editorModule';
+import { revealContentAroundRange } from './editorModule';
+import { fly } from 'svelte/transition';
 
 // Technically, this just needs to exist _somewhere_. Putting it here because of the svelte dependency
 // Force the use of the variable so that it is included in the bundle
@@ -154,6 +155,8 @@ $: virtual = $note.meta?.virtual
 
 $: willFixTitle = (fixedTitle ?? $fixedTitleSetting)
 
+let fallbackErrors: Error[] = null
+
 editor.enabled = editable
 editor.on('root', onEditorRoot)
 editor.on('change', onEditorChange)
@@ -212,17 +215,20 @@ function onEditorError(error) {
 	console.error(error.error)
 
 	// Fall back to a safe mode
-	editor.set(stripDocumentAttributes(editor.doc))
+	editor.modules.editorModule?.setFallbackMode(true)
+	const lines = stripLineAttributes(editor.doc.lines)
+	note.lines = lines
+	editor.set(new TextDocument(lines, editor.doc.selection), 'api')
+	fallbackErrors = [error]
+}
 
-	if (workspace?.api) {
-		workspace.api.postMessage({
-			type: 'error',
-			title: 'Critical Editor Error',
-			message: `Tangent encountered an error while editing "${workspace.directoryStore.pathToRelativePath(note?.path)}". The editor will fall back to safe mode.
-
-Please report this to the developers. Apologies for the inconvenience.`
-		})
-	}
+function disableFallbackMode() {
+	fallbackErrors = null
+	// A delay gives the user the impression that something has indeed been attempted
+	wait(500).then(() => {
+		editor.modules.editorModule?.setFallbackMode(false)
+		note.onFileContentChanged(note.getFileContent())
+	})
 }
 
 $: updateExtraSpace(extraTop, extraBottom, focusLevel, container)
@@ -1396,6 +1402,32 @@ function onDetailsContexMenu(event: MouseEvent) {
 </div>
 {/if}
 
+{#if fallbackErrors?.length}
+<div class="fallbackWarning" style={`top: ${extraTop + 10}px;`}
+	transition:fly={{y: -200}}
+>
+	<h1>Critical Error</h1>
+	<p>
+		Tangent encountered a critical error while processing this file.
+		The editor has fallen back to plain-text editing mode.
+	</p>
+	<p>
+		Please
+		<a target="_blank" rel="noreferrer" href="https://github.com/suchnsuch/Tangent/issues/new">
+			reach out to the developers
+		</a>
+		for support. Apologies for the inconvenience.</p>
+	<div>
+		<button
+			title="Attempt to re-enable the normal editing mode. This may fail."
+			on:click={disableFallbackMode}
+		>
+			Retry Normal Editing
+		</button>
+	</div>
+</div>
+{/if}
+
 <style lang="scss">
 main {
 	position: relative;
@@ -1560,5 +1592,25 @@ article, .detailsBlock {
 	color: var(--deemphasizedTextColor);
 	margin: 1em;
 	font-style: italic;
+}
+
+.fallbackWarning {
+	position: absolute;
+	right: 10px;
+
+	border: 2px solid red;
+	background: darkred;
+	color: white;
+	border-radius: var(--inputBorderRadius);
+
+	max-width: max(25%, 26em);
+	padding: 1em;
+
+	font-size: 80%;
+
+	h1 {
+		font-size: 1.1em;
+		margin-top: 0;
+	}
 }
 </style>

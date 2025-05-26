@@ -152,6 +152,8 @@ export default function editorModule(editor: Editor, options: {
 	let smartParagraphBreaks = false
 
 	let filepath = ''
+
+	let fallback = false
 	
 	function pushVerification<T>(instruction: VerificationInstruction<T>) {
 		if (verificationInstructions.length === 0) {
@@ -445,7 +447,7 @@ export default function editorModule(editor: Editor, options: {
 
 	function onChanging(event: EditorChangeEvent) {
 
-		if (event.source === Source.api || event.source === Source.history || !editor.enabled) {
+		if (event.source === Source.api || event.source === Source.history || !editor.enabled || fallback) {
 			// Only trigger reformatting when the user has changed the values
 			return
 		}
@@ -1521,6 +1523,10 @@ export default function editorModule(editor: Editor, options: {
 		toggleBold,
 
 		toggleLink,
-		toggleWikiLink
+		toggleWikiLink,
+
+		setFallbackMode(enabled=true) {
+			fallback = enabled
+		}
 	}
 }

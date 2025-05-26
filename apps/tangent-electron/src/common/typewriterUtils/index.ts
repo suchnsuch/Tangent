@@ -45,15 +45,15 @@ export function typewriterToText(model: TextDocument | Line[], startLine?: numbe
 /**
  * Duplicates a document but with all attributes removed
  */
-export function stripDocumentAttributes(doc: TextDocument): TextDocument {
-	return new TextDocument(doc.lines.map(l => {
+export function stripLineAttributes(lines: Line[]): Line[] {
+	return lines.map(l => {
 		return {
 			id: l.id,
 			attributes: {},
 			length: l.length,
 			content: new Delta([{ insert: lineToText(l) }])
 		}
-	}))
+	})
 }
 
 /**
