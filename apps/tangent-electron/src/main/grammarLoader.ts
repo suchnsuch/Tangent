@@ -23,7 +23,7 @@ async function loadVSCodeOnigurumaLib() {
 	try {
 		const wasmPath = await getNodePath('vscode-oniguruma/release/onig.wasm')
 		log.info('Loading onigurama wasm from: ' + wasmPath)
-		const wasmBin = (await fs.promises.readFile(wasmPath)).buffer
+		const wasmBin = await fs.promises.readFile(wasmPath)
 		log.info('    onigurama bin read from disk...')
 		await loadWASM(wasmBin)
 		log.info('    onigurama initialized')

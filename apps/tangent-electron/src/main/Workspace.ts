@@ -60,7 +60,7 @@ export default class Workspace {
 
 	observers: WindowHandle[]
 
-	private watcher: Watcher.type
+	private watcher: Watcher
 	private dirtyCache: Map<string, DirtyInfo>
 	private dataTypes: DataType[]
 

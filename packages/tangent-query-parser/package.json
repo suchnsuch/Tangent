@@ -29,8 +29,8 @@
     "jest": "^29.6.2",
     "ts-jest": "^29.1.1",
     "typescript": "^5.1.6",
-    "vscode-oniguruma": "^1.6.2",
-    "vscode-textmate": "^7.0.4",
+    "vscode-oniguruma": "^2.0.1",
+    "vscode-textmate": "^9.2.0",
     "vscode-tmgrammar-test": "^0.1.1"
   },
   "contributes": {

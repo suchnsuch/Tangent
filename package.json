@@ -18,6 +18,7 @@
 		"apps/tangent-test-workspace-generator"
 	],
 	"devDependencies": {
-		"vitest": "^2.1.8"
+		"@vitest/browser": "^3.1.4",
+		"vitest": "^3.1.4"
 	}
 }

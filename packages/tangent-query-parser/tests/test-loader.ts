@@ -10,7 +10,7 @@ function getNodePath(partial: string) {
 
 async function loadVSCodeOnigurumaLib() {
 	const wasmPath = getNodePath('vscode-oniguruma/release/onig.wasm')
-	const wasmBin = (await fs.promises.readFile(wasmPath)).buffer
+	const wasmBin = await fs.promises.readFile(wasmPath)
 
 	await loadWASM(wasmBin)
 

@@ -1,4 +1,4 @@
-import type { IGrammar, INITIAL, IToken, Registry, StackElement } from 'vscode-textmate'
+import type { IGrammar, INITIAL, IToken, Registry, StateStack } from 'vscode-textmate'
 import { Query, ClauseType, ClauseGroup, isQuery, PartialClauseType, ClauseMod, TodoQueryState, ClauseGroupMod, ClauseOrGroup } from './types'
 import { last, escapeRegExp } from '@such-n-such/core'
 import { tokenizeTagName } from './tags'
@@ -143,11 +143,11 @@ function expectedValuesForClause(clause: PartialClauseType) {
 }
 
 let queryGrammar: IGrammar
-let initialStack: StackElement
+let initialStack: StateStack
 
 interface TextmateLib {
 	registry: Registry
-	initialStack: StackElement
+	initialStack: StateStack
 }
 export async function installTextmate(textmate: TextmateLib) {
 	queryGrammar = await textmate.registry.loadGrammar('source.tangentquery')

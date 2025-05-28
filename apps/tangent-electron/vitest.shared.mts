@@ -11,8 +11,7 @@ export default defineProject({
 					/@such-n-such/
 				]
 			}
-		},
-		workspace: '../../vitest.workspace.ts'
+		}
 	},
 	plugins: [
 		tsconfigPaths()
