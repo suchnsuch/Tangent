@@ -42,6 +42,8 @@ import { INITIAL } from 'vscode-textmate'
 import { initializeDebugging } from './debugging'
 import { addShutDownTask, isReadyToShutDown, shutDown } from './shutdown'
 
+var isInitialized = false
+
 /******************
  * Initialization *
  ******************/
@@ -263,7 +265,9 @@ Tangent ${app.getVersion()} Launched With Arguments:`, process.argv)
 	app.on('activate', () => {
 		// On OS X it's common to re-create a window in the app when the
 		// dock icon is clicked and there are no other windows open.
-		if (BrowserWindow.getAllWindows().length === 0) {
+		// This can happen before initialization is complete and windows can be created,
+		// so check against that.
+		if (isInitialized && BrowserWindow.getAllWindows().length === 0) {
 			createWindow();
 		}
 	});
@@ -284,6 +288,8 @@ Tangent ${app.getVersion()} Launched With Arguments:`, process.argv)
 		}
 		shutDown()
 	})
+
+	isInitialized = true
 }
 
 let shouldInit = true
