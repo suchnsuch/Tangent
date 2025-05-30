@@ -194,7 +194,7 @@ function websiteImageStyle(form: WebsiteData) {
 </script>
 
 {#if form.mode === 'error'}
-	<span title={form.message} class="error">⚠</span>
+	<span class="error">⚠</span>
 {:else if form.mode === 'image'}
 	<!-- svelte-ignore a11y-missing-attribute -->
 	<img src={form.src} style={imageStyle(link.text)} on:error={e => error('Image not found!')} />

@@ -19,6 +19,7 @@ const linkPane = workspace.settings.linkClickPaneBehavior
 export let origin: TangentLink
 export let link: HrefFormedLink
 export let state: LinkState
+export let errorMessage: string
 
 $: context = workspace.getHandle(link)
 $:node = ($context != null && !Array.isArray($context) && typeof $context !== 'string' && isNode($context)) ? $context as TreeNode : null
@@ -87,7 +88,10 @@ function onClick(event: MouseEvent) {
 		</ul>
 		<p>Include parent folders in the link to identify the intended target.</p>
 	{:else if state === 'error'}
-		Something went wrong resolving this link.
+		<p>Something went wrong resolving this link.</p>
+		{#if errorMessage}
+			<p>{@html errorMessage}</p>
+		{/if}
 	{/if}
 </main>
 

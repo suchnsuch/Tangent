@@ -13,6 +13,7 @@ class TangentEmbed extends TangentLink {
 
 	private content: HTMLElement
 	private component: EmbedRoot
+	private errorMessage: string
 
 	private willUpdateState = false
 
@@ -116,14 +117,16 @@ class TangentEmbed extends TangentLink {
 			const handleForm = form => {
 				if (!form || form.mode === 'error') {
 					this.setLinkState('error', null)
+					this.errorMessage = form?.message
 				}
 				else {
-					if (form.src) {
-						if (isExternalLink(form.src)) {
-							return this.setLinkState('external', null)
-						}
+					const url = form.src ?? form.url
+					if (url && isExternalLink(url)) {
+						this.setLinkState('external', null)
 					}
-					this.setLinkState('resolved', null)
+					else {
+						this.setLinkState('resolved', null)
+					}
 				}
 			}
 
@@ -150,6 +153,7 @@ class TangentEmbed extends TangentLink {
 	getTooltip(): TooltipConfig {
 		const tooltip = super.getTooltip()
 		tooltip.placement = 'mouse-below'
+		tooltip.args.errorMessage = this.errorMessage
 		return tooltip
 	}
 }
