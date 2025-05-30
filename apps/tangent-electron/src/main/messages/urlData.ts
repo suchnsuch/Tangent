@@ -5,6 +5,7 @@ import { UrlData } from 'common/urlData'
 import { getWindowHandle } from 'main/workspaces'
 import chalk from 'chalk'
 import { isExternalLink } from 'common/links'
+import type { CheerioAPI } from 'cheerio'
 
 const log = Logger.get('url-data')
 
@@ -15,6 +16,20 @@ type CacheItem = {
 const previewCache = new Map<string, CacheItem>()
 
 const oneDayInMs = 24 * 60 * 60 * 1000;
+
+function getResponseHandlerURL(url: string) {
+	if (url.match(/wikipedia.org\/wiki/)) {
+		return (response, doc: CheerioAPI) => {
+			if (!response.description) {
+				response.description = doc('#mw-content-text p:not(.mw-empty-elt, table *)').first().text()
+			}
+			return response
+		}
+	}
+
+	return undefined
+}
+
 function getOrCacheUrlData(url: string): Promise<UrlData> {
 	const existing = previewCache.get(url)
 	const now = new Date()
@@ -31,7 +46,8 @@ function getOrCacheUrlData(url: string): Promise<UrlData> {
 			headers: {
 				// Helps with sites blocking automated traffic
 				'user-agent': 'googlebot'
-			}
+			},
+			onResponse: getResponseHandlerURL(url)
 		}).catch(error => {
 			log.warn('Error while fetching data for ' + chalk.gray(url) + ': ' + chalk.red(error))
 			previewCache.delete(url)

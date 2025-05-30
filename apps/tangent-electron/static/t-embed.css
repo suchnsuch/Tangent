@@ -30,6 +30,14 @@
 			font-size: .8em;
 			line-height: 1.5em;
 			font-style: italic;
+
+			/* Clamp multi-lin-text with elipses */
+			display: -webkit-box;
+			-webkit-box-orient: vertical;
+			-webkit-line-clamp: 6;
+			line-clamp: 6;
+			overflow: hidden;
+			text-overflow: ellipsis;
 		}
 	}
 
