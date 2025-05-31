@@ -74,7 +74,9 @@
 				"arch": ["x64", "arm64"]
 			}
 		],
-		"sign": "./build/jsign.js",
+		"signtoolOptions": {
+			"sign": "./build/jsign.js"
+		},
 		"fileAssociations": [
 			{
 				"ext": ["md", "mdx"],
