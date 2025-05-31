@@ -80,6 +80,7 @@ const {
 	noteWidthMax: maxWidth,
 	noteFontSize,
 	hangingHeaders,
+	crossOutFinishedTodos,
 	smartParagraphBreaks,
 	fixedTitle: fixedTitleSetting,
 	letCodeExpand,
@@ -1286,6 +1287,7 @@ function onDetailsContexMenu(event: MouseEvent) {
 	class={`noteEditor layout-${layout} background-${background} margins-${$margins}`}
 	class:editable={editable}
 	class:hangingHeaders={$hangingHeaders}
+	class:crossOutFinishedTodos={$crossOutFinishedTodos}
 	class:fixedTitle={willFixTitle}
 	class:typewriter={focusLevel >= FocusLevel.Typewriter}
 	style={`--noteWidthMax: ${$maxWidth}px;`}

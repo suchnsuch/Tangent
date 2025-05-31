@@ -1,4 +1,4 @@
-Todo items are a sub-type of [[Lists]]. A list item appended with ` [ ]` will become an incomplete, or "open" checkbox. A list item appended with ` [x]` will become a complete, or "done" checkbox. You can also cancel a checkbox with ` [-]`.
+Todo items are a sub-type of [[Lists]]. A list item appended with ` [ ]` will become an incomplete, or "open" checkbox. A list item appended with ` [x]` will become a complete, or "done" checkbox. You can also cancel a checkbox with ` [-]`. Whether or not they are crossed out can be changed in the [[Notes#Appearance Options]].
 
 - [ ] Open todo item
 - [x] Closed todo item

@@ -17,6 +17,8 @@ Enabling the __Floating Title__ option will keep the title of notes at the top o
 
 The __Hanging Headers__ setting controls whether or not H1, H2, and H3 [[Headers]] will stick out to the left of normal body text. Disabling this setting will actually give all content more horizontal space.
 
+The **Cross Out Finished Todos** setting controls whether or not the text of completed & canceled [[Todos]] will be crossed out.
+
 # Editing Options
 The **Default Bold/Italics Characters** settings let you choose which characters will be used when using the `Ctrl/Cmd+B` and `Ctrl/Cmd+I` shortcuts, respectively.
 

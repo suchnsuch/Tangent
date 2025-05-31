@@ -393,6 +393,12 @@ export default class Settings extends ObjectStore {
 		defaultValue: true
 	})
 
+	crossOutFinishedTodos = new Setting<boolean>({
+		name: 'Cross Out Finished Todos',
+		description: 'If enabled, completed todos will be crossed or scribbled out.',
+		defaultValue: true
+	})
+
 	linkCursor: Setting<string> = new Setting<string>(linkCursorDefinition)
 
 	// Attachments
