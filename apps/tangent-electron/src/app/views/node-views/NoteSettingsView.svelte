@@ -71,18 +71,25 @@ function onSearchChange(event) {
 
 <div class="lens-settings-row">
 	<span class="spacer"></span>
-	<span class="buttonGroup">
-		<button class="subtle" on:click={openSearch}>
-			<SvgIcon size={16} ref="query.svg#query" />
-		</button>
+	<span class="search buttonBar">
 		{#if $search?.enabled}
-			<input bind:this={searchField} class="search" type="text"
-				value={$search.text}
-				on:input={onSearchChange}
-				on:keydown={onSearchKeydown}
-				use:focusLayer={'FileSearch'}
-			/>
+			<span class="buttonGroup">
+				<button disabled>
+					<SvgIcon size={16} ref="query.svg#query" />
+				</button>
+				<input bind:this={searchField} class="search" type="text"
+					value={$search.text}
+					on:input={onSearchChange}
+					on:keydown={onSearchKeydown}
+					use:focusLayer={'FileSearch'}
+				/>
+			</span>
+		{:else}
+			<button class="subtle" on:click={openSearch}>
+				<SvgIcon size={16} ref="query.svg#query" />
+			</button>
 		{/if}
+		
 		{#if $annotations.length > 0}
 			<span class="annotation-count">{$annotationIndex + 1}/{$annotations.length}</span>
 			<span class="buttonGroup">
@@ -110,6 +117,10 @@ function onSearchChange(event) {
 	display: inline-flex;
 	align-items: center;
 	padding: 0 .5em;
+}
+
+.search {
+	gap: .5em;
 }
 
 </style>
