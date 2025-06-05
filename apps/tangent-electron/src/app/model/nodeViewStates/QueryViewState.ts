@@ -47,9 +47,11 @@ export default class QueryViewState extends BaseSetViewState {
 				workspace.api.query.resultsForQuery(queryString).then(queryResult => {
 					const end = performance.now()
 					console.log(`Received query ${id} in ${end - start}ms`)
-					set(queryResult)
 					this.lastReceivedID.update(i => {
-						if (i < id) return id
+						if (i < id) {
+							set(queryResult)
+							return id
+						}
 						return i
 					})
 				})
