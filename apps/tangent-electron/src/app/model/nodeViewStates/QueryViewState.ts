@@ -8,6 +8,7 @@ import QuerySettingsView from 'app/views/node-views/QuerySettingsView.svelte'
 import type { QueryResult } from 'common/indexing/queryResults'
 import { SelectEvent } from 'app/views/editors/selectionEvents'
 import { allChangedPaths, TreeChange } from 'common/trees'
+import { getInitialQuerySelection } from 'common/queryModel'
 
 export default class QueryViewState extends BaseSetViewState {
 	readonly queryFile: DataFile
@@ -90,11 +91,9 @@ export default class QueryViewState extends BaseSetViewState {
 	focus(element: HTMLElement): boolean {
 		const article = element?.querySelector(".QueryEditor .container article") as HTMLElement;
 		if (article) {
-			const match = this.queryInfo.value?.queryString.value.match(/Notes with ['"](.*)['"]/d)
-			if (match) {
-				article.dispatchEvent(new SelectEvent('setSelection', {
-					selection: (match as any).indices[1]
-				}))
+			const selection = getInitialQuerySelection(this.queryInfo.value?.queryString.value)
+			if (selection) {
+				article.dispatchEvent(new SelectEvent('setSelection', { selection }))
 			}
 			else {
 				document.getSelection().selectAllChildren(article)
