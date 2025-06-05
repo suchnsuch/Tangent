@@ -10,6 +10,7 @@ import classStore from 'app/utils/ClassStoreAction'
 import { fade } from 'svelte/transition'
 import { cubicInOut } from 'svelte/easing'
 import Session, { UpdateThreadOptions } from 'common/dataTypes/Session'
+    import { addShortcutsToEvent } from 'typewriter-editor';
 
 const workspace = getContext('workspace') as Workspace
 const {
@@ -224,7 +225,8 @@ function onFocus(event: FocusEvent) {
 }
 
 function interpretKeyboardEvent(event: KeyboardEvent) {
-	switch (event.key) {
+	const shortcutEvent = addShortcutsToEvent(event)
+	switch (shortcutEvent.modShortcut) {
 		case 'f':
 			ensureCurrentNodeIsContained('center-hard', 500)
 			return true
