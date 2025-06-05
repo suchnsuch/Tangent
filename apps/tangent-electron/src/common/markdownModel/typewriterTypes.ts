@@ -90,6 +90,12 @@ function revealableLine(lineName: string, elementName: string = 'div'): LineType
 
 function getCoreLineProperties(attributes, baseClass = ''): AttributeMap {
 	let className = baseClass + ' line'
+	if (attributes.collapsed) {
+		className += ' collapsed'
+		if (typeof attributes.collapsed === 'string') {
+			className += ' ' + attributes.collapsed
+		}
+	}
 	if (attributes.revealed) {
 		className += ' revealed'
 	}

@@ -61,6 +61,7 @@ import CodeBlockAutocompleteMenu from '../autocomplete/CodeBlockAutocompleteMenu
 import { handleIsNode } from 'app/model/NodeHandle';
 import { revealContentAroundRange } from './editorModule';
 import { fly } from 'svelte/transition';
+import LineGutter from './LineGutter.svelte';
 
 // Technically, this just needs to exist _somewhere_. Putting it here because of the svelte dependency
 // Force the use of the variable so that it is included in the bundle
@@ -902,6 +903,30 @@ function onEditorDoubleClick(event: MouseEvent) {
 	}
 }
 
+/////////////////////////////
+// Line gutter adornments //
+///////////////////////////
+function findLineElement(element: HTMLElement): HTMLElement {
+	while (element) {
+		if (element.classList.contains('line')) {
+			return element
+		}
+		element = element.parentElement
+	}
+}
+
+let hoveredLineElement: HTMLElement = null
+
+function onMouseOver(event: MouseEvent) {
+	if (event.defaultPrevented || !(event.target instanceof HTMLElement)) return
+	const lineElement = findLineElement(event.target)
+	if (lineElement === hoveredLineElement) return
+
+	console.log(lineElement)
+	hoveredLineElement = lineElement
+}
+//// End ////
+
 function onContextMenu(event: MouseEvent) {
 	// Holy sweet baby jesus this function though..
 	const menu: ContextMenuConstructorOptions[] = []
@@ -1277,12 +1302,14 @@ function onDetailsContexMenu(event: MouseEvent) {
 </script>
 
 <!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
+<!-- svelte-ignore a11y-mouse-events-have-key-events -->
 <main
 	on:mousedown={onMouseDown}
 	on:mouseup={selectEnd}
 	on:wheel={onWheel}
 	on:keydown={onNoteKeydown}
 	on:focusin={e => detailsOpened = false}
+	on:mouseover={onMouseOver}
 	bind:this={container}
 	class={`noteEditor layout-${layout} background-${background} margins-${$margins}`}
 	class:editable={editable}
@@ -1342,6 +1369,7 @@ function onDetailsContexMenu(event: MouseEvent) {
 			<CodeBlockAutocompleteMenu {handler} />
 		{/if}
 	</AutoCompleteMenu>
+	<LineGutter {editor} lineElement={hoveredLineElement} />
 </main>
 
 {#if state.detailMode}

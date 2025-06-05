@@ -1,5 +1,6 @@
 import { EditorRange, Line, normalizeRange, TextDocument } from '@typewriter/document'
 import { lineToText } from 'common/typewriterUtils'
+import { lineIsMultiLineFormat } from './line'
 
 /**
  * 
@@ -147,4 +148,29 @@ export function findSectionLines(
 		lines,
 		highest
 	}
+}
+
+export function isLineCollapsible(doc: TextDocument, lineIndex: number) {
+	if (lineIndex < 0 || lineIndex >= doc.lines.length - 1) return false
+
+	const line = doc.lines[lineIndex]
+	const attr = line.attributes
+	if ('header' in attr ||
+		'list' in attr
+	) {
+		let nextLine = lineIndex + 1
+		while (nextLine < doc.lines.length) {
+			const comparison = compareSectionDepth(line, doc.lines[lineIndex + 1])
+			if (comparison !== true) {
+				return comparison < 0
+			}
+			nextLine++
+		}
+	}
+	else if (lineIsMultiLineFormat(line)) {
+		if (lineIndex === 0) return true
+		const comparison = compareSectionDepth(line, doc.lines[lineIndex - 1])
+		if (comparison !== true) return true
+	}
+	return false
 }
