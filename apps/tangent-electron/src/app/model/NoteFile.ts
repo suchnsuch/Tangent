@@ -73,7 +73,8 @@ export default class NoteFile extends File implements TreeNode {
 		const result = parseMarkdown(text, {
 			filepath: this.path,
 			autoEmbedRawLinks: this.workspace.settings.rawLinksAutoEmbed.value,
-			allowInterTextUnderscoreFormatting: this.workspace.settings.allowInterTextUnderscoreFormatting.value
+			allowInterTextUnderscoreFormatting: this.workspace.settings.allowInterTextUnderscoreFormatting.value,
+			allowUnknownHTMLTags: this.workspace.settings.allowUnknownHTMLTags.value
 		})
 		if (result.awaiting?.length) {
 			// If we're waiting on something for processing complete, delay

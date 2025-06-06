@@ -61,6 +61,9 @@ export interface MarkdownParsingOptions {
 	/** When true, makes it possible to apply emphasis in the middle of words with underscores */
 	allowInterTextUnderscoreFormatting?: boolean
 
+	/** When true, HTML sections may be started with non-standard HTML tag names */
+	allowUnknownHTMLTags?: boolean
+
 	documentStartLine?: number
 	documentEndLine?: number
 }

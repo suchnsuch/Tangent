@@ -1,9 +1,9 @@
 This is a thing.	
 
-<Test myfoo="my cool thing" other and='boo'> And <something/> more!<And one more thing></and> and some some other things</Test> So endeth the lesson. Nice!
+<div myfoo="my cool thing" other and='boo'> And <something/> more!<And one more thing></and> and some some other things</div> So endeth the lesson. Nice!
 
-Here is a <test>of my stuff</test>. 
+Here is a <span>test of spans</span>. 
 
-Some <more>Tests
+Some <div>More Tests
 
-with some </more> things
+with some more </div> things

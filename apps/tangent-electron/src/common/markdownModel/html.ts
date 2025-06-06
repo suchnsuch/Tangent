@@ -1,5 +1,7 @@
 import NoteParser from './NoteParser';
 import { ParsingContext, ParsingContextType, ParsingProgram } from './parsingContext';
+import { htmlTagNames } from 'html-tag-names'
+import { svgTagNames } from 'svg-tag-names'
 
 const WHITESPACE_MATCH = /\s/
 
@@ -12,6 +14,18 @@ const ERROR_ATTRIBUTES = { code_syntax: 'invalid' }
 
 type HtmlParsingContext = ParsingContext & {
 	elementName: string
+}
+
+const validTags = new Set<string>()
+for (const name of htmlTagNames) {
+	validTags.add(name)
+}
+for (const name of svgTagNames) {
+	validTags.add(name)
+}
+
+function isValidTag(tag: string): boolean {
+	return validTags.has(tag.toLowerCase())
 }
 
 const tagParsingPrograms = [
@@ -52,7 +66,16 @@ export function parseHtml(char: string, parser: NoteParser): boolean {
 	if (char === '<' && parser.feed.peek().match(attributeNameMatch)) {
 		const { feed, builder } = parser
 		const hasBlockFormat = builder.hasOpenBlockFormat('html')
+
+		const tagStart = feed.index + 1
+		const wordEnd = feed.findWhile(attributeNameMatch, tagStart)
 		
+		if (!hasBlockFormat && !parser.options?.allowUnknownHTMLTags) {
+			// Check that this is a valid tag
+			const tag = feed.substring(tagStart, wordEnd + 1)
+			if (!isValidTag(tag)) return false
+		}
+
 		parser.commitSpan(hasBlockFormat ? CONTENT_ATTRIBUTES : null, 0) // Previous content
 
 		if (!hasBlockFormat) {
@@ -66,9 +89,6 @@ export function parseHtml(char: string, parser: NoteParser): boolean {
 
 		parser.commitSpan(PUNCTUATION_ATTRIBUTES)
 
-		feed.next()
-		const wordEnd = feed.findWhile(attributeNameMatch)
-		const tag = feed.substring(feed.index, wordEnd + 1)
 		feed.index = wordEnd
 
 		parser.commitSpan({ code_syntax: 'tag' })

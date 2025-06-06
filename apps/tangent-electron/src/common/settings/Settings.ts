@@ -464,7 +464,7 @@ export default class Settings extends ObjectStore {
 
 	rawLinksAutoEmbed = new Setting<boolean>({
 		name: 'Auto Embed Raw Links',
-		description: 'When on, raw links on their own line are automatically treated as embed links (Requires Window Reload).',
+		description: 'When on, raw links on their own line are automatically treated as embed links. (Requires restart.)',
 		defaultValue: true
 	})
 
@@ -529,6 +529,12 @@ export default class Settings extends ObjectStore {
 		name: 'Extra Wide Code',
 		description: 'Allow code blocks with long lines to expand into the margins of a note.',
 		defaultValue: true
+	})
+
+	allowUnknownHTMLTags = new Setting<boolean>({
+		name: 'Allow Unknown HTML Tags',
+		description: 'When true, allow HTML sections to be started by non-standard HTML tag names. (Requires restart.)',
+		defaultValue: false
 	})
 
 	// Debug

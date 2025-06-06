@@ -494,6 +494,7 @@ export default function editorModule(editor: Editor, options: {
 				asFormatting: true, // This gives us a line that is just attributed retains
 				autoEmbedRawLinks: workspace?.settings.rawLinksAutoEmbed.value,
 				allowInterTextUnderscoreFormatting: workspace?.settings.allowInterTextUnderscoreFormatting.value,
+				allowUnknownHTMLTags: workspace?.settings.allowUnknownHTMLTags.value,
 				documentStartLine: firstIndex,
 				documentEndLine: lastIndex
 			})
