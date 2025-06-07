@@ -87,6 +87,34 @@
   <update_contact>k8ie_AT_mcld.eu</update_contact>
 
   <releases>
+    <release version="0.9.0" date="2025-06-07">
+      <description>
+        <ul>
+          <li>Added support for link previews, with support for website previews, audio, video, and youtube links. Raw links on their own line are automatically previewed.</li>
+          <li>Added support for displaying HTML with syntax highlighting.</li>
+          <li>Hovering over wiki-links now show a preview of the note's contents.</li>
+          <li>Changed scrolling cards in the Cards Lens to require <code>alt</code> by default. This can be changed within settings.</li>
+          <li>Added support for Shifting Sections with Alt+Shift+Up/Down on Windows and Linux and ⌃⌥+Up/Down on Mac.</li>
+          <li>Added an option to follow links with unmodified left clicks.</li>
+          <li>Added an option to always autocomplete the full workspace path for Wiki Links.</li>
+          <li>Added an option to control whether finished Todos are crossed out.</li>
+          <li>Added support for selecting different code highlighting themes.</li>
+          <li>Added support for searching within a single file.</li>
+          <li>Added support for indenting headers, code blocks, math blocks, and quotes.</li>
+          <li>Added support for unicode autocomplete in note titles.</li>
+          <li>Added the List Lens and greatly improved the Card and Feed lenses.</li>
+          <li>Switched to using the computer name instead of <code>hostname</code> when identifying a machine in workspace data.</li>
+          <li>Added an option on linux and windows to use the native titlebar. Defaults to on for linux, off for windows.</li>
+          <li>Added error and warning indicators for YAML parsing errors in Front Matter.</li>
+          <li>Changed default Bold and Italics behavior so that underscores surrounded by text does not trigger formatting.</li>
+          <li>Updated Electron to v35.4.0.</li>
+          <li>Fixed an issue where query editor selection could be lost.</li>
+          <li>Fixed an issue where you couldn't open a new query from the Map.</li>
+          <li>Fixed an issue where query results could come out of order.</li>
+          <li>Fixed HTML parsing to only start on valid tag names.</li>
+        </ul>
+      </description>
+    </release>
     <release version="0.8.4" date="2025-01-19">
       <description>
         <ul>
