@@ -4,7 +4,7 @@
 	"copyright": "Copyright © 2022 Taylor Hadden",
 
 	"generateUpdatesFilesForAllChannels": true,
-	"electronVersion": "35.4.0",
+	"electronVersion": "32.3.3",
 
 	"files": [
 		"node_modules/**/*",
@@ -145,7 +145,7 @@
 		{
 			"provider": "s3",
 			"bucket": "suchnsuch-public",
-			"path": "/Tangent/Releases/"
+			"path": "/Tangent/Releases/Legacy"
 		}
 	],
 

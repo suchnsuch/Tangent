@@ -80,7 +80,7 @@
     "@vitest/browser": "^3.1.4",
     "cross-env": "^7.0.3",
     "css-loader": "^7.1.2",
-    "electron": "^35.0.0",
+    "electron": "^32.3.3",
     "electron-builder": "^26.0.12",
     "html-tag-names": "^2.1.0",
     "katex": "^0.16.8",
