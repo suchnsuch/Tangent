@@ -1,10 +1,12 @@
 {
 	"appId": "com.SuchnSuch.Tangent",
-	"productName": "Tangent",
+	"productName": "Tangent Legacy",
 	"copyright": "Copyright © 2022 Taylor Hadden",
 
 	"generateUpdatesFilesForAllChannels": true,
 	"electronVersion": "32.3.3",
+
+	"artifactName": "Tangent-Legacy-${version}.${ext}",
 
 	"files": [
 		"node_modules/**/*",
