@@ -1,25 +1,13 @@
 <script lang="ts">
 import { computePosition } from '@floating-ui/dom'
 import { applyCollapseChange, CollapseChange, collapseSection, expandSection, lineHasCollapsedChildren, isLineCollapsible } from 'common/markdownModel/sections';
-import { WritableStore } from 'common/stores';
 import { Editor, Line } from 'typewriter-editor'
 
 export let editor: Editor
 export let lineElement: HTMLElement
 
-const lockedLine = new WritableStore<HTMLElement>(null)
-let lineSwitchTimeout = null
-
-$: if (lineElement) {
-	clearTimeout(lineSwitchTimeout)
-	lockedLine.set(lineElement)
-} else {
-	clearTimeout(lineSwitchTimeout)
-	lineSwitchTimeout = setTimeout(() => lockedLine.set(null), 300)
-}
-
-$: lineIndex = (editor && $lockedLine)
-	? Array.prototype.indexOf.call($lockedLine.parentNode.children, $lockedLine)
+$: lineIndex = (editor && lineElement)
+	? Array.prototype.indexOf.call(lineElement.parentNode.children, lineElement)
 	: -1
 
 let container: HTMLElement = null
@@ -37,14 +25,6 @@ function positionOnLine(line: HTMLElement, container: HTMLElement) {
 		container.style.left = result.x - marginLeft + 'px'
 		container.style.top = result.y + 'px'
 	})
-}
-
-function onMouseEnter() {
-	clearTimeout(lineSwitchTimeout)
-}
-function onMouseLeave() {
-	clearTimeout(lineSwitchTimeout)
-	lineSwitchTimeout = setTimeout(() => lockedLine.set(null), 300)
 }
 
 function toggleLineCollapse() {
@@ -70,14 +50,10 @@ function toggleLineCollapse() {
 
 </script>
 
-{#if $lockedLine}
+{#if lineElement}
 <!-- svelte-ignore a11y-no-static-element-interactions -->
-<div bind:this={container}
-	on:mouseenter={onMouseEnter}
-	on:mouseleave={onMouseLeave}
->
+<div bind:this={container}>
 	{#if isLineCollapsible(editor.doc, lineIndex)}
-		{lineIndex}
 		<button
 			on:click={toggleLineCollapse}
 		>
@@ -92,6 +68,5 @@ div {
 	position: absolute;
 	top: 200px;
 	left: 0;
-	background: green;
 }
 </style>

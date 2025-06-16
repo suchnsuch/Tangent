@@ -906,22 +906,29 @@ function onEditorDoubleClick(event: MouseEvent) {
 /////////////////////////////
 // Line gutter adornments //
 ///////////////////////////
-function findLineElement(element: HTMLElement): HTMLElement {
-	while (element) {
-		if (element.classList.contains('line')) {
-			return element
-		}
-		element = element.parentElement
-	}
-}
-
 let hoveredLineElement: HTMLElement = null
 
-function onMouseOver(event: MouseEvent) {
-	if (event.defaultPrevented || !(event.target instanceof HTMLElement)) return
-	const lineElement = findLineElement(event.target)
-	if (lineElement === hoveredLineElement) return
-	hoveredLineElement = lineElement
+function onMouseMove(event: MouseEvent) {
+	const count = editorElement.childElementCount
+	for (let i = 0 ; i < count; i++) {
+		const element = editorElement.children.item(i) as HTMLElement
+		const bounds = element.getBoundingClientRect()
+
+		if (event.clientY > bounds.top && event.clientY <= bounds.bottom
+			&& event.clientX > bounds.left - 50 && event.clientX < bounds.left + 150
+		) {
+			if (hoveredLineElement !== element) {
+				hoveredLineElement = element
+			}
+			return
+		}
+	}
+
+	if (hoveredLineElement) hoveredLineElement = null
+}
+
+function onMouseLeave(event: MouseEvent) {
+	if (hoveredLineElement) hoveredLineElement = null
 }
 //// End ////
 
@@ -1304,10 +1311,11 @@ function onDetailsContexMenu(event: MouseEvent) {
 <main
 	on:mousedown={onMouseDown}
 	on:mouseup={selectEnd}
+	on:mousemove={onMouseMove}
+	on:mouseleave={onMouseLeave}
 	on:wheel={onWheel}
 	on:keydown={onNoteKeydown}
 	on:focusin={e => detailsOpened = false}
-	on:mouseover={onMouseOver}
 	bind:this={container}
 	class={`noteEditor layout-${layout} background-${background} margins-${$margins}`}
 	class:editable={editable}
