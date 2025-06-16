@@ -518,6 +518,11 @@ export default function editorModule(editor: Editor, options: {
 				const existingLineFormat = doc.getLineFormat(existingLineRange)
 				const formatDiff = AttributeMap.diff(existingLineFormat, newLine.attributes)
 				if (formatDiff) {
+					// Collapsed state should be retained
+					// TODO: The use of "diff" above may want to be reconsider.
+					// It might be better to use a "blank + new" approach similar to 
+					// how inline elements are resolved.
+					delete formatDiff.collapsed
 					change.formatLine(existingLineStart, formatDiff, true)
 				}
 

@@ -7,6 +7,7 @@ import type { ListDefinition } from './list'
 import type { TagSectionData } from './tag'
 import { CodeData } from './code'
 import { MathData } from './math'
+import { hasCollapsedChildren, isCollapsed } from './sections'
 
 const defaultOptions = {}
 
@@ -90,12 +91,14 @@ function revealableLine(lineName: string, elementName: string = 'div'): LineType
 
 function getCoreLineProperties(attributes, baseClass = ''): AttributeMap {
 	let className = baseClass + ' line'
-	if (attributes.collapsed) {
+	const collapsed = attributes.collapsed
+	if (isCollapsed(collapsed)) {
 		className += ' collapsed'
-		if (typeof attributes.collapsed === 'string') {
-			className += ' ' + attributes.collapsed
-		}
 	}
+	if (hasCollapsedChildren(collapsed)) {
+		className += ' collapse-parent'
+	}
+
 	if (attributes.revealed) {
 		className += ' revealed'
 	}

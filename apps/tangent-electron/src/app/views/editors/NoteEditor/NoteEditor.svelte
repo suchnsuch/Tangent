@@ -921,8 +921,6 @@ function onMouseOver(event: MouseEvent) {
 	if (event.defaultPrevented || !(event.target instanceof HTMLElement)) return
 	const lineElement = findLineElement(event.target)
 	if (lineElement === hoveredLineElement) return
-
-	console.log(lineElement)
 	hoveredLineElement = lineElement
 }
 //// End ////

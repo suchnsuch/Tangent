@@ -1,6 +1,6 @@
 <script lang="ts">
 import { computePosition } from '@floating-ui/dom'
-    import { isLineCollapsible } from 'common/markdownModel/sections';
+import { applyCollapseChange, CollapseChange, collapseSection, expandSection, lineHasCollapsedChildren, isLineCollapsible } from 'common/markdownModel/sections';
 import { WritableStore } from 'common/stores';
 import { Editor, Line } from 'typewriter-editor'
 
@@ -32,7 +32,9 @@ function positionOnLine(line: HTMLElement, container: HTMLElement) {
 		strategy: 'absolute',
 		placement: 'left-start'
 	}).then(result => {
-		container.style.left = result.x + 'px'
+		const lineStyle = getComputedStyle(line)
+		const marginLeft = parseFloat(lineStyle.marginLeft)
+		container.style.left = result.x - marginLeft + 'px'
 		container.style.top = result.y + 'px'
 	})
 }
@@ -48,10 +50,22 @@ function onMouseLeave() {
 function toggleLineCollapse() {
 	const doc = editor.doc
 	const line = doc.lines[lineIndex]
-	const range = doc.getLineRange(line)
-	editor.change.formatLine(range, {
-		collapsed: true
-	})
+
+	let collapse: CollapseChange
+
+	if (lineHasCollapsedChildren(line)) {
+		console.log('expanding')
+		collapse = expandSection(doc, line)
+	}
+	else {
+		console.log('collapsing')
+		collapse = collapseSection(doc, line)
+	}
+
+	console.log(collapse)
+
+	applyCollapseChange(collapse, editor.change).apply()
+	console.log(editor.doc.lines.map(l => l.attributes.collapsed))
 }
 
 </script>

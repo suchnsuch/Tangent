@@ -1,4 +1,4 @@
-import { EditorRange, Line, normalizeRange, TextDocument } from '@typewriter/document'
+import { EditorRange, Line, normalizeRange, TextChange, TextDocument } from '@typewriter/document'
 import { lineToText } from 'common/typewriterUtils'
 import { lineIsMultiLineFormat } from './line'
 
@@ -154,10 +154,13 @@ export function isLineCollapsible(doc: TextDocument, lineIndex: number) {
 	if (lineIndex < 0 || lineIndex >= doc.lines.length - 1) return false
 
 	const line = doc.lines[lineIndex]
-	const attr = line.attributes
-	if ('header' in attr ||
-		'list' in attr
-	) {
+
+	if (lineIsMultiLineFormat(line)) {
+		if (lineIndex === 0) return true
+		const comparison = compareSectionDepth(line, doc.lines[lineIndex - 1])
+		if (comparison !== true) return true
+	}
+	else {
 		let nextLine = lineIndex + 1
 		while (nextLine < doc.lines.length) {
 			const comparison = compareSectionDepth(line, doc.lines[lineIndex + 1])
@@ -167,10 +170,109 @@ export function isLineCollapsible(doc: TextDocument, lineIndex: number) {
 			nextLine++
 		}
 	}
-	else if (lineIsMultiLineFormat(line)) {
-		if (lineIndex === 0) return true
-		const comparison = compareSectionDepth(line, doc.lines[lineIndex - 1])
-		if (comparison !== true) return true
-	}
 	return false
+}
+
+/*
+ * Hack documentation.
+ * The "collapsed" attribute should be as condensed as possible.
+ * A positive value means the line has been collapsed by some number of parents.
+ * A _negative_ value means that the line has collapsed its children.
+ * 	-1 -> A visible line that has collapsed its children.
+ * 	-2>= -> A collapsed line that has collapsed its children.
+ */
+
+export function isCollapsed(collapsedState: any): boolean {
+	return typeof collapsedState === 'number' && !(collapsedState === 0 || collapsedState === -1)
+}
+
+export function hasCollapsedChildren(collapsedState: any): boolean {
+	return typeof collapsedState === 'number' && collapsedState < 0
+}
+
+export function isLineCollapsed(line: Line): boolean {
+	return isCollapsed(line.attributes.collapsed)
+}
+
+export function lineHasCollapsedChildren(line: Line): boolean {
+	return hasCollapsedChildren(line.attributes.collapsed)
+}
+
+export type CollapseChange = {
+	[K: string]: number
+}
+
+function getCollapseState(line: Line, change: CollapseChange): number | undefined {
+	if (change[line.id] !== undefined) return change[line.id]
+	return line.attributes.collapsed
+}
+
+function modifyCollapseState(line: Line, change: CollapseChange, modification: number) {
+	const state = getCollapseState(line, change) ?? 0
+	change[line.id] = state < 0 ? state - modification : state + modification
+}
+
+export function collapseSection(doc: TextDocument, line: Line, change: CollapseChange = {}): CollapseChange {
+	const startLineState = getCollapseState(line, change)
+	if (startLineState === undefined || startLineState === null || startLineState === 0) {
+		// The line has collapsed its children but is still visible
+		change[line.id] = -1
+	}
+	else if (startLineState > 0) {
+		// The line was previously collapsed by a parent and now it collapses its children as well
+		change[line.id] = -(startLineState + 1)
+	}
+	else {
+		modifyCollapseState(line, change, 1)
+	}
+
+	const startLineIndex = doc.lines.indexOf(line)
+
+	for (let index = startLineIndex + 1; index < doc.lines.length; index++) {
+		const someLine = doc.lines[index]
+		const comparison = compareSectionDepth(line, someLine)
+		if (comparison === true || comparison < 0) {
+			modifyCollapseState(someLine, change, 1)
+		}
+		else {
+			break
+		}
+	}
+
+	return change
+}
+
+export function expandSection(doc: TextDocument, line: Line, change: CollapseChange = {}): CollapseChange {
+	const startLineState = getCollapseState(line, change)
+	if (startLineState === undefined || startLineState === null || startLineState >= 0) {
+		// Do nothing. This is unexpected
+		return
+	}
+	else if (startLineState < 0) {
+		// The line previously collapsed its children, now it doesn't
+		change[line.id] = -(startLineState + 1)
+	}
+
+	const startLineIndex = doc.lines.indexOf(line)
+
+	for (let index = startLineIndex + 1; index < doc.lines.length; index++) {
+		const someLine = doc.lines[index]
+		const comparison = compareSectionDepth(line, someLine)
+		if (comparison === true || comparison < 0) {
+			modifyCollapseState(someLine, change, -1)
+		}
+		else {
+			break
+		}
+	}
+
+	return change
+}
+
+export function applyCollapseChange(collapse: CollapseChange, text: TextChange): TextChange {
+	for (const key in collapse) {
+		const range = text.doc.getLineRange(key)
+		text.formatLine(range[0], { collapsed: collapse[key] }, true)
+	}
+	return text
 }

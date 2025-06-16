@@ -242,9 +242,23 @@ article.note {
 		.hidden, .line_format {
 			color: green;
 		}
+
+		&.collapsed:not(.revealed) {
+			height: 0;
+			min-height: 0;
+			display: none;
+		}
+
+		&.collapse-parent {
+			&::after {
+				content: "…";
+				color: var(--deemphasizedTextColor);
+				padding-inline-start: .5em;
+			}
+		}
 	}
 
-	.hidden {
+	.hidden, .line.collapsed {
 		/*
 		 * This is a cheaky trick that makes text invisible but allows it to be navigated as expected.
 		 * `display: none;` does _not_ handle this as well.
@@ -252,12 +266,12 @@ article.note {
 		font-size: 0;
 		line-height: 0;
 		tab-size: 0; // Without this, tabs are always rendered. Silly.
-	}
 
-	.hidden.revealed {
-		font-size: unset;
-		line-height: unset;
-		tab-size: unset;
+		&.revealed {
+			font-size: unset;
+			line-height: unset;
+			tab-size: unset;
+		}
 	}
 
 	.horizontal_rule {
