@@ -252,6 +252,7 @@ article.note {
 		&.collapse-parent {
 			&::after {
 				content: "…";
+				font-size: var(--fontSize);
 				color: var(--deemphasizedTextColor);
 				padding-inline-start: .5em;
 			}
