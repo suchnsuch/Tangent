@@ -158,6 +158,7 @@ describe('Alias Searching', () => {
 			fileType: '.md',
 			name: 'File I made',
 			meta: {
+				uuid: '',
 				structure: [
 					{
 						type: StructureType.FrontMatter,

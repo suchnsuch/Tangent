@@ -321,6 +321,7 @@ export default class Workspace extends EventDispatcher {
 				existing.integrateFrom(incoming)
 			}
 			else {
+				existing.meta = incoming.meta
 				existing.created = incoming.created
 				existing.modified = incoming.modified
 			}
@@ -540,7 +541,8 @@ export default class Workspace extends EventDispatcher {
 				}
 
 				if (virtual) {
-					node.meta = { virtual: true }
+					// This meta value is only used localy. Therefor, the blank uuid should be replaced once actually created.
+					node.meta = { uuid: '', virtual: true }
 				}
 
 				return this.createTreeNode({

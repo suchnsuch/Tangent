@@ -411,9 +411,7 @@ export default class Workspace {
 
 				try {
 					log.info(`Creating a virtual node from "${chalk.green(link.href)}" at "${chalk.grey(newPath)}".`)
-					const newNode = this.createFile(null, newPath, { 
-						virtual: true
-					})
+					const newNode = this.createFile(null, newPath, IndexData.blankVirtual())
 
 					return newNode
 				}
@@ -486,7 +484,11 @@ export default class Workspace {
 
 		this.contentsStore.ensureFolderExists(
 			folderPath,
-			(parent, name) => this.createFolder(handle, path.join(parent.path, name), virtual ? { virtual: true } : undefined, queue),
+			(parent, name) => this.createFolder(
+				handle,
+				path.join(parent.path, name),
+				virtual ? IndexData.blankVirtual() : IndexData.blank(),
+				queue),
 			virtual
 		)
 
@@ -535,7 +537,7 @@ export default class Workspace {
 			path: filepath,
 			name: path.basename(filepath, extension),
 			fileType: extension,
-			meta: meta || {}
+			meta: meta || IndexData.blank()
 		}
 
 		let file = this.nodeConstructor(rawNode) as File
@@ -708,7 +710,7 @@ export default class Workspace {
 			// Make sure the new node has all of the same linkages as the moved node
 			// This should only happen if the existing node was virtual
 			if (existingNode.meta.inLinks) {
-				const meta = node.meta || (node.meta = {})
+				const meta = node.meta || (node.meta = IndexData.blank())
 				const theLinks = meta.inLinks || (meta.inLinks = [])
 				for (const link of existingNode.meta.inLinks) {
 					theLinks.push(link)
@@ -740,6 +742,7 @@ export default class Workspace {
 		newPath = this.contentsStore.getUniquePath(newPath)
 		
 		const newRawNode = shallowCopyTreeNodeWithoutChildren(nodeToCopy)
+		newRawNode.meta = IndexData.blank()
 		newRawNode.path = newPath
 		newRawNode.name = path.basename(newPath, newRawNode.fileType !== 'folder' ? newRawNode.fileType : undefined)
 
@@ -1053,7 +1056,7 @@ export default class Workspace {
 						// Extra retain conditions still mark node as deleted
 						node.state = 'deleted'
 					}
-					if (!node.meta) node.meta = {}
+					if (!node.meta) node.meta = IndexData.blank()
 					node.meta.virtual = true
 				}
 

@@ -73,9 +73,16 @@ export default class Indexer {
 		if (rawIndex?.items) {
 			for (const itemPath of Object.keys(rawIndex.items)) {
 				const item = rawIndex.items[itemPath]
-				const meta: IndexData = {}
 
-				meta.modified = new Date(item.modified)
+				let uuid = item.uuid
+				if (!IndexData.isValidUUID(uuid)) {
+					uuid = IndexData.newUUID()
+				}
+
+				const meta: IndexData = {
+					uuid,
+					modified: new Date(item.modified)
+				}
 
 				if (Array.isArray(item.structure)) {
 					meta.structure = item.structure
@@ -304,26 +311,25 @@ export default class Indexer {
 
 	private parseFile(node: TreeNode, contents?: string): IndexData {
 		if (node.fileType.match(parseableFileMatch)) {
+
+			const meta: IndexData = {
+				uuid: node.meta?.uuid ?? IndexData.newUUID(),
+				modified: node.modified ?? node.created
+			}
+
 			try {
 				const { structure } = parseMarkdown(contents, this.parsingOptions)
 
-				const meta: IndexData = {
-					modified: node.modified ?? node.created
-				}
-				
 				if (structure.length) {
 					meta.structure = structure
 				}
-
-				return meta
 			}
 			catch (e) {
 				log.error('Failed to parse file:' + node.path)
 				log.log(e)
 			}
 
-			// Return an empty meta file
-			return {}
+			return meta
 		}
 	}
 
@@ -360,7 +366,7 @@ export default class Indexer {
 		let targetMeta = target.meta as IndexData
 		if (!targetMeta) {
 			// This occurs if the other note has not been initialized
-			target.meta = targetMeta = {}
+			target.meta = targetMeta = IndexData.blank()
 		}
 		if (!targetMeta.inLinks)
 			targetMeta.inLinks = []

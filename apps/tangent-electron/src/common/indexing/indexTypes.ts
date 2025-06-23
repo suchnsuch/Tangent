@@ -1,7 +1,15 @@
 import paths from 'common/paths'
+import { v6 as uuidv6, validate } from 'uuid'
 import type { TreeNode } from 'common/trees'
 
 export interface IndexData {
+	/**
+	 * v6 UUID. Identifies the node through renames and moves.
+	 * This is inherently fragile: regenerating the index from scratch will regenerate all UUIDs.
+	 * Thus, only use this value as a linkage for data that can afford to be dropped.
+	 */
+	uuid: string
+
 	modified?: Date
 
 	virtual?: boolean
@@ -14,6 +22,30 @@ export interface IndexData {
 }
 
 export namespace IndexData {
+
+	export function newUUID() {
+		return uuidv6()
+	}
+
+	export function isValidUUID(value: unknown): boolean {
+		return validate(value)
+	}
+
+	/** Generates a new index data object with newly generated uuid */
+	export function blank(): IndexData {
+		return {
+			uuid: newUUID()
+		}
+	}
+
+	/** Generates a new index data object with newly generated uuid and `virtual: true` */
+	export function blankVirtual(): IndexData {
+		return {
+			uuid: newUUID(),
+			virtual: true
+		}
+	}
+
 	export function* outgoingConnections(data: IndexData, filter?: (item: ConnectionInfo) => boolean) {
 		if (!data?.structure) return
 
