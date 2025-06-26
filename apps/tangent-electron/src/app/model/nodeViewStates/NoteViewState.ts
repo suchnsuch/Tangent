@@ -1,10 +1,10 @@
 import { derived, Readable } from 'svelte/store'
 import type { EditorRange } from "@typewriter/document"
-import { escapeRegExp, getRegexMatchIndices } from '@such-n-such/core'
+import { escapeRegExp } from '@such-n-such/core'
 import type NodeViewState from "./NodeViewState"
 import type NoteFile from "../NoteFile"
 import { PartialLink, StructureType } from "common/indexing/indexTypes"
-import { ReadableStore, WritableStore } from 'common/stores'
+import { ForwardingStore, ReadableStore, WritableStore } from 'common/stores'
 import type { StructureDelta } from 'common/indexing/structureUtils'
 import type LensViewState from './LensViewState'
 
@@ -16,6 +16,9 @@ import { safeHeaderLine } from 'common/markdownModel/header'
 import { lineToText } from 'common/typewriterUtils'
 import { clamp } from 'common/utils'
 import NoteSettingsView from 'app/views/node-views/NoteSettingsView.svelte'
+import DataFile from '../DataFile'
+import NoteViewInfo from 'common/dataTypes/NoteViewInfo'
+import paths from 'common/paths'
 
 export enum NoteDetailMode {
 	None = 0,
@@ -47,30 +50,64 @@ function searchDataToRegex(search: NoteSearchData): RegExp {
 	return null
 }
 
+function getFolderInfoFile(context: ViewStateContext, file: NoteFile): DataFile | null {
+	if (!file.meta?.uuid) {
+		// TODO: Does this need to be handled?
+		console.error('No UUID for', file.path)
+		return null
+	}
+	const directory = context.getRelativePersistentStateDirectory()
+	if (!directory) return null
+
+	return context.workspace.commands.createNewFile.execute({
+		relativePath: paths.join(directory, file.meta?.uuid + NoteViewInfo.fileType),
+		creationMode: 'createOrOpenCaseInsensitive',
+		updateSelection: false
+	}) as DataFile
+}
+
 export default class NoteViewState implements NodeViewState, LensViewState {
+	// Core Values
 	readonly context: ViewStateContext
 	readonly note: NoteFile
-	selection: EditorRange
-	detailMode: NoteDetailMode
+	
+	readonly noteViewInfoFile: DataFile
+	readonly noteViewInfo = new WritableStore<NoteViewInfo>(null)
 
+	readonly currentLens: ReadableStore<LensViewState>
+	readonly pinSettings: Readable<boolean>
+
+	// Forwarded state values
+	readonly selection: WritableStore<EditorRange>
+	readonly scrollY: WritableStore<number>
+
+	// Local Values
+	detailMode: NoteDetailMode
 	readonly annotations: WritableStore<Annotation[]> = new WritableStore([])
 	readonly annotationIndex: WritableStore<number> = new WritableStore(-1)
 
 	readonly search: WritableStore<NoteSearchData> = new WritableStore(null)
-
-	readonly scrollY: WritableStore<number> = new WritableStore(0)
-
-	readonly currentLens: ReadableStore<LensViewState>
-	readonly pinSettings: Readable<boolean>
 
 	protected readonly unsubs: (() => void)[]
 
 	constructor(context: ViewStateContext, file: NoteFile, showDetails=NoteDetailMode.None) {
 		this.context = context
 		this.note = file
-		this.detailMode = showDetails
+
+		this.selection = new ForwardingStore<EditorRange>(undefined)
+		this.scrollY = new ForwardingStore<number>(undefined)
 
 		this.note.loadFile()
+		this.noteViewInfoFile = getFolderInfoFile(context, file)
+		this.noteViewInfoFile?.loadData<NoteViewInfo>().then(info => {
+			this.noteViewInfo.set(info)
+			if (info) {
+				;(this.selection as ForwardingStore<EditorRange>).forwardFrom(info.selection)
+				;(this.scrollY as ForwardingStore<number>).forwardFrom(info.scrollY)
+			}
+		})
+
+		this.detailMode = showDetails
 
 		this.currentLens = new ReadableStore(this)
 		this.pinSettings = derived([this.search, this.annotations], ([search, annotations]) => {
@@ -139,6 +176,7 @@ export default class NoteViewState implements NodeViewState, LensViewState {
 
 	dispose() {
 		this.note.dropFile()
+		this.noteViewInfoFile.unloadFile()
 		for (const unsub of this.unsubs) {
 			unsub()
 		}

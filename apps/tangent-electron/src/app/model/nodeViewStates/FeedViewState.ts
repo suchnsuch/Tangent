@@ -25,6 +25,10 @@ class FeedViewStateContext extends ViewStateContext {
 
 		return state
 	}
+
+	getRelativePersistentStateDirectory(): string | null {
+		return null
+	}
 }
 
 export default class FeedViewState implements SetLensViewState {

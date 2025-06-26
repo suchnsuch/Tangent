@@ -19,6 +19,13 @@ export function rangeIsCollapsed(range: EditorRange) {
 	return range[0] === range[1]
 }
 
+export function rangesAreEquivalent(a: EditorRange, b: EditorRange) {
+	if (a === b) return true
+	if (!a || !b) return false
+	if (a.length !== b.length) return false
+	return a[0] === b[0] && a[1] === b[1]
+}
+
 /**
  * Returns the intersection of two normalized ranges
  */

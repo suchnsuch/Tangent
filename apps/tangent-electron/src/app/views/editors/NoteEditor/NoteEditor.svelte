@@ -34,7 +34,7 @@ import { pluralize } from 'common/plurals'
 import arrowNavigate from 'app/utils/arrowNavigate'
 import { HrefFormedLink, StructureType } from 'common/indexing/indexTypes'
 import type { ConnectionInfo } from 'common/indexing/indexTypes'
-import { areLineArraysOpTextEquivalent, EditInfo, getEditInfo, getLineRangeWhile, getRangeWhile, lineToText, stripLineAttributes } from 'common/typewriterUtils'
+import { areLineArraysOpTextEquivalent, EditInfo, getEditInfo, getLineRangeWhile, getRangeWhile, lineToText, rangesAreEquivalent, stripLineAttributes } from 'common/typewriterUtils'
 import { scrollTo } from 'app/utils';
 import { eventHasSelectionRequest, type NavigationData } from 'app/events'
 import WorkspaceFileHeader from 'app/utils/WorkspaceFileHeader.svelte';
@@ -62,6 +62,7 @@ import { handleIsNode } from 'app/model/NodeHandle';
 import { revealContentAroundRange } from './editorModule';
 import { fly } from 'svelte/transition';
 import LineGutter from './LineGutter.svelte';
+    import { contextIsolated } from 'process';
 
 // Technically, this just needs to exist _somewhere_. Putting it here because of the svelte dependency
 // Force the use of the variable so that it is included in the bundle
@@ -132,7 +133,7 @@ let justScrolled = true
 let editorIsFocused = false
 
 let selectEndEnabled = true
-let allowSelectionJump = true
+let isEditorMouseDown = false
 let mouseDownX = 0
 let mouseDownY = 0
 
@@ -167,13 +168,7 @@ editor.on('error', onEditorError)
 
 editor.on('navigate', navigationForward)
 
-onMount(() => {
-	if (container && state?.scrollY && layout === 'fill') {
-		tick().then(() => {
-			container.scrollTop = state.scrollY.value
-		})
-	}
-})
+const unsubs: (() => void)[] = []
 
 function onEditorRoot() {
 	editor.root.addEventListener('resumeFocus', resumeFocus)
@@ -183,15 +178,30 @@ function onEditorRoot() {
 	
 	editor.modules.tangent?.setNotePath(note.path)
 
+	if (state?.scrollY && layout === 'fill') {
+		wait().then(() => {
+			subscribeUntil(state.scrollY, scroll => {
+				if (typeof scroll === 'number') {
+					if (container) {
+						container.scrollTop = scroll
+					}
+					return true
+				}
+			}, 1000)
+		})
+	}
+
 	if (isCurrent) {
 		tick().then(() => {
-			if (state.selection && !editor.doc.selection) {
+			if (state.selection.value && !editor.doc.selection) {
 				resumeFocus()
 			}
 		})
 	}
 
-	smartParagraphBreaks.subscribe(v => editor.modules.tangent?.setSmartParagraphBreaks(v))
+	unsubs.push(
+		smartParagraphBreaks.subscribe(v => editor.modules.tangent?.setSmartParagraphBreaks(v))
+	)
 }
 
 onDestroy(() => {
@@ -209,6 +219,10 @@ onDestroy(() => {
 		editor.off('navigate', navigationForward)
 		
 		editor.destroy()
+	}
+
+	for (const unsub of unsubs) {
+		unsub()
 	}
 })
 
@@ -418,7 +432,7 @@ function updateAnnotations(annotations: Annotation[], index=0) {
 				editor.select(selection)
 			}
 			else {
-				state.selection = [selection, selection]
+				state.selection.set([selection, selection])
 			}
 			allowAnnotationReactions = true
 		}
@@ -437,6 +451,7 @@ function setScrollTo(options: ScrollToOptions) {
 		marginY.start += headerElement.getBoundingClientRect().height
 		options.marginY = marginY
 	}
+
 	if (layout === 'fill') {
 		scrollTo(options)
 	}
@@ -539,7 +554,13 @@ function onEditorChange(changeEvent: EditorChangeEvent) {
 
 	if (editable) {
 		if (editor.doc.selection) {
-			state.selection = editor.doc.selection
+			state.selection.set(editor.doc.selection)
+			
+			if (state.scrollY.value && container?.scrollTop) {
+				wait().then(() => {
+					state.scrollY.set(container.scrollTop)
+				})
+			}
 		}
 
 		if (changeEvent.changedLines?.length > 0) {
@@ -552,7 +573,7 @@ function onEditorChange(changeEvent: EditorChangeEvent) {
 			note.realizeFile()
 		}
 
-		if (container && focusLevel >= FocusLevel.Typewriter && allowSelectionJump) {
+		if (container && focusLevel >= FocusLevel.Typewriter && !isEditorMouseDown) {
 			if (changeEvent.doc.selection) {
 				// Microtask means that layout is finished and the scroll appears to happen seemlessly
 				queueMicrotask(() => centerOnEditorRange(changeEvent.doc.selection))
@@ -746,10 +767,7 @@ function resumeFocus(arg?) {
 		editorElement?.focus({
 			preventScroll: true
 		})
-		if (state.selection) {
-			editor.select(state.selection)
-		}
-		else {
+		if (!state.selection.value) {
 			editor.select(getInitialSelection(editor.doc))
 		}
 	}
@@ -837,8 +855,10 @@ function onWheel(event: WheelEvent) {
 
 function onEditorFocus() {
 	editorIsFocused = true
-	if (state.selection) {
-		editor?.select(state.selection)
+	// this allows clicks to bypass stored selection state while allowing
+	// focus shifts with the keyboard to restore selection state.
+	if (state.selection.value && !isEditorMouseDown) {
+		editor?.select(state.selection.value)
 	}
 }
 
@@ -859,11 +879,11 @@ function onMouseDown(event: MouseEvent) {
 }
 
 function onEditorMouseDown(event: MouseEvent) {
-	allowSelectionJump = false
+	isEditorMouseDown = true
 }
 
 function onEditorMouseUp(event: MouseEvent) {
-	allowSelectionJump = true
+	isEditorMouseDown = false
 	if (focusLevel >= FocusLevel.Typewriter) {
 		if (editor.doc.selection) {
 			centerOnEditorRange(editor.doc.selection, 500)

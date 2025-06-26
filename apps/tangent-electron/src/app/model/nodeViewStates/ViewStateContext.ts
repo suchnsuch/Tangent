@@ -1,4 +1,5 @@
 import { swapRemove } from '@such-n-such/core'
+import paths from 'common/paths'
 import type { TreeChange, TreeNode } from 'common/trees'
 import { getNodeFromReference, isNode, isSubReference, TreeNodeOrReference, TreeNodeReference } from 'common/nodeReferences'
 import type Workspace from '../Workspace'
@@ -21,7 +22,6 @@ export default class ViewStateContext {
 	// In theory, this would eventually let plugins define their own creation methods
 	creators: ViewStateCreator[] = null
 
-	// TODO: Replication support
 	private states: Map<string, NodeViewState> = new Map()
 
 	constructor(workspace: Workspace, tangent: Tangent, parent: ViewStateContext = null) {
@@ -74,6 +74,11 @@ export default class ViewStateContext {
 			state.dispose()
 		}
 		this.states.delete(key)
+	}
+
+	getRelativePersistentStateDirectory(): string | null {
+		const result = this.workspace.directoryStore.pathToRelativePath(paths.dirname(this.tangent.tangentInfoFile.path))
+		return result === false ? null : paths.join(result, 'state')
 	}
 
 	protected createNodeViewState(item: TreeNodeOrReference, allowUnhandled=true): NodeViewState {
