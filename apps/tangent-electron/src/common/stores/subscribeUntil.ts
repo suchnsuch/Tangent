@@ -24,6 +24,16 @@ export function subscribeUntil<T>(store: Readable<T>, handler: (value: T) => boo
 			unsub()
 			unsub = null
 		}
+		else {
+			// This happens if the value is immediately valid within the subscription
+			// Defer unsub until after unsub is set
+			queueMicrotask(() => {
+				if (unsub) {
+					unsub()
+					unsub = null
+				}
+			})
+		}
 	}
 
 	unsub = store.subscribe(value => {
