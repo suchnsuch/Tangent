@@ -65,6 +65,8 @@ export function revealContentAroundRange(doc: TextDocument, range: EditorRange, 
 	const selection = normalizeRange(range)
 	const formats = doc.getTextFormat(selection)
 	const lines = doc.getLinesAt(selection)
+
+	let revealLine = false
 	
 	for (let line of lines) {
 		// Expand range to grab on either side
@@ -78,8 +80,10 @@ export function revealContentAroundRange(doc: TextDocument, range: EditorRange, 
 		let earliestUnbrokenHidden = relativeSelection[0]
 		let latestUnbrokenHidden = relativeSelection[1]
 		const isHiddenLine = line.attributes.hidden ?? false 
-		let hitLineFormat = isHiddenLine
-		let hitRevealable = hitLineFormat
+		
+		revealLine = revealLine || isHiddenLine
+
+		let hitRevealable = revealLine
 		let foundLatest = false
 		let textIndex = 0
 		let opIndex = 0
@@ -92,7 +96,7 @@ export function revealContentAroundRange(doc: TextDocument, range: EditorRange, 
 				if (op.attributes?.hidden || op.attributes?.hiddenGroup) {
 					hitRevealable = true
 					if (op.attributes?.line_format) {
-						hitLineFormat = true
+						revealLine = true
 					}
 					if (textIndex < earliestUnbrokenHidden) {
 						earliestUnbrokenHidden = textIndex
@@ -101,7 +105,7 @@ export function revealContentAroundRange(doc: TextDocument, range: EditorRange, 
 				else {
 					// Continuity broken, reset
 					hitRevealable = false
-					hitLineFormat = isHiddenLine
+					revealLine = revealLine || isHiddenLine
 					earliestUnbrokenHidden = relativeSelection[0]
 				}
 			}
@@ -109,7 +113,7 @@ export function revealContentAroundRange(doc: TextDocument, range: EditorRange, 
 				if (op.attributes?.hidden || op.attributes?.hiddenGroup) {
 					hitRevealable = true
 					if (op.attributes?.line_format) {
-						hitLineFormat = true
+						revealLine = true
 					}
 					if (opEndIndex > latestUnbrokenHidden) {
 						latestUnbrokenHidden = opEndIndex
@@ -134,7 +138,7 @@ export function revealContentAroundRange(doc: TextDocument, range: EditorRange, 
 			
 			change.formatText(targetRange, { revealed: true })
 		}
-		if (hitLineFormat) {
+		if (revealLine) {
 			change.formatLine(doc.getLineRange(line), { revealed: true}, true)
 		}
 	}
