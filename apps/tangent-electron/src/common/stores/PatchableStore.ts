@@ -1,3 +1,4 @@
+import { deepEqual } from 'fast-equals'
 import type { RawValueMode } from './ObjectStore'
 import type { PatchObserver } from './Patchable'
 import type { Patchable } from './Patchable'
@@ -62,4 +63,27 @@ export abstract class PatchableStore<V, P> extends WritableStore<V> implements P
 
 	protected abstract convertFromPatch(patch: P): V
 	protected abstract convertToPatch(value: V, mode?: RawValueMode): P
+}
+
+/**
+ * A patchable store where values are json serializeable and support value equality
+ */
+export class SimplePatchableStore<V> extends PatchableStore<V, V> implements Patchable {
+
+	applyPatch(patch: V): boolean {
+		this.isPatching = true
+		const newValue = this.validateValue(this.convertFromPatch(patch))
+		const changed = !deepEqual(this.value, newValue)
+		this.value = newValue
+		this.isPatching = false
+		return changed
+	}
+
+	protected convertFromPatch(patch: V): V {
+		return patch
+	}
+
+	protected convertToPatch(value: V): V {
+		return value
+	}
 }
