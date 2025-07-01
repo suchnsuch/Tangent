@@ -31,6 +31,7 @@ const defaultOptions: ObjectStoreOptions = {
 }
 
 function isPatchCompatibleValue(value: any) {
+	if (value === null || value === undefined) return true
 	if (typeof value === 'object' && !Array.isArray(value)) {
 		if (Object.getPrototypeOf(value).constructor !== Object) {
 			return false
