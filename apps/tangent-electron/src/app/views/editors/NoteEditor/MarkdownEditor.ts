@@ -14,6 +14,7 @@ import { getRegexMatchIndices } from '@such-n-such/core'
 import UnicodeAutocompleter from '../autocomplete/UnicodeAutocompleter'
 import CodeBlockAutocompleter from '../autocomplete/CodeBlockAutoCompleter'
 import autoWrapping from '../autobraces/autoWrappingModule'
+import { collapsingSections, CollapsingSectionsModule } from './collapsingSections'
 
 function indentLines(editor: MarkdownEditor, direction: -1 | 1) {
 	const { doc } = editor
@@ -141,6 +142,7 @@ export default class MarkdownEditor extends Editor {
 				}),
 				tCheckbox: tCheckboxModule,
 				autoWrap: autoWrapping,
+				collapsingSections,
 				// This goes before copy/paste to get priority over those events
 				tangent: editor => editorModule(editor, { workspace }),
 				
@@ -175,4 +177,6 @@ export default class MarkdownEditor extends Editor {
 		}
 		return super.select(at, source)
 	}
+
+	get collapsingSections() { return this.modules.collapsingSections as CollapsingSectionsModule }
 }

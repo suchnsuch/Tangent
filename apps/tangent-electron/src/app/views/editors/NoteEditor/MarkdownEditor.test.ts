@@ -5,7 +5,7 @@ import { wait } from '@such-n-such/core'
 import { markdownToTextDocument } from 'common/markdownModel'
 import MarkdownEditor from './MarkdownEditor'
 import { Workspace } from 'app/model'
-import { getSelectedLines } from 'common/typewriterUtils'
+import { getSelectedLines, lineToText } from 'common/typewriterUtils'
 
 let editor: MarkdownEditor
 const waitTime = 10
@@ -1179,5 +1179,113 @@ line two
 line three
 line four`)
 		expect(editor.doc.selection).toEqual([13, 22])
+	})
+})
+
+
+describe('Section Collapse', () => {
+
+	function getCollapseState() {
+		const result: ('visible'|'collapsed'|'collapsed-children')[] = []
+		for (let index = 0; index < editor.doc.lines.length; index++) {
+			if (editor.collapsingSections.lineIsCollapsed(index)) {
+				result.push('collapsed')
+			}
+			else if (editor.collapsingSections.lineHasCollapsedChildren(index)) {
+				result.push('collapsed-children')
+			}
+			else {
+				result.push('visible')
+			}
+		}
+		return result
+	}
+
+	it('Edits a header while remaining collapsed', () => {
+		editor.set(markdownToTextDocument(`# My Header
+My Content
+My other content`))
+
+		editor.collapsingSections.toggleLineCollapsed(0)
+		expect(getCollapseState()).toEqual([
+			'collapsed-children', 'collapsed', 'collapsed'
+		])
+
+		editor.select(11)
+		editor.delete(-1)
+
+		expect(lineToText(editor.doc.lines[0]))
+			.toEqual('# My Heade')
+		expect(getCollapseState()).toEqual([
+			'collapsed-children', 'collapsed', 'collapsed'
+		])		
+	})
+
+	it('Deleting into a collapsed line expands the collapsed section', () => {
+		editor.set(markdownToTextDocument(`# Header 1
+Content 1
+Content 1.2
+# Header 2
+Content 2`))
+		
+		editor.collapsingSections.toggleLineCollapsed(0)
+		expect(getCollapseState()).toEqual([
+			'collapsed-children', 'collapsed', 'collapsed', 'visible', 'visible'
+		])
+
+		editor.select(33)
+		editor.delete(-1)
+
+		expect(getCollapseState()).toEqual(Array(4).fill('visible'))
+	})
+
+	it('Expands lower collapsed sections when adding a new line at the end', () => {
+		editor.set(markdownToTextDocument(`# Header 1
+Content 1
+Content 1.2
+# Header 2
+Content 2`))
+
+		editor.collapsingSections.toggleLineCollapsed(0)
+
+		editor.select(10)
+		editor.insert('\n')
+
+		expect(getCollapseState()).toEqual(Array(6).fill('visible'))
+	})
+
+	it('Expands upper collpased sections when adding a new line at the start', () => {
+		editor.set(markdownToTextDocument(`# Header 1
+Content 1
+Content 1.2
+# Header 2
+Content 2`))
+
+		editor.collapsingSections.toggleLineCollapsed(0)
+		editor.collapsingSections.toggleLineCollapsed(3)
+
+		editor.select(33)
+		editor.insert('\n')
+
+		expect(getCollapseState()).toEqual(Array(6).fill('visible'))
+	})
+
+	it('Drops collapsed sections when a document is replaced', () => {
+		editor.set(markdownToTextDocument(`# Header 1
+Content 1
+Content 1.2
+# Header 2
+Content 2`))
+
+		editor.collapsingSections.toggleLineCollapsed(0)
+		editor.collapsingSections.toggleLineCollapsed(3)
+
+		editor.set(markdownToTextDocument(`# Other stuff
+that is long
+and has no
+# ability
+to be collapsed.`))
+
+		expect(getCollapseState()).toEqual(Array(5).fill('visible'))
 	})
 })

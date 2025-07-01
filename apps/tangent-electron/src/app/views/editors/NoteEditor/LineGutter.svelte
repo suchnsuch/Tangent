@@ -1,11 +1,24 @@
 <script lang="ts">
+import { onDestroy } from 'svelte'
 import { computePosition } from '@floating-ui/dom'
 import SvgIcon from 'app/views/smart-icons/SVGIcon.svelte'
-import { applyCollapseChange, CollapseChange, collapseSection, expandSection, lineHasCollapsedChildren, isLineCollapsible, isLineCollapsed } from 'common/markdownModel/sections'
-import { Editor } from 'typewriter-editor'
+import { isLineCollapsible } from 'common/markdownModel/sections'
+import type MarkdownEditor from './MarkdownEditor'
 
-export let editor: Editor
+export let editor: MarkdownEditor
 export let lineElement: HTMLElement
+
+let doc = editor.doc
+
+editor.on('changed', onEditorChanged)
+
+onDestroy(() => {
+	editor.off('changed', onEditorChanged)
+})
+
+function onEditorChanged() {
+	doc = editor.doc
+}
 
 $: lineIndex = (editor && lineElement)
 	? Array.prototype.indexOf.call(lineElement.parentNode.children, lineElement)
@@ -13,7 +26,7 @@ $: lineIndex = (editor && lineElement)
 
 $: lineCollapseIcon = getLineCollapseIcon(lineIndex)
 function getLineCollapseIcon(index: number) {
-	return lineIndex >= 0 && lineHasCollapsedChildren(editor.doc.lines[index]) ?
+	return lineIndex >= 0 && editor.collapsingSections.lineHasCollapsedChildren(index) ?
 		"collapse.svg#closed" : "collapse.svg#open"
 }
 
@@ -40,21 +53,7 @@ function positionOnLine(line: HTMLElement, container: HTMLElement) {
 }
 
 function toggleLineCollapse() {
-	const doc = editor.doc
-	const line = doc.lines[lineIndex]
-
-	let collapse: CollapseChange
-
-	if (lineHasCollapsedChildren(line)) {
-		console.log('expanding')
-		collapse = expandSection(doc, line)
-	}
-	else {
-		console.log('collapsing')
-		collapse = collapseSection(doc, line)
-	}
-
-	applyCollapseChange(collapse, editor.change).apply()
+	editor.collapsingSections.toggleLineCollapsed(lineIndex)
 	lineCollapseIcon = getLineCollapseIcon(lineIndex)
 }
 
@@ -63,7 +62,7 @@ function toggleLineCollapse() {
 {#if lineElement}
 <!-- svelte-ignore a11y-no-static-element-interactions -->
 <div bind:this={container}>
-	{#if isLineCollapsible(editor.doc, lineIndex)}
+	{#if isLineCollapsible(doc, lineIndex)}
 		<button class="subtle collapse"
 			on:click={toggleLineCollapse}
 		>

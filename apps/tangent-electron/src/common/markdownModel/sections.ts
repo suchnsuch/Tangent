@@ -209,7 +209,7 @@ function getCollapseState(line: Line, change: CollapseChange): number | undefine
 
 function modifyCollapseState(line: Line, change: CollapseChange, modification: number) {
 	const state = getCollapseState(line, change) ?? 0
-	change[line.id] = state < 0 ? state - modification : state + modification
+	change[line.id] = state < 0 ? Math.min(state - modification, 0) : Math.max(state + modification, 0)
 }
 
 export function collapseSection(doc: TextDocument, line: Line, change: CollapseChange = {}): CollapseChange {
@@ -270,7 +270,7 @@ export function expandSection(doc: TextDocument, line: Line, change: CollapseCha
 }
 
 export function applyCollapseChange(collapse: CollapseChange, text: TextChange): TextChange {
-	for (const key in collapse) {
+	for (const key of Object.keys(collapse)) {
 		const range = text.doc.getLineRange(key)
 		text.formatLine(range[0], { collapsed: collapse[key] }, true)
 	}
