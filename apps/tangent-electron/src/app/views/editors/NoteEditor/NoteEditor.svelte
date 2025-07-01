@@ -191,6 +191,18 @@ function onEditorRoot() {
 		})
 	}
 
+	if (state?.collapsedLines) {
+		wait().then(() => {
+			subscribeUntil(state.note, note => {
+				console.log('collapsed', state.collapsedLines.value)
+				if (note.isReady) {
+					editor.collapsingSections.setCollapsedStateStore(state.collapsedLines)
+					return true
+				}
+			}, 1000)
+		})
+	}
+
 	if (isCurrent) {
 		tick().then(() => {
 			if (state.selection.value && !editor.doc.selection) {

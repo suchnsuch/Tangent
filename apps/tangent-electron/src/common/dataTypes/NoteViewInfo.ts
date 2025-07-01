@@ -9,6 +9,7 @@ export default class NoteViewInfo extends ObjectStore {
 
 	readonly scrollY = new WritableStore(0)
 	readonly selection = new SimplePatchableStore<EditorRange>(null)
+	readonly collapsedLines = new SimplePatchableStore<number[]>(null)
 
 	constructor({ json }) {
 		super()

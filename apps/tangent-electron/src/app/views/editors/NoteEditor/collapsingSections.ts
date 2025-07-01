@@ -1,11 +1,12 @@
 import { DecorationsModule, Editor, EditorChangeEvent, TextDocument } from 'typewriter-editor'
 import * as sections from 'common/markdownModel/sections'
-import { lineToText } from 'common/typewriterUtils'
 import { lazyPush } from '@such-n-such/core'
+import { WritableStore } from 'common/stores'
 
 export function collapsingSections(editor: Editor) {
 
 	let oldDoc: TextDocument = null
+	let collapsedState: WritableStore<number[]> = null
 	
 	function decorations() {
 		return editor.modules.decorations as DecorationsModule
@@ -43,6 +44,8 @@ export function collapsingSections(editor: Editor) {
 		const decorator = getDecorator()
 		sections.applyCollapseChange(collapse, decorator.change)
 		decorator.apply()
+
+		applyCollapsedState()
 	}
 
 	function onChanging(event: EditorChangeEvent) {
@@ -104,6 +107,27 @@ export function collapsingSections(editor: Editor) {
 			sections.applyCollapseChange(collapseChange, decorator.change)
 			decorator.apply()
 		}
+
+		applyCollapsedState()
+	}
+
+	function applyCollapsedState() {
+		if (collapsedState) {
+			collapsedState.set(extractCollapsedState(decorations().doc))
+		}
+	}
+
+	function extractCollapsedState(doc: TextDocument): number[] | null {
+		let result: number[] = null
+
+		for (let i = 0; i < doc.lines.length; i++) {
+			const line = doc.lines[i]
+			if (sections.lineHasCollapsedChildren(line)) {
+				result = lazyPush(result, i)
+			}
+		}
+
+		return result
 	}
 
 	return {
@@ -120,6 +144,27 @@ export function collapsingSections(editor: Editor) {
 		lineHasCollapsedChildren,
 		lineIsCollapsed,
 		toggleLineCollapsed,
+
+		setCollapsedStateStore(store: WritableStore<number[]>) {
+			collapsedState = store
+
+			const decorator = getDecorator()
+			decorator.clear()
+
+			if (collapsedState.value) {
+				let collapseChange: sections.CollapseChange = {}
+				const doc = decorations().doc
+				for (const index of collapsedState.value) {
+					const line = doc.lines[index]
+					if (!line) break
+					if (!sections.isLineCollapsible(doc, index)) break
+					sections.collapseSection(doc, line, collapseChange)
+				}
+				sections.applyCollapseChange(collapseChange, decorator.change)
+			}
+			
+			decorator.apply()
+		}
 	}
 }
 

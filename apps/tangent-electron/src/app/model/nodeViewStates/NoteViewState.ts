@@ -80,6 +80,7 @@ export default class NoteViewState implements NodeViewState, LensViewState {
 	// Forwarded state values
 	readonly selection: WritableStore<EditorRange>
 	readonly scrollY: WritableStore<number>
+	readonly collapsedLines: WritableStore<number[]>
 
 	// Local Values
 	detailMode: NoteDetailMode
@@ -96,6 +97,7 @@ export default class NoteViewState implements NodeViewState, LensViewState {
 
 		this.selection = new ForwardingStore<EditorRange>(undefined)
 		this.scrollY = new ForwardingStore<number>(undefined)
+		this.collapsedLines = new ForwardingStore<number[]>(undefined)
 
 		this.note.loadFile()
 		this.noteViewInfoFile = getFolderInfoFile(context, file)
@@ -104,6 +106,7 @@ export default class NoteViewState implements NodeViewState, LensViewState {
 			if (info) {
 				;(this.selection as ForwardingStore<EditorRange>).forwardFrom(info.selection)
 				;(this.scrollY as ForwardingStore<number>).forwardFrom(info.scrollY)
+				;(this.collapsedLines as ForwardingStore<number[]>).forwardFrom(info.collapsedLines)
 			}
 		})
 
