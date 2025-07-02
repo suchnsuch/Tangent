@@ -160,6 +160,7 @@ export function isLineCollapsible(lines: Line[], lineIndex: number) {
 		const comparison = compareSectionDepth(line, lines[lineIndex - 1])
 		if (comparison !== true) return true
 	}
+	else if (line.attributes.horizontal_rule) return false
 	else {
 		let nextLine = lineIndex + 1
 		while (nextLine < lines.length) {

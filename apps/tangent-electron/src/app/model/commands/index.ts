@@ -31,7 +31,7 @@ import ShiftThreadHistoryCommand from './ShiftThreadHistory'
 import ShowAllChildMapNodesCommand from './ShowAllChildMapNodes'
 import ShowPreviousSessionCommand from './ShowPreviousSession'
 import DuplicateNodeCommand from './DuplicateNode'
-import { CollapseCurrentSectionCommand } from './CollapseSectionCommands'
+import { CollapseAllSectionsCommand, CollapseCurrentSectionCommand } from './CollapseSectionCommands'
 export { Command, CommandAction }
 
 export interface WorkspaceCommands {
@@ -66,6 +66,10 @@ export interface WorkspaceCommands {
 	setParagraph: NoteKeyboardProxyCommand
 
 	collapseCurrentSection: CollapseCurrentSectionCommand
+	collapseAllSections: CollapseAllSectionsCommand
+	expandAllSections: CollapseAllSectionsCommand
+	collapseSmallestSections: CollapseAllSectionsCommand
+	expandLargestSections: CollapseAllSectionsCommand
 
 	goTo: ShowCommandPaletteCommand
 	openInFileBrowser: ShowInFileBrowserCommand
@@ -217,6 +221,26 @@ export default function workspaceCommands(workspace: Workspace): WorkspaceComman
 
 		collapseCurrentSection: new CollapseCurrentSectionCommand(workspace, {
 			shortcut: 'Mod+Alt+Enter'
+		}),
+		collapseAllSections: new CollapseAllSectionsCommand(workspace, {
+			scope: 'all',
+			mode: 'collapse',
+			shortcut: 'Mod+Alt+Shift+,'
+		}),
+		expandAllSections: new CollapseAllSectionsCommand(workspace, {
+			scope: 'all',
+			mode: 'expand',
+			shortcut: 'Mod+Alt+Shift+.'
+		}),
+		collapseSmallestSections: new CollapseAllSectionsCommand(workspace, {
+			scope: 'edge',
+			mode: 'collapse',
+			shortcut: 'Mod+Alt+,'
+		}),
+		expandLargestSections: new CollapseAllSectionsCommand(workspace, {
+			scope: 'edge',
+			mode: 'expand',
+			shortcut: 'Mod+Alt+.'
 		}),
 
 		showIncomingLinks: new NoteKeyboardProxyCommand(workspace, {

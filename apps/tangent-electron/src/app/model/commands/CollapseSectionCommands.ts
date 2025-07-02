@@ -1,9 +1,11 @@
-import { getFirstCollapseableParentIndex } from 'common/markdownModel/sections'
+import { compareSectionDepth, getFirstCollapseableParentIndex, isLineCollapsible } from 'common/markdownModel/sections'
 import { NoteViewState } from '../nodeViewStates'
-import { CommandContext } from './Command'
-import WorkspaceCommand from './WorkspaceCommand'
+import { CommandContext, CommandOptions } from './Command'
+import WorkspaceCommand, { PaletteAction } from './WorkspaceCommand'
 import { rangeContainsRange } from 'common/typewriterUtils'
 import { wait } from '@such-n-such/core'
+import type { Line } from '@typewriter/document'
+import { Workspace } from '..'
 
 export class CollapseCurrentSectionCommand extends WorkspaceCommand {
 
@@ -48,5 +50,121 @@ export class CollapseCurrentSectionCommand extends WorkspaceCommand {
 			return 'Collapse Current Section'
 		}
 		return 'Toggle Current Section'
+	}
+}
+
+export interface CollapseAllSectionsOptions extends CommandOptions {
+	mode?: 'collapse'|'expand'
+	scope?: 'all'|'edge'
+}
+
+export class CollapseAllSectionsCommand extends WorkspaceCommand {
+
+	mode: 'collapse'|'expand'
+	scope: 'all'|'edge'
+
+	constructor(workspace: Workspace, options: CollapseAllSectionsOptions) {
+		super(workspace, options)
+
+		this.scope = options?.scope ?? 'all'
+		this.mode = options?.mode ?? 'collapse'
+	}
+
+	getView() {
+		const view = this.workspace.viewState.tangent.currentThreadState.value
+		if (!view || !(view instanceof NoteViewState) || !view.editor) return null
+		return view
+	}
+
+	canExecute(context?: CommandContext): boolean {
+		const view = this.getView()
+		if (!view) return false
+
+		const doc = view.editor.doc
+		const sections = view.editor.collapsingSections
+
+		if (this.mode === 'collapse') {
+			for (let i = 0; i < doc.lines.length; i++) {
+				if (isLineCollapsible(doc.lines, i) && !sections.lineHasCollapsedChildren(i)) {
+					return true
+				}
+			}
+		}
+		else if (this.mode === 'expand') {
+			for (let i = 0; i < doc.lines.length; i++) {
+				if (isLineCollapsible(doc.lines, i) && sections.lineHasCollapsedChildren(i)) {
+					return true
+				}
+			}
+		}
+
+		return false
+	}
+
+	execute(context?: CommandContext): void {
+		const view = this.getView()
+		if (!view) return
+
+		const doc = view.editor.doc
+		const sections = view.editor.collapsingSections
+
+		let baseLine: Line = null
+		let targets: number[] = []
+
+		for (let i = 0; i < doc.lines.length; i++) {
+			const targetable = isLineCollapsible(doc.lines, i) &&
+				!sections.lineIsCollapsed(i) &&
+				(this.mode === 'collapse' 
+					? !sections.lineHasCollapsedChildren(i)
+					: sections.lineHasCollapsedChildren(i)
+				)
+
+			if (!targetable) continue
+
+			if (!baseLine || this.scope === 'all') {
+				baseLine = doc.lines[i]
+				targets.push(i)
+			}
+			else {
+				const line = doc.lines[i]
+				const comparison = compareSectionDepth(baseLine, line)
+				if (comparison === true) continue
+
+				console.log('compare', comparison)
+
+				if (comparison === 0) {
+					targets.push(i)
+				}
+				else if ((this.mode === 'collapse' && comparison < 0)
+					|| (this.mode === 'expand' && comparison > 0)
+				) {
+					// Prefer collapsing lower tier sections
+					// and expanding higher tier sections
+					baseLine = line
+					targets = [i]
+				}
+			}
+		}
+
+		sections.toggleLineCollapsed(targets)
+	}
+
+	getLabel(context?: CommandContext) {
+		if (this.scope === 'all') {
+			switch (this.mode) {
+				case 'collapse':
+					return 'Collapse All Sections'
+				case 'expand':
+					return 'Expand All Sections'
+			}
+		}
+		else if (this.scope === 'edge') {
+			switch (this.mode) {
+				case 'collapse':
+					return 'Collapse Smallest Sections'
+				case 'expand':
+					return 'Collapse Largest Sections'
+			} 
+		}
 	}
 }

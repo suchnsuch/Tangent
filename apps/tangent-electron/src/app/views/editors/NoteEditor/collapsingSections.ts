@@ -28,19 +28,23 @@ export function collapsingSections(editor: Editor) {
 		return line && sections.isLineCollapsed(line)
 	}
 
-	function toggleLineCollapsed(lineIndex: number) {
+	function toggleLineCollapsed(targets: number|number[]) {
 		const doc = decorations().doc
-		const line = doc.lines[lineIndex]
+		const indexes = Array.isArray(targets) ? targets : [targets]
 
-		let collapse: sections.CollapseChange
+		if (indexes.length === 0) return
 		
-		if (sections.lineHasCollapsedChildren(line)) {
-			collapse = sections.expandSection(doc, line)
+		let collapse: sections.CollapseChange = {}
+		for (const index of indexes) {
+			const line = doc.lines[index]
+			if (sections.lineHasCollapsedChildren(line)) {
+				collapse = sections.expandSection(doc, line, collapse)
+			}
+			else {
+				collapse = sections.collapseSection(doc, line, collapse)
+			}
 		}
-		else {
-			collapse = sections.collapseSection(doc, line)
-		}
-
+		
 		const decorator = getDecorator()
 		sections.applyCollapseChange(collapse, decorator.change)
 		decorator.apply()
