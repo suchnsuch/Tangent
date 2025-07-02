@@ -130,8 +130,6 @@ export class CollapseAllSectionsCommand extends WorkspaceCommand {
 				const comparison = compareSectionDepth(baseLine, line)
 				if (comparison === true) continue
 
-				console.log('compare', comparison)
-
 				if (comparison === 0) {
 					targets.push(i)
 				}

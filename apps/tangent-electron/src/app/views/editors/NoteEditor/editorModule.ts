@@ -1324,7 +1324,6 @@ export default function editorModule(editor: Editor, options: {
 			const firstIndex = doc.lines.indexOf(lines[0])
 			if (firstIndex === 0) return // Can't move up!
 			const up = findSectionLines(doc, [doc.lines[firstIndex - 1], lines[0]], true, false)
-			console.log(up.lines.map(lineToText))
 			shift = -(up.lines.length - 1)
 		}
 		else {
