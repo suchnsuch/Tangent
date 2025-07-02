@@ -51,6 +51,17 @@ export class CollapseCurrentSectionCommand extends WorkspaceCommand {
 		}
 		return 'Toggle Current Section'
 	}
+
+	getTooltip(context?: CommandContext) {
+		const targets = this.getTargets()
+		if (targets) {
+			if (targets.editor.collapsingSections.lineHasCollapsedChildren(targets.index)) {
+				return 'Expands the current note section, revealing hidden content.'
+			}
+			return 'Collapses the current note section, hiding its contents.'
+		}
+		return 'Toggles the current note section between collapsed & expanded.'
+	}
 }
 
 export interface CollapseAllSectionsOptions extends CommandOptions {
@@ -161,7 +172,26 @@ export class CollapseAllSectionsCommand extends WorkspaceCommand {
 				case 'collapse':
 					return 'Collapse Smallest Sections'
 				case 'expand':
-					return 'Collapse Largest Sections'
+					return 'Expand Largest Sections'
+			} 
+		}
+	}
+
+	getTooltip(context?: CommandContext) {
+		if (this.scope === 'all') {
+			switch (this.mode) {
+				case 'collapse':
+					return 'Collapses all sections within the current note, hiding their contents.'
+				case 'expand':
+					return 'Expands all sections within the current note, revealing their contents.'
+			}
+		}
+		else if (this.scope === 'edge') {
+			switch (this.mode) {
+				case 'collapse':
+					return 'Collapses the lowest-tier, visible sections of the note.'
+				case 'expand':
+					return 'Expands the highest-tier, collapsed sections of the note.'
 			} 
 		}
 	}
