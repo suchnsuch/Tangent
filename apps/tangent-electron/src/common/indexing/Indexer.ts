@@ -207,6 +207,7 @@ export default class Indexer {
 			const meta = node.meta
 			
 			const data: any = {
+				uuid: meta.uuid,
 				modified: meta.modified
 				// Don't include in-links as those are rebuilt each time
 			}
