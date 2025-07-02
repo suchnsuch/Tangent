@@ -62,7 +62,6 @@ import { handleIsNode } from 'app/model/NodeHandle';
 import { revealContentAroundRange } from './editorModule';
 import { fly } from 'svelte/transition';
 import LineGutter from './LineGutter.svelte';
-    import { contextIsolated } from 'process';
 
 // Technically, this just needs to exist _somewhere_. Putting it here because of the svelte dependency
 // Force the use of the variable so that it is included in the bundle
@@ -214,6 +213,10 @@ function onEditorRoot() {
 	unsubs.push(
 		smartParagraphBreaks.subscribe(v => editor.modules.tangent?.setSmartParagraphBreaks(v))
 	)
+
+	if (state.editor === null) {
+		state.editor = editor
+	}
 }
 
 onDestroy(() => {
@@ -231,6 +234,10 @@ onDestroy(() => {
 		editor.off('navigate', navigationForward)
 		
 		editor.destroy()
+	}
+
+	if (state.editor) {
+		state.editor = null
 	}
 
 	for (const unsub of unsubs) {

@@ -31,6 +31,7 @@ import ShiftThreadHistoryCommand from './ShiftThreadHistory'
 import ShowAllChildMapNodesCommand from './ShowAllChildMapNodes'
 import ShowPreviousSessionCommand from './ShowPreviousSession'
 import DuplicateNodeCommand from './DuplicateNode'
+import { CollapseCurrentSectionCommand } from './CollapseSectionCommands'
 export { Command, CommandAction }
 
 export interface WorkspaceCommands {
@@ -63,6 +64,8 @@ export interface WorkspaceCommands {
 	setHeader6: NoteKeyboardProxyCommand
 
 	setParagraph: NoteKeyboardProxyCommand
+
+	collapseCurrentSection: CollapseCurrentSectionCommand
 
 	goTo: ShowCommandPaletteCommand
 	openInFileBrowser: ShowInFileBrowserCommand
@@ -210,6 +213,10 @@ export default function workspaceCommands(workspace: Workspace): WorkspaceComman
 			label: 'Paragraph',
 			paletteLabel: 'Set Paragraph',
 			tooltip: 'Changes the currently selected line(s) to be paragraphs.'
+		}),
+
+		collapseCurrentSection: new CollapseCurrentSectionCommand(workspace, {
+			shortcut: 'Mod+Alt+Enter'
 		}),
 
 		showIncomingLinks: new NoteKeyboardProxyCommand(workspace, {

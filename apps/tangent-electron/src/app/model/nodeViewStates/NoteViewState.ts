@@ -19,6 +19,7 @@ import NoteSettingsView from 'app/views/node-views/NoteSettingsView.svelte'
 import DataFile from '../DataFile'
 import NoteViewInfo from 'common/dataTypes/NoteViewInfo'
 import paths from 'common/paths'
+import type MarkdownEditor from 'app/views/editors/NoteEditor/MarkdownEditor'
 
 export enum NoteDetailMode {
 	None = 0,
@@ -90,6 +91,10 @@ export default class NoteViewState implements NodeViewState, LensViewState {
 	readonly search: WritableStore<NoteSearchData> = new WritableStore(null)
 
 	protected readonly unsubs: (() => void)[]
+
+	// This is filled in & cleared out by the implementing component
+	// It exists for easy access from top-level systems (e.g. commands)
+	editor: MarkdownEditor = null
 
 	constructor(context: ViewStateContext, file: NoteFile, showDetails=NoteDetailMode.None) {
 		this.context = context

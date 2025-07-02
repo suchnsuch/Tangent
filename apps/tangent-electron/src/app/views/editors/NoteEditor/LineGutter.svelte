@@ -62,7 +62,7 @@ function toggleLineCollapse() {
 {#if lineElement}
 <!-- svelte-ignore a11y-no-static-element-interactions -->
 <div bind:this={container}>
-	{#if isLineCollapsible(doc, lineIndex)}
+	{#if isLineCollapsible(doc.lines, lineIndex)}
 		<button class="subtle collapse"
 			on:click={toggleLineCollapse}
 		>

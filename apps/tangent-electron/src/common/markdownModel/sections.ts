@@ -150,20 +150,20 @@ export function findSectionLines(
 	}
 }
 
-export function isLineCollapsible(doc: TextDocument, lineIndex: number) {
-	if (lineIndex < 0 || lineIndex >= doc.lines.length - 1) return false
+export function isLineCollapsible(lines: Line[], lineIndex: number) {
+	if (lineIndex < 0 || lineIndex >= lines.length - 1) return false
 
-	const line = doc.lines[lineIndex]
+	const line = lines[lineIndex]
 
 	if (lineIsMultiLineFormat(line)) {
 		if (lineIndex === 0) return true
-		const comparison = compareSectionDepth(line, doc.lines[lineIndex - 1])
+		const comparison = compareSectionDepth(line, lines[lineIndex - 1])
 		if (comparison !== true) return true
 	}
 	else {
 		let nextLine = lineIndex + 1
-		while (nextLine < doc.lines.length) {
-			const comparison = compareSectionDepth(line, doc.lines[lineIndex + 1])
+		while (nextLine < lines.length) {
+			const comparison = compareSectionDepth(line, lines[lineIndex + 1])
 			if (comparison !== true) {
 				return comparison < 0
 			}
@@ -210,6 +210,21 @@ function getCollapseState(line: Line, change: CollapseChange): number | undefine
 function modifyCollapseState(line: Line, change: CollapseChange, modification: number) {
 	const state = getCollapseState(line, change) ?? 0
 	change[line.id] = state < 0 ? Math.min(state - modification, 0) : Math.max(state + modification, 0)
+}
+
+export function getFirstCollapseableParentIndex(doc: TextDocument, position: number): number {
+	const line = doc.getLineAt(position)
+	const lineIndex = doc.lines.indexOf(line)
+
+	if (isLineCollapsible(doc.lines, lineIndex)) return lineIndex
+
+	for (let i = lineIndex - 1; i >= 0; i--) {
+		const result = compareSectionDepth(line, doc.lines[i])
+		if (result === true || result <= 0) continue
+		if (isLineCollapsible(doc.lines, i)) return i
+	}
+
+	return undefined
 }
 
 export function collapseSection(doc: TextDocument, line: Line, change: CollapseChange = {}): CollapseChange {

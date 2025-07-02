@@ -157,7 +157,7 @@ export function collapsingSections(editor: Editor) {
 				for (const index of collapsedState.value) {
 					const line = doc.lines[index]
 					if (!line) break
-					if (!sections.isLineCollapsible(doc, index)) break
+					if (!sections.isLineCollapsible(doc.lines, index)) break
 					sections.collapseSection(doc, line, collapseChange)
 				}
 				sections.applyCollapseChange(collapseChange, decorator.change)
