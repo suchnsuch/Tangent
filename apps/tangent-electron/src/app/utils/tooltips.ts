@@ -157,10 +157,11 @@ export function tooltip(node: HTMLElement, def: TooltipDefOrConfig) {
 
 	return {
 		update(def: TooltipDefOrConfig) {
+			dropTooltip(node)
 			config = tooltipToConfig(def)
 		},
 		destroy() {
-			dropTooltip(node)
+			dropTooltip(node, false)
 			node.removeEventListener('mouseenter', makeTooltipRequest)
 			node.removeEventListener('mousemove', makeTooltipRequest)
 			node.removeEventListener('mouseleave', onLeave)
