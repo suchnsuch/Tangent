@@ -193,7 +193,6 @@ function onEditorRoot() {
 	if (state?.collapsedLines) {
 		wait().then(() => {
 			subscribeUntil(state.note, note => {
-				console.log('collapsed', state.collapsedLines.value)
 				if (note.isReady) {
 					editor.collapsingSections.setCollapsedStateStore(state.collapsedLines)
 					return true
