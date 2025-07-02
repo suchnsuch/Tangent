@@ -34,7 +34,7 @@ import { isLeftClick, startDrag } from 'app/utils'
 import { repeatString } from '@such-n-such/core'
 import { subscribeUntil } from 'common/stores'
 import { handleIsNode } from 'app/model/NodeHandle'
-import { findSectionLines } from 'common/markdownModel/sections'
+import { findSectionLines, isLineCollapsed } from 'common/markdownModel/sections'
 import { isMac } from 'common/platform'
 import { bustIntoSelection } from '../selectionBuster'
 
@@ -66,23 +66,22 @@ export function revealContentAroundRange(doc: TextDocument, range: EditorRange, 
 	const formats = doc.getTextFormat(selection)
 	const lines = doc.getLinesAt(selection)
 
-	let revealLine = false
+	// Expand range to grab on either side
+	selection[0] = selection[0] - 1
+	selection[1] = selection[1] + 1
 	
 	for (let line of lines) {
-		// Expand range to grab on either side
-		selection[0] = selection[0] - 1
-		selection[1] = selection[1] + 1
-
 		const lineRange = doc.getLineRange(line)
 		const lineSelection = clampRange(selection, lineRange)
 		const relativeSelection = [lineSelection[0] - lineRange[0], lineSelection[1] - lineRange[0]]
 		
 		let earliestUnbrokenHidden = relativeSelection[0]
 		let latestUnbrokenHidden = relativeSelection[1]
-		const isHiddenLine = line.attributes.hidden ?? false 
-		
-		revealLine = revealLine || isHiddenLine
 
+		const baseRevealLine = (line.attributes.hidden ?? false)
+			|| (lineRange[0] === lineSelection[0] && lineRange[1] === lineSelection[1])
+		
+		let revealLine = baseRevealLine
 		let hitRevealable = revealLine
 		let foundLatest = false
 		let textIndex = 0
@@ -105,7 +104,7 @@ export function revealContentAroundRange(doc: TextDocument, range: EditorRange, 
 				else {
 					// Continuity broken, reset
 					hitRevealable = false
-					revealLine = revealLine || isHiddenLine
+					revealLine = baseRevealLine
 					earliestUnbrokenHidden = relativeSelection[0]
 				}
 			}
