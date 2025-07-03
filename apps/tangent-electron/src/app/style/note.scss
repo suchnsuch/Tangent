@@ -298,7 +298,7 @@ article.note {
 			height: rhythmUnit(1);
 			position: relative;
 			
-			&:not(.revealed)::after {
+			&:not(.revealed):not(.collapse-parent)::after {
 				content: "";
 				display: block;
 				background: var(--deemphasizedTextColor);
@@ -309,6 +309,26 @@ article.note {
 				top: rhythmUnit(.5);
 				left: .5em;
 				right: .5em;
+			}
+		}
+
+		&.start.collapse-parent {
+			&::after {
+				content: "---front matter-->";
+				font-style: italic;
+				font-weight: 200;
+				display: inline-block;
+				border-top: 1px solid var(--deemphasizedTextColor);
+				border-bottom: 1px solid var(--deemphasizedTextColor);
+				opacity: .5;
+
+				position: absolute;
+				left: 0;
+				right: .5em;
+				height: rhythmUnit(1);
+			}
+			&.revealed::after {
+				content: '---'
 			}
 		}
 	}

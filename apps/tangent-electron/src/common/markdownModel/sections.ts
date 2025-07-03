@@ -72,6 +72,14 @@ export function compareSectionDepth(lineA: Line, lineB: Line): number | true {
 		return 0
 	}
 
+	// Frontmatter needs to be considered together
+	const frontA = attrA?.front_matter
+	const frontB = attrB?.front_matter
+	if (frontA && frontB) {
+		if (frontA === frontB) return true
+		return 0
+	}
+
 	return 0
 }
 
