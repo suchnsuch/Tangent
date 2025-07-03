@@ -71,6 +71,14 @@ export function collapsingSections(editor: Editor) {
 					const newState = newLine.attributes.collapsed
 					if (oldState !== newState) {
 						linesToTweak = lazyPush(linesToTweak, changedLine.id)
+						continue
+					}
+
+					if (oldState < 0) { // IE collapsible & collapsed
+						const index = newDoc.lines.indexOf(newLine)
+						if (!sections.isLineCollapsible(newDoc.lines, index)) {
+							linesToTweak = lazyPush(linesToTweak, changedLine.id)
+						}
 					}
 				}
 				else {
