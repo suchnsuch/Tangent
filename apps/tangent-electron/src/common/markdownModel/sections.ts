@@ -225,11 +225,7 @@ export function getFirstCollapseableParentIndex(doc: TextDocument, position: num
 	const line = doc.getLineAt(position)
 	const lineIndex = doc.lines.indexOf(line)
 
-	if (isLineCollapsible(doc.lines, lineIndex)) return lineIndex
-
-	for (let i = lineIndex - 1; i >= 0; i--) {
-		const result = compareSectionDepth(line, doc.lines[i])
-		if (result === true || result <= 0) continue
+	for (let i = lineIndex; i >= 0; i--) {
 		if (isLineCollapsible(doc.lines, i)) return i
 	}
 

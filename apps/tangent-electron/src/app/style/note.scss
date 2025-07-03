@@ -314,7 +314,7 @@ article.note {
 
 		&.start.collapse-parent {
 			&::after {
-				content: "---front matter-->";
+				content: "--- front matter ---";
 				font-style: italic;
 				font-weight: 200;
 				display: inline-block;
@@ -326,9 +326,6 @@ article.note {
 				left: 0;
 				right: .5em;
 				height: rhythmUnit(1);
-			}
-			&.revealed::after {
-				content: '---'
 			}
 		}
 	}
