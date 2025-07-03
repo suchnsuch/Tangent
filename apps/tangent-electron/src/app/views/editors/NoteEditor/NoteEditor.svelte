@@ -944,29 +944,35 @@ function onEditorDoubleClick(event: MouseEvent) {
 /////////////////////////////
 // Line gutter adornments //
 ///////////////////////////
-let hoveredLineElement: HTMLElement = null
+let hoveredLineTarget: { element: HTMLElement, index: number } = null
 
 function onMouseMove(event: MouseEvent) {
-	const count = editorElement.childElementCount
+
+	const lines = editorElement.querySelectorAll('.line')
+
+	const count = lines.length
 	for (let i = 0 ; i < count; i++) {
-		const element = editorElement.children.item(i) as HTMLElement
-		const bounds = element.getBoundingClientRect()
+		const lineElement = lines.item(i) as HTMLElement
+		const bounds = lineElement.getBoundingClientRect()
 
 		if (event.clientY > bounds.top && event.clientY <= bounds.bottom
 			&& event.clientX > bounds.left - 50 && event.clientX < bounds.left + 150
 		) {
-			if (hoveredLineElement !== element) {
-				hoveredLineElement = element
+			if (hoveredLineTarget?.element !== lineElement) {
+				hoveredLineTarget = {
+					element: lineElement,
+					index: i
+				}
 			}
 			return
 		}
 	}
 
-	if (hoveredLineElement) hoveredLineElement = null
+	if (hoveredLineTarget) hoveredLineTarget = null
 }
 
 function onMouseLeave(event: MouseEvent) {
-	if (hoveredLineElement) hoveredLineElement = null
+	if (hoveredLineTarget) hoveredLineTarget = null
 }
 //// End ////
 
@@ -1413,7 +1419,7 @@ function onDetailsContexMenu(event: MouseEvent) {
 			<CodeBlockAutocompleteMenu {handler} />
 		{/if}
 	</AutoCompleteMenu>
-	<LineGutter {editor} lineElement={hoveredLineElement} />
+	<LineGutter {editor} target={hoveredLineTarget} />
 </main>
 
 {#if state.detailMode}

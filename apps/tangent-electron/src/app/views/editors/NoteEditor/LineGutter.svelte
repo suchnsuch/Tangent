@@ -6,7 +6,7 @@ import { isLineCollapsible } from 'common/markdownModel/sections'
 import type MarkdownEditor from './MarkdownEditor'
 
 export let editor: MarkdownEditor
-export let lineElement: HTMLElement
+export let target: { element: HTMLElement, index: number }
 
 let doc = editor.doc
 
@@ -20,19 +20,15 @@ function onEditorChanged() {
 	doc = editor.doc
 }
 
-$: lineIndex = (editor && lineElement)
-	? Array.prototype.indexOf.call(lineElement.parentNode.children, lineElement)
-	: -1
-
-$: lineCollapseIcon = getLineCollapseIcon(lineIndex)
+$: lineCollapseIcon = getLineCollapseIcon(target?.index ?? -1)
 function getLineCollapseIcon(index: number) {
-	return lineIndex >= 0 && editor.collapsingSections.lineHasCollapsedChildren(index) ?
+	return index >= 0 && editor.collapsingSections.lineHasCollapsedChildren(index) ?
 		"collapse.svg#closed" : "collapse.svg#open"
 }
 
 let container: HTMLElement = null
 
-$: positionOnLine(lineElement, container)
+$: positionOnLine(target?.element, container)
 function positionOnLine(line: HTMLElement, container: HTMLElement) {
 	if (!line || !container) return
 
@@ -53,16 +49,19 @@ function positionOnLine(line: HTMLElement, container: HTMLElement) {
 }
 
 function toggleLineCollapse() {
-	editor.collapsingSections.toggleLineCollapsed(lineIndex)
-	lineCollapseIcon = getLineCollapseIcon(lineIndex)
+	const index = target?.index
+	if (index !== undefined) {
+		editor.collapsingSections.toggleLineCollapsed(index)
+		lineCollapseIcon = getLineCollapseIcon(index)
+	}
 }
 
 </script>
 
-{#if lineElement}
+{#if target?.element}
 <!-- svelte-ignore a11y-no-static-element-interactions -->
 <div bind:this={container}>
-	{#if isLineCollapsible(doc.lines, lineIndex)}
+	{#if isLineCollapsible(doc.lines, target.index)}
 		<button class="subtle collapse"
 			on:click={toggleLineCollapse}
 		>
