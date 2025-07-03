@@ -537,6 +537,12 @@ export default class Settings extends ObjectStore {
 		defaultValue: false
 	})
 
+	collapseFrontMatter = new Setting<boolean>({
+		name: 'Collapse Front Matter',
+		description: 'When enabled, front matter will start collapsed.',
+		defaultValue: false
+	})
+
 	// Debug
 	debug_sendCrashReports = new Setting<boolean>({
 		name: 'Send Crash Reports',

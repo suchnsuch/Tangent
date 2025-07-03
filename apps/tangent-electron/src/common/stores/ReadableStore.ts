@@ -36,9 +36,10 @@ export class ReadableStore<T> {
 		}
 	}
 
-	ifHasValue(valueUser: (value: T) => any) {
+	ifHasValue<R, D>(valueUser: (value: T) => R, otherwise?: D): R | D {
 		if (this._value !== null && this._value !== undefined) {
-			valueUser(this._value)
+			return valueUser(this._value)
 		}
+		return otherwise
 	}
 }

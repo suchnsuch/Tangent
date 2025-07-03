@@ -62,6 +62,7 @@ import { handleIsNode } from 'app/model/NodeHandle';
 import { revealContentAroundRange } from './editorModule';
 import { fly } from 'svelte/transition';
 import LineGutter from './LineGutter.svelte';
+import { derived } from 'svelte/store';
 
 // Technically, this just needs to exist _somewhere_. Putting it here because of the svelte dependency
 // Force the use of the variable so that it is included in the bundle
@@ -191,14 +192,15 @@ function onEditorRoot() {
 	}
 
 	if (state?.collapsedLines) {
-		wait().then(() => {
-			subscribeUntil(state.note, note => {
-				if (note.isReady) {
-					editor.collapsingSections.setCollapsedStateStore(state.collapsedLines)
-					return true
-				}
-			}, 1000)
-		})
+		subscribeUntil(derived([state.note, state.noteViewInfo], stores => stores), ([note, info]) => {
+			if (note.isReady && info) {
+				// Delay so that the first render pass is complete
+				wait().then(() => {
+					editor.collapsingSections.setCollapsedStateStore(state.collapsedLines)	
+				})
+				return true
+			}
+		}, 1000)
 	}
 
 	if (isCurrent) {

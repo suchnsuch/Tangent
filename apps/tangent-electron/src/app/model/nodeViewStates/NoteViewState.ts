@@ -4,7 +4,7 @@ import { escapeRegExp } from '@such-n-such/core'
 import type NodeViewState from "./NodeViewState"
 import type NoteFile from "../NoteFile"
 import { PartialLink, StructureType } from "common/indexing/indexTypes"
-import { ForwardingStore, ReadableStore, WritableStore } from 'common/stores'
+import { ForwardingStore, ReadableStore, subscribeUntil, WritableStore } from 'common/stores'
 import type { StructureDelta } from 'common/indexing/structureUtils'
 import type LensViewState from './LensViewState'
 
@@ -114,6 +114,22 @@ export default class NoteViewState implements NodeViewState, LensViewState {
 				;(this.collapsedLines as ForwardingStore<number[]>).forwardFrom(info.collapsedLines)
 			}
 		})
+
+		subscribeUntil(derived([this.note, this.noteViewInfo], stores => stores), ([note, info]) => {
+			if (note.isReady && info) {
+				if (note.workspace.settings.collapseFrontMatter.value &&
+					note.lines.length > 0 &&
+					note.lines[0].attributes.front_matter &&
+					info.collapsedLines.ifHasValue(v => v.length > 0 && v[0] !== 0, true)
+				) {
+					info.collapsedLines.update(value => {
+						if (value) return [0, ...value]
+						return [0]
+					})
+				}
+				return true	
+			}
+		}, 5000)
 
 		this.detailMode = showDetails
 
