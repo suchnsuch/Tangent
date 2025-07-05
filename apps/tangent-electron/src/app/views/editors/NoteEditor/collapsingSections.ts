@@ -7,6 +7,8 @@ export function collapsingSections(editor: Editor) {
 
 	let oldDoc: TextDocument = null
 	let collapsedState: WritableStore<number[]> = null
+
+	let uncollapseOnEdit = true
 	
 	function decorations() {
 		return editor.modules.decorations as DecorationsModule
@@ -58,6 +60,7 @@ export function collapsingSections(editor: Editor) {
 	}
 
 	function onChanged(event: EditorChangeEvent) {
+		if (!uncollapseOnEdit) return
 		if (event.change?.contentChanged && event.changedLines?.length) {
 
 			const newDoc = decorations().doc
@@ -176,6 +179,10 @@ export function collapsingSections(editor: Editor) {
 			}
 			
 			decorator.apply()
+		},
+
+		setUncollapseOnEdit(value: boolean) {
+			uncollapseOnEdit = value
 		}
 	}
 }

@@ -37,6 +37,7 @@ import { handleIsNode } from 'app/model/NodeHandle'
 import { findSectionLines, isLineCollapsed } from 'common/markdownModel/sections'
 import { isMac } from 'common/platform'
 import { bustIntoSelection } from '../selectionBuster'
+import type MarkdownEditor from './MarkdownEditor'
 
 function clampRange(range: EditorRange, clampingRange: EditorRange): EditorRange {
 	range = normalizeRange(range)
@@ -1307,35 +1308,98 @@ export default function editorModule(editor: Editor, options: {
 		}
 	}
 
-	function shiftSection(event: ShortcutEvent, direction: -1 | 1) {
+	function shiftGroup(event: ShortcutEvent, mode: 'lines'|'section', direction: -1 | 1) {
 		const { doc } = editor
 		const selection = normalizeRange(doc.selection)
 		if (!selection) return
 		const [at, to] = doc.selection
 
-		const { lines } = findSectionLines(
-			doc, selection,
-			direction === -1 ? 'take-parent' : true
-		)
+		let lines: Line[]
+
+		if (mode === 'section') {
+			lines = findSectionLines(
+				doc, selection,
+				direction === -1 ? 'take-parent' : true
+			).lines
+		}
+		else if (mode === 'lines') {
+			lines = getSelectedLines(doc)
+		}
+
+		// `editorModule` is allowed to do this as its the primary module and can know about
+		// all default modules in MarkdownEditor
+		const collapsingSections = (editor as MarkdownEditor).collapsingSections
+
+		// Collect the currently collapsed elements so that they can be recollapsed later
+		let shiftedReCollapseTargets: number[] = []
+
+		{
+			const firstIndex = doc.lines.indexOf(lines[0])
+			const lastIndex = doc.lines.indexOf(lines.at(-1))
+			for (let i = firstIndex; i <= lastIndex; i++) {
+				if (collapsingSections.lineHasCollapsedChildren(i)) {
+					shiftedReCollapseTargets.push(i)
+				}
+			}
+
+			if (shiftedReCollapseTargets.at(-1) === lastIndex) {
+
+				// Upgrade the movement to a section movement
+				mode = 'section'
+
+				// Extend the bottom of the selection if the bottom line has collapsed children
+				for (let i = lastIndex + 1; i < doc.lines.length; i++) {
+					if (!collapsingSections.lineIsCollapsed(i)) break
+					if (collapsingSections.lineHasCollapsedChildren(i)) {
+						shiftedReCollapseTargets.push(i)
+					}
+					lines.push(doc.lines[i])
+				}
+			}
+		}
 
 		// Find the next insertion point to jump the next section.
-		let shift = 0
+		let shift = mode === 'lines' ? direction : 0
 		if (direction === -1) {
 			const firstIndex = doc.lines.indexOf(lines[0])
 			if (firstIndex === 0) return // Can't move up!
-			const up = findSectionLines(doc, [doc.lines[firstIndex - 1], lines[0]], true, false)
-			shift = -(up.lines.length - 1)
+			if (mode === 'section') {
+				const up = findSectionLines(doc, [doc.lines[firstIndex - 1], lines[0]], true, false)
+				shift = -(up.lines.length - 1)
+			}
+
+			// Shift past any collapsed text
+			for (let i = firstIndex + shift; i >= 0; i--) {
+				if (!collapsingSections.lineIsCollapsed(i)) break
+				shift--
+			}
 		}
 		else {
 			const lastIndex = doc.lines.indexOf(lines.at(-1))
 			if (lastIndex === doc.lines.length - 1) return // Can't move down!
-			const down = findSectionLines(doc, [lines.at(-1), doc.lines[lastIndex + 1]], false, true)
-			shift = (down.lines.length - 1)	
+			if (mode === 'section') {
+				const down = findSectionLines(doc, [lines.at(-1), doc.lines[lastIndex + 1]], false, true)
+				shift = (down.lines.length - 1)	
+			}
 		}
 
 		if (shift === 0) return // Can't move!
 
-		return shiftLines(event, lines, shift)
+		for (let i = 0; i < shiftedReCollapseTargets.length; i++) {
+			shiftedReCollapseTargets[i] += shift
+		}
+
+		// Allow collapsed pieces to remain collapsed
+
+		const shouldPreventUncollapse = mode === 'section'
+
+		if (shouldPreventUncollapse) collapsingSections.setUncollapseOnEdit(false)
+		shiftLines(event, lines, shift)
+		if (shouldPreventUncollapse) collapsingSections.setUncollapseOnEdit(true)
+
+		if (shiftedReCollapseTargets.length) {
+			collapsingSections.toggleLineCollapsed(shiftedReCollapseTargets)
+		}
 	}
 
 	function toStartOfLine(event: ShortcutEvent, addToSelection=false) {
@@ -1414,9 +1478,9 @@ export default function editorModule(editor: Editor, options: {
 				return setLinePrefix(event, '')
 
 			case 'Alt+ArrowUp':
-				return shiftLines(event, getSelectedLines(editor.doc), -1)
+				return shiftGroup(event, 'lines', -1)
 			case 'Alt+ArrowDown':
-				return shiftLines(event, getSelectedLines(editor.doc), 1)
+				return shiftGroup(event, 'lines', 1)
 
 			case 'Escape':
 				return onEscape(event)
@@ -1425,17 +1489,17 @@ export default function editorModule(editor: Editor, options: {
 		if (isMac) {
 			switch (event.shortcut) {
 				case 'Ctrl+Alt+ArrowUp':
-					return shiftSection(event, -1)
+					return shiftGroup(event, 'section', -1)
 				case 'Ctrl+Alt+ArrowDown':
-					return shiftSection(event, 1)
+					return shiftGroup(event, 'section', 1)
 			}
 		}
 		else {
 			switch (event.modShortcut) {
 				case 'Alt+Shift+ArrowUp':
-					return shiftSection(event, -1)
+					return shiftGroup(event, 'section', -1)
 				case 'Alt+Shift+ArrowDown':
-					return shiftSection(event, 1)
+					return shiftGroup(event, 'section', 1)
 			}
 		}
 			
@@ -1526,6 +1590,7 @@ export default function editorModule(editor: Editor, options: {
 			})
 		},
 		shiftLines,
+		shiftGroup,
 		toggleLineComment,
 		toggleItalic,
 		toggleBold,

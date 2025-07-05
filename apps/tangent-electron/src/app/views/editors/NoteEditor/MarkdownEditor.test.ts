@@ -1288,4 +1288,131 @@ to be collapsed.`))
 
 		expect(getCollapseState()).toEqual(Array(5).fill('visible'))
 	})
+
+	describe('Shifting collapsed sections', () => {
+		it('Shifts collapsed sections down past other collapsed sections', () => {
+			editor.set(markdownToTextDocument(`# Header 1
+Content 1
+# Header 2
+Content 2
+# Header 3
+Content 3`))
+			editor.collapsingSections.toggleLineCollapsed([0, 2, 4])
+
+			editor.select(2)
+			editor.modules.tangent.shiftGroup(new Event('test'), 'lines', 1)
+
+			expect(editor.getText()).toEqual(`# Header 2
+Content 2
+# Header 1
+Content 1
+# Header 3
+Content 3`)
+		})
+
+		it('Shifts collapsed sections up past other collapsed sections', () => {
+			editor.set(markdownToTextDocument(`# Header 1
+Content 1
+# Header 2
+Content 2
+# Header 3
+Content 3`))
+			editor.collapsingSections.toggleLineCollapsed([0, 2, 4])
+
+			editor.select(44)
+			editor.modules.tangent.shiftGroup(new Event('test'), 'lines', -1)
+
+			expect(editor.getText()).toEqual(`# Header 1
+Content 1
+# Header 3
+Content 3
+# Header 2
+Content 2`)
+		})
+
+		it('Shifts collapsed sections down past other sections', () => {
+			editor.set(markdownToTextDocument(`# Header 1
+Content 1
+# Header 2
+Content 2
+# Header 3
+Content 3`))
+			editor.collapsingSections.toggleLineCollapsed(0)
+
+			editor.select(2)
+			editor.modules.tangent.shiftGroup(new Event('test'), 'lines', 1)
+
+			expect(editor.getText()).toEqual(`# Header 2
+Content 2
+# Header 1
+Content 1
+# Header 3
+Content 3`)
+		})
+
+		it('Shifts collapsed sections up past collapsed sections', () => {
+			editor.set(markdownToTextDocument(`# Header 1
+Content 1
+# Header 2
+Content 2
+# Header 3
+Content 3`))
+			editor.collapsingSections.toggleLineCollapsed(4)
+
+			editor.select(44)
+			editor.modules.tangent.shiftGroup(new Event('test'), 'lines', -1)
+
+			expect(editor.getText()).toEqual(`# Header 1
+Content 1
+# Header 3
+Content 3
+# Header 2
+Content 2`)
+		})
+
+		it('Shifts content down into collapsed sections', () => {
+			editor.set(markdownToTextDocument(`# Header 1
+Content 1
+# Header 2
+Content 2
+# Header 3
+Content 3`))
+			editor.collapsingSections.toggleLineCollapsed(2)
+
+			editor.select(12)
+			editor.modules.tangent.shiftGroup(new Event('test'), 'lines', 1)
+
+			expect(editor.getText()).toEqual(`# Header 1
+# Header 2
+Content 1
+Content 2
+# Header 3
+Content 3`)
+
+			expect(editor.collapsingSections.lineHasCollapsedChildren(1)).toBeFalsy()
+			expect(editor.collapsingSections.lineIsCollapsed(2)).toBeFalsy()
+		})
+
+		it('Shifts lines up past collapsed sections', () => {
+			editor.set(markdownToTextDocument(`# Header 1
+Content 1
+# Header 2
+Content 2
+# Header 3
+Content 3`))
+			editor.collapsingSections.toggleLineCollapsed(2)
+
+			editor.select(44)
+			editor.modules.tangent.shiftGroup(new Event('test'), 'lines', -1)
+
+			expect(editor.getText()).toEqual(`# Header 1
+Content 1
+# Header 3
+# Header 2
+Content 2
+Content 3`)
+			
+			expect(getCollapseState()).toEqual(Array(6).fill('visible'))
+		})
+	})
 })
