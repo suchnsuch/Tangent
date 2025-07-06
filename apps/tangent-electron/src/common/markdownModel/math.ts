@@ -93,7 +93,6 @@ export function parseMathBlock(char: string, parser: NoteParser): boolean {
 		isAtEnd: (char, parser, context) => {
 			const line = parser.feed.getLineText()
 			if (line.trimEnd() === '$$') {
-				console.log('  exiting')
 				parser.feed.nextByLength(line.length)
 				
 				return true
