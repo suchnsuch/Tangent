@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest'
 
-import { compareSectionDepth, findSectionLines } from './sections'
+import { compareSectionDepth, findSectionLines, getFirstCollapseableParentIndex } from './sections'
 import { markdownToTextDocument } from './parser'
 
 describe('Section Depth', () => {
@@ -187,6 +187,25 @@ foo++
 		expect(findSectionLines(doc, [25, 25])).toEqual({
 			lines: doc.lines.slice(1, 5),
 			highest: doc.lines[1]
+		})
+	})
+})
+
+describe('Collapsing', () => {
+	describe('getFirstCollapseableParentIndex', () => {
+		it('Does not target non-parent sections that are above the selection', () => {
+			const doc = markdownToTextDocument(`# Here is a header
+* Here is a list
+	* With children
+	* And stuff
+* And some other things
+
+And some paragraph content.`)
+
+			expect(getFirstCollapseableParentIndex(doc, 6)).toEqual(0)
+			expect(getFirstCollapseableParentIndex(doc, 43)).toEqual(1)
+			expect(getFirstCollapseableParentIndex(doc, 72)).toEqual(0)
+			expect(getFirstCollapseableParentIndex(doc, 99)).toEqual(0)
 		})
 	})
 })

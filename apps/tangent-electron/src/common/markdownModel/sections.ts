@@ -222,10 +222,14 @@ function modifyCollapseState(line: Line, change: CollapseChange, modification: n
 }
 
 export function getFirstCollapseableParentIndex(doc: TextDocument, position: number): number {
-	const line = doc.getLineAt(position)
-	const lineIndex = doc.lines.indexOf(line)
+	const sourceLine = doc.getLineAt(position)
+	const sourceLineIndex = doc.lines.indexOf(sourceLine)
 
-	for (let i = lineIndex; i >= 0; i--) {
+	for (let i = sourceLineIndex; i >= 0; i--) {
+		if (i !== sourceLineIndex) {
+			const compare = compareSectionDepth(sourceLine, doc.lines[i])
+			if (compare !== true && compare <= 0) continue
+		}
 		if (isLineCollapsible(doc.lines, i)) return i
 	}
 
