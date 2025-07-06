@@ -1,37 +1,29 @@
-import { DecorationsModule, Editor, EditorChangeEvent, TextDocument } from 'typewriter-editor'
+import { Editor, EditorChangeEvent, Source, TextChange, TextDocument } from 'typewriter-editor'
 import * as sections from 'common/markdownModel/sections'
 import { lazyPush } from '@such-n-such/core'
 import { WritableStore } from 'common/stores'
+import { lineToText } from 'common/typewriterUtils'
 
 export function collapsingSections(editor: Editor) {
 
-	let oldDoc: TextDocument = null
 	let collapsedState: WritableStore<number[]> = null
 
-	let uncollapseOnEdit = true
+	let preventUncollapseOnEdit = 0
 	
-	function decorations() {
-		return editor.modules.decorations as DecorationsModule
-	}
-
-	function getDecorator() {
-		return decorations().getDecorator('collapsedSections')
-	}
-
 	function lineHasCollapsedChildren(lineIndex: number): boolean {
-		const doc = decorations().doc
+		const doc = editor.doc
 		const line = doc.lines[lineIndex]
 		return sections.lineHasCollapsedChildren(line)
 	}
 
 	function lineIsCollapsed(lineIndex: number): boolean {
-		const doc = decorations().doc
+		const doc = editor.doc
 		const line = doc.lines[lineIndex]
 		return line && sections.isLineCollapsed(line)
 	}
 
 	function toggleLineCollapsed(targets: number|number[]) {
-		const doc = decorations().doc
+		const doc = editor.doc
 		const indexes = Array.isArray(targets) ? targets : [targets]
 
 		if (indexes.length === 0) return
@@ -47,23 +39,21 @@ export function collapsingSections(editor: Editor) {
 			}
 		}
 		
-		const decorator = getDecorator()
-		sections.applyCollapseChange(collapse, decorator.change)
-		decorator.apply()
-
+		preventUncollapseOnEdit++
+		const change = editor.change
+		sections.applyCollapseChange(collapse, change)
+		change.apply()
+		preventUncollapseOnEdit--
+		
 		applyCollapsedState()
 	}
 
 	function onChanging(event: EditorChangeEvent) {
-		// Cache the old decorations doc so that we can compare against it
-		oldDoc = decorations().doc
-	}
-
-	function onChanged(event: EditorChangeEvent) {
-		if (!uncollapseOnEdit) return
+		if (preventUncollapseOnEdit > 0 || event.source === Source.history) return
 		if (event.change?.contentChanged && event.changedLines?.length) {
 
-			const newDoc = decorations().doc
+			const newDoc = event.doc
+			const oldDoc = event.old
 			let linesToTweak: string[] = null
 
 			for (const changedLine of event.changedLines) {
@@ -72,7 +62,7 @@ export function collapsingSections(editor: Editor) {
 				if (oldLine) {
 					const oldState = oldLine.attributes.collapsed
 					const newState = newLine.attributes.collapsed
-					if (oldState !== newState) {
+					if (oldState !== newState || newState > 0 || newState < -1) {
 						linesToTweak = lazyPush(linesToTweak, changedLine.id)
 						continue
 					}
@@ -118,17 +108,20 @@ export function collapsingSections(editor: Editor) {
 				}
 			}
 
-			const decorator = getDecorator()
-			sections.applyCollapseChange(collapseChange, decorator.change)
-			decorator.apply()
+			const collapseTextChange = new TextChange(newDoc)
+			sections.applyCollapseChange(collapseChange, collapseTextChange)
+			event.modify(collapseTextChange.delta)
 		}
+	}
 
+	function onChanged(event: EditorChangeEvent) {
+		
 		applyCollapsedState()
 	}
 
 	function applyCollapsedState() {
 		if (collapsedState) {
-			collapsedState.set(extractCollapsedState(decorations().doc))
+			collapsedState.set(extractCollapsedState(editor.doc))
 		}
 	}
 
@@ -153,7 +146,6 @@ export function collapsingSections(editor: Editor) {
 		destroy() {
 			editor.off('changing', onChanging)
 			editor.off('changed', onChanged)
-			oldDoc = null
 		},
 
 		lineHasCollapsedChildren,
@@ -163,26 +155,34 @@ export function collapsingSections(editor: Editor) {
 		setCollapsedStateStore(store: WritableStore<number[]>) {
 			collapsedState = store
 
-			const decorator = getDecorator()
-			decorator.clear()
+			const doc = editor.doc
+			const change = editor.change
+
+			for (let i = 0; i < doc.lines.length; i++) {
+				const range = doc.getLineRange(doc.lines[i])
+				change.formatLine(range[0], {
+					collapsed: null
+				})
+			}
 
 			if (collapsedState.value) {
 				let collapseChange: sections.CollapseChange = {}
-				const doc = decorations().doc
 				for (const index of collapsedState.value) {
 					const line = doc.lines[index]
 					if (!line) break
 					if (!sections.isLineCollapsible(doc.lines, index)) break
 					sections.collapseSection(doc, line, collapseChange)
 				}
-				sections.applyCollapseChange(collapseChange, decorator.change)
+				sections.applyCollapseChange(collapseChange, change)
 			}
 			
-			decorator.apply()
+			preventUncollapseOnEdit++
+			change.apply()
+			preventUncollapseOnEdit--
 		},
 
 		setUncollapseOnEdit(value: boolean) {
-			uncollapseOnEdit = value
+			preventUncollapseOnEdit += value ? -1 : 1
 		}
 	}
 }

@@ -1250,7 +1250,7 @@ export default function editorModule(editor: Editor, options: {
 			for (const op of line.content.ops) {
 				movingOps.push(op)
 			}
-			movingOps.insert('\n')
+			movingOps.insert('\n', line.attributes)
 		}
 
 		const movingRangeSize = movingOps.length()
@@ -1330,29 +1330,15 @@ export default function editorModule(editor: Editor, options: {
 		// all default modules in MarkdownEditor
 		const collapsingSections = (editor as MarkdownEditor).collapsingSections
 
-		// Collect the currently collapsed elements so that they can be recollapsed later
-		let shiftedReCollapseTargets: number[] = []
-
 		{
-			const firstIndex = doc.lines.indexOf(lines[0])
 			const lastIndex = doc.lines.indexOf(lines.at(-1))
-			for (let i = firstIndex; i <= lastIndex; i++) {
-				if (collapsingSections.lineHasCollapsedChildren(i)) {
-					shiftedReCollapseTargets.push(i)
-				}
-			}
-
-			if (shiftedReCollapseTargets.at(-1) === lastIndex) {
-
+			if (collapsingSections.lineHasCollapsedChildren(lastIndex)) {
 				// Upgrade the movement to a section movement
 				mode = 'section'
 
 				// Extend the bottom of the selection if the bottom line has collapsed children
 				for (let i = lastIndex + 1; i < doc.lines.length; i++) {
 					if (!collapsingSections.lineIsCollapsed(i)) break
-					if (collapsingSections.lineHasCollapsedChildren(i)) {
-						shiftedReCollapseTargets.push(i)
-					}
 					lines.push(doc.lines[i])
 				}
 			}
@@ -1385,21 +1371,11 @@ export default function editorModule(editor: Editor, options: {
 
 		if (shift === 0) return // Can't move!
 
-		for (let i = 0; i < shiftedReCollapseTargets.length; i++) {
-			shiftedReCollapseTargets[i] += shift
-		}
-
 		// Allow collapsed pieces to remain collapsed
 
-		const shouldPreventUncollapse = mode === 'section'
-
-		if (shouldPreventUncollapse) collapsingSections.setUncollapseOnEdit(false)
+		collapsingSections.setUncollapseOnEdit(false)
 		shiftLines(event, lines, shift)
-		if (shouldPreventUncollapse) collapsingSections.setUncollapseOnEdit(true)
-
-		if (shiftedReCollapseTargets.length) {
-			collapsingSections.toggleLineCollapsed(shiftedReCollapseTargets)
-		}
+		collapsingSections.setUncollapseOnEdit(true)
 	}
 
 	function toStartOfLine(event: ShortcutEvent, addToSelection=false) {
