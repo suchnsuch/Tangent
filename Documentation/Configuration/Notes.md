@@ -35,3 +35,7 @@ When this setting is enabled, holding Shift while pressing Enter or Backspace wi
 
 # Code Options
 **Extra Wide Code** allows code blocks to expand outside of the normal width of a note. This can be very helpful when looking at code from verbose codebases.
+
+__Allow Unknown HTML Tags__ allows Tangent to start parsing HTML within notes starting with non-standard HTML tags.
+
+Enabling __Collapse Front Matter__ will make front matter collapsed by default. If you open the front matter in a particular note, that will be retained.
