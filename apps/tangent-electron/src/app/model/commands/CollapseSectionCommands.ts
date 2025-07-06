@@ -115,7 +115,7 @@ export class CollapseAllSectionsCommand extends WorkspaceCommand {
 
 		for (let i = 0; i < doc.lines.length; i++) {
 			const targetable = isLineCollapsible(doc.lines, i) &&
-				!sections.lineIsCollapsed(i) &&
+				(this.scope == 'all' || !sections.lineIsCollapsed(i)) &&
 				(this.mode === 'collapse' 
 					? !sections.lineHasCollapsedChildren(i)
 					: sections.lineHasCollapsedChildren(i)
