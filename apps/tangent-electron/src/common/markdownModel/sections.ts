@@ -191,16 +191,28 @@ export function isLineCollapsible(lines: Line[], lineIndex: number) {
  * 	-2>= -> A collapsed line that has collapsed its children.
  */
 
-export function isCollapsed(collapsedState: any): boolean {
+export function isCollapsed(collapsedState: unknown): boolean {
 	return typeof collapsedState === 'number' && !(collapsedState === 0 || collapsedState === -1)
 }
 
-export function hasCollapsedChildren(collapsedState: any): boolean {
+export function hasCollapsedChildren(collapsedState: unknown): boolean {
 	return typeof collapsedState === 'number' && collapsedState < 0
+}
+
+export function collapseDepth(collapseState: unknown): number {
+	if (typeof collapseState === 'number') {
+		if (collapseState < 0) return Math.abs(collapseState) - 1
+		return collapseState
+	}
+	return 0
 }
 
 export function isLineCollapsed(line: Line): boolean {
 	return isCollapsed(line.attributes.collapsed)
+}
+
+export function lineCollapseDepth(line: Line): number {
+	return collapseDepth(line.attributes.collapsed)
 }
 
 export function lineHasCollapsedChildren(line: Line): boolean {

@@ -243,10 +243,11 @@ article.note {
 			color: green;
 		}
 
-		&.collapsed:not(.revealed) {
-			height: 0;
-			min-height: 0;
+		&.collapsed:not(.collapsed-revealed) {
 			display: none;
+		}
+		&.collapsed-revealed {
+			opacity: .7;
 		}
 
 		&.collapse-parent {
@@ -255,11 +256,12 @@ article.note {
 				font-size: var(--fontSize);
 				color: var(--deemphasizedTextColor);
 				padding-inline-start: .5em;
+				line-height: 1em; // Not sure why this is needed, but it prevents children from moving down
 			}
 		}
 	}
 
-	.hidden, .line.collapsed {
+	.hidden {
 		/*
 		 * This is a cheaky trick that makes text invisible but allows it to be navigated as expected.
 		 * `display: none;` does _not_ handle this as well.
@@ -321,6 +323,7 @@ article.note {
 				border-top: 1px solid var(--deemphasizedTextColor);
 				border-bottom: 1px solid var(--deemphasizedTextColor);
 				opacity: .5;
+				line-height: rhythmUnit(1);
 
 				position: absolute;
 				left: 0;

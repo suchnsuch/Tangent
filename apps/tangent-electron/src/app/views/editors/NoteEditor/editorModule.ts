@@ -34,7 +34,7 @@ import { isLeftClick, startDrag } from 'app/utils'
 import { repeatString } from '@such-n-such/core'
 import { subscribeUntil } from 'common/stores'
 import { handleIsNode } from 'app/model/NodeHandle'
-import { findSectionLines, isCollapsed, isLineCollapsed } from 'common/markdownModel/sections'
+import {findSectionLines, isLineCollapsed, lineCollapseDepth } from 'common/markdownModel/sections'
 import { isMac } from 'common/platform'
 import { bustIntoSelection } from '../selectionBuster'
 import type MarkdownEditor from './MarkdownEditor'
@@ -42,7 +42,10 @@ import type MarkdownEditor from './MarkdownEditor'
 function clampRange(range: EditorRange, clampingRange: EditorRange): EditorRange {
 	range = normalizeRange(range)
 	clampingRange = normalizeRange(clampingRange)
-	return [Math.max(range[0], clampingRange[0]), Math.min(range[1], clampingRange[1])]
+	const first = Math.max(range[0], clampingRange[0])
+	const second = Math.min(range[1], clampingRange[1])
+	if (second < first) return null
+	return [first, second]
 }
 
 interface VerificationInstruction<T> {
@@ -69,23 +72,37 @@ export function revealContentAroundRange(doc: TextDocument, range: EditorRange, 
 
 	{
 		// Expand line consideration to reveal collapsed sections
-		if (isLineCollapsed(lines[0])) {
+		let anchorCollapseDepth = lineCollapseDepth(lines[0])
+		if (anchorCollapseDepth > 0) {
 			const firstIndex = doc.lines.indexOf(lines[0])
 			for (let i = firstIndex - 1; i >= 0; i--) {
-				if (isLineCollapsed(doc.lines[i])) {
+				const line = doc.lines[i]
+				const depth = lineCollapseDepth(line)
+				if (depth === 0) break
+				if (depth <= anchorCollapseDepth) {
 					lines.unshift(doc.lines[i])
 				}
-				else break
+				if (depth < anchorCollapseDepth) {
+					anchorCollapseDepth = depth
+				}
 			}
 		}
+	}
 
-		if (isLineCollapsed(lines.at(-1))) {
+	{
+		let anchorCollapseDepth = lineCollapseDepth(lines.at(-1))
+		if (anchorCollapseDepth > 0) {
 			const lastIndex = doc.lines.indexOf(lines.at(-1))
 			for (let i = lastIndex + 1; i < doc.lines.length; i++) {
-				if (isLineCollapsed(doc.lines[i])) {
+				const line = doc.lines[i]
+				const depth = lineCollapseDepth(line)
+				if (depth === 0) break
+				if (depth <= anchorCollapseDepth) {
 					lines.push(doc.lines[i])
 				}
-				else break
+				if (depth < anchorCollapseDepth) {
+					anchorCollapseDepth = depth
+				}
 			}
 		}
 	}
@@ -94,76 +111,79 @@ export function revealContentAroundRange(doc: TextDocument, range: EditorRange, 
 	selection[0] = selection[0] - 1
 	selection[1] = selection[1] + 1
 	
-	for (let line of lines) {
+	for (const line of lines) {
 		const lineRange = doc.getLineRange(line)
 		const lineSelection = clampRange(selection, lineRange)
-		const relativeSelection = [lineSelection[0] - lineRange[0], lineSelection[1] - lineRange[0]]
-		
-		let earliestUnbrokenHidden = relativeSelection[0]
-		let latestUnbrokenHidden = relativeSelection[1]
+		if (lineSelection) {
+			const relativeSelection = [lineSelection[0] - lineRange[0], lineSelection[1] - lineRange[0]]
+			let earliestUnbrokenHidden = relativeSelection[0]
+			let latestUnbrokenHidden = relativeSelection[1]
 
-		const baseRevealLine = (line.attributes.hidden ?? false)
-			|| isLineCollapsed(line)
-			|| (lineRange[0] === lineSelection[0] && lineRange[1] === lineSelection[1])
-		
-		let revealLine = baseRevealLine
-		let hitRevealable = revealLine
-		let foundLatest = false
-		let textIndex = 0
-		let opIndex = 0
-		
-		while (textIndex < line.length && opIndex < line.content.ops.length) {
-			const op = line.content.ops[opIndex]
-			const opLength = Op.length(op)
-			const opEndIndex = textIndex + opLength
-			if (textIndex <= relativeSelection[0]) {
-				if (op.attributes?.hidden || op.attributes?.hiddenGroup) {
-					hitRevealable = true
-					if (op.attributes?.line_format) {
-						revealLine = true
+			const baseRevealLine = (line.attributes.hidden ?? false)
+			
+			let revealLine = baseRevealLine
+			let hitRevealable = revealLine
+			let foundLatest = false
+			let textIndex = 0
+			let opIndex = 0
+			
+			while (textIndex < line.length && opIndex < line.content.ops.length) {
+				const op = line.content.ops[opIndex]
+				const opLength = Op.length(op)
+				const opEndIndex = textIndex + opLength
+				if (textIndex <= relativeSelection[0]) {
+					if (op.attributes?.hidden || op.attributes?.hiddenGroup) {
+						hitRevealable = true
+						if (op.attributes?.line_format) {
+							revealLine = true
+						}
+						if (textIndex < earliestUnbrokenHidden) {
+							earliestUnbrokenHidden = textIndex
+						}
 					}
-					if (textIndex < earliestUnbrokenHidden) {
-						earliestUnbrokenHidden = textIndex
-					}
-				}
-				else {
-					// Continuity broken, reset
-					hitRevealable = false
-					revealLine = baseRevealLine
-					earliestUnbrokenHidden = relativeSelection[0]
-				}
-			}
-			if (!foundLatest && opEndIndex >= relativeSelection[1]) {
-				if (op.attributes?.hidden || op.attributes?.hiddenGroup) {
-					hitRevealable = true
-					if (op.attributes?.line_format) {
-						revealLine = true
-					}
-					if (opEndIndex > latestUnbrokenHidden) {
-						latestUnbrokenHidden = opEndIndex
+					else {
+						// Continuity broken, reset
+						hitRevealable = false
+						revealLine = baseRevealLine
+						earliestUnbrokenHidden = relativeSelection[0]
 					}
 				}
-				else {
-					// Continuity broken, stop looking
-					foundLatest = true
+				if (!foundLatest && opEndIndex >= relativeSelection[1]) {
+					if (op.attributes?.hidden || op.attributes?.hiddenGroup) {
+						hitRevealable = true
+						if (op.attributes?.line_format) {
+							revealLine = true
+						}
+						if (opEndIndex > latestUnbrokenHidden) {
+							latestUnbrokenHidden = opEndIndex
+						}
+					}
+					else {
+						// Continuity broken, stop looking
+						foundLatest = true
+					}
+				}
+				
+				opIndex++
+				textIndex += opLength
+				
+				if (foundLatest && textIndex > relativeSelection[0]) {
+					break
 				}
 			}
 			
-			opIndex++
-			textIndex += opLength
-			
-			if (foundLatest && textIndex > relativeSelection[0]) {
-				break
+			if (hitRevealable || formats.hidden || formats.hiddenGroup) {
+				const targetRange = [earliestUnbrokenHidden + lineRange[0], latestUnbrokenHidden + lineRange[0]] as EditorRange
+				
+				change.formatText(targetRange, { revealed: true })
+			}
+			if (revealLine) {
+				change.formatLine(doc.getLineRange(line), { revealed: true}, true)
 			}
 		}
 		
-		if (hitRevealable || formats.hidden || formats.hiddenGroup) {
-			const targetRange = [earliestUnbrokenHidden + lineRange[0], latestUnbrokenHidden + lineRange[0]] as EditorRange
-			
-			change.formatText(targetRange, { revealed: true })
-		}
-		if (revealLine) {
-			change.formatLine(doc.getLineRange(line), { revealed: true}, true)
+		if (isLineCollapsed(line)) {
+			change.formatLine(doc.getLineRange(line), { collapsedReveal: true}, true)
 		}
 	}
 }

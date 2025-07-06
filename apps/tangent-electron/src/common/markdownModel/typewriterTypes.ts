@@ -98,6 +98,9 @@ function getCoreLineProperties(attributes, baseClass = ''): AttributeMap {
 	if (hasCollapsedChildren(collapsed)) {
 		className += ' collapse-parent'
 	}
+	if (attributes.collapsedReveal) {
+		className += ' collapsed-revealed'
+	}
 
 	if (attributes.revealed) {
 		className += ' revealed'
