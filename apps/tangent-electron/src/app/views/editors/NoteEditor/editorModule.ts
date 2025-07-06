@@ -34,7 +34,7 @@ import { isLeftClick, startDrag } from 'app/utils'
 import { repeatString } from '@such-n-such/core'
 import { subscribeUntil } from 'common/stores'
 import { handleIsNode } from 'app/model/NodeHandle'
-import { findSectionLines, isLineCollapsed } from 'common/markdownModel/sections'
+import { findSectionLines, isCollapsed, isLineCollapsed } from 'common/markdownModel/sections'
 import { isMac } from 'common/platform'
 import { bustIntoSelection } from '../selectionBuster'
 import type MarkdownEditor from './MarkdownEditor'
@@ -67,6 +67,29 @@ export function revealContentAroundRange(doc: TextDocument, range: EditorRange, 
 	const formats = doc.getTextFormat(selection)
 	const lines = doc.getLinesAt(selection)
 
+	{
+		// Expand line consideration to reveal collapsed sections
+		if (isLineCollapsed(lines[0])) {
+			const firstIndex = doc.lines.indexOf(lines[0])
+			for (let i = firstIndex - 1; i >= 0; i--) {
+				if (isLineCollapsed(doc.lines[i])) {
+					lines.unshift(doc.lines[i])
+				}
+				else break
+			}
+		}
+
+		if (isLineCollapsed(lines.at(-1))) {
+			const lastIndex = doc.lines.indexOf(lines.at(-1))
+			for (let i = lastIndex + 1; i < doc.lines.length; i++) {
+				if (isLineCollapsed(doc.lines[i])) {
+					lines.push(doc.lines[i])
+				}
+				else break
+			}
+		}
+	}
+
 	// Expand range to grab on either side
 	selection[0] = selection[0] - 1
 	selection[1] = selection[1] + 1
@@ -80,6 +103,7 @@ export function revealContentAroundRange(doc: TextDocument, range: EditorRange, 
 		let latestUnbrokenHidden = relativeSelection[1]
 
 		const baseRevealLine = (line.attributes.hidden ?? false)
+			|| isLineCollapsed(line)
 			|| (lineRange[0] === lineSelection[0] && lineRange[1] === lineSelection[1])
 		
 		let revealLine = baseRevealLine
