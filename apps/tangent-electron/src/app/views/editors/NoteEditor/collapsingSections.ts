@@ -62,7 +62,8 @@ export function collapsingSections(editor: Editor) {
 				if (oldLine) {
 					const oldState = oldLine.attributes.collapsed
 					const newState = newLine.attributes.collapsed
-					if (oldState !== newState || newState > 0 || newState < -1) {
+
+					if (oldState !== newState || sections.isCollapsed(newState)) {
 						linesToTweak = lazyPush(linesToTweak, changedLine.id)
 						continue
 					}
@@ -88,18 +89,27 @@ export function collapsingSections(editor: Editor) {
 				const index = newDoc.lines.findIndex(l => l.id === id)
 				for (let i = index - 1; i >= 0; i--) {
 					const line = newDoc.lines[i]
-					const collapsed = line.attributes.collapsed
-					if ((typeof collapsed === 'number' && collapsed !== 0) ||
+					console.log({
+						id: line.id,
+						index: i,
+						collapsed: line.attributes.collapsed,
+						included: linesToTweak.includes(line.id)
+					})
+					if (sections.isCollapsed(line.attributes.collapsed) ||
 						linesToTweak.includes(line.id)
 					) {
 						collapseChange[line.id] = 0
+					}
+					else if (sections.hasCollapsedChildren(line.attributes.collapsed)) {
+						// Open this section and stop expanding
+						collapseChange[line.id] = 0
+						break
 					}
 					else break
 				}
 				for (let i = index + 1; i < newDoc.lines.length; i++) {
 					const line = newDoc.lines[i]
-					const collapsed = line.attributes.collapsed
-					if ((typeof collapsed === 'number' && collapsed !== 0) ||
+					if (sections.isCollapsed(line.attributes.collapsed) ||
 						linesToTweak.includes(line.id)
 					) {
 						collapseChange[line.id] = 0

@@ -1270,6 +1270,25 @@ Content 2`))
 		expect(getCollapseState()).toEqual(Array(6).fill('visible'))
 	})
 
+	it('Only opens one section when editing', () => {
+		editor.set(markdownToTextDocument(`# Header 1
+Content 1
+Content 1.2
+# Header 2
+Content 2`))
+
+		editor.collapsingSections.toggleLineCollapsed([0, 3])
+
+		editor.select(53)
+		editor.insert(' Hi!')
+
+		expect(lineToText(editor.doc.lines.at(-1))).toEqual('Content 2 Hi!')
+		expect(getCollapseState()).toEqual([
+			'collapsed-children', 'collapsed', 'collapsed',
+			'visible', 'visible'
+		])
+	})
+
 	it('Drops collapsed sections when a document is replaced', () => {
 		editor.set(markdownToTextDocument(`# Header 1
 Content 1

@@ -1373,9 +1373,11 @@ export default function editorModule(editor: Editor, options: {
 
 		// Allow collapsed pieces to remain collapsed
 
-		collapsingSections.setUncollapseOnEdit(false)
+		const shouldPreventUncollapse = mode === 'section'
+
+		if (shouldPreventUncollapse) collapsingSections.setUncollapseOnEdit(false)
 		shiftLines(event, lines, shift)
-		collapsingSections.setUncollapseOnEdit(true)
+		if (shouldPreventUncollapse) collapsingSections.setUncollapseOnEdit(true)
 	}
 
 	function toStartOfLine(event: ShortcutEvent, addToSelection=false) {

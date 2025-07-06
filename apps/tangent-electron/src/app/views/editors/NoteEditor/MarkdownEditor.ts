@@ -142,9 +142,10 @@ export default class MarkdownEditor extends Editor {
 				}),
 				tCheckbox: tCheckboxModule,
 				autoWrap: autoWrapping,
-				collapsingSections,
 				// This goes before copy/paste to get priority over those events
 				tangent: editor => editorModule(editor, { workspace }),
+				// After the main pass so that on-edit-uncollapse occurs after markdown reparse
+				collapsingSections,
 				
 				copy: editor => copy(editor, {
 					copyHTML: false,

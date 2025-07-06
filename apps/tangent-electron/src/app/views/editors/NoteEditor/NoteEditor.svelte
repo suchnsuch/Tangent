@@ -194,8 +194,8 @@ function onEditorRoot() {
 	if (state?.collapsedLines) {
 		subscribeUntil(derived([state.note, state.noteViewInfo], stores => stores), ([note, info]) => {
 			if (note.isReady && info) {
-				// Delay so that the first render pass is complete
-				wait().then(() => {
+				// Delay so that any render pass is complete
+				tick().then(() => {
 					editor.collapsingSections.setCollapsedStateStore(state.collapsedLines)	
 				})
 				return true
