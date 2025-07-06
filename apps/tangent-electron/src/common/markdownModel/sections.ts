@@ -163,6 +163,7 @@ export function isLineCollapsible(lines: Line[], lineIndex: number) {
 
 	const line = lines[lineIndex]
 
+	if (line.attributes.empty) return false
 	if (lineIsMultiLineFormat(line)) {
 		if (lineIndex === 0) return true
 		const comparison = compareSectionDepth(line, lines[lineIndex - 1])
