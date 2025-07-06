@@ -200,7 +200,7 @@ export default class NoteViewState implements NodeViewState, LensViewState {
 
 	dispose() {
 		this.note.dropFile()
-		this.noteViewInfoFile.unloadFile()
+		this.noteViewInfoFile?.unloadFile()
 		for (const unsub of this.unsubs) {
 			unsub()
 		}
