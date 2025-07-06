@@ -342,7 +342,7 @@ function extraBottomClick(event: MouseEvent) {
 	const itemState = state.context.getState($currentItem)
 	if (itemState && itemState instanceof NoteViewState) {
 		const length = itemState.node.length
-		itemState.selection = [length - 1, length - 1]
+		itemState.selection.set([length - 1, length - 1])
 		state.focus(feedContainer)
 	}
 }
