@@ -1,8 +1,8 @@
-import { Editor, EditorChangeEvent, Source, TextChange, TextDocument } from 'typewriter-editor'
+import { Editor, EditorChangeEvent, normalizeRange, selection, Source, TextChange, TextDocument } from 'typewriter-editor'
 import * as sections from 'common/markdownModel/sections'
 import { lazyPush } from '@such-n-such/core'
 import { WritableStore } from 'common/stores'
-import { lineToText } from 'common/typewriterUtils'
+import { rangeContains } from 'common/typewriterUtils'
 
 export function collapsingSections(editor: Editor) {
 
@@ -42,6 +42,24 @@ export function collapsingSections(editor: Editor) {
 		preventUncollapseOnEdit++
 		const change = editor.change
 		sections.applyCollapseChange(collapse, change)
+
+		if (doc.selection) {
+			// Adjust any collapsed selection to an uncollapsed zone
+			const [start, end] = normalizeRange(doc.selection)
+			for (let i = 0; i < doc.lines.length; i++) {
+				const range = doc.getLineRange(doc.lines[i])
+				if (rangeContains(range, end) && sections.isLineCollapsed(doc.lines[i], collapse)) {
+					for (let j = i - 1; j >= 0; j--) {
+						if (!sections.isLineCollapsed(doc.lines[j], collapse)) {
+							change.select(doc.getLineRange(doc.lines[j])[1] - 1)
+							break
+						}
+					}
+					break
+				}
+			}
+		}
+
 		change.apply()
 		preventUncollapseOnEdit--
 		
@@ -89,12 +107,6 @@ export function collapsingSections(editor: Editor) {
 				const index = newDoc.lines.findIndex(l => l.id === id)
 				for (let i = index - 1; i >= 0; i--) {
 					const line = newDoc.lines[i]
-					console.log({
-						id: line.id,
-						index: i,
-						collapsed: line.attributes.collapsed,
-						included: linesToTweak.includes(line.id)
-					})
 					if (sections.isCollapsed(line.attributes.collapsed) ||
 						linesToTweak.includes(line.id)
 					) {

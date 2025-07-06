@@ -207,16 +207,16 @@ export function collapseDepth(collapseState: unknown): number {
 	return 0
 }
 
-export function isLineCollapsed(line: Line): boolean {
-	return isCollapsed(line.attributes.collapsed)
+export function isLineCollapsed(line: Line, change?: CollapseChange): boolean {
+	return isCollapsed(getCollapseState(line, change))
 }
 
-export function lineCollapseDepth(line: Line): number {
-	return collapseDepth(line.attributes.collapsed)
+export function lineCollapseDepth(line: Line, change?: CollapseChange): number {
+	return collapseDepth(getCollapseState(line, change))
 }
 
-export function lineHasCollapsedChildren(line: Line): boolean {
-	return hasCollapsedChildren(line.attributes.collapsed)
+export function lineHasCollapsedChildren(line: Line, change?: CollapseChange): boolean {
+	return hasCollapsedChildren(getCollapseState(line, change))
 }
 
 export type CollapseChange = {
@@ -224,7 +224,7 @@ export type CollapseChange = {
 }
 
 function getCollapseState(line: Line, change: CollapseChange): number | undefined {
-	if (change[line.id] !== undefined) return change[line.id]
+	if (change && change[line.id] !== undefined) return change[line.id]
 	return line.attributes.collapsed
 }
 

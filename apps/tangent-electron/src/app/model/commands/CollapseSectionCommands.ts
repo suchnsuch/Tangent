@@ -1,9 +1,7 @@
 import { compareSectionDepth, getFirstCollapseableParentIndex, isLineCollapsible } from 'common/markdownModel/sections'
 import { NoteViewState } from '../nodeViewStates'
 import { CommandContext, CommandOptions } from './Command'
-import WorkspaceCommand, { PaletteAction } from './WorkspaceCommand'
-import { rangeContainsRange } from 'common/typewriterUtils'
-import { wait } from '@such-n-such/core'
+import WorkspaceCommand from './WorkspaceCommand'
 import type { Line } from '@typewriter/document'
 import { Workspace } from '..'
 
@@ -19,7 +17,7 @@ export class CollapseCurrentSectionCommand extends WorkspaceCommand {
 		const index = getFirstCollapseableParentIndex(editor.doc, view.selection.value[0])
 		if (index === undefined) return null
 
-		return { view, editor, index }
+		return { editor, index }
 	}
 
 	canExecute(context?: CommandContext): boolean {
@@ -29,15 +27,8 @@ export class CollapseCurrentSectionCommand extends WorkspaceCommand {
 	execute(context?: CommandContext): void {
 		const targets = this.getTargets()
 		if (targets) {
-			const { view, editor, index } = targets
+			const { editor, index } = targets
 			editor.collapsingSections.toggleLineCollapsed(index)
-
-			const lineRange = editor.doc.getLineRange(editor.doc.lines[index])
-			if (!rangeContainsRange(lineRange, view.selection.value)) {
-				wait().then(() => {
-					editor.select(lineRange[1] - 1)
-				})
-			}
 		}
 	}
 
