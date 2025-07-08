@@ -120,7 +120,11 @@ export namespace IndexData {
 			const base = paths.dirname(node.path)
 			for (const alias of frontMatter.data.aliases) {
 				if (typeof alias !== 'string') continue
-				result.push(paths.join(base, alias))
+				let aliasPath = paths.join(base, alias)
+				if (node.fileType.startsWith('.')) {
+					aliasPath += node.fileType
+				}
+				result.push(aliasPath)
 			}
 			return result
 		}

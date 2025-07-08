@@ -4,8 +4,4 @@ aliases:
 	- Flexing
 ---
 
-And some content.
-
-```
-```
-
+And some content

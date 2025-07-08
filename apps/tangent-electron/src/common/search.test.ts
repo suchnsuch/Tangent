@@ -2,7 +2,7 @@ import { describe, test, expect, it } from 'vitest'
 
 import type { TreeNode } from './trees'
 import { IndexData, StructureType } from './indexing/indexTypes'
-import { buildFuzzySegementMatcher, buildMatcher, compareNodeSearch, nodeSearchResults } from './search'
+import { bestMatchForSearch, buildFuzzySegementMatcher, buildMatcher, compareNodeSearch, nodeSearchResults } from './search'
 
 describe('Match building', () => {
 	it('should split characters by whitespace', () => {
@@ -172,7 +172,7 @@ describe('Alias Searching', () => {
 		}
 
 		expect(IndexData.findAliasPaths(testNode)).toEqual([
-			'Some/I made files'
+			'Some/I made files.md'
 		])
 	})
 })
