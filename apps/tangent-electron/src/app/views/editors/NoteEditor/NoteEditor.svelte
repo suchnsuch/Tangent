@@ -451,7 +451,7 @@ function updateAnnotations(annotations: Annotation[], index=0) {
 			if (document.activeElement === editorElement) {
 				editor.select(selection)
 			}
-			else {
+			else if (state.selection) {
 				state.selection.set([selection, selection])
 			}
 			allowAnnotationReactions = true
