@@ -129,12 +129,12 @@ function pathSearchResult(path: string, searchMatch: RegExp, root?: string): Sea
 
 export function nodeSearchResults(node: TreeNode, searchMatch: RegExp, root?: TreeNode): SearchMatchResult | SearchMatchResult[] {
 
-	const rawMatch = pathSearchResult(node.path, searchMatch, root.path)
+	const rawMatch = pathSearchResult(node.path, searchMatch, root?.path)
 
 	const aliasPaths = IndexData.findAliasPaths(node)
 	if (aliasPaths) {
 		const result = [rawMatch]
-		result.push(...aliasPaths.map(p => pathSearchResult(p, searchMatch, root.path)))
+		result.push(...aliasPaths.map(p => pathSearchResult(p, searchMatch, root?.path)))
 		return result
 	}
 
