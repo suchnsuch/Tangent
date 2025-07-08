@@ -251,7 +251,7 @@ function onEditorError(error) {
 	console.error(error.error)
 
 	// Fall back to a safe mode
-	editor.modules.editorModule?.setFallbackMode(true)
+	editor.mainModule?.setFallbackMode(true)
 	const lines = stripLineAttributes(editor.doc.lines)
 	note.lines = lines
 	editor.set(new TextDocument(lines, editor.doc.selection), 'api')
@@ -262,7 +262,7 @@ function disableFallbackMode() {
 	fallbackErrors = null
 	// A delay gives the user the impression that something has indeed been attempted
 	wait(500).then(() => {
-		editor.modules.editorModule?.setFallbackMode(false)
+		editor.mainModule?.setFallbackMode(false)
 		note.onFileContentChanged(note.getFileContent())
 	})
 }
@@ -987,7 +987,7 @@ function onContextMenu(event: MouseEvent) {
 		const linkInfo = linkElement.getLinkInfo()
 
 		if (linkInfo.type !== StructureType.Embed) {
-			editor.modules.tangent.preventSelectionReveal()
+			editor.mainModule.preventSelectionReveal()
 			document.getSelection().selectAllChildren(linkElement)
 		}
 

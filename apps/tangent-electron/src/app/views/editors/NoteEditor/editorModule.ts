@@ -1605,7 +1605,7 @@ export default function editorModule(editor: Editor, options: {
 		setSmartParagraphBreaks(value) {
 			smartParagraphBreaks = value
 		},
-		preventSelectionReveal(until: Promise<unknown>) {
+		preventSelectionReveal(until?: Promise<unknown>) {
 			updateSelectionReveal = false
 			;(until ?? wait()).then(() => {
 				updateSelectionReveal = true

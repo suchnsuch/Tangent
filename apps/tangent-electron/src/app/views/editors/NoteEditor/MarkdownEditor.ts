@@ -179,5 +179,6 @@ export default class MarkdownEditor extends Editor {
 		return super.select(at, source)
 	}
 
+	get mainModule() { return this.modules.tangent as ReturnType<typeof editorModule> }
 	get collapsingSections() { return this.modules.collapsingSections as CollapsingSectionsModule }
 }
