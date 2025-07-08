@@ -102,42 +102,43 @@ export function collapsingSections(editor: Editor) {
 
 			// Find adjacent collapsed sections and expand them
 			const collapseChange: sections.CollapseChange = {}
+			let changed = false
 			for (const id of linesToTweak) {
-				collapseChange[id] = 0
 				const index = newDoc.lines.findIndex(l => l.id === id)
-				for (let i = index - 1; i >= 0; i--) {
+				for (let i = index; i >= 0; i--) {
 					const line = newDoc.lines[i]
-					if (sections.isCollapsed(line.attributes.collapsed) ||
-						linesToTweak.includes(line.id)
-					) {
+					if (sections.isCollapsed(line.attributes.collapsed)) {
 						collapseChange[line.id] = 0
+						changed = true
 					}
 					else if (sections.hasCollapsedChildren(line.attributes.collapsed)) {
-						// Open this section and stop expanding
+						// Open this section
 						collapseChange[line.id] = 0
-						break
+						changed = true
+						// Stop expanding if we're not expanding a tweaked item
+						if (!linesToTweak.includes(line.id)) break
 					}
-					else break
+					else if (!linesToTweak.includes(line.id)) break
 				}
 				for (let i = index + 1; i < newDoc.lines.length; i++) {
 					const line = newDoc.lines[i]
-					if (sections.isCollapsed(line.attributes.collapsed) ||
-						linesToTweak.includes(line.id)
-					) {
+					if (sections.isCollapsed(line.attributes.collapsed)) {
 						collapseChange[line.id] = 0
+						changed = true
 					}
-					else break
+					else if (!linesToTweak.includes(line.id)) break
 				}
 			}
 
-			const collapseTextChange = new TextChange(newDoc)
-			sections.applyCollapseChange(collapseChange, collapseTextChange)
-			event.modify(collapseTextChange.delta)
+			if (changed) {
+				const collapseTextChange = new TextChange(newDoc)
+				sections.applyCollapseChange(collapseChange, collapseTextChange)
+				event.modify(collapseTextChange.delta)
+			}
 		}
 	}
 
 	function onChanged(event: EditorChangeEvent) {
-		
 		applyCollapsedState()
 	}
 
