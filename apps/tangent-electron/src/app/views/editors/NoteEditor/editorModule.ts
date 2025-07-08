@@ -562,17 +562,7 @@ export default function editorModule(editor: Editor, options: {
 				// Apply the new line formatting
 				const existingLineRange = doc.getLineRange(oldLine)
 				const existingLineStart = existingLineRange[0]
-
 				const existingLineFormat = doc.getLineFormat(existingLineRange)
-				const formatDiff = AttributeMap.diff(existingLineFormat, newLine.attributes)
-				if (formatDiff) {
-					// Collapsed state should be retained
-					// TODO: The use of "diff" above may want to be reconsider.
-					// It might be better to use a "blank + new" approach similar to 
-					// how inline elements are resolved.
-					delete formatDiff.collapsed
-					change.formatLine(existingLineStart, formatDiff, true)
-				}
 
 				// Apply the new content formatting
 				// Observe my absuse of typescript. `TextChange.compose()` is private.
@@ -580,8 +570,17 @@ export default function editorModule(editor: Editor, options: {
 					for (const op of newLine.content.ops) {
 						delta.push(op)
 					}
-					// Retain the new line character as well
-					delta.retain(1)
+
+					// Apply the line attributes to the trailing newline
+					const formatDiff = AttributeMap.diff(existingLineFormat, newLine.attributes)
+					if (formatDiff) {
+						// Collapsed state should be retained
+						// TODO: The use of "diff" above may want to be reconsidered.
+						// It might be better to use a "blank + new" approach similar to 
+						// how inline elements are resolved.
+						delete formatDiff.collapsed
+					}
+					delta.retain(1, formatDiff)
 					return delta
 				}, newLine.length)
 
