@@ -261,6 +261,11 @@ export function moveTree(node: TreeNode, newPath: string): TreeChangeMovedItem[]
 	return moved
 }
 
+export type PathValidationMessages = ({
+	level: 'error'|'warning'|'info',
+	message: string
+})[]
+
 // Windows is the largest offender here, with very limited valid characters
 // Values sourced from: https://stackoverflow.com/questions/1976007/what-characters-are-forbidden-in-windows-and-linux-directory-names#31976060
 // additionally stripping out newlines
@@ -268,28 +273,86 @@ const illegalCharacterToBlankMatch = /[<>:"?*]+/g
 const illegalCharacterToSpaceMatch = /[\/\\\|\n\r]+/g
 const endingCharacterMatch = /[\. ]$/
 const reservedNames = /^(CON|PRN|AUX|NUL|COM\d|LPT\d)(\..*)?$/i
-export function validateFileSegment(segment: string): string | false {
-	if (segment === null || segment === undefined) return false
+export function validateFileSegment(segment: string, messages?: PathValidationMessages): string | false {
+	if (segment === null || segment === undefined) {
+		messages?.push({
+			level: 'error',
+			message: 'Invalid Path Segment'
+		})
+		return false
+	}
 
-	const cleaned = segment
-		.replace(illegalCharacterToBlankMatch, '')
-		.replace(illegalCharacterToSpaceMatch, ' ')
-		.replace(endingCharacterMatch, '')
-		.trim()
-	const reserveMatch = cleaned.match(reservedNames)
-	if (reserveMatch) return false // This is just not valid
+	const cleanedBlankChars = segment.replace(illegalCharacterToBlankMatch, '')
+	if (messages && cleanedBlankChars !== segment) {
+		messages.push({
+			level: 'warning',
+			message: 'The characters <>:"?* are not allowed and have been removed.'
+		})
+	}
 
-	return cleaned
+	const cleanedSpaceChars = cleanedBlankChars.replace(illegalCharacterToSpaceMatch, ' ')
+	if (messages && cleanedBlankChars !== cleanedSpaceChars) {
+		messages.push({
+			level: 'warning',
+			message: 'Forward slashes (/), backslashes (\\), pipes (|), newlines, and returns are not allowed and have been replaced with spaces.'
+		})
+	}
+
+	const cleanedEndingChars = cleanedSpaceChars.replace(endingCharacterMatch, '')
+	if (messages && cleanedEndingChars !== cleanedSpaceChars) {
+		messages.push({
+			level: 'warning',
+			message: 'File & folder names may not end with a space or a period. They have been removed.'
+		})
+	}
+
+	const trimmed = cleanedEndingChars.trim()
+	if (messages && trimmed !== cleanedEndingChars) {
+		messages.push({
+			level: 'warning',
+			message: 'File & folder names may not begin or end with blank space.'
+		})
+	}
+	
+	const reserveMatch = trimmed.match(reservedNames)
+	if (reserveMatch) {
+		messages?.push({
+			level: 'error',
+			message: `"${reserveMatch[1]}" is a reserved name and cannot be used.`
+		})
+		return false // This is just not valid
+	}
+
+	return trimmed
 }
 
-export function validatePath(path: string): string | false {
+/**
+ * Validates a path, removing invalid characters if possible.
+ * @param path The path to validate
+ * @param messages If present, error messages will be pushed out.
+ * @returns The path if it is valid, a cleaned path if it is cleanable, or false if it cannot be cleaned.
+ */
+export function validatePath(path: string, messages?: PathValidationMessages): string | false {
 	let segments = paths.segment(path)
-	if (segments == null) return false
+	if (segments == null) {
+		messages?.push({
+			level: 'error',
+			message: 'Cannot segment path.'
+		})
+		return false
+	}
 
 	for (let i = 0; i < segments.length; i++) {
-		const cleaned = validateFileSegment(segments[i])
+		const cleaned = validateFileSegment(segments[i], messages)
 		if (cleaned === false) return false
 		segments[i] = cleaned
+		if (cleaned === '' && (i || segments[0] !== '')) {
+			messages?.push({
+				level: 'error',
+				message: 'Empty folder paths are not allowed'
+			})
+			return false
+		}
 	}
 
 	if (segments[0] === '') {

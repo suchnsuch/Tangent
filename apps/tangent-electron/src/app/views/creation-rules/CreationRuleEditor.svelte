@@ -4,6 +4,7 @@ import { nameFromRule, willPromptForName } from 'common/settings/CreationRule'
 import editable from 'app/utils/editable'
 import SettingView from '../System/SettingView.svelte'
 import { tooltip } from 'app/utils/tooltips'
+import { PathValidationMessages, validatePath } from 'common/trees'
 
 export let rule: CreationRule
 
@@ -12,12 +13,58 @@ $: nameTemplate = rule.nameTemplate
 
 let asksForName = false
 let exampleName = ''
+let exampleNameMessages: PathValidationMessages = []
 
 $: templateDependencies($nameTemplate)
 function templateDependencies(template) {
 	asksForName = willPromptForName(template)
 	exampleName = nameFromRule(rule.getDefinition(), 'Example Name') as string
-	return 
+
+	let messages: PathValidationMessages = []
+	const validation = validatePath(exampleName, messages)
+
+	if (validation === false) {
+		messages.unshift({
+			level: 'error',
+			message: 'This path cannot be used.'
+		})
+
+		messages.sort((a, b) => {
+			// This is a very simple, stupid sort, but it puts errors in front and that's what's needed
+			if (a.level === b.level) return 0
+			if (a.level === 'error') return -1
+			if (b.level === 'error') return 1
+			return 0
+		})
+	}
+	else if (validation !== exampleName) {
+		exampleName = validation
+	}
+
+	if (!messages.find(m => m.level === 'error')) {
+
+		if (willPromptForName(template)) {
+			messages.unshift({
+				level: 'info',
+				message: 'Will prompt for a name on creation.'
+			})
+		}
+
+		if (exampleName.includes('/')) {
+			messages.push({
+				level: 'info',
+				message: `Will create notes in folders named like: "<span class="demoName">${exampleName}</span>".`
+			})
+		}
+		else {
+			messages.push({
+				level: 'info',
+				message: `Will create notes named like: "<span class="demoName">${exampleName}</span>".`
+			})
+		}
+	}
+
+	exampleNameMessages = messages
 }
 </script>
 
@@ -34,14 +81,11 @@ function templateDependencies(template) {
 		<span>Name Template</span>
 		<input type="text" bind:value={$nameTemplate} />
 	</label>
-	{#if asksForName}
-		<p class="explanation">
-			Will prompt for a name on creation.
-		</p>
+	{#if exampleNameMessages?.length}
+		{#each exampleNameMessages as message}
+			<p class={'explanation ' + message.level}>{@html message.message}</p>
+		{/each}
 	{/if}
-	<p class="explanation">
-		Will create notes named like: "<span class="demoName">{exampleName}</span>"
-	</p>
 	<details>
 		<summary>Name Template Tokens</summary>
 		<p>You can use the following tokens to automate some aspects of note naming.</p>
@@ -120,12 +164,21 @@ label {
 
 .explanation {
 	margin: .5em 2em;
+	padding: 0;
 	font-size: 90%;
 	color: var(--deemphasizedTextColor);
-}
 
-.demoName {
-	white-space: pre;
+	&:global(.error) {
+		color: red;
+	}
+
+	&:global(.warning) {
+		color: orange;
+	}
+
+	:global(.demoName) {
+		white-space: pre;
+	}
 }
 
 details {

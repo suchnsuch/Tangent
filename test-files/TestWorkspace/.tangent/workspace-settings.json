@@ -15,7 +15,7 @@
 		},
 		{
 			"name": "📆 Daily Note",
-			"nameTemplate": "%YYYY%-%MM%-%DD%",
+			"nameTemplate": "%YYYY%/%MM%-%Month%/%YYYY%-%MM%-%DD%",
 			"folder": "Log",
 			"mode": "createOrOpen",
 			"description": "Creates or opens a timestamped note for the current day for journaling and quickly jotting down quick thoughts.",
@@ -44,6 +44,10 @@
 		{
 			"name": "Nested Folder Rule",
 			"nameTemplate": "%YYYY%/%Month%/%name%"
+		},
+		{
+			"name": "Rule With Bad Characters",
+			"nameTemplate": "My: Fancy/aux/%name%"
 		}
 	],
 	"styleFiles": []
