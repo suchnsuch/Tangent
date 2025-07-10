@@ -191,6 +191,9 @@ export function revealContentAroundRange(doc: TextDocument, range: EditorRange, 
 export default function editorModule(editor: Editor, options: {
 	workspace: Workspace
 }) {
+	// `editorModule` is allowed to do this as its the primary module and can know about
+	// all default modules in MarkdownEditor
+	const markdownEditor = editor as MarkdownEditor
 	const { workspace } = options
 
 	let allowVerification = true
@@ -909,7 +912,11 @@ export default function editorModule(editor: Editor, options: {
 		}
 	}
 
-	function toggleWikiLink(event: ShortcutEvent) {
+	/**
+	 * @param event 
+	 * @param mode 'name' uses the selected text as the name of the note to link to. 'display' uses the selected text as the display text.
+	 */
+	function toggleWikiLink(event: ShortcutEvent, mode: 'name'|'display') {
 		const { doc } = editor
 		const selection = normalizeRange(doc.selection)
 		if (!selection) return
@@ -957,34 +964,44 @@ export default function editorModule(editor: Editor, options: {
 
 			const text = doc.getText([linkStart, linkEnd])
 
-			const resolution = workspace ? resolveLink(workspace.directoryStore, {
-				form: 'wiki',
-				href: text
-			}) : null
+			if (mode === 'name') {
+				const resolution = workspace ? resolveLink(workspace.directoryStore, {
+					form: 'wiki',
+					href: text
+				}) : null
 
-			const change = editor.change
+				const change = editor.change
 
-			if (resolution && !Array.isArray(resolution) && typeof resolution !== 'string') {
-				// Adjust the text to match the actual resolved object
-				if (text !== resolution.name) {
-					change.delete([linkStart, linkEnd])
-					change.insert(linkStart, resolution.name)
+				if (resolution && !Array.isArray(resolution) && typeof resolution !== 'string') {
+					// Adjust the text to match the actual resolved object
+					if (text !== resolution.name) {
+						change.delete([linkStart, linkEnd])
+						change.insert(linkStart, resolution.name)
+					}
+				}
+
+				change
+					.insert(linkStart, '[[')
+					.insert(linkEnd, ']]')
+					.apply()
+
+				if (!resolution || Array.isArray(resolution)) {
+					// Could not resolve the resulting link, open autocomplete
+					markdownEditor.autocomplete?.activateAutocomplete()
+				}
+				else {
+					// Resolution was successful, jump to end of link
+					editor.select(editor.doc.selection[1] + 2)
 				}
 			}
-
-			change
-				.insert(linkStart, '[[')
-				.insert(linkEnd, ']]')
-				.apply()
-
-			if (!resolution || Array.isArray(resolution)) {
-				// Could not resolve the resulting link, open autocomplete
-				const autocomplete = editor.modules.autocomplete as AutocompleteModule
-				autocomplete?.activateAutocomplete()
-			}
-			else {
-				// Resolution was successful, jump to end of link
-				editor.select(editor.doc.selection[1] + 2)
+			else if (mode === 'display') {
+				editor.change
+					.insert(linkStart, '[[|')
+					.insert(linkEnd, ']]')
+					.select(linkStart + 2)
+					.apply()
+				
+				markdownEditor.autocomplete?.activateAutocomplete()
 			}
 		}
 	}
@@ -1369,9 +1386,7 @@ export default function editorModule(editor: Editor, options: {
 			lines = getSelectedLines(doc)
 		}
 
-		// `editorModule` is allowed to do this as its the primary module and can know about
-		// all default modules in MarkdownEditor
-		const collapsingSections = (editor as MarkdownEditor).collapsingSections
+		const collapsingSections = markdownEditor.collapsingSections
 
 		{
 			const lastIndex = doc.lines.indexOf(lines.at(-1))
@@ -1471,7 +1486,9 @@ export default function editorModule(editor: Editor, options: {
 			case 'Mod+K':
 				return toggleLink(event)
 			case 'Mod+Alt+K':
-				return toggleWikiLink(event)
+				return toggleWikiLink(event, 'name')
+			case 'Mod+Alt+Shift+K':
+				return toggleWikiLink(event, 'display')
 			case 'Mod+I':
 				return toggleItalic(event)
 			case 'Mod+B':

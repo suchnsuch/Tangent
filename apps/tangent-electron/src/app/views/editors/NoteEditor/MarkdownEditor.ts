@@ -2,7 +2,7 @@ import { defaultModules, Editor, EditorOptions, Delta, EditorRange, Source } fro
 
 import htmlToMarkdown from '@such-n-such/tangent-html-to-markdown'
 import editorModule from './editorModule'
-import autocompleteBuilder  from '../autocomplete/autocompleteModule'
+import autocompleteBuilder, { AutocompleteModule }  from '../autocomplete/autocompleteModule'
 import NoteTypes from 'common/markdownModel/typewriterTypes'
 import WikiLinkAutocompleter from '../autocomplete/WikiLinkAutocompleter'
 import type { Workspace } from 'app/model'
@@ -181,4 +181,5 @@ export default class MarkdownEditor extends Editor {
 
 	get mainModule() { return this.modules.tangent as ReturnType<typeof editorModule> }
 	get collapsingSections() { return this.modules.collapsingSections as CollapsingSectionsModule }
+	get autocomplete() { return this.modules.autocomplete as AutocompleteModule }
 }
