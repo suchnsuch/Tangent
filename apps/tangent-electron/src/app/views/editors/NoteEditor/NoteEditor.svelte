@@ -911,38 +911,6 @@ function onEditorMouseUp(event: MouseEvent) {
 	}
 }
 
-function onEditorClick(event: MouseEvent) {
-	const selectionRequest = eventHasSelectionRequest(event)
-	if (selectionRequest) {
-		const index = editor.getIndexFromPoint(event.clientX, event.clientY)
-		editor.select(index)
-	}
-}
-
-function onEditorDoubleClick(event: MouseEvent) {
-	const selectionRequest = eventHasSelectionRequest(event)
-	if (selectionRequest) {
-		// Assume the previous click event set the index and select the whole thing
-		const selection = editor.doc.selection
-
-		let range: EditorRange = null
-
-		if (selectionRequest.inline) {
-			range = getRangeWhile(editor.doc, selection[0] - 1, selectionRequest.inline)
-		}
-		else if (selectionRequest.line) {
-			range = getLineRangeWhile(editor.doc, selection[0] - 1, selectionRequest.line)
-		}
-
-		if (range) {
-			if (selectionRequest.postProcessSelection) {
-				range = selectionRequest.postProcessSelection(range)
-			}
-			editor.select(range)
-		}
-	}
-}
-
 /////////////////////////////
 // Line gutter adornments //
 ///////////////////////////
@@ -1390,8 +1358,6 @@ function onDetailsContexMenu(event: MouseEvent) {
 		use:asRoot={editor}
 		on:mousedown={onEditorMouseDown}
 		on:mouseup|preventDefault={onEditorMouseUp}
-		on:click={onEditorClick}
-		on:dblclick={onEditorDoubleClick}
 		on:focus={onEditorFocus}
 		on:blur={onEditorBlur}
 		on:contextmenu={onContextMenu}

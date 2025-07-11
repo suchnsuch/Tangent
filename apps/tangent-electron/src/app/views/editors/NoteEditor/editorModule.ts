@@ -29,7 +29,7 @@ import type { HrefFormedLink } from 'common/indexing/indexTypes'
 import type { Workspace } from 'app/model'
 import type { AutocompleteModule } from '../autocomplete/autocompleteModule'
 import { findLinkAround, matchMarkdownLink, matchWikiLink, resolveLink } from 'common/markdownModel/links'
-import { AttributePredicate, findWordAroundPositionInDocument, getEditInfo, getRangeWhile, getRangesIntersecting, getSelectedLines, intersectRanges, lineToText } from 'common/typewriterUtils'
+import { AttributePredicate, findWordAroundPositionInDocument, getEditInfo, getLineRangeWhile, getRangeWhile, getRangesIntersecting, getSelectedLines, intersectRanges, lineToText } from 'common/typewriterUtils'
 import { isLeftClick, startDrag } from 'app/utils'
 import { repeatString } from '@such-n-such/core'
 import { subscribeUntil } from 'common/stores'
@@ -38,6 +38,8 @@ import {findSectionLines, isLineCollapsed, lineCollapseDepth } from 'common/mark
 import { isMac } from 'common/platform'
 import { bustIntoSelection } from '../selectionBuster'
 import type MarkdownEditor from './MarkdownEditor'
+import { appendContextTemplate, ContextMenuConstructorOptions } from 'app/model/contextmenu'
+import { eventHasSelectionRequest } from 'app/events'
 
 function clampRange(range: EditorRange, clampingRange: EditorRange): EditorRange {
 	range = normalizeRange(range)
@@ -1551,6 +1553,91 @@ export default function editorModule(editor: Editor, options: {
 		}
 	}
 
+	function handleSelectionRequest(event: MouseEvent, mode: 'point' | 'all') {
+		const selectionRequest = eventHasSelectionRequest(event)
+		if (selectionRequest) {
+			const index = editor.getIndexFromPoint(event.clientX, event.clientY)
+			if (mode === 'point') {
+				editor.select(index)
+			}
+			else if (mode === 'all') {
+				let range: EditorRange = null
+
+				if (selectionRequest.inline) {
+					range = getRangeWhile(editor.doc, index - 1, selectionRequest.inline)
+				}
+				else if (selectionRequest.line) {
+					range = getLineRangeWhile(editor.doc, index - 1, selectionRequest.line)
+				}
+
+				if (range) {
+					if (selectionRequest.postProcessSelection) {
+						range = selectionRequest.postProcessSelection(range)
+					}
+					editor.select(range)
+				}
+			}
+		}
+	}
+
+	function onClick(event: MouseEvent) {
+		handleSelectionRequest(event, 'point')
+	}
+
+	function onDoubleClick(event: MouseEvent) {
+		handleSelectionRequest(event, 'all')
+	}
+
+	function onContextMenu(event: MouseEvent) {
+		handleSelectionRequest(event, 'all')
+
+		const menu: ContextMenuConstructorOptions[] = []
+
+		{
+			const linkItems: ContextMenuConstructorOptions[] = []
+
+			// need to get the link from the event as selection change caused by this click hasn't propegated yet
+			let linkElement: TangentLink = null
+			let link: HrefFormedLink = null
+			if (TangentLink.isTangentLinkEvent(event)) {
+				linkElement = TangentLink.getTangentLinkFromEvent(event)
+				link = linkElement.getLinkInfo()
+			}
+
+			if (!link || link.form === 'wiki') {
+				linkItems.push({
+					label: (link ? 'Remove' : 'Create') + ' Wikilink',
+					accelerator: 'CommandOrControl+Alt+K',
+					click() {
+						toggleWikiLink(new ShortcutEvent('foo'), 'name')
+					}
+				})
+			}
+			
+			if (!link || link.form === 'md' || link.form === 'raw') {
+				linkItems.push({
+					label: (link?.form === 'md' ? 'Remove' : 'Create') + ' Markdown Link',
+					accelerator: 'CommandOrControl+K',
+					click() {
+						toggleLink(new ShortcutEvent('foo'))
+					},
+				})
+			}
+
+			if (linkItems.length > 1) {
+				menu.push({
+					label: 'Links',
+					submenu: linkItems
+				})
+			}
+			else if (linkItems.length === 1) {
+				menu.push(linkItems[0])
+			}
+		}
+
+		appendContextTemplate(event, menu, 'middle')
+	}
+
 	function onPaste(event: ClipboardEvent) {
 
 		const doc = editor.doc
@@ -1605,6 +1692,9 @@ export default function editorModule(editor: Editor, options: {
 			
 			editor.root.addEventListener('shortcut', onKeyDown)
 			editor.root.addEventListener('mousedown', onMouseDown)
+			editor.root.addEventListener('click', onClick)
+			editor.root.addEventListener('dblclick', onDoubleClick)
+			editor.root.addEventListener('contextmenu', onContextMenu)
 			editor.root.addEventListener('paste', onPaste)
 		},
 		destroy() {
@@ -1613,6 +1703,9 @@ export default function editorModule(editor: Editor, options: {
 			
 			editor.root.removeEventListener('shortcut', onKeyDown)
 			editor.root.removeEventListener('mousedown', onMouseDown)
+			editor.root.removeEventListener('click', onClick)
+			editor.root.removeEventListener('dblclick', onDoubleClick)
+			editor.root.removeEventListener('contextmenu', onContextMenu)
 			editor.root.removeEventListener('paste', onPaste)
 		},
 		setNotePath(path) {
