@@ -23,6 +23,7 @@ export interface ContextMenuConstructorOptions extends ContextMenuCommand {
 
 export interface SplitContextMenuTemplate {
 	top?: ContextMenuConstructorOptions[]
+	middle?: ContextMenuConstructorOptions[]
 	bottom?: ContextMenuConstructorOptions[]
 }
 
@@ -32,8 +33,8 @@ interface ContextMenuContext extends SplitContextMenuTemplate {
 
 export type ExtendedContextEvent = MouseEvent & SplitContextMenuTemplate
 
-export function appendContextTemplate(event: ExtendedContextEvent, template: ContextMenuConstructorOptions[], section: 'top' | 'bottom' = 'top') {
-	const t = section === 'top' ? (event.top = event.top ?? []) : (event.bottom = event.bottom ?? [])
+export function appendContextTemplate(event: ExtendedContextEvent, template: ContextMenuConstructorOptions[], section: 'top' | 'middle' | 'bottom' = 'top') {
+	const t = (event[section] = event[section] ?? []) as ContextMenuConstructorOptions[]
 
 	t.push({ type: 'separator' })
 	for (const item of template) {
@@ -44,6 +45,7 @@ export function appendContextTemplate(event: ExtendedContextEvent, template: Con
 export function extractRawTemplate(template: SplitContextMenuTemplate): SplitContextMenuTemplate {
 	return {
 		top: template.top,
+		middle: template.middle,
 		bottom: template.bottom
 	}
 }
@@ -58,6 +60,7 @@ export function prepareContextMenuCommands(template: SplitContextMenuTemplate | 
 	}
 	else {
 		context.top = template.top
+		context.middle = template.middle
 		context.bottom = template.bottom
 	}
 
@@ -126,6 +129,12 @@ export function prepareContextMenuCommands(template: SplitContextMenuTemplate | 
 
 	if (context.top) {
 		for (const item of context.top) {
+			recursiveConverter(item)
+		}
+	}
+
+	if (context.middle) {
+		for (const item of context.middle) {
 			recursiveConverter(item)
 		}
 	}

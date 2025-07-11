@@ -2,6 +2,7 @@ import type { MenuItemConstructorOptions } from 'electron/common';
 
 export interface ContextMenuTemplate {
 	top?: MenuItemConstructorOptions[]
+	middle?: MenuItemConstructorOptions[]
 	bottom?: MenuItemConstructorOptions[]
 	mixWithDefaultContext?: boolean
 }
@@ -25,8 +26,8 @@ export function cleanMenuTemplate(template: MenuItemConstructorOptions[]) {
 			if (i === template.length - 1) continue
 		}
 
-		if (item.submenu) {
-			item.submenu = cleanMenuTemplate(template)
+		if (Array.isArray(item.submenu)) {
+			item.submenu = cleanMenuTemplate(item.submenu)
 		}
 
 		newTemplate.push(item)

@@ -140,6 +140,10 @@ export function createWindow(assignedWorkspace?: string) {
 			)
 		}
 
+		if (customizations?.middle) {
+			template.push(...customizations.middle)
+		}
+
 		if (customizations?.bottom) {
 			template.push(...customizations.bottom)
 		}

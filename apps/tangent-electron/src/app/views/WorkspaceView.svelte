@@ -186,7 +186,7 @@ function onWindowAuxClick(event: MouseEvent) {
 }
 
 function onContextMenu(event: ExtendedContextEvent) {
-	if (!event.defaultPrevented && (event.top || event.bottom)) {
+	if (!event.defaultPrevented && (event.top || event.middle || event.bottom)) {
 		workspace.showContextMenu(extractRawTemplate(event))
 	}
 }

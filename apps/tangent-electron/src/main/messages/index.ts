@@ -521,6 +521,12 @@ ipcMain.on('showContextMenu', (event, template: ContextMenuTemplate) => {
 		}
 	}
 
+	if (template.middle) {
+		for (const item of template.middle) {
+			recursivePassthrough(item)
+		}
+	}
+
 	if (template.bottom) {
 		for (const item of template.bottom) {
 			recursivePassthrough(item)
