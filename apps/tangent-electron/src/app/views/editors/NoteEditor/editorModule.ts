@@ -788,7 +788,7 @@ export default function editorModule(editor: Editor, options: {
 		}
 	}
 
-	async function toggleLink(event: ShortcutEvent) {
+	async function toggleLink(event?: ShortcutEvent) {
 		const { doc } = editor
 		const selection = normalizeRange(doc.selection)
 		if (!selection) return
@@ -800,7 +800,7 @@ export default function editorModule(editor: Editor, options: {
 		// No stomping!
 		if (link?.form === 'wiki') return
 
-		event.preventDefault()
+		event?.preventDefault()
 		
 		if (link) {
 			if (link.form === 'raw') {
@@ -918,7 +918,7 @@ export default function editorModule(editor: Editor, options: {
 	 * @param event 
 	 * @param mode 'name' uses the selected text as the name of the note to link to. 'display' uses the selected text as the display text.
 	 */
-	function toggleWikiLink(event: ShortcutEvent, mode: 'name'|'display') {
+	function toggleWikiLink(mode: 'name'|'display', event?: ShortcutEvent) {
 		const { doc } = editor
 		const selection = normalizeRange(doc.selection)
 		if (!selection) return
@@ -930,7 +930,7 @@ export default function editorModule(editor: Editor, options: {
 		// No stomping!
 		if (link?.form === 'md' || link?.form === 'raw') return
 
-		event.preventDefault()
+		event?.preventDefault()
 
 		if (link?.form === 'wiki') {
 			// Remove the link
@@ -1008,42 +1008,44 @@ export default function editorModule(editor: Editor, options: {
 		}
 	}
 
-	function toggleItalic(event: ShortcutEvent) {
+	function toggleItalic(event?: ShortcutEvent) {
 		toggleInlineFormat(
-			event,
 			workspace?.settings?.italicsCharacters.value ?? '_',
-			attr => attr?.italic)
+			attr => attr?.italic,
+			event
+		)
 	}
 
-	function toggleBold(event: ShortcutEvent) {
+	function toggleBold(event?: ShortcutEvent) {
 		return toggleInlineFormat(
-			event,
 			workspace?.settings?.boldCharacters.value ?? '**',
-			attr => attr?.bold)
+			attr => attr?.bold,
+			event
+		)
 	}
 
-	function toggleHightlight(event: ShortcutEvent) {
+	function toggleHightlight(event?: ShortcutEvent) {
 		return toggleInlineFormat(
-			event,
 			'==',
-			attr => attr?.highlight
+			attr => attr?.highlight,
+			event
 		)
 	}
 
-	function toggleInlineCode(event: ShortcutEvent) {
+	function toggleInlineCode(event?: ShortcutEvent) {
 		return toggleInlineFormat(
-			event,
 			'`',
-			attr => attr?.inline_code
+			attr => attr?.inline_code,
+			event
 		)
 	}
 
-	function toggleInlineFormat(event: ShortcutEvent, formattingCharacters: string, predicate: AttributePredicate) {
+	function toggleInlineFormat(formattingCharacters: string, predicate: AttributePredicate, event?: ShortcutEvent) {
 		const { doc } = editor
 		const selection = normalizeRange(doc.selection)
 		if (!selection) return
 		const [at, to] = selection
-		event.preventDefault()
+		event?.preventDefault()
 
 		const formatLength = formattingCharacters.length
 
@@ -1226,18 +1228,18 @@ export default function editorModule(editor: Editor, options: {
 		change.apply()
 	}
 
-	function setHeader(event: ShortcutEvent, level: number) {
+	function setHeader(level: number, event?: ShortcutEvent) {
 		if (level <= 0) return
-		return setLinePrefix(event, repeatString('#', level) + ' ')
+		return setLinePrefix(repeatString('#', level) + ' ', event)
 	}
 
-	function setLinePrefix(event: ShortcutEvent, newPrefix: string) {
+	function setLinePrefix(newPrefix: string, event?: ShortcutEvent) {
 		const { doc } = editor
 		const selection = doc.selection
 		if (!selection) return
 		const [at, to] = doc.selection
 
-		event.preventDefault()
+		event?.preventDefault()
 
 		const lines = doc.getLinesAt(selection)
 		const change = editor.change
@@ -1488,9 +1490,9 @@ export default function editorModule(editor: Editor, options: {
 			case 'Mod+K':
 				return toggleLink(event)
 			case 'Mod+Alt+K':
-				return toggleWikiLink(event, 'name')
+				return toggleWikiLink('name', event)
 			case 'Mod+Alt+Shift+K':
-				return toggleWikiLink(event, 'display')
+				return toggleWikiLink('display', event)
 			case 'Mod+I':
 				return toggleItalic(event)
 			case 'Mod+B':
@@ -1503,19 +1505,19 @@ export default function editorModule(editor: Editor, options: {
 				return toggleLineComment(event)
 
 			case 'Mod+1':
-				return setHeader(event, 1)
+				return setHeader(1, event)
 			case 'Mod+2':
-				return setHeader(event, 2)
+				return setHeader(2, event)
 			case 'Mod+3':
-				return setHeader(event, 3)
+				return setHeader(3, event)
 			case 'Mod+4':
-				return setHeader(event, 4)
+				return setHeader(4, event)
 			case 'Mod+5':
-				return setHeader(event, 5)
+				return setHeader(5, event)
 			case 'Mod+6':
-				return setHeader(event, 6)
+				return setHeader(6, event)
 			case 'Mod+0':
-				return setLinePrefix(event, '')
+				return setLinePrefix('', event)
 
 			case 'Alt+ArrowUp':
 				return shiftGroup(event, 'lines', -1)
@@ -1609,7 +1611,7 @@ export default function editorModule(editor: Editor, options: {
 					label: (link ? 'Remove' : 'Create') + ' Wikilink',
 					accelerator: 'CommandOrControl+Alt+K',
 					click() {
-						toggleWikiLink(new ShortcutEvent('foo'), 'name')
+						toggleWikiLink('name')
 					}
 				})
 			}
@@ -1618,9 +1620,7 @@ export default function editorModule(editor: Editor, options: {
 				linkItems.push({
 					label: (link?.form === 'md' ? 'Remove' : 'Create') + ' Markdown Link',
 					accelerator: 'CommandOrControl+K',
-					click() {
-						toggleLink(new ShortcutEvent('foo'))
-					},
+					click: toggleLink
 				})
 			}
 
@@ -1634,6 +1634,93 @@ export default function editorModule(editor: Editor, options: {
 				menu.push(linkItems[0])
 			}
 		}
+
+		menu.push({
+			label: 'Formatting',
+			submenu: [
+				{
+					id: 'window_toggleBold',
+					label: 'Toggle Bold',
+					accelerator: 'CommandOrControl+B',
+					click: toggleBold
+				},
+				{
+					id: 'window_toggleItalics',
+					label: 'Toggle Italics',
+					accelerator: 'CommandOrControl+I',
+					click: toggleItalic
+				},
+				{
+					id: 'window_toggleHighlight',
+					label: 'Toggle Highlight',
+					accelerator: 'CommandOrControl+=',
+					click: toggleHightlight
+				},
+				{
+					id: 'window_toggleInlineCode',
+					label: 'Toggle Inline Code',
+					accelerator: 'CommandOrControl+\\',
+					click: toggleInlineCode
+				},
+				{ type: 'separator' },
+				{
+					id: 'window_setParagraph',
+					label: 'Paragraph',
+					accelerator: 'CommandOrControl+0',
+					click() {
+						setLinePrefix('')
+					}
+				},
+				{
+					id: 'window_setHeader1',
+					label: 'Header 1',
+					accelerator: 'CommandOrControl+1',
+					click() {
+						setHeader(1)
+					}
+				},
+				{
+					id: 'window_setHeader2',
+					label: 'Header 2',
+					accelerator: 'CommandOrControl+2',
+					click() {
+						setHeader(2)
+					}
+				},
+				{
+					id: 'window_setHeader3',
+					label: 'Header 3',
+					accelerator: 'CommandOrControl+3',
+					click() {
+						setHeader(3)
+					}
+				},
+				{
+					id: 'window_setHeader4',
+					label: 'Header 4',
+					accelerator: 'CommandOrControl+4',
+					click() {
+						setHeader(4)
+					}
+				},
+				{
+					id: 'window_setHeader5',
+					label: 'Header 5',
+					accelerator: 'CommandOrControl+5',
+					click() {
+						setHeader(5)
+					}
+				},
+				{
+					id: 'window_setHeader6',
+					label: 'Header 6',
+					accelerator: 'CommandOrControl+6',
+					click() {
+						setHeader(6)
+					}
+				}
+			]
+		})
 
 		appendContextTemplate(event, menu, 'middle')
 	}
