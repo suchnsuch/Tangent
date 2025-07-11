@@ -19,7 +19,7 @@ const linkPane = workspace.settings.linkClickPaneBehavior
 export let origin: TangentLink
 export let link: HrefFormedLink
 export let state: LinkState
-export let errorMessage: string
+export let errorMessage: string = null
 
 $: context = workspace.getHandle(link)
 $:node = ($context != null && !Array.isArray($context) && typeof $context !== 'string' && isNode($context)) ? $context as TreeNode : null

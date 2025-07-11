@@ -87,19 +87,19 @@ export function requestTooltip(element: HTMLElement, config: TooltipDefOrConfig,
 }
 
 export function pinTooltip(element: HTMLElement) {
-	clearTimeouts()
-
 	const item = tooltips.value.find(i => i.origin === element)
 	if (item) {
+		clearTimeouts()
 		item.liveCount += 1
 	}
 }
 
 export function dropTooltip(element: HTMLElement, delay=true) {
-	clearTimeouts()
-
 	const itemIndex = tooltips.value.findIndex(i => i.origin === element)
 	if (itemIndex < 0) return
+
+	clearTimeouts()
+
 	const item = tooltips.value[itemIndex]
 
 	item.liveCount -= 1
@@ -120,6 +120,12 @@ export function dropTooltip(element: HTMLElement, delay=true) {
 		requireDelay = true;
 		drop()
 	}
+}
+
+export function dropAllTooltips() {
+	clearTimeouts()
+	requireDelay = true;
+	tooltips.set([])
 }
 
 export function tooltipToConfig(configIsh: TooltipDefOrConfig) {

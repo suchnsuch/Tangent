@@ -16,7 +16,7 @@ import { mailTo } from 'common/email'
 import { mediaQueryStore } from './utils/svelte'
 import SvgIcon from './views/smart-icons/SVGIcon.svelte'
 
-import { tooltips } from './utils/tooltips'
+import { dropAllTooltips, tooltips } from './utils/tooltips'
 import Tooltip from './utils/Tooltip.svelte'
 import { setTLinkTooltipComponent } from './views/editors/NoteEditor/t-link'
 import TLinkTooltip from './views/editors/TLinkTooltip.svelte'
@@ -303,7 +303,7 @@ Below is a stack trace of the error. Please provide any additional details above
 <svelte:head>
 	<title>{title}</title>
 </svelte:head>
-<svelte:body on:focusin={onFocusIn} on:focusout={onFocusOut} />
+<svelte:body on:focusin={onFocusIn} on:focusout={onFocusOut} on:contextmenu={dropAllTooltips} />
 
 {#if applicationState === 'initializing' && showLoading}
 	<div class="loading">
