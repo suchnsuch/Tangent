@@ -75,13 +75,20 @@ export function matchMarkdownLink(text: string, startIndex=0): LinkInfo {
 			return null
 		}
 
+		let href = text.substring(linkStart, index - 1)
+		const idIndex = href.indexOf('#')
+		const content_id = idIndex >= 0 ? href.substring(idIndex + 1) : undefined
+		href = content_id ? href.substring(0, idIndex) : href
+
 		let details: LinkInfo = {
 			type: StructureType.Link,
 			form: 'md',
 			start: startIndex + match.index,
 			end: startIndex + index,
-			href: text.substring(linkStart, index - 1)
+			href,
+			content_id
 		}
+
 		if (match[2]) {
 			details.text = match[2]
 		}
@@ -174,6 +181,19 @@ export function resolveLink(store: DefaultIndexStore, link: HrefFormedLink): Tre
 			console.error('Invalid link form', link);
 			return
 	}
+}
+
+export function createContentIdMatcher(contentId: string): RegExp {
+	if (!contentId) return null
+	if (contentId[0] === '^') {
+		// ID matches (technically not supported yet)
+		return new RegExp('\^' + contentId.substring(1), 'i')
+	}
+
+	// Header matches
+	// We want "space-likes" to all be treated the same for cross-compatability & consistency
+	const segments = contentId.split(/[-_ ]+|%20/)
+	return new RegExp(segments.join('([-_ ]|%20)'), 'i')
 }
 
 export function parseRawLink(char: string, parser: NoteParser): boolean {
@@ -400,6 +420,9 @@ export function parseLink(char: string, parser: NoteParser): boolean {
 		if (mdLinkInfo.text) {
 			t_link.text = mdLinkInfo.text
 		}
+		if (mdLinkInfo.content_id) {
+			t_link.content_id = mdLinkInfo.content_id
+		}
 		if (parser.filepath) {
 			t_link.from = parser.filepath
 		}
@@ -504,6 +527,10 @@ function finishMarkdownLink(parser: NoteParser, linkInfo: LinkInfo) {
 	// Commit the `](` and link
 	feed.next(2)
 	feed.nextByLength(linkInfo.href.length)
+	if (linkInfo.content_id !== undefined) {
+		// Consume the '#' character and the id
+		feed.nextByLength(1 + linkInfo.content_id.length)
+	}
 	parser.commitSpan({
 		link_internal: true,
 		hidden: true,

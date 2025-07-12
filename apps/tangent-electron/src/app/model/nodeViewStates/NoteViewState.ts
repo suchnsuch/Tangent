@@ -20,6 +20,7 @@ import DataFile from '../DataFile'
 import NoteViewInfo from 'common/dataTypes/NoteViewInfo'
 import paths from 'common/paths'
 import type MarkdownEditor from 'app/views/editors/NoteEditor/MarkdownEditor'
+import { createContentIdMatcher } from 'common/markdownModel/links'
 
 export enum NoteDetailMode {
 	None = 0,
@@ -253,16 +254,18 @@ export default class NoteViewState implements NodeViewState, LensViewState {
 			annotation.end = link.end
 		}
 		else if (link.content_id) {
-			const id = link.content_id
-			// Look for headers
-			let start = 0
-			for (const line of this.note.lines) {
-				if (line.attributes.header && safeHeaderLine(lineToText(line)) === id) {
-					annotation.start = start
-					annotation.end = start + line.length
-					break
+			const idMatch = createContentIdMatcher(link.content_id)
+			if (idMatch) {
+				// Look for headers
+				let start = 0
+				for (const line of this.note.lines) {
+					if (line.attributes.header && safeHeaderLine(lineToText(line)).match(idMatch)) {
+						annotation.start = start
+						annotation.end = start + line.length
+						break
+					}
+					start += line.length
 				}
-				start += line.length
 			}
 		}
 

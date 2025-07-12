@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
 import { StructureType } from 'common/indexing/indexTypes'
-import { matchMarkdownLink } from './links'
+import { createContentIdMatcher, matchMarkdownLink } from './links'
 
 describe('Markdown Links', () => {
 	it('should work for basics', () => {
@@ -62,5 +62,17 @@ describe('Markdown Links', () => {
 			text: 'md link',
 			href: 'link(with)[brackets]'
 		})
+	})
+})
+
+describe('Content ID Matching', () => {
+	it('Can use varying header id forms to match header text', () => {
+		expect('My Header'.match(createContentIdMatcher('My Header'))).toBeTruthy()
+		expect('My Header'.match(createContentIdMatcher('my header'))).toBeTruthy()
+		expect('My Header'.match(createContentIdMatcher('my-header'))).toBeTruthy()
+		expect('My Header'.match(createContentIdMatcher('my_header'))).toBeTruthy()
+		expect('My Header'.match(createContentIdMatcher('my%20header'))).toBeTruthy()
+
+		expect('My Long Header'.match(createContentIdMatcher('my-long_header'))).toBeTruthy()
 	})
 })
