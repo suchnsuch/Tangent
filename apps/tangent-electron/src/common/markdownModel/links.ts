@@ -78,7 +78,7 @@ export function matchMarkdownLink(text: string, startIndex=0): LinkInfo {
 		let href = text.substring(linkStart, index - 1)
 		const idIndex = href.indexOf('#')
 		const content_id = idIndex >= 0 ? href.substring(idIndex + 1) : undefined
-		href = content_id ? href.substring(0, idIndex) : href
+		href = idIndex >= 0 ? href.substring(0, idIndex) : href
 
 		let details: LinkInfo = {
 			type: StructureType.Link,
@@ -267,7 +267,9 @@ export function parseLink(char: string, parser: NoteParser): boolean {
 
 		const t_link: HrefFormedLink & { block?: boolean } = {
 			href: wikiLinkInfo.href,
-			form: 'wiki'
+			form: 'wiki',
+			text: wikiLinkInfo.text ?? null,
+			content_id: wikiLinkInfo.content_id ?? null
 		}
 
 		// Avoiding adding the key unless the value exists
@@ -275,12 +277,6 @@ export function parseLink(char: string, parser: NoteParser): boolean {
 		if (isEmbed) {
 			// TODO: Convert to allowing indentation for embeds
 			t_link.block = parser.lineStart === feed.index - 1
-		}
-		if (wikiLinkInfo.content_id) {
-			t_link.content_id = wikiLinkInfo.content_id
-		}
-		if (wikiLinkInfo.text) {
-			t_link.text = wikiLinkInfo.text
 		}
 		if (parser.filepath) {
 			t_link.from = parser.filepath
@@ -408,7 +404,9 @@ export function parseLink(char: string, parser: NoteParser): boolean {
 
 		const t_link: HrefFormedLink & { block?: boolean } = {
 			href: mdLinkInfo.href,
-			form: 'md'
+			form: 'md',
+			text: mdLinkInfo.text ?? null,
+			content_id: mdLinkInfo.content_id ?? null
 		}
 
 		// Avoiding adding the key unless the value exists
@@ -416,12 +414,6 @@ export function parseLink(char: string, parser: NoteParser): boolean {
 		if (isEmbed) {
 			// TODO: Convert to allowing indentation for embeds
 			t_link.block = parser.lineStart === feed.index - 1
-		}
-		if (mdLinkInfo.text) {
-			t_link.text = mdLinkInfo.text
-		}
-		if (mdLinkInfo.content_id) {
-			t_link.content_id = mdLinkInfo.content_id
 		}
 		if (parser.filepath) {
 			t_link.from = parser.filepath

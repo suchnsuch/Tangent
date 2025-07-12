@@ -63,6 +63,30 @@ describe('Markdown Links', () => {
 			href: 'link(with)[brackets]'
 		})
 	})
+
+	it('Parses headers to content_id', () => {
+		expect(matchMarkdownLink('[text](link#header)')).toEqual({
+			type: StructureType.Link,
+			start: 0,
+			end: 19,
+			form: 'md',
+			text: 'text',
+			href: 'link',
+			content_id: 'header'
+		})
+	})
+
+	it('Parses empty headers', () => {
+		expect(matchMarkdownLink('[text](link#)')).toEqual({
+			type: StructureType.Link,
+			start: 0,
+			end: 13,
+			form: 'md',
+			text: 'text',
+			href: 'link',
+			content_id: ''
+		})
+	})
 })
 
 describe('Content ID Matching', () => {
