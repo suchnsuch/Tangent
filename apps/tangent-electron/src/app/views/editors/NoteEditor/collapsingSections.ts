@@ -182,10 +182,13 @@ export function collapsingSections(editor: Editor) {
 			const change = editor.change
 
 			for (let i = 0; i < doc.lines.length; i++) {
-				const range = doc.getLineRange(doc.lines[i])
-				change.formatLine(range[0], {
-					collapsed: null
-				})
+				const line = doc.lines[i]
+				if (typeof line.attributes.collapsed === 'number') {
+					const range = doc.getLineRange(line)
+					change.formatLine(range[0], {
+						collapsed: null
+					})
+				}
 			}
 
 			if (collapsedState.value) {
@@ -199,9 +202,11 @@ export function collapsingSections(editor: Editor) {
 				sections.applyCollapseChange(collapseChange, change)
 			}
 			
-			preventUncollapseOnEdit++
-			change.apply()
-			preventUncollapseOnEdit--
+			if (change.contentChanged) {
+				preventUncollapseOnEdit++
+				change.apply()
+				preventUncollapseOnEdit--
+			}
 		},
 
 		setUncollapseOnEdit(value: boolean) {
