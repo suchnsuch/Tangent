@@ -32,6 +32,8 @@ type TooltipItem = {
 
 export const tooltips = new WritableStore<TooltipItem[]>([])
 
+/** The tooltip queued for opening */
+let queuedTooltip: TooltipItem = null
 /** Timeout for whether or not a tooltip shows up or is hidden */
 let tooltipTimeout: any = null
 
@@ -43,6 +45,7 @@ let requireDelay = true
 let requireTimeout: any = null
 
 function clearTimeouts() {
+	queuedTooltip = null
 	if (tooltipTimeout) {
 		clearTimeout(tooltipTimeout)
 		tooltipTimeout = null
@@ -72,10 +75,12 @@ export function requestTooltip(element: HTMLElement, config: TooltipDefOrConfig,
 
 	if (tooltips.value.length === 0 && requireDelay) {
 		// No active tooltips
+		queuedTooltip = requestedTooltip
 		tooltipTimeout = setTimeout(() => {
 			requireDelay = false
 			tooltips.value.push(requestedTooltip)
 			tooltips.notifyObservers()
+			queuedTooltip = null
 		}, 1000)
 	}
 	else {
@@ -96,9 +101,10 @@ export function pinTooltip(element: HTMLElement) {
 
 export function dropTooltip(element: HTMLElement, delay=true) {
 	const itemIndex = tooltips.value.findIndex(i => i.origin === element)
+	if (itemIndex >= 0 || queuedTooltip?.origin === element) {
+		clearTimeouts()
+	}
 	if (itemIndex < 0) return
-
-	clearTimeouts()
 
 	const item = tooltips.value[itemIndex]
 
