@@ -21,6 +21,7 @@ import NoteViewInfo from 'common/dataTypes/NoteViewInfo'
 import paths from 'common/paths'
 import type MarkdownEditor from 'app/views/editors/NoteEditor/MarkdownEditor'
 import { createContentIdMatcher } from 'common/markdownModel/links'
+import { deepEqual } from 'fast-equals'
 
 export enum NoteDetailMode {
 	None = 0,
@@ -270,8 +271,10 @@ export default class NoteViewState implements NodeViewState, LensViewState {
 		}
 
 		if (annotation.start >= 0 || annotation.end >= 0) {
-			this.annotations.update(a => [...a, annotation])
-			this.annotationIndex.set(this.annotations.value.length - 1)
+			if (!this.annotations.value.find(i => deepEqual(i, annotation))) {
+				this.annotations.update(a => [...a, annotation])
+				this.annotationIndex.set(this.annotations.value.length - 1)
+			}
 		}
 	}
 

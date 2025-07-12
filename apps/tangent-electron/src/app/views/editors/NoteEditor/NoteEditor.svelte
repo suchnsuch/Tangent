@@ -369,7 +369,9 @@ function onFileChanged(note: NoteFile) {
 		try {
 			if (editable) {
 				isInitializing = true
+				allowAnnotationReactions = false
 				editor.set(textDocument, Source.api)
+				allowAnnotationReactions = true
 				isInitializing = false
 			}
 			else {
@@ -448,7 +450,7 @@ function updateAnnotations(annotations: Annotation[], index=0) {
 			}, 100)
 
 			const selection = annotations[index].end
-			if (document.activeElement === editorElement) {
+			if (document.activeElement === editorElement || (isCurrent && isInitializing)) {
 				editor.select(selection)
 			}
 			else if (state.selection) {
@@ -509,7 +511,8 @@ function onEditorChange(changeEvent: EditorChangeEvent) {
 
 		let editInfo: EditInfo = null
 		let invalidChange = false
-		if (changeEvent.change?.contentChanged) {
+		const contentChanged = changeEvent.change?.contentChanged
+		if (contentChanged) {
 			editInfo = getEditInfo(changeEvent.change.delta)
 			if (!editInfo && changeEvent.change.delta.ops.find(o => 'delete' in o || 'insert' in o)) {
 				invalidChange = true
@@ -532,7 +535,7 @@ function onEditorChange(changeEvent: EditorChangeEvent) {
 
 			for (const annotation of annos) {
 
-				if (editable && typeof annotation.data === 'object' && 'href' in annotation.data) {
+				if (editable && !contentChanged && typeof annotation.data === 'object' && 'href' in annotation.data) {
 					// Remove link-based annotations when selection changes
 					edited = true
 					continue;
@@ -784,12 +787,14 @@ function resumeFocus(arg?) {
 	if (headerEditElement !== document.activeElement && editorElement !== document.activeElement) {
 		console.log('Resuming focus to ', note.name, state.selection)
 		
+		allowAnnotationReactions = false
 		editorElement?.focus({
 			preventScroll: true
 		})
 		if (!state.selection.value) {
 			editor.select(getInitialSelection(editor.doc))
 		}
+		allowAnnotationReactions = true
 	}
 }
 
