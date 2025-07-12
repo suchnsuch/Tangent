@@ -72,6 +72,8 @@ export function revealContentAroundRange(doc: TextDocument, range: EditorRange, 
 	const formats = doc.getTextFormat(selection)
 	const lines = doc.getLinesAt(selection)
 
+	if (lines.length === 0) return
+
 	{
 		// Expand line consideration to reveal collapsed sections
 		let anchorCollapseDepth = lineCollapseDepth(lines[0])
