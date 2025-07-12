@@ -99,4 +99,9 @@ describe('Content ID Matching', () => {
 
 		expect('My Long Header'.match(createContentIdMatcher('my-long_header'))).toBeTruthy()
 	})
+
+	it('Only hits entire names', () => {
+		expect('My Header'.match(createContentIdMatcher('My'))).toBeFalsy()
+		expect('My'.match(createContentIdMatcher('My-header'))).toBeFalsy()
+	})
 })
