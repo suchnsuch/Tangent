@@ -411,31 +411,6 @@ const noteTypeset:TypesetTypes = {
 		},
 
 		{
-			name: 'highlight',
-			selector: 'mark',
-			render: (attributes, children) => {
-				let className = getHideableFormatClass(attributes)
-				if (typeof attributes.highlight === 'string') {
-					className += ' ' + attributes.highlight
-				}
-				return h('mark', { className }, children)
-			}
-		},
-
-		hideableFormat('inline_code',
-			{
-				elementName: 'code',
-				attributeClasses: ['afterSpace', 'beforeSpace'],
-				attributes: {
-					spellcheck: false
-				}
-			}),
-
-		hideableFormat('italic', { elementName: 'em' } ),
-		hideableFormat('bold', { elementName: 'strong' }),
-		hideableFormat('strikethrough', { elementName: 's' }),
-
-		{
 			name: 'list_format',
 			selector: 'span.list_format',
 			render: (attributes, children: any) => {
@@ -517,6 +492,31 @@ const noteTypeset:TypesetTypes = {
 					children)
 			}
 		},
+
+		{
+			name: 'highlight',
+			selector: 'mark',
+			render: (attributes, children) => {
+				let className = getHideableFormatClass(attributes)
+				if (typeof attributes.highlight === 'string') {
+					className += ' ' + attributes.highlight
+				}
+				return h('mark', { className }, children)
+			}
+		},
+
+		hideableFormat('inline_code',
+			{
+				elementName: 'code',
+				attributeClasses: ['afterSpace', 'beforeSpace'],
+				attributes: {
+					spellcheck: false
+				}
+			}),
+
+		hideableFormat('italic', { elementName: 'em' } ),
+		hideableFormat('bold', { elementName: 'strong' }),
+		hideableFormat('strikethrough', { elementName: 's' }),
 
 		{
 			name: 'error',
