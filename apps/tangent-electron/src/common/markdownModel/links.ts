@@ -470,8 +470,10 @@ export function parseLink(char: string, parser: NoteParser): boolean {
 }
 
 function awaitWikiLinkAt(index: number): ParsingProgram {
+	const next = index + 1
 	return (_, parser: NoteParser) => {
-		if (parser.feed.index === index) {
+		const feedIndex = parser.feed.index
+		if (feedIndex === index) {
 			parser.commitSpan(null)
 			parser.builder.dropOpenFormat('wiki-link-custom')
 
@@ -479,15 +481,24 @@ function awaitWikiLinkAt(index: number): ParsingProgram {
 			parser.popContext()
 			return true
 		}
+		else if (feedIndex === next) {
+			// This can happen if the last parser just consumed the previous character
+			parser.commitSpan(null, 0)
+			parser.builder.dropOpenFormat('wiki-link-custom')
+
+			finishWikiLink(parser, -1)
+			parser.popContext()
+			return true
+		}
 		return false
 	}
 }
 
-function finishWikiLink(parser: NoteParser) {
+function finishWikiLink(parser: NoteParser, offset=0) {
 	const { feed, builder } = parser
 
 	// Commit the `]]`
-	feed.next(2)
+	feed.next(2 + offset)
 	parser.commitSpan({
 		link_internal: true,
 		hiddenGroup: true,
@@ -501,11 +512,21 @@ function finishWikiLink(parser: NoteParser) {
 }
 
 function awaitMarkdownLinkAt(index: number, linkInfo: LinkInfo): ParsingProgram {
+	const next = index + 1
 	return (_, parser: NoteParser) => {
-		if (parser.feed.index === index) {
+		const feedIndex = parser.feed.index
+		if (feedIndex === index) {
 			parser.commitSpan(null)
 			parser.builder.dropOpenFormat('md-link-text')
 			finishMarkdownLink(parser, linkInfo)
+			parser.popContext()
+			return true
+		}
+		else if (feedIndex === next) {
+			// This can happen if the last parser just consumed the previous character
+			parser.commitSpan(null, 0)
+			parser.builder.dropOpenFormat('md-link-text')
+			finishMarkdownLink(parser, linkInfo, -1)
 			parser.popContext()
 			return true
 		}
@@ -513,11 +534,11 @@ function awaitMarkdownLinkAt(index: number, linkInfo: LinkInfo): ParsingProgram 
 	}
 }
 
-function finishMarkdownLink(parser: NoteParser, linkInfo: LinkInfo) {
+function finishMarkdownLink(parser: NoteParser, linkInfo: LinkInfo, offset=0) {
 	const { feed, builder } = parser
 
 	// Commit the `](` and link
-	feed.next(2)
+	feed.next(2 + offset)
 	feed.nextByLength(linkInfo.href.length)
 	if (linkInfo.content_id !== undefined) {
 		// Consume the '#' character and the id
