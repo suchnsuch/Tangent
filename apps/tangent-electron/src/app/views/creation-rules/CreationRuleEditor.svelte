@@ -76,6 +76,18 @@ function templateDependencies(template) {
 	exampleNameMessages = messages
 }
 
+function getNewSelectionStart(selectionStart: number, selectionEnd: number, insertString: string) {
+	if (selectionStart < selectionEnd) {
+		return selectionStart
+	} else {
+		return selectionStart + insertString.length
+	}
+}
+
+function getNewSelectionEnd(selectionStart: number, selectionEnd: number, insertString: string) {
+	return selectionStart + insertString.length
+}
+
 /**
  * Insert the given insertionString into the template at the last-seen selection start position. If the lastSelectionEnd position
  * is unlike the lastSelectionStart position, then the insertion will be made between the two positions and the selected text will be removed.
@@ -91,20 +103,24 @@ const insertTextIntoTemplate: TemplateButtonCallback = function(
 			$nameTemplate = currentText.slice(0, lastSelectionStart) + insertionString + currentText.slice(lastSelectionEnd)
 
 			// give the svelte UI time to redraw things
-			tick()
+			tick().then(() => {
+				console.log(`Selection range was ${lastSelectionStart}, ${lastSelectionEnd}`)
 
-			//set the new selection position after the redraw has happened
-			const newSelectionStart = lastSelectionStart + insertionString.length
-			const newSelectionEnd = newSelectionStart
+				//set the new selection position after the redraw has happened
+				const newSelectionStart = getNewSelectionStart(lastSelectionStart, lastSelectionEnd, insertionString)
+				const newSelectionEnd = getNewSelectionEnd(lastSelectionStart, lastSelectionEnd, insertionString)
 
-			// wanted to maintain the range selection here, but couldn't get the API to behave as expected. Unsure why.
+				// wanted to maintain the range selection here, but couldn't get the API to behave as expected. Unsure why.
 
-			templateInput.focus()
-			templateInput.setSelectionRange(newSelectionStart, newSelectionEnd)
+				templateInput.focus()
+				templateInput.setSelectionRange(newSelectionStart, newSelectionEnd)
 
-			// reset last selection start to 0 - await a new selection start when the user initiates another mousedown on a template component
-			lastSelectionStart = 0
-			lastSelectionEnd = 0
+				console.log(`Attempted to set focus to ${newSelectionStart}, ${newSelectionEnd} with insertion length ${insertionString.length}, got setting ${templateInput.selectionStart}, ${templateInput.selectionEnd}`)
+
+				// reset last selection start to 0 - await a new selection start when the user initiates another mousedown on a template component
+				lastSelectionStart = 0
+				lastSelectionEnd = 0
+			})
 		} else {
 			// user had no focus set, so we're just going to insert at the end
 			$nameTemplate = currentText + insertionString
