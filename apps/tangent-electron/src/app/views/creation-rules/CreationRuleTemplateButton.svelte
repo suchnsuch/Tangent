@@ -3,7 +3,6 @@
 	import {tooltip} from "../../utils/tooltips";
 
     export let templateText: string;
-	export let saveCurrentSelection;
 	export let insertTemplateText: TemplateButtonCallback;
 
 	// Handler function that calls the prop function
@@ -11,9 +10,6 @@
 		insertTemplateText(templateText);
 	}
 
-	function handleMouseDown() {
-		saveCurrentSelection();
-	}
 </script>
 
 <!--
@@ -26,7 +22,7 @@ the template input (and erases the selection start and end) The other callback i
 engaged, and follows the TemplateButtonCallback interface to  request insertion of the template string into the Template input.
 -->
 
-<button use:tooltip={`Click to insert template token "${templateText}" into template string`} on:mousedown={handleMouseDown} on:click={handleClick}>
+<button use:tooltip={`Click to insert template token "${templateText}" into template string`} on:click={handleClick}>
 	{templateText}
 </button>
 
