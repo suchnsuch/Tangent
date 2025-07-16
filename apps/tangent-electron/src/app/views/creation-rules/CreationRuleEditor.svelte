@@ -20,9 +20,6 @@ let exampleNameMessages: PathValidationMessages = []
 
 // object reference for the template input element
 let templateInput;
-// last seen selection within the input element
-let lastSelectionStart = 0
-let lastSelectionEnd = 0
 
 $: templateDependencies($nameTemplate)
 function templateDependencies(template) {
@@ -76,18 +73,6 @@ function templateDependencies(template) {
 	exampleNameMessages = messages
 }
 
-function getNewSelectionStart(selectionStart: number, selectionEnd: number, insertString: string) {
-	if (selectionStart < selectionEnd) {
-		return selectionStart
-	} else {
-		return selectionStart + insertString.length
-	}
-}
-
-function getNewSelectionEnd(selectionStart: number, selectionEnd: number, insertString: string) {
-	return selectionStart + insertString.length
-}
-
 /**
  * Insert the given insertionString into the template at the last-seen selection start position. If the lastSelectionEnd position
  * is unlike the lastSelectionStart position, then the insertion will be made between the two positions and the selected text will be removed.
@@ -99,45 +84,27 @@ const insertTextIntoTemplate: TemplateButtonCallback = function(
 	if (templateInput) {
 		// check if the user last had focus inside the template input
 		const currentText = $nameTemplate
+		const lastSelectionStart = templateInput.selectionStart
+		const lastSelectionEnd = templateInput.selectionEnd
+
 		if (lastSelectionStart > 0 || lastSelectionEnd > 0) {
 			$nameTemplate = currentText.slice(0, lastSelectionStart) + insertionString + currentText.slice(lastSelectionEnd)
 
 			// give the svelte UI time to redraw things
 			tick().then(() => {
-				console.log(`Selection range was ${lastSelectionStart}, ${lastSelectionEnd}`)
-
 				//set the new selection position after the redraw has happened
-				const newSelectionStart = getNewSelectionStart(lastSelectionStart, lastSelectionEnd, insertionString)
-				const newSelectionEnd = getNewSelectionEnd(lastSelectionStart, lastSelectionEnd, insertionString)
+				const newSelectionStart = lastSelectionStart + insertionString.length
+				const newSelectionEnd = newSelectionStart
 
-				// wanted to maintain the range selection here, but couldn't get the API to behave as expected. Unsure why.
-
+				// you only want to set this after the redraw has happened or your selection is going to bug out
 				templateInput.focus()
+				// need to set focus first or setting the selection range is not going to have an effect
 				templateInput.setSelectionRange(newSelectionStart, newSelectionEnd)
-
-				console.log(`Attempted to set focus to ${newSelectionStart}, ${newSelectionEnd} with insertion length ${insertionString.length}, got setting ${templateInput.selectionStart}, ${templateInput.selectionEnd}`)
-
-				// reset last selection start to 0 - await a new selection start when the user initiates another mousedown on a template component
-				lastSelectionStart = 0
-				lastSelectionEnd = 0
 			})
 		} else {
 			// user had no focus set, so we're just going to insert at the end
 			$nameTemplate = currentText + insertionString
 		}
-	}
-}
-
-/**
- * Save the last-seen selection start and end positions of the template input element.
- * 
- * This function should be called on a mousedown that is about to request a template insertion, to ensure that the 
- * input selection start and end are available when the click fires (and focus has been lost from the input element)
- */
-function saveLastSelectionStart() {
-	if (templateInput) {
-		lastSelectionStart = templateInput.selectionStart
-		lastSelectionEnd = templateInput.selectionEnd
 	}
 }
 
@@ -167,7 +134,7 @@ function saveLastSelectionStart() {
 			Click the buttons to insert the token text at the end of the string or where your input currently is.</p>
 		<table>
 			<tr>
-				<th><CreationRuleTemplateButton templateText="%name%" insertTemplateText={insertTextIntoTemplate} saveCurrentSelection={saveLastSelectionStart}/></th>
+				<th><CreationRuleTemplateButton templateText="%name%" insertTemplateText={insertTextIntoTemplate}/></th>
 				<td>
 					The name of the note.
 					A blank template is equivalent to a template with just this value.
@@ -178,22 +145,22 @@ function saveLastSelectionStart() {
 		<p>These tokens are replaced with the appropriate values based on when the note is created.</p>
 		<figure>
 			<table>
-				<tr><th><CreationRuleTemplateButton templateText="%YYYY%" insertTemplateText={insertTextIntoTemplate} saveCurrentSelection={saveLastSelectionStart}/></th><td>The full year.</td></tr>
-				<tr><th><CreationRuleTemplateButton templateText="%YY%" insertTemplateText={insertTextIntoTemplate} saveCurrentSelection={saveLastSelectionStart}/></th><td>The last two digits of the year.</td></tr>
-				<tr><th><CreationRuleTemplateButton templateText="%MM%" insertTemplateText={insertTextIntoTemplate} saveCurrentSelection={saveLastSelectionStart}/></th><td>The two digit month. e.g. "05" for May.</td></tr>
-				<tr><th><CreationRuleTemplateButton templateText="%M%" insertTemplateText={insertTextIntoTemplate} saveCurrentSelection={saveLastSelectionStart}/></th><td>The single digit month. e.g. "5" for May, "10" for October.</td></tr>
-				<tr><th><CreationRuleTemplateButton templateText="%DD%" insertTemplateText={insertTextIntoTemplate} saveCurrentSelection={saveLastSelectionStart}/></th><td>The two digit day of the month. e.g. "07".<sup>1</sup></td></tr>
-				<tr><th><CreationRuleTemplateButton templateText="%D%" insertTemplateText={insertTextIntoTemplate} saveCurrentSelection={saveLastSelectionStart}/></th><td>The single digit day of the month. e.g. "5", "15".<sup>1</sup></td></tr>
-				<tr><th><CreationRuleTemplateButton templateText="%HH%" insertTemplateText={insertTextIntoTemplate} saveCurrentSelection={saveLastSelectionStart}/></th><td>The two digit hour of the day (24 hour clock).</td></tr>
-				<tr><th><CreationRuleTemplateButton templateText="%H%" insertTemplateText={insertTextIntoTemplate} saveCurrentSelection={saveLastSelectionStart}/></th><td>The single digit hour of the day (24 hour clock).</td></tr>
-				<tr><th><CreationRuleTemplateButton templateText="%mm%" insertTemplateText={insertTextIntoTemplate} saveCurrentSelection={saveLastSelectionStart}/></th><td>The two digit minute of the hour.</td></tr>
-				<tr><th><CreationRuleTemplateButton templateText="%m%" insertTemplateText={insertTextIntoTemplate} saveCurrentSelection={saveLastSelectionStart}/></th><td>The single digit minute of the hour.</td></tr>
-				<tr><th><CreationRuleTemplateButton templateText="%ss%" insertTemplateText={insertTextIntoTemplate} saveCurrentSelection={saveLastSelectionStart}/></th><td>The two digit second of the minute.</td></tr>
+				<tr><th><CreationRuleTemplateButton templateText="%YYYY%" insertTemplateText={insertTextIntoTemplate}/></th><td>The full year.</td></tr>
+				<tr><th><CreationRuleTemplateButton templateText="%YY%" insertTemplateText={insertTextIntoTemplate}/></th><td>The last two digits of the year.</td></tr>
+				<tr><th><CreationRuleTemplateButton templateText="%MM%" insertTemplateText={insertTextIntoTemplate}/></th><td>The two digit month. e.g. "05" for May.</td></tr>
+				<tr><th><CreationRuleTemplateButton templateText="%M%" insertTemplateText={insertTextIntoTemplate}/></th><td>The single digit month. e.g. "5" for May, "10" for October.</td></tr>
+				<tr><th><CreationRuleTemplateButton templateText="%DD%" insertTemplateText={insertTextIntoTemplate}/></th><td>The two digit day of the month. e.g. "07".<sup>1</sup></td></tr>
+				<tr><th><CreationRuleTemplateButton templateText="%D%" insertTemplateText={insertTextIntoTemplate}/></th><td>The single digit day of the month. e.g. "5", "15".<sup>1</sup></td></tr>
+				<tr><th><CreationRuleTemplateButton templateText="%HH%" insertTemplateText={insertTextIntoTemplate}/></th><td>The two digit hour of the day (24 hour clock).</td></tr>
+				<tr><th><CreationRuleTemplateButton templateText="%H%" insertTemplateText={insertTextIntoTemplate}/></th><td>The single digit hour of the day (24 hour clock).</td></tr>
+				<tr><th><CreationRuleTemplateButton templateText="%mm%" insertTemplateText={insertTextIntoTemplate}/></th><td>The two digit minute of the hour.</td></tr>
+				<tr><th><CreationRuleTemplateButton templateText="%m%" insertTemplateText={insertTextIntoTemplate}/></th><td>The single digit minute of the hour.</td></tr>
+				<tr><th><CreationRuleTemplateButton templateText="%ss%" insertTemplateText={insertTextIntoTemplate}/></th><td>The two digit second of the minute.</td></tr>
 				<tr></tr>
-				<tr><th><CreationRuleTemplateButton templateText="%Month%" insertTemplateText={insertTextIntoTemplate} saveCurrentSelection={saveLastSelectionStart}/></th><td>The full name of the month.<sup>2</sup></td></tr>
-				<tr><th><CreationRuleTemplateButton templateText="%Mth%" insertTemplateText={insertTextIntoTemplate} saveCurrentSelection={saveLastSelectionStart}/></th><td>The shortened name of the month.<sup>2</sup></td></tr>
-				<tr><th><CreationRuleTemplateButton templateText="%WeekDay%" insertTemplateText={insertTextIntoTemplate} saveCurrentSelection={saveLastSelectionStart}/></th><td>The full name of the week day.<sup>2</sup></td></tr>
-				<tr><th><CreationRuleTemplateButton templateText="%WDay%" insertTemplateText={insertTextIntoTemplate} saveCurrentSelection={saveLastSelectionStart}/></th><td>The short name of the week day.<sup>2</sup></td></tr>
+				<tr><th><CreationRuleTemplateButton templateText="%Month%" insertTemplateText={insertTextIntoTemplate}/></th><td>The full name of the month.<sup>2</sup></td></tr>
+				<tr><th><CreationRuleTemplateButton templateText="%Mth%" insertTemplateText={insertTextIntoTemplate}/></th><td>The shortened name of the month.<sup>2</sup></td></tr>
+				<tr><th><CreationRuleTemplateButton templateText="%WeekDay%" insertTemplateText={insertTextIntoTemplate}/></th><td>The full name of the week day.<sup>2</sup></td></tr>
+				<tr><th><CreationRuleTemplateButton templateText="%WDay%" insertTemplateText={insertTextIntoTemplate}/></th><td>The short name of the week day.<sup>2</sup></td></tr>
 			</table>
 			<figcaption>
 				<table>
