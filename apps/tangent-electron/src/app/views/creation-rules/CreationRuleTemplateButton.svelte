@@ -1,5 +1,5 @@
 <script lang="ts">
-import {tooltip} from "../../utils/tooltips";
+import { tooltip } from "../../utils/tooltips"
 
 /**
  * The TemplateButtonCallback interface specifies how a Template button will call back to the parent
@@ -8,15 +8,15 @@ import {tooltip} from "../../utils/tooltips";
  * @param templateText the template text that the button wishes to insert
  */
 interface TemplateButtonCallback {
-	(templateText: string): void;
+	(templateText: string): void
 }
 
-export let templateText: string;
-export let insertTemplateText: TemplateButtonCallback;
+export let templateText: string
+export let insertTemplateText: TemplateButtonCallback
 
 // Handler function that calls the prop function
 function handleClick() {
-	insertTemplateText(templateText);
+	insertTemplateText(templateText)
 }
 </script>
 
