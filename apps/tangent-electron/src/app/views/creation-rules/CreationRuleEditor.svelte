@@ -128,8 +128,7 @@ function insertTextIntoTemplate(
 	{/if}
 	<details>
 		<summary>Name Template Tokens</summary>
-		<p>You can use the following tokens to automate some aspects of note naming.<br/>
-			Click the buttons to insert the token text at the end of the string or where your input currently is.</p>
+		<p>You can use the following tokens to automate some aspects of note naming.</p>
 		<table>
 			<tr>
 				<th><CreationRuleTemplateButton templateText="%name%" insertTemplateText={insertTextIntoTemplate}/></th>
