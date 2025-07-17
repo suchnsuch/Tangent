@@ -1,6 +1,5 @@
 <script lang="ts">
 import type CreationRule from 'common/settings/CreationRule'
-import {TemplateButtonCallback} from "common/templatebuttons";
 import { nameFromRule, willPromptForName } from 'common/settings/CreationRule'
 import editable from 'app/utils/editable'
 import SettingView from '../System/SettingView.svelte'
@@ -18,8 +17,7 @@ let asksForName = false
 let exampleName = ''
 let exampleNameMessages: PathValidationMessages = []
 
-// object reference for the template input element
-let templateInput;
+let templateInput: HTMLInputElement
 
 $: templateDependencies($nameTemplate)
 function templateDependencies(template) {
@@ -78,8 +76,8 @@ function templateDependencies(template) {
  * is unlike the lastSelectionStart position, then the insertion will be made between the two positions and the selected text will be removed.
  * @param insertionString the string to insert into the template
  */
-const insertTextIntoTemplate: TemplateButtonCallback = function(
-		insertionString
+function insertTextIntoTemplate(
+		insertionString: string
 ) {
 	if (templateInput) {
 		// check if the user last had focus inside the template input
