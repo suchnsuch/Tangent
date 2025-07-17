@@ -102,6 +102,10 @@ function insertTextIntoTemplate(
 		} else {
 			// user had no focus set, so we're just going to insert at the end
 			$nameTemplate = currentText + insertionString
+
+			tick().then(() => {
+				templateInput.focus()
+			})
 		}
 	}
 }
