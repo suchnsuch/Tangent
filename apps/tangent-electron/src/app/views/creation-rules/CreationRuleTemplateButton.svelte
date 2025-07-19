@@ -2,14 +2,12 @@
 import { tooltip } from "../../utils/tooltips"
 
 /**
- * The TemplateButtonCallback interface specifies how a Template button will call back to the parent
+ * The TemplateButtonCallback type specifies how a Template button will call back to the parent
  * component that is using this button to offer click-to-insert behavior.
  *
  * @param templateText the template text that the button wishes to insert
  */
-interface TemplateButtonCallback {
-	(templateText: string): void
-}
+type TemplateButtonCallback = (templateText: string) => void
 
 export let templateText: string
 export let insertTemplateText: TemplateButtonCallback
