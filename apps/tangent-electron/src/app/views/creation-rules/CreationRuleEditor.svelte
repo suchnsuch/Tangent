@@ -5,6 +5,8 @@ import editable from 'app/utils/editable'
 import SettingView from '../System/SettingView.svelte'
 import { tooltip } from 'app/utils/tooltips'
 import { PathValidationMessages, validatePath } from 'common/trees'
+import { tick } from 'svelte';
+import CreationRuleTemplateButton from './CreationRuleTemplateButton.svelte'
 
 export let rule: CreationRule
 
@@ -14,6 +16,8 @@ $: nameTemplate = rule.nameTemplate
 let asksForName = false
 let exampleName = ''
 let exampleNameMessages: PathValidationMessages = []
+
+let templateInput: HTMLInputElement
 
 $: templateDependencies($nameTemplate)
 function templateDependencies(template) {
@@ -66,6 +70,46 @@ function templateDependencies(template) {
 
 	exampleNameMessages = messages
 }
+
+/**
+ * Insert the given insertionString into the template at the last-seen selection start position. If the lastSelectionEnd position
+ * is unlike the lastSelectionStart position, then the insertion will be made between the two positions and the selected text will be removed.
+ * @param insertionString the string to insert into the template
+ */
+function insertTextIntoTemplate(
+		insertionString: string
+) {
+	if (templateInput) {
+		// check if the user last had focus inside the template input
+		const currentText = $nameTemplate
+		const lastSelectionStart = templateInput.selectionStart
+		const lastSelectionEnd = templateInput.selectionEnd
+
+		if (lastSelectionStart > 0 || lastSelectionEnd > 0) {
+			$nameTemplate = currentText.slice(0, lastSelectionStart) + insertionString + currentText.slice(lastSelectionEnd)
+
+			// give the svelte UI time to redraw things
+			tick().then(() => {
+				//set the new selection position after the redraw has happened
+				const newSelectionStart = lastSelectionStart + insertionString.length
+				const newSelectionEnd = newSelectionStart
+
+				// you only want to set this after the redraw has happened or your selection is going to bug out
+				templateInput.focus()
+				// need to set focus first or setting the selection range is not going to have an effect
+				templateInput.setSelectionRange(newSelectionStart, newSelectionEnd)
+			})
+		} else {
+			// user had no focus set, so we're just going to insert at the end
+			$nameTemplate = currentText + insertionString
+
+			tick().then(() => {
+				templateInput.focus()
+			})
+		}
+	}
+}
+
 </script>
 
 <main>
@@ -79,7 +123,7 @@ function templateDependencies(template) {
 	</header>
 	<label use:tooltip={"Defines how the note will be named. Refer to the Template Token list for available dynamic values."}>
 		<span>Name Template</span>
-		<input type="text" bind:value={$nameTemplate} />
+		<input type="text" bind:value={$nameTemplate} bind:this={templateInput}/>
 	</label>
 	{#if exampleNameMessages?.length}
 		{#each exampleNameMessages as message}
@@ -91,7 +135,7 @@ function templateDependencies(template) {
 		<p>You can use the following tokens to automate some aspects of note naming.</p>
 		<table>
 			<tr>
-				<th>%name%</th>
+				<th><CreationRuleTemplateButton templateText="%name%" insertTemplateText={insertTextIntoTemplate}/></th>
 				<td>
 					The name of the note.
 					A blank template is equivalent to a template with just this value.
@@ -102,22 +146,22 @@ function templateDependencies(template) {
 		<p>These tokens are replaced with the appropriate values based on when the note is created.</p>
 		<figure>
 			<table>
-				<tr><th>%YYYY%</th><td>The full year.</td></tr>
-				<tr><th>%YY%</th><td>The last two digits of the year.</td></tr>
-				<tr><th>%MM%</th><td>The two digit month. e.g. "05" for May.</td></tr>
-				<tr><th>%M%</th><td>The single digit month. e.g. "5" for May, "10" for October.</td></tr>
-				<tr><th>%DD%</th><td>The two digit day of the month. e.g. "07".<sup>1</sup></td></tr>
-				<tr><th>%D%</th><td>The single digit day of the month. e.g. "5", "15".<sup>1</sup></td></tr>
-				<tr><th>%HH%</th><td>The two digit hour of the day (24 hour clock).</td></tr>
-				<tr><th>%H%</th><td>The single digit hour of the day (24 hour clock).</td></tr>
-				<tr><th>%mm%</th><td>The two digit minute of the hour.</td></tr>
-				<tr><th>%m%</th><td>The single digit minute of the hour.</td></tr>
-				<tr><th>%ss%</th><td>The two digit second of the minute.</td></tr>
+				<tr><th><CreationRuleTemplateButton templateText="%YYYY%" insertTemplateText={insertTextIntoTemplate}/></th><td>The full year.</td></tr>
+				<tr><th><CreationRuleTemplateButton templateText="%YY%" insertTemplateText={insertTextIntoTemplate}/></th><td>The last two digits of the year.</td></tr>
+				<tr><th><CreationRuleTemplateButton templateText="%MM%" insertTemplateText={insertTextIntoTemplate}/></th><td>The two digit month. e.g. "05" for May.</td></tr>
+				<tr><th><CreationRuleTemplateButton templateText="%M%" insertTemplateText={insertTextIntoTemplate}/></th><td>The single digit month. e.g. "5" for May, "10" for October.</td></tr>
+				<tr><th><CreationRuleTemplateButton templateText="%DD%" insertTemplateText={insertTextIntoTemplate}/></th><td>The two digit day of the month. e.g. "07".<sup>1</sup></td></tr>
+				<tr><th><CreationRuleTemplateButton templateText="%D%" insertTemplateText={insertTextIntoTemplate}/></th><td>The single digit day of the month. e.g. "5", "15".<sup>1</sup></td></tr>
+				<tr><th><CreationRuleTemplateButton templateText="%HH%" insertTemplateText={insertTextIntoTemplate}/></th><td>The two digit hour of the day (24 hour clock).</td></tr>
+				<tr><th><CreationRuleTemplateButton templateText="%H%" insertTemplateText={insertTextIntoTemplate}/></th><td>The single digit hour of the day (24 hour clock).</td></tr>
+				<tr><th><CreationRuleTemplateButton templateText="%mm%" insertTemplateText={insertTextIntoTemplate}/></th><td>The two digit minute of the hour.</td></tr>
+				<tr><th><CreationRuleTemplateButton templateText="%m%" insertTemplateText={insertTextIntoTemplate}/></th><td>The single digit minute of the hour.</td></tr>
+				<tr><th><CreationRuleTemplateButton templateText="%ss%" insertTemplateText={insertTextIntoTemplate}/></th><td>The two digit second of the minute.</td></tr>
 				<tr></tr>
-				<tr><th>%Month%</th><td>The full name of the month.<sup>2</sup></td></tr>
-				<tr><th>%Mth%</th><td>The shortened name of the month.<sup>2</sup></td></tr>
-				<tr><th>%WeekDay%</th><td>The full name of the week day.<sup>2</sup></td></tr>
-				<tr><th>%WDay%</th><td>The short name of the week day.<sup>2</sup></td></tr>
+				<tr><th><CreationRuleTemplateButton templateText="%Month%" insertTemplateText={insertTextIntoTemplate}/></th><td>The full name of the month.<sup>2</sup></td></tr>
+				<tr><th><CreationRuleTemplateButton templateText="%Mth%" insertTemplateText={insertTextIntoTemplate}/></th><td>The shortened name of the month.<sup>2</sup></td></tr>
+				<tr><th><CreationRuleTemplateButton templateText="%WeekDay%" insertTemplateText={insertTextIntoTemplate}/></th><td>The full name of the week day.<sup>2</sup></td></tr>
+				<tr><th><CreationRuleTemplateButton templateText="%WDay%" insertTemplateText={insertTextIntoTemplate}/></th><td>The short name of the week day.<sup>2</sup></td></tr>
 			</table>
 			<figcaption>
 				<table>
