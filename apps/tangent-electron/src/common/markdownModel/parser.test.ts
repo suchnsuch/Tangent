@@ -260,7 +260,9 @@ describe('Link parsing', () => {
 
 			expect(t_link).toEqual({
 				form: 'wiki',
-				href: 'Simple Link'
+				href: 'Simple Link',
+				content_id: null,
+				text: null
 			})
 
 			expect(ops).toMatchObject(buildOpsFromInsertList([
@@ -370,7 +372,12 @@ describe('Link parsing', () => {
 			const ops = parser.parseMarkdown(`[web link](https://google.com) and a [[Wiki Link]]`).lines[0].content.ops
 	
 			// The first link should be seen as a markdown link
-			expect(ops[0].attributes.t_link).toEqual({ form: 'md', href: 'https://google.com', text: 'web link' })
+			expect(ops[0].attributes.t_link).toEqual({
+				form: 'md',
+				href: 'https://google.com',
+				text: 'web link',
+				content_id: null
+			})
 		})
 
 		it('Should allow for inline formatting in text', () => {
