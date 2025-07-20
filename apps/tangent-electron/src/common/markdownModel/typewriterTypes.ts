@@ -85,39 +85,44 @@ function revealableLine(lineName: string, elementName: string = 'div'): LineType
 				elementName,
 				getCoreLineProperties(attributes, lineName),
 				children)
-		}
+		},
+		fromDom: defaultLineFromDom(lineName)
 	}
 }
 
 function getCoreLineProperties(attributes, baseClass = ''): AttributeMap {
-	let className = baseClass + ' line'
+
+	const props: AttributeMap = {
+		className: baseClass + ' line',
+		dir: 'auto' // for RTL language support
+	}
+
 	const collapsed = attributes.collapsed
-	if (isCollapsed(collapsed)) {
-		className += ' collapsed'
+	if (typeof collapsed === 'number') {
+		// Store the raw value so it can be recovered from the HTML if necessary
+		props['data-collapsed'] = collapsed
+		if (isCollapsed(collapsed)) {
+			props.className += ' collapsed'
+		}
+		if (hasCollapsedChildren(collapsed)) {
+			props.className += ' collapse-parent'
+		}
 	}
-	if (hasCollapsedChildren(collapsed)) {
-		className += ' collapse-parent'
-	}
+	
 	if (attributes.collapsedReveal) {
-		className += ' collapsed-revealed'
+		props.className += ' collapsed-revealed'
 	}
 
 	if (attributes.revealed) {
-		className += ' revealed'
+		props.className += ' revealed'
 	}
 	if (attributes.empty) {
-		className += ' empty'
-	}
-	const indent = attributes.indent as IndentDefinition
-	let style = ''
-	if (indent) {
-		style += getLineIndentStyle(indent.indentSize)
+		props.className += ' empty'
 	}
 
-	let props: AttributeMap = {
-		className,
-		style,
-		dir: 'auto' // for RTL language support
+	const indent = attributes.indent as IndentDefinition
+	if (indent) {
+		props.style = getLineIndentStyle(indent.indentSize)
 	}
 
 	const decoration = attributes.decoration
@@ -138,6 +143,21 @@ function getCoreLineProperties(attributes, baseClass = ''): AttributeMap {
 	return props
 }
 
+function extractCoreLineProperties(element: HTMLElement, attributes: AttributeMap) {
+	const collapsed = element.getAttribute('data-collapsed')
+	if (collapsed) {
+		attributes.collapsed = parseInt(collapsed)
+	}
+}
+
+function defaultLineFromDom(name: string){
+	return (element: HTMLElement) => {
+		const attributes: AttributeMap = { [name]: true }
+		extractCoreLineProperties(element, attributes)
+		return attributes
+	}
+}
+
 function getLineIndentStyle(indent: number) {
 	return '--lineIndent: ' + indent + ';'
 }
@@ -156,13 +176,15 @@ const noteTypeset:TypesetTypes = {
 			selector: 'p',
 			render: (attributes, children) => {
 				return h('p', getCoreLineProperties(attributes), children)	
-			}
+			},
+			fromDom: defaultLineFromDom('line')
 		},
 		{
 			name: 'header',
 			selector: 'h1, h2, h3, h4, h5, h6',
 			defaultFollows: true,
-			render: (attributes, children) => h(`h${attributes.header}`, getCoreLineProperties(attributes), children)
+			render: (attributes, children) => h(`h${attributes.header}`, getCoreLineProperties(attributes), children),
+			fromDom: defaultLineFromDom('header') // Technically incorrect, but will be re-parsed anyhow
 		},
 		{
 			name: 'list',
@@ -179,7 +201,8 @@ const noteTypeset:TypesetTypes = {
 				}
 
 				return h('p', props, children)
-			}
+			},
+			fromDom: defaultLineFromDom('list')
 		},
 		{
 			name: 'blockquote',
@@ -189,7 +212,9 @@ const noteTypeset:TypesetTypes = {
 				const { className } = node.parentElement
 				const match = className.match(/depth-(\d+)/)
 				const blockquote = parseInt(match && match[1])
-				return { blockquote }
+				const attributes: AttributeMap = { blockquote }
+				extractCoreLineProperties(node, attributes)
+				return attributes
 			},
 			shouldCombine: (prev, next) => {
 				return prev.blockquote === next.blockquote
@@ -231,10 +256,13 @@ const noteTypeset:TypesetTypes = {
 			fromDom(node: HTMLElement) {
 				const { className } = node.parentElement
 				const match = className.match(/language-(.*)/)
-				const result:any = {}
+				const result: AttributeMap = {}
 				if (match && match[1] !== 'none') {
-					result.code = match[1]
+					result.code = {
+						language: match[1]
+					}
 				}
+				extractCoreLineProperties(node, result)
 				return result
 			},
 			shouldCombine: (prev, next) => {
@@ -289,6 +317,7 @@ const noteTypeset:TypesetTypes = {
 			name: 'front_matter',
 			selector: 'div.frontMatter code div.frontMatterLine',
 			defaultFollows: true,
+			fromDom: defaultLineFromDom('front_matter'),
 			shouldCombine: (prev, next) => {
 				return prev.front_matter === next.front_matter
 			},
@@ -311,6 +340,7 @@ const noteTypeset:TypesetTypes = {
 			name: 'math',
 			selector: 'figure pre code div.mathLine',
 			defaultFollows: true,
+			fromDom: defaultLineFromDom('math'),
 			shouldCombine: (prev, next) => {
 				return prev.math.source === next.math.source
 					&& prev.indent.indent === next.indent.indent
