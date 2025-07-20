@@ -16,3 +16,5 @@ Markdown links can also be used to link to files and folders on your local compu
 Links that resolve to a file within the workspace are highlighted in your accent color (default green). Clicking these links will open the file within Tangent. If Tangent cannot display that file, the file will be opened in its default application.
 
 Links that resolve elsewhere are highlighted in purple. Clicking on these links will open the linked file or folder in its default application for your system.
+
+Markdown links can link to a specific header of a note by appending `#` and the id name of the header (the text of the header with any characters unsafe for URLs stripped out and spaces replaced with dashes or underscores).

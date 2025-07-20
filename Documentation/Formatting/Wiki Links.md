@@ -26,6 +26,10 @@ You can open a link in the current pane by `Cmd/Ctrl+Shift`-clicking it or press
 
 You can open a link to the _left_ of the current pane by `Cmd/Ctrl+Alt`-clocking it or pressing `Cmd/Ctrl+Alt+Enter` with the cursor in the link. This effectively "rebases" the thread with the linked item acting as the new root of the thread.
 
+Wiki links can be created directly from selected text:
+* `Cmd/Ctrl+Alt+K` will turn the selected text or current word into a wiki link. If there is already a note with this name, the casing of the selected text will be updated to match.
+* `Cmd/Ctrl+Alt+Shift+K` will turn the selected text into the custom wiki link text for a new link and place the cursor ready to type out the name of the note.
+
 When creating a new link in autocomplete, the following shortcuts may be useful:
 * `Cmd/Ctrl+Enter` will complete and open the link immediately.
 * `Shift+Enter` will end autocomplete with the current text, making it quick and easy to create new notes that have names similar to other notes.
