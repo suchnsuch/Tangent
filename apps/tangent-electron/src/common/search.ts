@@ -1,12 +1,14 @@
 import { escapeRegExp, getRegexMatchIndices, last } from '@such-n-such/core'
 import { daysIntoYear } from './dates'
 import type { TreeNode } from './trees'
-import { IndexData } from './indexing/indexTypes'
+import { IndexData, StructureType } from './indexing/indexTypes'
 import paths, { normalizeSeperators } from './paths'
 import { applyAnnotation, ChildList } from './annotations/nodeAnnotations'
 
 export type PathMatch = RegExp
-export type SearchMatchResult = RegExpMatchArray
+export type SearchMatchResult = RegExpMatchArray & {
+	type?: 'alias'|'header'
+}
 
 export interface SegmentSearchNodePair {
 	node: TreeNode
@@ -127,18 +129,43 @@ function pathSearchResult(path: string, searchMatch: RegExp, root?: string): Sea
 	}
 }
 
-export function nodeSearchResults(node: TreeNode, searchMatch: RegExp, root?: TreeNode): SearchMatchResult | SearchMatchResult[] {
+export function nodeSearchResults(node: TreeNode, searchMatch: RegExp, root?: TreeNode, aliases=true, headers=true): SearchMatchResult | SearchMatchResult[] {
 
 	const rawMatch = pathSearchResult(node.path, searchMatch, root?.path)
 
-	const aliasPaths = IndexData.findAliasPaths(node)
-	if (aliasPaths) {
-		const result = [rawMatch]
-		result.push(...aliasPaths.map(p => pathSearchResult(p, searchMatch, root?.path)))
-		return result
+	let arrayResult: RegExpMatchArray[]
+
+	if (aliases) {
+		const aliasPaths = IndexData.findAliasPaths(node)
+		if (aliasPaths?.length) {
+			for (const alias of aliasPaths) {
+				const match = pathSearchResult(alias, searchMatch, root?.path)
+				if (match) {
+					if (!arrayResult) arrayResult = rawMatch ? [rawMatch] : []
+					match.type = 'alias'
+					arrayResult.push(match)
+				}
+			}
+		}
 	}
 
-	return rawMatch
+	// Doing our own loop rather than IndexData.headers to avoid generator overhead
+	if (headers && node.meta?.structure) {
+		const structure = node.meta.structure
+		for (let i = 0; i < structure.length; i++) {
+			const item = structure[i]
+			if (item.type === StructureType.Header) {
+				const match = item.text.match(searchMatch) as SearchMatchResult
+				if (match) {
+					if (!arrayResult) arrayResult = rawMatch ? [rawMatch] : []
+					match.type = 'header'
+					arrayResult.push(match)
+				}
+			}
+		}
+	}
+
+	return arrayResult ?? rawMatch
 }
 
 export function compareNodeSearch(a: SearchMatchResult, b: SearchMatchResult) {

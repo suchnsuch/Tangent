@@ -118,6 +118,7 @@ function getContent(node: TreeNode, relativeTo: string | TreeNode, showFileType:
 
 <div class="NodeLine">
 	{#if showIcon}<SvgIcon ref={iconForNode(node)} size="1em" />{/if}
+	{#if nameMatch?.type === 'header'}<span class="headerNoteName">{node.name} →</span>{/if}
 	<span class="path" class:highlightName>{@html content}</span>
 	{#if showModDate}
 		<span class="date" use:tooltip={"Last modified " + simpleTimestamp(node.modified)}>{shortestDayDate(node.modified)}</span>
@@ -147,7 +148,7 @@ div > :global(svg) {
 	}
 }
 
-.path :global(.directory), .path :global(.fileType), .date {
+.path :global(.directory), .path :global(.fileType), .date, .headerNoteName {
 	// When highlighted, this looks better as it adjusts to the background color
 	opacity: 60%;
 	font-size: 80%;

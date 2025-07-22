@@ -236,6 +236,15 @@ function selectOption(selectEvent: CustomEvent<{option: Option, event: KeyboardE
 			target: option.node
 		}
 
+		if (option.match.type === 'header') {
+			// Provide a fake link for the content_id to the header
+			nav.link = {
+				form: 'wiki',
+				href: '',
+				content_id: option.match.input
+			}
+		}
+
 		if (isModKey(event) || event.shiftKey || event.altKey) {
 			nav.origin = 'current'
 			nav.direction = 'out'
