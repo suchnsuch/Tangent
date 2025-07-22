@@ -535,8 +535,11 @@ function onEditorChange(changeEvent: EditorChangeEvent) {
 
 			for (const annotation of annos) {
 
-				if (editable && !contentChanged && typeof annotation.data === 'object' && 'href' in annotation.data) {
-					// Remove link-based annotations when selection changes
+				if (editable && !contentChanged
+					&& typeof annotation.data === 'object' && 'href' in annotation.data
+					&& !rangesAreEquivalent(editor.doc.selection, state.selection.value)
+				) {
+					// Remove link-based annotations when selection change
 					edited = true
 					continue;
 				}
