@@ -539,7 +539,6 @@ article.note {
 	}
 
 	.annotation {
-		border-radius: 2px;
 		background-color: color(from var(--accentActiveBackgroundColor) srgb r g b / .7);
 		&.soft {
 			background-color: color(from var(--accentDeemphasizedBackgroundColor) srgb r g b / .7);
