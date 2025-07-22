@@ -12,6 +12,9 @@ type Form = {
 	mode: 'error'
 	message: string
 } | {
+	mode: 'pending'
+	src: string
+} | {
 	mode: 'image'
 	src: string 
 } | {
@@ -41,7 +44,10 @@ $: nodeHandle = workspace?.getHandle(link)
 $: onNodeHandleChanged(nodeHandle ? $nodeHandle : null)
 function onNodeHandleChanged(value: HandleResult) {
 	if (!value) {
-		error('Handle resolution error')
+		form = {
+			mode: 'pending',
+			src: link.href
+		}
 	}
 	else if (typeof value === 'string') {
 		// This occurs with a bad md link

@@ -119,6 +119,9 @@ class TangentEmbed extends TangentLink {
 					this.setLinkState('error', null)
 					this.errorMessage = form?.message
 				}
+				else if (form.mode === 'pending') {
+					this.setLinkState('uninitialized', null)
+				}
 				else {
 					const url = form.src ?? form.url
 					if (url && isExternalLink(url)) {
