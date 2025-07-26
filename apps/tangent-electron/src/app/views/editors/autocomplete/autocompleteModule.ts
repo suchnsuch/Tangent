@@ -198,6 +198,11 @@ export class AutocompleteModule {
 		const doc = event.doc
 
 		if (this.activeHandler.value) {
+			if (!doc.selection) {
+				this.endAutocomplete()
+				return
+			}
+			
 			if (event.change) {
 				if (this.nextRangeOverride) {
 					this.range.set(this.nextRangeOverride)
