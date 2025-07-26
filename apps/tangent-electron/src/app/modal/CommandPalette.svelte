@@ -144,7 +144,7 @@ function updateOptions(text: string) {
 					node, match: undefined
 				}))
 			}
-			nodes.sort((a, b) => orderTreeNodesForSearch(a, b))
+			nodes.sort((a, b) => orderTreeNodesForSearch(a, b, false))
 			if (!text) {
 				nodes = nodes.slice(0, 16)
 			}

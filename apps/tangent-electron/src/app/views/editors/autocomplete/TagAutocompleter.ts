@@ -169,7 +169,7 @@ export default class TagAutocompleter implements AutocompleteHandler {
 				node, match: undefined
 			})) as TagOption[]
 		}
-		nodes.sort(orderTreeNodesForSearch)
+		nodes.sort((a, b) => orderTreeNodesForSearch(a, b, false))
 
 		if (!searchText) {
 			nodes = nodes.slice(0, 10)

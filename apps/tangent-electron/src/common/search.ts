@@ -169,14 +169,14 @@ export function nodeSearchResults(node: TreeNode, searchMatch: RegExp, root?: Tr
 	return arrayResult ?? rawMatch
 }
 
-export function compareNodeSearch(a: SearchMatchResult, b: SearchMatchResult) {
+export function compareNodeSearch(a: SearchMatchResult, b: SearchMatchResult, directoryRelative=true) {
 	if (!a && !b) return 0
 	if (!a) return 1
 	if (!b) return -1
 
 	// Find the local directory start here
-	const aDirStart = a.input.lastIndexOf('/', a.index)
-	const bDirStart = b.input.lastIndexOf('/', b.index)
+	const aDirStart = directoryRelative ? a.input.lastIndexOf('/', a.index) : 0
+	const bDirStart = directoryRelative ? b.input.lastIndexOf('/', b.index) : 0
 
 	const aRelSart = a.index - aDirStart
 	const bRelStart = b.index - bDirStart
@@ -241,9 +241,9 @@ export function bestMatchForSearch(node: TreeNode, searchMatch: RegExp, root?: T
 	return bestMatch
 }
 
-export function orderTreeNodesForSearch(a: SegmentSearchNodePair, b: SegmentSearchNodePair) {
+export function orderTreeNodesForSearch(a: SegmentSearchNodePair, b: SegmentSearchNodePair, directoryRelative=true) {
 	if (a.match && b.match) {
-		const result = compareNodeSearch(a.match, b.match)
+		const result = compareNodeSearch(a.match, b.match, directoryRelative)
 		// Fractional differences occur only when we've fallen back to ratios
 		// We want to use different metrics for similar ratios
 		// This value is a hand-tuned guess
