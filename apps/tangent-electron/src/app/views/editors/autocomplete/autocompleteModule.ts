@@ -199,7 +199,6 @@ export class AutocompleteModule {
 
 		if (this.activeHandler.value) {
 			if (!doc.selection) {
-				this.endAutocomplete()
 				return
 			}
 			
