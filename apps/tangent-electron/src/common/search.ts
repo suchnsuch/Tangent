@@ -251,12 +251,20 @@ export function orderTreeNodesForSearch(a: SegmentSearchNodePair, b: SegmentSear
 
 		// Use lower precision here so that we can sort by edit date
 		// for notes with similar inlink count, losing precision as values increase
-		const aInlinkish = Math.log2(a.node.meta?.inLinks?.length ?? 0)
-		const bInlinkish = Math.log2(b.node.meta?.inLinks?.length ?? 0)
+		const aLinkCount = a.node.meta?.inLinks?.length ?? 0
+		const bLinkCount = b.node.meta?.inLinks?.length ?? 0
 
-		const inlinkishDiff = bInlinkish - aInlinkish
-		if (Math.abs(inlinkishDiff) > .5) {
-			return inlinkishDiff
+		if (aLinkCount !== bLinkCount) {
+			if (aLinkCount === 0) return 1
+			if (bLinkCount === 0) return -1
+
+			const aInlinkish = Math.log2(aLinkCount)
+			const bInlinkish = Math.log2(bLinkCount)
+
+			const inlinkishDiff = bInlinkish - aInlinkish
+			if (Math.abs(inlinkishDiff) > .5) {
+				return inlinkishDiff
+			}
 		}
 	}
 	
