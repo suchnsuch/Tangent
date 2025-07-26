@@ -1,5 +1,4 @@
 <script lang="ts">
-import { FocusLevel } from "app/model";
 import { decodeSortMode } from "app/model/directoryView";
 
 export let sortMode: string = 'name|ascending'
