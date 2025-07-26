@@ -238,10 +238,13 @@ function selectOption(selectEvent: CustomEvent<{option: Option, event: KeyboardE
 
 		if (option.match.type === 'header') {
 			// Provide a fake link for the content_id to the header
-			nav.link = {
-				form: 'wiki',
-				href: '',
-				content_id: option.match.input
+			const content_id = option.match.input.substring(option.match.input.lastIndexOf('#') + 1)
+			if (content_id) {
+				nav.link = {
+					form: 'wiki',
+					href: '',
+					content_id
+				}
 			}
 		}
 

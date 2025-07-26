@@ -149,13 +149,14 @@ export function nodeSearchResults(node: TreeNode, searchMatch: RegExp, root?: Tr
 		}
 	}
 
-	// Doing our own loop rather than IndexData.headers to avoid generator overhead
-	if (headers && node.meta?.structure) {
+	// Only match headers if there isn't already a match
+	if (headers && !rawMatch && !arrayResult?.length && node.meta?.structure) {
 		const structure = node.meta.structure
+		// Doing our own loop rather than IndexData.headers to avoid generator overhead
 		for (let i = 0; i < structure.length; i++) {
 			const item = structure[i]
 			if (item.type === StructureType.Header) {
-				const match = item.text.match(searchMatch) as SearchMatchResult
+				const match = pathSearchResult(node.path + '#' + item.text, searchMatch, root?.path)
 				if (match) {
 					if (!arrayResult) arrayResult = rawMatch ? [rawMatch] : []
 					match.type = 'header'

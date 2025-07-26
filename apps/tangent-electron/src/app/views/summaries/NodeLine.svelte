@@ -65,16 +65,23 @@ function getContent(node: TreeNode, relativeTo: string | TreeNode, showFileType:
 		relativePath = normalizeSeperators(relativePath, '/')
 	}
 
-	const extenstion = paths.extname(relativePath)
-	const extenstionStart = relativePath.length - extenstion.length
+	let extension = paths.extname(relativePath)
+	const extenstionStart = relativePath.length - extension.length
+	const extensionHeaderIndex = extension.lastIndexOf('#')
+	if (extensionHeaderIndex >= 0) {
+		// Strip off the header
+		extension = extension.substring(0, extensionHeaderIndex)
+		relativePath = relativePath.substring(0, extenstionStart + extensionHeaderIndex) + '→' + relativePath.substring(extenstionStart + extensionHeaderIndex + 1)
+	}
+	const extensionEnd = extenstionStart + extension.length
 	
-	let showExtension = showFileType && extenstion.startsWith('.')
+	let showExtension: false|true|'highlighted' = showFileType && extension.startsWith('.') || extensionHeaderIndex >= 0
 
 	const indices = (match as any)?.indices
-	if (indices && extenstion.startsWith('.')) {
+	if (indices && extension.startsWith('.')) {
 		for (let index = 1; index < indices.length; index++) {
-			if (indices[index][1] > extenstionStart) {
-				showExtension = true
+			if (indices[index][1] > extenstionStart && indices[index][0] < extensionEnd) {
+				showExtension = 'highlighted'
 				break
 			}
 		}
@@ -92,19 +99,28 @@ function getContent(node: TreeNode, relativeTo: string | TreeNode, showFileType:
 			}, [0, dirName.length + 1])
 			annotations = applyAnnotation(annotations, {
 				className: 'name'
-			}, [dirname.length + 1, relativePath.length])
+			}, [dirname.length + 1, extenstionStart])
 		}
 		else {
 			annotations = applyAnnotation(annotations, {
 				className: 'name'
-			}, [0, relativePath.length])
+			}, [0, extenstionStart])
 		}
 	}
 
 	if (showExtension) {
 		annotations = applyAnnotation(annotations, {
-			className: 'fileType'
-		}, [extenstionStart, relativePath.length])
+			className: 'fileType' + (showExtension === 'highlighted' ? ' highlighted' : '')
+		}, [extenstionStart, extensionEnd])
+	}
+
+	if (extensionHeaderIndex >= 0) {
+		annotations = applyAnnotation(annotations, {
+			className: 'headerHash'
+		}, [extenstionStart + extensionHeaderIndex, extenstionStart + extensionHeaderIndex + 1])
+		annotations = applyAnnotation(annotations, {
+			className: 'headerName'
+		}, [extenstionStart + extensionHeaderIndex + 1, relativePath.length])
 	}
 
 	if (match) {
@@ -116,9 +132,8 @@ function getContent(node: TreeNode, relativeTo: string | TreeNode, showFileType:
 
 </script>
 
-<div class="NodeLine">
+<div class="NodeLine" class:header={nameMatch?.type === 'header'}>
 	{#if showIcon}<SvgIcon ref={iconForNode(node)} size="1em" />{/if}
-	{#if nameMatch?.type === 'header'}<span class="headerNoteName">{node.name} →</span>{/if}
 	<span class="path" class:highlightName>{@html content}</span>
 	{#if showModDate}
 		<span class="date" use:tooltip={"Last modified " + simpleTimestamp(node.modified)}>{shortestDayDate(node.modified)}</span>
@@ -148,11 +163,20 @@ div > :global(svg) {
 	}
 }
 
-.path :global(.directory), .path :global(.fileType), .date, .headerNoteName {
+.path :global(.directory), .path :global(.fileType), .path :global(.headerHash), .date, .NodeLine.header :global(.name) {
 	// When highlighted, this looks better as it adjusts to the background color
 	opacity: 60%;
 	font-size: 80%;
 	line-height: 125%;
+}
+
+.path :global(.headerHash) {
+	display: inline-block;
+	padding: 0 .2em;
+}
+
+.path :global(.fileType):not(.highlighted) {
+	display: none;
 }
 
 .path :global(.directory) {
