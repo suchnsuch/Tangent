@@ -1,7 +1,7 @@
 The command palette is a quick and easy way to jump around to different notes and perform different actions just by using the keyboard.
 
 # Go To File
-`Cmd/Ctrl+O` opens up the raw palette, which serves as a "go to" system. By default, this will list out files you have recently edited. By typing, you can search for a specific file or [[Tags|Tag]], select the right one with the cursor keys, and hit `Enter` to set that item as the root of a new [[Thread View|thread]]. You can also press `Cmd/Ctrl+Enter` to add the selected file to the end of your current thread.
+`Cmd/Ctrl+O` opens up the raw palette, which serves as a "go to" system. By default, this will list out files you have recently edited. By typing, you can search for a specific file, [[Headers|Header]] or [[Tags|Tag]], select the right one with the cursor keys, and hit `Enter` to set that item as the root of a new [[Thread View|thread]]. You can also press `Cmd/Ctrl+Enter` to add the selected file to the end of your current thread.
 
 # Go To Tag
 By prefixing your search with a `#` character, you can explicitly search only for tags within your workspace.
