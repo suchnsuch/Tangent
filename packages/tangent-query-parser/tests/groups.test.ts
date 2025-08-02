@@ -1,3 +1,4 @@
+import { beforeAll, describe, test, expect } from 'vitest'
 import { ClauseGroupMod, ClauseType, parseQueryText } from '../src'
 import { install } from './test-loader'
 
@@ -245,7 +246,7 @@ describe('Negated groups', () => {
 // TODO: Make these tests pass
 // These tests are marked as failing so that they are ready to go when I actually want to implement this
 describe('Implicit groups', () => {
-	test.failing('Itra-group and & or', async () => {
+	test.fails('Itra-group and & or', async () => {
 		const result = await parseQueryText('Notes with "foo" and "boo" or "goo"')
 		expect(result.query).toEqual({
 			forms: ['Notes'],
@@ -272,7 +273,7 @@ describe('Implicit groups', () => {
 		})
 	})
 
-	test.failing('Inter group and & or', async () => {
+	test.fails('Inter group and & or', async () => {
 		const result = await parseQueryText('Notes with "foo" and in [[boo]] or with "goo"')
 		expect(result.query).toEqual({
 			forms: ['Notes'],
@@ -299,7 +300,7 @@ describe('Implicit groups', () => {
 		})
 	})
 
-	test.failing('Mixed inter & intra', async () => {
+	test.fails('Mixed inter & intra', async () => {
 		const result = await parseQueryText('Notes with "foo" or "goo" and in [[boo]]')
 		expect(result.query).toEqual({
 			forms: ['Notes'],

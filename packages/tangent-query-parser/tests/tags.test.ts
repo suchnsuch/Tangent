@@ -1,3 +1,4 @@
+import { beforeAll, describe, it, test, expect } from 'vitest'
 import { parseQueryText, ClauseType } from '../src'
 import { tagContainsTag, tokenizeTagName } from '../src/tags'
 import { install } from './test-loader'

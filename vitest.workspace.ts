@@ -1,3 +1,4 @@
 export default [
-	'apps/*/vitest.config.*'
+	'apps/*/vitest.config.*',
+	'packages/*/vitest.config.*'
 ]

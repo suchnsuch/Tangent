@@ -1,3 +1,4 @@
+import { beforeAll, describe, test, expect } from 'vitest'
 import { ClauseType, parseQueryText } from '../src'
 import { install } from './test-loader'
 
