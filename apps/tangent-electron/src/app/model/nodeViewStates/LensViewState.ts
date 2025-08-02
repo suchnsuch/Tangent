@@ -23,7 +23,11 @@ export default interface LensViewState {
 	/*
 	 * The optional node represented via willRepresent
 	 */
-	currentlyRepresenting?: TreeNodeOrReference
+	readonly currentlyRepresenting?: TreeNodeOrReference
+	/*
+	 * The view state handling the representation of `currentlyRepresenting`
+	 */
+	readonly currentlyRepresentingView?: NodeViewState
 }
 
 export interface SetLensViewState extends LensViewState {

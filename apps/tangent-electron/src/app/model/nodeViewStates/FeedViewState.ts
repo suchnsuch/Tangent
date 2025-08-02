@@ -111,6 +111,13 @@ export default class FeedViewState implements SetLensViewState {
 		return false
 	}
 
+	get currentlyRepresentingView() {
+		if (this.currentlyRepresenting) {
+			return this.context.getState(this.currentlyRepresenting, false, false)
+		}
+		return null
+	}
+
 	applyCurrentItemToThread(item: TreeNodeOrReference) {
 		if (!item) return
 		if (areNodesOrReferencesEquivalent(item, this.currentlyRepresenting)) return

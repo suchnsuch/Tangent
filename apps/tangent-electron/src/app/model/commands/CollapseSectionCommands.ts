@@ -3,12 +3,22 @@ import { NoteViewState } from '../nodeViewStates'
 import { CommandContext, CommandOptions } from './Command'
 import WorkspaceCommand from './WorkspaceCommand'
 import type { Line } from '@typewriter/document'
-import { Workspace } from '..'
+import { Tangent, Workspace } from '..'
+
+function getNoteView(tangent: Tangent) {
+	let view = tangent.currentThreadState.value
+	if (!view) return null
+	if (view.currentLens.value.currentlyRepresenting) {
+		view = view.currentLens.value.currentlyRepresentingView
+	}
+	if (!view || !(view instanceof NoteViewState) || !view.editor) return null
+	return view
+}
 
 export class CollapseCurrentSectionCommand extends WorkspaceCommand {
 
 	getTargets() {
-		const view = this.workspace.viewState.tangent.currentThreadState.value
+		const view = getNoteView(this.workspace.viewState.tangent)
 		if (!view || !(view instanceof NoteViewState) || !view.editor) return null
 
 		const editor = view.editor
@@ -73,9 +83,7 @@ export class CollapseAllSectionsCommand extends WorkspaceCommand {
 	}
 
 	getView() {
-		const view = this.workspace.viewState.tangent.currentThreadState.value
-		if (!view || !(view instanceof NoteViewState) || !view.editor) return null
-		return view
+		return getNoteView(this.workspace.viewState.tangent)
 	}
 
 	canExecute(context?: CommandContext): boolean {
