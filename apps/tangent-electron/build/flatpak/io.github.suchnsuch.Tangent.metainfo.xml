@@ -87,6 +87,27 @@
   <update_contact>k8ie_AT_mcld.eu</update_contact>
 
   <releases>
+    <release version="0.10.0" date="2025-08-03">
+      <description>
+        <ul>
+          <li>Added support for Collapsing Sections. Headers, lists, code, math, and front matter can all be collapsed. Collapsed state is kept persistent between sessions.</li>
+          <li>Added an option to automatically collapse Front Matter.</li>
+          <li>Made the Creation Rule name template tokens clickable buttons for easier editing.</li>
+          <li>Added the Cmd/Ctrl+Alt+Shift+K shortcut for inserting wiki links with the selected text as the display text.</li>
+          <li>Added support for adding links from the context menu.</li>
+          <li>Exposed formatting toggles from the context menu.</li>
+          <li>Added support for linking directly to header id links in markdown links.</li>
+          <li>Added support for restoring selection and scroll position in notes between sessions.</li>
+          <li>Added support for searching for and navigating to headers from the Cmd/Ctrl+O search menu.</li>
+          <li>Made tag search not relative to the last name item, better matching user intuition.</li>
+          <li>Updated to Electron 37.</li>
+          <li>Fixed an issue where the note editor fallback feature wasn't correctly invoked.</li>
+          <li>Fixed an issue where link data could be incorrect after editing links.</li>
+          <li>Fixed an issue where closing inline formatting at the end of a link broke link parsing.</li>
+          <li>Fixed several issues with selection and annotation initialization when opening notes.</li>
+        </ul>
+      </description>
+    </release>
     <release version="0.9.0" date="2025-06-07">
       <description>
         <ul>
