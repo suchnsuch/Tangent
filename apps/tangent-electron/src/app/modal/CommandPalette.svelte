@@ -236,7 +236,7 @@ function selectOption(selectEvent: CustomEvent<{option: Option, event: KeyboardE
 			target: option.node
 		}
 
-		if (option.match.type === 'header') {
+		if (option.match?.type === 'header') {
 			// Provide a fake link for the content_id to the header
 			const content_id = option.match.input.substring(option.match.input.lastIndexOf('#') + 1)
 			if (content_id) {
