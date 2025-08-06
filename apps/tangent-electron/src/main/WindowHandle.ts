@@ -19,9 +19,6 @@ import { getSafeComputerName, getSafeHostName, getWorkspaceNamePrefix } from './
 import type { UserMessage } from 'common/WindowApi'
 import { dropWorkspace } from './workspaces'
 
-// TODO: Make this not a copy paste
-const mode = process.env.NODE_ENV || 'production';
-
 const log = Logger.get('workspace-view')
 
 type HandleReadyAction = (handle: WindowHandle) => void
