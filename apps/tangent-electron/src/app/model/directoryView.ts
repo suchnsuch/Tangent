@@ -2,8 +2,7 @@ import { ObjectStore, WritableStore } from 'common/stores'
 import { DirectoryStore, iterateOverSortedChildren, TreePredicateResult, TreeNode } from 'common/trees'
 import { TreeItemListReference, TreeItemSetReference } from 'common/trees/treeReferences'
 import { numberedStringSort } from 'common/sorting'
-import { getExtensionRegex, visibleFileTypeMatch } from 'common/fileExtensions'
-import { imageFileExtensions, noteFileExtensions } from 'common/fileExtensions'
+import { visibleFileTypeMatch } from 'common/fileExtensions'
 import { queryFileType } from 'common/dataTypes/QueryInfo'
 
 type SortOrder = 'ascending' | 'descending'
@@ -35,13 +34,11 @@ function encodeSortMode({ key, order }: SortMode): string {
 }
 
 export function decodeSortMode(value: string): SortMode {
-	if (typeof value === 'string') {
-		let match = value.match(/([^\|]+)\|(ascending|descending)/)
-		if (match) {
-			return {
-				key: match[1],
-				order: match[2] as SortOrder
-			}
+	const match = value.match(/([^\|]+)\|(ascending|descending)/)
+	if (match) {
+		return {
+			key: match[1],
+			order: match[2] as SortOrder
 		}
 	}
 	return null
