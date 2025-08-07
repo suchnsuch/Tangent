@@ -47,6 +47,26 @@ export const imageFileExtensions = [
 ]
 export const imageExtensionMatch = getExtensionRegex(imageFileExtensions)
 
+export const audioFileExtensions = [
+	'.mp3',
+	'.m4a',
+	'.wav',
+	'.ogg',
+	'.flac'
+]
+export const audioExtensionMatch = getExtensionRegex(audioFileExtensions)
+
+export const videoFileExtensions = [
+	'.mov',
+	'.mp4',
+	'.avi',
+	'.webm'
+]
+export const videoExtensionMatch = getExtensionRegex(videoFileExtensions)
+
+export const pdfFileExtensions = ['.pdf']
+export const pdfExtensionMatch = getExtensionRegex(pdfFileExtensions)
+
 export const styleFileExtensions = ['.css']
 export const styleExtensionMatch = getExtensionRegex(styleFileExtensions)
 
@@ -69,6 +89,9 @@ export const mscExtensions = [
 export const knownExtensions = [
 	...noteFileExtensions,
 	...imageFileExtensions,
+	...audioFileExtensions,
+	...videoFileExtensions,
+	...pdfFileExtensions,
 	...codeExtensions,
 	...mscExtensions
 ]
@@ -80,6 +103,8 @@ export const knownExtensionsMatch = getExtensionRegex(knownExtensions)
  */
 export const visibleFileTypeMatch = getFileTypeRegex([
 	...noteFileExtensions, ...imageFileExtensions,
+	...audioFileExtensions, ...videoFileExtensions,
+	...pdfFileExtensions,
 	queryFileType, 'folder', 'tag'
 ])
 

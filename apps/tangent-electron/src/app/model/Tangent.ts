@@ -21,6 +21,7 @@ import EmbedFile from './EmbedFile'
 import { EmbedType } from 'common/embedding'
 import QueryInfo from 'common/dataTypes/QueryInfo'
 import QueryViewState from './nodeViewStates/QueryViewState'
+import AudioVideoViewState from './nodeViewStates/AudioVideoViewState'
 
 export default class Tangent {
 	_state: WorkspaceViewState
@@ -122,6 +123,9 @@ export default class Tangent {
 					switch (node.embedType) {
 						case EmbedType.Image:
 							return new ImageViewState(node)
+						case EmbedType.Audio:
+						case EmbedType.Video:
+							return new AudioVideoViewState(node)
 					}
 				}
 		
