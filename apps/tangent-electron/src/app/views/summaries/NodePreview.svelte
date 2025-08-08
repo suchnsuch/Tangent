@@ -63,12 +63,27 @@ export let noteDetailMode: NoteDetailMode = NoteDetailMode.None
 			{/if}
 		</div>
 	{:else if node instanceof EmbedFile}
-		{#if node.embedType === EmbedType.Image}
-			<div class={"imageCard " + layout}>
+		{@const embedType = node.embedType}
+		{#if embedType !== EmbedType.Invalid}
+			<div class={"embedCard " + layout}>
 				<WorkspaceFileHeader {node} editable={false} />
-				<div class="image" style={`background-image: url("${node.cacheBustPath}");`}></div>
+				{#if embedType === EmbedType.Image}
+					<div class="image" style={`background-image: url("${node.cacheBustPath}");`}></div>
+				{:else if embedType === EmbedType.Audio}
+					<div class="audio stretch">
+						<audio src={node.cacheBustPath} controls />
+					</div>
+				{:else if embedType === EmbedType.Video}
+					<div class="video stretch">
+						<div class="video-inner">
+							<!-- svelte-ignore a11y-media-has-caption -->
+							<video src={node.cacheBustPath} controls />
+						</div>
+					</div>
+				{/if}
 			</div>
 		{/if}
+		
 	{:else if node instanceof WorkspaceTreeNode}
 		<div class={"fallbackCard " + layout}>
 			<WorkspaceFileHeader {node} editable={false} showExtension={false} />
@@ -130,12 +145,12 @@ export let noteDetailMode: NoteDetailMode = NoteDetailMode.None
 	}
 }
 
-.imageCard {
+.embedCard {
 	display: flex;
 	flex-direction: column;
 
 	& :global(header) {
-		margin: 0;
+		margin: 0 !important;
 	}
 
 	.image {
@@ -145,15 +160,49 @@ export let noteDetailMode: NoteDetailMode = NoteDetailMode.None
 		background-repeat: no-repeat;
 
 		border-radius: var(--borderRadius);
-		border-top-left-radius: 0;
-		border-top-right-radius: 0;
 	}
 
-	&:not(.fill) {
+	.audio {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+	}
+
+	.video {
+		position: relative;
+		video {
+			width: 100%;
+		}
+	}
+
+	.stretch {
+		flex-grow: 1;
+	}
+
+	&.fill {
 		min-height: 20em;
+
 		.image {
-			border-radius: var(--borderRadius);
+			border-top-left-radius: 0;
+			border-top-right-radius: 0;
+		}
+
+		.audio {
+			// This presents the audio centered relative to the container rather than
+			// the gap under the header. Looks nicer.
+			position: absolute;
+			inset: 0;
+		}
+
+		.video .video-inner {
+			position: absolute;
+			inset: 0;
+			video {
+				width: 100%;
+				height: 100%;
+			}
 		}
 	}
 }
+
 </style>

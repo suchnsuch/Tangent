@@ -77,6 +77,18 @@ function onNodeHandleChanged(value: HandleResult) {
 					src: (value as EmbedFile).cacheBustPath
 				}
 				break
+			case EmbedType.Audio:
+				form = {
+					mode: 'audio',
+					src: (value as EmbedFile).cacheBustPath
+				}
+				break
+			case EmbedType.Video:
+				form = {
+					mode: 'video',
+					src: (value as EmbedFile).cacheBustPath
+				}
+				break
 			default:
 				error(`Invalid file type. Cannot embed a "${value.fileType}" file.`)
 				break
