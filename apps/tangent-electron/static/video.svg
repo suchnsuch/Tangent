@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<svg xmlns="http://www.w3.org/2000/svg">
+	<symbol id="video" viewBox="0 0 24 24">
+		<path style="stroke: var(--iconStroke, black); fill: var(--iconStroke, black); stroke-width: 1px; stroke-linejoin: round;"
+			d="M10.5,10.5 13.5,12 10.5,13.5 z" />
+
+		<rect style="stroke: var(--iconStroke, black); fill: var(--iconStroke, black); stroke-width: 1px; stroke-linejoin: round;"
+			x="2.5" y="5" width="1" height="1" />
+		<rect style="stroke: var(--iconStroke, black); fill: var(--iconStroke, black); stroke-width: 1px; stroke-linejoin: round;"
+			x="5.5" y="5" width="1" height="1" />
+		<rect style="stroke: var(--iconStroke, black); fill: var(--iconStroke, black); stroke-width: 1px; stroke-linejoin: round;"
+			x="8.5" y="5" width="1" height="1" />
+		<rect style="stroke: var(--iconStroke, black); fill: var(--iconStroke, black); stroke-width: 1px; stroke-linejoin: round;"
+			x="11.5" y="5" width="1" height="1" />
+		<rect style="stroke: var(--iconStroke, black); fill: var(--iconStroke, black); stroke-width: 1px; stroke-linejoin: round;"
+			x="14.5" y="5" width="1" height="1" />
+		<rect style="stroke: var(--iconStroke, black); fill: var(--iconStroke, black); stroke-width: 1px; stroke-linejoin: round;"
+			x="17.5" y="5" width="1" height="1" />
+		<rect style="stroke: var(--iconStroke, black); fill: var(--iconStroke, black); stroke-width: 1px; stroke-linejoin: round;"
+			x="20.5" y="5" width="1" height="1" />
+
+		<rect style="stroke: var(--iconStroke, black); fill: var(--iconStroke, black); stroke-width: 1px; stroke-linejoin: round;"
+			x="2.5" y="18" width="1" height="1" />
+		<rect style="stroke: var(--iconStroke, black); fill: var(--iconStroke, black); stroke-width: 1px; stroke-linejoin: round;"
+			x="5.5" y="18" width="1" height="1" />
+		<rect style="stroke: var(--iconStroke, black); fill: var(--iconStroke, black); stroke-width: 1px; stroke-linejoin: round;"
+			x="8.5" y="18" width="1" height="1" />
+		<rect style="stroke: var(--iconStroke, black); fill: var(--iconStroke, black); stroke-width: 1px; stroke-linejoin: round;"
+			x="11.5" y="18" width="1" height="1" />
+		<rect style="stroke: var(--iconStroke, black); fill: var(--iconStroke, black); stroke-width: 1px; stroke-linejoin: round;"
+			x="14.5" y="18" width="1" height="1" />
+		<rect style="stroke: var(--iconStroke, black); fill: var(--iconStroke, black); stroke-width: 1px; stroke-linejoin: round;"
+			x="17.5" y="18" width="1" height="1" />
+		<rect style="stroke: var(--iconStroke, black); fill: var(--iconStroke, black); stroke-width: 1px; stroke-linejoin: round;"
+			x="20.5" y="18" width="1" height="1" />
+		
+	</symbol>
+</svg>

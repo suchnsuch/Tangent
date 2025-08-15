@@ -1,0 +1,72 @@
+media-controller {
+
+	--media-primary-color: #ccc;
+	--media-secondary-color: #323232;
+	--media-control-hover-background: #565656;
+
+	&.audio {
+		--media-background-color: none;
+		media-settings-menu {
+			position: absolute;
+			--media-menu-max-height: auto;
+			--media-menu-hidden-max-height: auto;
+		}
+		media-control-bar {
+			width: 100%;
+			border-radius: var(--borderRadius);
+
+			> :first-child, .first {
+				border-top-left-radius: var(--borderRadius);
+				border-bottom-left-radius: var(--borderRadius);
+			}
+
+			> :last-child {
+				border-top-right-radius: var(--borderRadius);
+				border-bottom-right-radius: var(--borderRadius);
+			}
+		}
+	}
+
+	&.roundedBottom {
+		border-bottom-left-radius: var(--borderRadius);
+		border-bottom-right-radius: var(--borderRadius);
+
+		media-control-bar {
+			border-bottom-left-radius: var(--borderRadius);
+			border-bottom-right-radius: var(--borderRadius);
+
+			> :first-child, .first {
+				border-bottom-left-radius: var(--borderRadius);
+			}
+
+			> :last-child {
+				border-bottom-right-radius: var(--borderRadius);
+			}
+		}
+	}
+
+	.simple-menu {
+		position: relative;
+
+		.floating {
+			position: absolute;
+			top: -100%;
+			left: 0;
+			display: none;
+
+			> :first-child {
+				border-top-left-radius: var(--borderRadius);
+				border-bottom-left-radius: var(--borderRadius);
+			}
+
+			> :last-child {
+				border-top-right-radius: var(--borderRadius);
+				border-bottom-right-radius: var(--borderRadius);
+			}
+		}
+
+		&:hover .floating {
+			display: inline-flex;
+		}
+	}
+}

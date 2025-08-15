@@ -54,6 +54,7 @@
     "font-list": "^1.4.0",
     "js-logger": "^1.6.1",
     "link-preview-js": "^3.1.0",
+    "media-chrome": "^4.12.0",
     "node-fetch": "^3.3.0",
     "prismjs": "^1.24.1",
     "semver": "^7.3.7",

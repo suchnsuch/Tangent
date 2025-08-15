@@ -63,7 +63,8 @@ export default function tlinkModule(editor: Editor, options?: {
 	}
 
 	function onClick(event: MouseEvent) {
-		if (isLinkFollowingEvent(event)) {
+		console.log('click', event.defaultPrevented)
+		if (!event.defaultPrevented && isLinkFollowingEvent(event)) {
 			if (TangentLink.isTangentLinkEvent(event)) {
 				event.preventDefault()
 				let linkElement = TangentLink.getTangentLinkFromEvent(event)

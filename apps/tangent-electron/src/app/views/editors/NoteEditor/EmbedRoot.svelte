@@ -4,9 +4,8 @@ import { EmbedType, getEmbedType } from 'common/embedding'
 import type { HrefFormedLink } from 'common/indexing/indexTypes'
 import type { Workspace } from 'app/model'
 import type EmbedFile from 'app/model/EmbedFile'
-import { ForwardingStore } from 'common/stores'
 import { HandleResult, isNode } from 'app/model/NodeHandle'
-import type { UrlData, UrlDataError, WebsiteData } from 'common/urlData'
+import type { UrlDataError, WebsiteData } from 'common/urlData'
 
 type Form = {
 	mode: 'error'
@@ -199,6 +198,14 @@ function imageStyle(customizations: string) {
 	return style
 }
 
+function audioStyle() {
+	let style = getBaseStyle()
+	if (block) {
+		style +="width: 100%;"
+	}
+	return style
+}
+
 function websiteStyle(form: WebsiteData) {
 	return getBaseStyle()
 }
@@ -217,10 +224,71 @@ function websiteImageStyle(form: WebsiteData) {
 	<!-- svelte-ignore a11y-missing-attribute -->
 	<img src={form.src} style={imageStyle(link.text)} on:error={e => error('Image not found!')} />
 {:else if form.mode === 'audio'}
-	<audio controls src={form.src} style={getBaseStyle()} />
+	<!-- svelte-ignore a11y-click-events-have-key-events -->
+	<!-- svelte-ignore a11y-no-static-element-interactions -->
+	<media-controller style={audioStyle()} audio class="audio" on:click|preventDefault>
+		<audio slot="media" src={form.src} />
+		<media-settings-menu hidden anchor="auto">
+			<media-settings-menu-item>
+				Speed
+				<media-playback-rate-menu slot="submenu" hidden>
+					<div slot="title">Speed</div>
+				</media-playback-rate-menu>
+			</media-settings-menu-item>
+		</media-settings-menu>
+		<media-control-bar>
+			<div class="simple-menu">
+				<media-play-button class="first" notooltip/>
+				<div class="floating">
+					<media-seek-backward-button style="min-width: 3em"/>
+					<media-seek-forward-button style="min-width: 3em"/>
+				</div>
+			</div>
+			<div class="simple-menu">
+				<media-mute-button notooltip/>
+				<div class="floating">
+					<media-volume-range/>
+				</div>
+			</div>
+			<media-time-display showduration notoggle/>
+			<media-time-range></media-time-range>
+			<media-settings-menu-button/>
+		</media-control-bar>
+	</media-controller>
 {:else if form.mode === 'video'}
-	<!-- svelte-ignore a11y-media-has-caption -->
-	<video controls src={form.src} style={getBaseStyle()} />
+	<!-- svelte-ignore a11y-click-events-have-key-events -->
+	<!-- svelte-ignore a11y-no-static-element-interactions -->
+	<media-controller style={getBaseStyle()} on:click|preventDefault>
+		<!-- svelte-ignore a11y-media-has-caption -->
+		<video slot="media" src={form.src} />
+		<media-settings-menu hidden anchor="auto">
+			<media-settings-menu-item>
+				Speed
+				<media-playback-rate-menu slot="submenu" hidden>
+					<div slot="title">Speed</div>
+				</media-playback-rate-menu>
+			</media-settings-menu-item>
+		</media-settings-menu>
+		<media-control-bar>
+			<div class="simple-menu">
+				<media-play-button class="first" notooltip/>
+				<div class="floating">
+					<media-seek-backward-button style="min-width: 3em"/>
+					<media-seek-forward-button style="min-width: 3em"/>
+				</div>
+			</div>
+			<div class="simple-menu">
+				<media-mute-button notooltip/>
+				<div class="floating">
+					<media-volume-range/>
+				</div>
+			</div>
+			<media-time-display showduration notoggle/>
+			<media-time-range></media-time-range>
+			<media-settings-menu-button/>
+			<media-fullscreen-button/>
+		</media-control-bar>
+	</media-controller>
 {:else if form.mode === 'website'}
 	<div class={'website-preview ' + form.mediaType} class:description={form.description} style={websiteStyle(form)}>
 		<div class="info">
@@ -245,3 +313,82 @@ function websiteImageStyle(form: WebsiteData) {
 {/if}
 
 <svelte:options accessors={true}/>
+
+<style lang="scss">
+@import '../../../style/media.scss';
+
+.website-preview {
+	width: 100%;
+	display: grid;
+	grid-template-columns: auto 50%;
+	grid-template-rows: auto auto;
+
+	background: var(--backgroundColor);
+	border-radius: var(--borderRadius);
+
+	.info {
+
+		padding: 0 1em;
+		white-space: normal;
+
+		h1 {
+			font-size: 1.2em;
+			font-weight: 500;
+		}
+
+		p {
+			margin: 0;
+			font-size: .8em;
+			line-height: 1.5em;
+			font-style: italic;
+
+			/* Clamp multi-lin-text with elipses */
+			display: -webkit-box;
+			-webkit-box-orient: vertical;
+			-webkit-line-clamp: 6;
+			line-clamp: 6;
+			overflow: hidden;
+			text-overflow: ellipsis;
+		}
+	}
+
+	.image {
+		grid-row: 1 / 3;
+		grid-column: 2;
+	
+		min-height: 10em;
+		border-top-right-radius: var(--borderRadius);
+		border-bottom-right-radius: var(--borderRadius);
+	}
+
+	.link {
+		grid-row: 2;
+		grid-column: 1;
+
+		display: flex;
+		padding: .67em 1em .15em;
+		align-items: center;
+		gap: .25em;
+		overflow: hidden;
+		text-wrap: nowrap;
+		
+		&:hover {
+			grid-column: 1 / 3;
+		}
+		
+		span {
+			font-size: .7em;
+			color: var(--deemphasizedTextColor);
+			text-shadow: var(--backgroundColor) 0 0 4px;
+
+			overflow: hidden;
+			white-space: nowrap;
+			text-overflow: ellipsis;
+		}
+	}
+}
+
+media-control-bar {
+	--media-control-bar-display: flex;
+}
+</style>

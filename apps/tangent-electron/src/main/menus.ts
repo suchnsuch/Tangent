@@ -489,6 +489,18 @@ export function createMenus(interop: {
 						
 						browserWindow.webContents.closeDevTools()
 					}
+				},
+				{
+					label: 'Force Reload',
+					accelerator: 'CommandOrControl+R',
+					async click(menuItem, window: BrowserWindow, event) {
+						await window.webContents.session.clearCache()
+						await window.webContents.session.clearStorageData({
+							storages: ['filesystem', 'cachestorage'],
+							quotas: ['temporary']
+						});
+						window.reload()
+					},
 				}
 			]
 		})

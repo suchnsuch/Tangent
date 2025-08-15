@@ -5,6 +5,9 @@ import WorkspaceFileHeader from 'app/utils/WorkspaceFileHeader.svelte'
 import AudioVideoViewState from 'app/model/nodeViewStates/AudioVideoViewState'
 import { EmbedType } from 'common/embedding'
 
+import 'media-chrome'
+import 'media-chrome/menu'
+
 const workspace = getContext('workspace') as Workspace
 const {
 	noteWidthMax: maxWidth,
@@ -30,18 +33,52 @@ $: embedType = state?.file?.embedType
 		{editable}
 	/>
 	<article>
-		{#if embedType == EmbedType.Audio}
-			<audio
-				controls
-				src={state.file.cacheBustPath}
-			/>
-		{:else if embedType == EmbedType.Video}
-			<!-- svelte-ignore a11y-media-has-caption -->
-			<video
-				controls preload="auto"
-				src={state.file.cacheBustPath}
-			/>
-		{/if}
+		<media-controller
+			audio={embedType === EmbedType.Audio}
+			class:audio={embedType === EmbedType.Audio}
+		>
+			{#if embedType === EmbedType.Audio}
+				<audio
+					slot="media"
+					src={state.file.cacheBustPath}
+				/>
+			{:else if embedType === EmbedType.Video}
+				<!-- svelte-ignore a11y-media-has-caption -->
+				<video
+					slot="media" preload="auto"
+					src={state.file.cacheBustPath}
+				/>
+			{/if}
+			<media-settings-menu hidden anchor="auto">
+				<media-settings-menu-item>
+					Speed
+					<media-playback-rate-menu slot="submenu" hidden>
+						<div slot="title">Speed</div>
+					</media-playback-rate-menu>
+				</media-settings-menu-item>
+			</media-settings-menu>
+			<media-control-bar>
+				<div class="simple-menu">
+					<media-play-button class="first" notooltip/>
+					<div class="floating">
+						<media-seek-backward-button style="min-width: 3em"/>
+						<media-seek-forward-button style="min-width: 3em"/>
+					</div>
+				</div>
+				<div class="simple-menu">
+					<media-mute-button notooltip/>
+					<div class="floating">
+						<media-volume-range/>
+					</div>
+				</div>
+				<media-time-display showduration notoggle/>
+				<media-time-range></media-time-range>
+				<media-settings-menu-button/>
+				{#if embedType === EmbedType.Video}
+					<media-fullscreen-button/>
+				{/if}
+			</media-control-bar>
+		</media-controller>
 	</article>
 </main>
 
@@ -59,11 +96,12 @@ article {
 	margin: 0 auto;
 }
 
-audio, video {
-	width: 100%;
+media-controller {
+	display: block;
+
+	&.audio {
+		margin: 16vh 1em;
+	}
 }
 
-audio {
-	margin-top: 16vh;
-}
 </style>

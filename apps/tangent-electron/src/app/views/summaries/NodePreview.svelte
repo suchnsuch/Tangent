@@ -70,15 +70,33 @@ export let noteDetailMode: NoteDetailMode = NoteDetailMode.None
 				{#if embedType === EmbedType.Image}
 					<div class="image" style={`background-image: url("${node.cacheBustPath}");`}></div>
 				{:else if embedType === EmbedType.Audio}
-					<div class="audio stretch">
-						<audio src={node.cacheBustPath} controls />
-					</div>
+					<media-controller class="audio stretch" autohide="-1">
+						<audio slot="media" src={node.cacheBustPath} />
+						<!-- svelte-ignore a11y-click-events-have-key-events -->
+						<!-- svelte-ignore a11y-no-static-element-interactions -->
+						<media-play-button slot="centered-chrome" on:click|preventDefault/>
+						<!-- svelte-ignore a11y-click-events-have-key-events -->
+						<!-- svelte-ignore a11y-no-static-element-interactions -->
+						<media-control-bar on:click|preventDefault>
+							<media-time-display showduration notoggle/>
+							<media-time-range/>
+						</media-control-bar>
+					</media-controller>
 				{:else if embedType === EmbedType.Video}
-					<div class="video stretch">
-						<div class="video-inner">
+					<!-- svelte-ignore a11y-click-events-have-key-events -->
+					<!-- svelte-ignore a11y-no-static-element-interactions -->
+					<div class="video stretch" on:click|preventDefault>
+						<media-controller class="roundedBottom">
 							<!-- svelte-ignore a11y-media-has-caption -->
-							<video src={node.cacheBustPath} controls />
-						</div>
+							<video slot="media" src={node.cacheBustPath}/>
+							<media-control-bar>
+								<media-play-button/>
+								<media-mute-button/>
+								<media-time-display showduration notoggle/>
+								<media-time-range/>
+								<media-fullscreen-button/>
+							</media-control-bar>
+						</media-controller>
 					</div>
 				{/if}
 			</div>
@@ -163,15 +181,23 @@ export let noteDetailMode: NoteDetailMode = NoteDetailMode.None
 	}
 
 	.audio {
-		display: flex;
-		align-items: center;
+		display: block;
+		flex-direction: column;
 		justify-content: center;
+		padding: 1em;
+
+		media-play-button {
+			border-radius: var(--borderRadius);
+			--media-button-icon-height: 48px;
+		}
 	}
 
 	.video {
 		position: relative;
-		video {
-			width: 100%;
+		media-controller {
+			position: absolute;
+			inset: 0;
+			bottom: 2px;
 		}
 	}
 
@@ -192,15 +218,7 @@ export let noteDetailMode: NoteDetailMode = NoteDetailMode.None
 			// the gap under the header. Looks nicer.
 			position: absolute;
 			inset: 0;
-		}
-
-		.video .video-inner {
-			position: absolute;
-			inset: 0;
-			video {
-				width: 100%;
-				height: 100%;
-			}
+			bottom: 2px;
 		}
 	}
 }

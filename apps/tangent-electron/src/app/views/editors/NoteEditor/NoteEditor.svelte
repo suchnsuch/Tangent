@@ -36,7 +36,7 @@ import { HrefFormedLink, StructureType } from 'common/indexing/indexTypes'
 import type { ConnectionInfo } from 'common/indexing/indexTypes'
 import { areLineArraysOpTextEquivalent, EditInfo, getEditInfo, getLineRangeWhile, getRangeWhile, lineToText, rangesAreEquivalent, stripLineAttributes } from 'common/typewriterUtils'
 import { scrollTo } from 'app/utils';
-import { eventHasSelectionRequest, type NavigationData } from 'app/events'
+import { type NavigationData } from 'app/events'
 import WorkspaceFileHeader from 'app/utils/WorkspaceFileHeader.svelte';
 import TangentLink from './t-link';
 import { appendContextTemplate, ContextMenuConstructorOptions } from 'app/model/contextmenu';

@@ -18,7 +18,7 @@ Or:
 https://www.youtube.com/watch?v=qAuwW7Wzrng
 
 ## Raw Audio
-https://www.computerhope.com/jargon/m/example.mp3
+https://samplelib.com/lib/preview/mp3/sample-3s.mp3
 
 ## Raw Video
 https://download.samplelib.com/mp4/sample-5s.mp4

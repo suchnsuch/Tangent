@@ -138,13 +138,15 @@ class TangentEmbed extends TangentLink {
 		}
 	}
 
-	onClick(event: any): void {
+	onClick(event: MouseEvent): void {
 		super.onClick(event)
 
-		const href = this.getCleanedHref()
-		markAsSelectionRequest(event, { inline: attr => {
-			return attr?.t_link?.href === href
-		}})
+		if (!event.defaultPrevented) {
+			const href = this.getCleanedHref()
+			markAsSelectionRequest(event, { inline: attr => {
+				return attr?.t_link?.href === href
+			}})
+		}
 	}
 
 	getLinkInfo() {

@@ -57,7 +57,9 @@ onMount(() => {
 	})
 })
 
-function nodeClick(event, ref: TreeNodeOrReference) {
+function nodeClick(event: MouseEvent, ref: TreeNodeOrReference) {
+	if (event.defaultPrevented) return
+	
 	dispatch('navigate', {
 		origin: state.parent.node,
 		target: ref
