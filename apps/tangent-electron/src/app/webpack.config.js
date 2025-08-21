@@ -58,9 +58,10 @@ module.exports = {
 								case 'a11y-no-noninteractive-tabindex':
 								case 'a11y-no-noninteractive-element-interactions':
 								case 'a11y-no-static-element-interactions':
+								case 'css-unused-selector':
 									return
 							}
-							console.log(warning)
+							//console.log(warning)
 							handler(warning)
 						}
 					}

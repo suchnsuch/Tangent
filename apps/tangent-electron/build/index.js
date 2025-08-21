@@ -142,7 +142,7 @@ function buildMain() {
 	return new Promise((resolve, reject) => {
 		const mainCompiler = webpack(require('../src/main/webpack.config'))
 		mainCompiler.run((err, stats) => {
-			if (logWebpackErrors(err, stats)) {
+			if (logWebpackErrors(err, stats) !== 0) {
 				console.error('webpack failed to build')
 				reject()
 				throw 'Webpack failed to build'
@@ -166,7 +166,7 @@ function buildPreload() {
 	return new Promise((resolve, reject) => {
 		const mainCompiler = webpack(require('../src/preload/webpack.config'))
 		mainCompiler.run((err, stats) => {
-			if (logWebpackErrors(err, stats)) {
+			if (logWebpackErrors(err, stats) !== 0) {
 				console.error('webpack failed to build')
 				reject()
 				throw 'Webpack failed to build'
@@ -190,7 +190,7 @@ function buildApp() {
 	return new Promise((resolve, reject) => {
 		if (prod || process.env.NO_WATCH === 'true') {
 			appCompiler.run((err, stats) => {
-				if (logWebpackErrors(err, stats)) {
+				if (logWebpackErrors(err, stats) > 0) {
 					console.error('webpack failed to build')
 					reject()
 					throw 'Webpack failed to build'
@@ -213,7 +213,7 @@ function buildApp() {
 			let watcher = appCompiler.watch({
 				aggregateTimeout: 500
 			}, (err, stats) => {
-				if (logWebpackErrors(err, stats)) {
+				if (logWebpackErrors(err, stats) > 0) {
 					console.error('webpack failed to build')
 					if (firstBuild) {
 						reject(err)
