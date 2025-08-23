@@ -87,6 +87,15 @@
   <update_contact>k8ie_AT_mcld.eu</update_contact>
 
   <releases>
+    <release version="0.10.1" date="2025-08-03">
+      <description>
+        <ul>
+          <li>Fixed an issue where deleting text at the beginning of a line deleted text at the top of the document.</li>
+          <li>Fixed an issue where section collapsed controls were impossible to click for indented lines.</li>
+          <li>Fixed an issue where notes would scroll to their selection even when their selection hadn't changed.</li>
+        </ul>
+      </description>
+    </release>
     <release version="0.10.0" date="2025-08-03">
       <description>
         <ul>
