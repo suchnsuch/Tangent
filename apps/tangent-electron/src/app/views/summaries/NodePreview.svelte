@@ -98,6 +98,16 @@ export let noteDetailMode: NoteDetailMode = NoteDetailMode.None
 							</media-control-bar>
 						</media-controller>
 					</div>
+				{:else if embedType === EmbedType.PDF}
+					<div class="stretch">
+						<object
+							type="application/pdf"
+							title={node.path}
+							data={node.cacheBustPath}
+						>
+							<p>There was an issue viewing the file.</p>
+						</object>
+					</div>
 				{/if}
 			</div>
 		{/if}

@@ -68,6 +68,10 @@ module.exports = {
 				}
 			},
 			{
+				test: /pdf\.worker\.min\.mjs/,
+				type: 'asset/resource'
+			},
+			{
 				test: /\.js$/,
 				resolve: { fullySpecified: false }
 			},
