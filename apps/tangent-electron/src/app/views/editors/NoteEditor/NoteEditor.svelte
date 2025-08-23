@@ -926,15 +926,16 @@ let hoveredLineTarget: { element: HTMLElement, index: number } = null
 
 function onMouseMove(event: MouseEvent) {
 
+	const bounds = editorElement.getBoundingClientRect()
 	const lines = editorElement.querySelectorAll('.line')
 
 	const count = lines.length
 	for (let i = 0 ; i < count; i++) {
 		const lineElement = lines.item(i) as HTMLElement
-		const bounds = lineElement.getBoundingClientRect()
+		const lineBounds = lineElement.getBoundingClientRect()
 
-		if (event.clientY > bounds.top && event.clientY <= bounds.bottom
-			&& event.clientX > bounds.left - 50 && event.clientX < bounds.left + 150
+		if (event.clientY > lineBounds.top && event.clientY <= lineBounds.bottom
+			&& event.clientX > bounds.left - 50 && event.clientX < lineBounds.left + 150
 		) {
 			if (hoveredLineTarget?.element !== lineElement) {
 				hoveredLineTarget = {
