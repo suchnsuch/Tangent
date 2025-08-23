@@ -579,8 +579,12 @@ function onEditorChange(changeEvent: EditorChangeEvent) {
 	}
 
 	if (editable) {
+		let selectionChanged = false
 		if (editor.doc.selection) {
-			state.selection.set(editor.doc.selection)
+			if (!rangesAreEquivalent(editor.doc.selection, state.selection.value)) {
+				selectionChanged = true
+				state.selection.set(editor.doc.selection)
+			}
 			
 			if (state.scrollY.value && container?.scrollTop) {
 				wait().then(() => {
@@ -599,21 +603,23 @@ function onEditorChange(changeEvent: EditorChangeEvent) {
 			note.realizeFile()
 		}
 
-		if (container && focusLevel >= FocusLevel.Typewriter && !isEditorMouseDown) {
-			if (changeEvent.doc.selection) {
-				// Microtask means that layout is finished and the scroll appears to happen seemlessly
-				queueMicrotask(() => centerOnEditorRange(changeEvent.doc.selection))
+		if (selectionChanged) {
+			if (container && focusLevel >= FocusLevel.Typewriter && !isEditorMouseDown) {
+				if (changeEvent.doc.selection) {
+					// Microtask means that layout is finished and the scroll appears to happen seemlessly
+					queueMicrotask(() => centerOnEditorRange(changeEvent.doc.selection))
 
-				// This fixes a bug where trying to jump the selection too much causes the mouseup event to
-				// happen not on the editor. We don't want that.
-				selectEndEnabled = false
-				setTimeout(() => selectEndEnabled = true, 100)
+					// This fixes a bug where trying to jump the selection too much causes the mouseup event to
+					// happen not on the editor. We don't want that.
+					selectEndEnabled = false
+					setTimeout(() => selectEndEnabled = true, 100)
+				}
+			}
+			else if (changeEvent.doc?.selection && allowSelectionScroll) {
+				queueMicrotask(() => ensureRangeInView(changeEvent.doc.selection))
 			}
 		}
-		else if (changeEvent.doc?.selection && allowSelectionScroll) {
-			queueMicrotask(() => ensureRangeInView(changeEvent.doc.selection))
-		}
-
+		
 		if (!isInitializing) {
 			hasSelection = changeEvent.doc.selection != null
 			justScrolled = false
