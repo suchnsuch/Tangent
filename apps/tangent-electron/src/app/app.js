@@ -9,6 +9,8 @@ import pdfWorker from 'pdfjs-dist/build/pdf.worker.min.mjs'
 console.log({pdfWorker})
 pdfjs.GlobalWorkerOptions.workerSrc = pdfWorker
 
+import 'pdfjs-dist/web/pdf_viewer.css'
+
 const app = new App({
 	target: document.body,
 })

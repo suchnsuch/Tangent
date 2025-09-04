@@ -160,12 +160,10 @@ body {
 	padding: 8px;
 	box-sizing: border-box;
 	font-family: var(--fontFamily);
-}
-
-* {
 	-webkit-user-select: none;
 	user-select: none;
 }
+
 *:focus {
 	outline: none;/*2px solid var(--deemphasizedAccentTextColor);*/
 }
