@@ -50,6 +50,21 @@ function onResize(resizeEntries: ResizeObserverEntry[]) {
 	}
 }
 
+function onClick(event: MouseEvent) {
+	if (event.target instanceof HTMLAnchorElement) {
+		// Redirect links to the default application
+		event.preventDefault()
+		//workspace.api.links.openExternal(event.target.href)
+		workspace.navigateTo({
+			link: {
+				form: 'raw',
+				href: event.target.href
+			},
+			origin: state.node
+		})
+	}
+}
+
 </script>
 
 <main
@@ -64,7 +79,9 @@ function onResize(resizeEntries: ResizeObserverEntry[]) {
 
 	<article use:resizeObserver={onResize}>
 		<div class="container pdfViewer" bind:this={container}>
-			<div bind:this={viewerElement}></div>
+			<!-- svelte-ignore a11y-click-events-have-key-events -->
+			<!-- svelte-ignore a11y-no-static-element-interactions -->
+			<div bind:this={viewerElement} on:click={onClick}></div>
 		</div>
 	</article>
 </main>
