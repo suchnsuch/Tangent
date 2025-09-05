@@ -9,6 +9,7 @@ import WorkspaceFileHeader from 'app/utils/WorkspaceFileHeader.svelte'
 import NoteEditor from '../editors/NoteEditor/NoteEditor.svelte'
 import NodeIcon from '../smart-icons/NodeIcon.svelte'
 import { NoteDetailMode } from 'app/model/nodeViewStates/NoteViewState'
+import PdfPreview from '../node-views/PdfPreview.svelte'
 
 const workspace: Workspace = getContext('workspace')
 
@@ -99,14 +100,8 @@ export let noteDetailMode: NoteDetailMode = NoteDetailMode.None
 						</media-controller>
 					</div>
 				{:else if embedType === EmbedType.PDF}
-					<div class="stretch">
-						<object
-							type="application/pdf"
-							title={node.path}
-							data={node.cacheBustPath}
-						>
-							<p>There was an issue viewing the file.</p>
-						</object>
+					<div class="pdf stretch">
+						<PdfPreview file={node} />
 					</div>
 				{/if}
 			</div>
@@ -211,7 +206,13 @@ export let noteDetailMode: NoteDetailMode = NoteDetailMode.None
 		}
 	}
 
+	.pdf, .pdf > :global(div) {
+		border-bottom-left-radius: var(--borderRadius);
+		border-bottom-right-radius: var(--borderRadius);
+	}
+
 	.stretch {
+		position: relative;
 		flex-grow: 1;
 	}
 
