@@ -12,7 +12,7 @@ import LazyScrolledList from 'app/utils/LazyScrolledList.svelte';
 import type { NavigationData } from 'app/events';
 import { getTreeNodeTransfer, hasTreeNodeTransfer, setTreeNodeTransfer } from 'app/utils/dragDrop';
 import { queryFileType } from 'common/dataTypes/QueryInfo';
-import { iconForNode } from 'common/icons';
+import NodeIcon from '../smart-icons/NodeIcon.svelte';
 
 let workspace = getContext('workspace') as Workspace
 
@@ -307,11 +307,8 @@ function drop(event: DragEvent, item: TreeNode) {
 		{:else}
 			<span class="opener-placeholder"></span>
 		{/if}
-		<span class="icon"><svg style="width: 16px; height: 16px;">
-			{#each iconForNode(item) as icon }
-				<use href={icon}/>
-			{/each}
-		</svg></span>
+		
+		<span class="icon"><NodeIcon node={item} size="16px" /></span>
 		{#if item === renameTarget}
 			<span class="name rename"
 				contenteditable="true"

@@ -8,13 +8,13 @@ import type { Tangent, Workspace } from 'app/model'
 import type MapNode from 'common/tangentMap/MapNode'
 import { mapStrengthClass } from 'common/tangentMap/MapNode'
 import { clockTime, shortestDayDate } from 'common/dates'
-import { iconForNode } from 'common/icons'
 
 import PopUpButton from 'app/utils/PopUpButton.svelte'
 import SVGIcon from '../smart-icons/SVGIcon.svelte'
 
 import ScrollingItemList from 'app/utils/ScrollingItemList.svelte'
 import NodeLine from '../summaries/NodeLine.svelte'
+import NodeIcon from '../smart-icons/NodeIcon.svelte'
 
 const dispatch = createEventDispatcher()
 const tangent = getContext('tangent') as Tangent
@@ -113,7 +113,7 @@ function _onPointerLeave(event: PointerEvent) {
 	on:contextmenu
 >
 <span class="name">
-	{#if showIcon}<SVGIcon ref={iconForNode(mapNode?.node.value)} size="1em" />{/if}
+	{#if showIcon}<NodeIcon node={mapNode?.node.value} size="1em" />{/if}
 	{mapNode.node.value?.name}
 </span>
 

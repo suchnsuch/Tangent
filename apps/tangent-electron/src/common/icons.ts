@@ -42,9 +42,9 @@ for (const ext of videoFileExtensions) {
 	icons[ext] = videoIcon
 }
 
-const noIcon = []
+const noIcon = [] as string[]
 
-export function iconForNode(node: TreeNode) {
+export function iconForNode(node: TreeNode): string[] {
 	if (!node) return noIcon
 	return icons[node.fileType] ?? noIcon
 }
