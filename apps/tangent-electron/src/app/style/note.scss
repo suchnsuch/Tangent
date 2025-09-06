@@ -222,11 +222,18 @@ article.note {
 		.crossOutFinishedTodos & {
 			&.checked:not(.revealed) {
 				color: var(--deemphasizedTextColor);
-				text-decoration: line-through 1.5px var(--textColor);
 			}
 			&.canceled:not(.revealed) {
 				color: var(--deemphasizedTextColor);
-				text-decoration: line-through wavy 1.5px;
+			}
+
+			&:not([data-focus="focused"]) {
+				&.checked:not(.revealed) {
+					text-decoration: line-through 1.5px var(--textColor);
+				}
+				&.canceled:not(.revealed) {
+					text-decoration: line-through wavy 1.5px;
+				}
 			}
 		}
 	}
