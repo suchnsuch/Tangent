@@ -810,6 +810,12 @@ function resumeFocus(arg?) {
 function onNoteKeydown(event: KeyboardEventWithShortcut) {
 	if (event.defaultPrevented) return
 
+	if (event.modShortcut === 'Escape' && $annotations.length) {
+		event.preventDefault()
+		state.setAnnotations([])
+		return
+	}
+
 	if (event.modShortcut === 'Mod+Alt+ArrowDown') {
 		event.preventDefault()
 		openDetails()
