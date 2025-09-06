@@ -87,7 +87,14 @@
   <update_contact>k8ie_AT_mcld.eu</update_contact>
 
   <releases>
-    <release version="0.10.1" date="2025-08-03">
+    <release version="0.10.2" date="2025-09-06">
+      <ul>
+        <li>Pressing escape now dismisses any active annotations or search highlights in a note.</li>
+        <li>Completed or canceled Todos are now no longer crossed out while selected.</li>
+        <li>Fixed an issue that caused scrolling up in the [[Feed Lens]] to jump around obnoxiously.</li>
+      </ul>
+    </release>
+    <release version="0.10.1" date="2025-08-23">
       <description>
         <ul>
           <li>Fixed an issue where deleting text at the beginning of a line deleted text at the top of the document.</li>
