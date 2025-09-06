@@ -115,7 +115,7 @@ export let showHeaderIcon = false
 let container: HTMLElement
 
 let _lastFile: NoteFile
-let _lastFileLoadState: FileLoadState
+let _lastFileLoadState: FileLoadState = null
 
 let effectiveExtraTop = extraTop
 let lastExtraTop = extraTop
@@ -322,7 +322,8 @@ function onFileChanged(note: NoteFile) {
 			_lastFile.dropFile()
 		}
 		if (note) {
-			_lastFileLoadState = 'unloaded'
+			// An uninitialized last state represents the pass on initial mount
+			if (_lastFileLoadState) _lastFileLoadState = 'unloaded'
 			note.loadFile()
 		}
 		_lastFile = note
@@ -343,7 +344,7 @@ function onFileChanged(note: NoteFile) {
 		if (lines.length > 0) {
 			if (_lastFileLoadState !== note.loadState) {
 				if (note.isReady) {
-					if (_lastFileLoadState === 'unloaded') {
+					if (_lastFileLoadState === null) {
 						// In theory, this only happens when the note was already
 						// loaded, and thus ready to go as soon as this component
 						// was mounted. In this case, we need to delay before dispatching,
@@ -391,6 +392,9 @@ function onFileChanged(note: NoteFile) {
 			}
 		}
 	}
+
+	// We're done with the onMount first pass; ensure the last state is a valid value
+	if (!_lastFileLoadState) _lastFileLoadState = 'unloaded'
 }
 
 $: initializeSelection(headerEditElement, editorElement)
