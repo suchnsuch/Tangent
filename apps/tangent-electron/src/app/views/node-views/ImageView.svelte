@@ -1,4 +1,5 @@
 <script lang="ts">
+import { fly } from 'svelte/transition'
 import type { ImageViewState } from 'app/model/nodeViewStates'
 import WorkspaceFileHeader from 'app/utils/WorkspaceFileHeader.svelte'
 import { clamp } from 'common/utils';
@@ -15,6 +16,7 @@ let panX = state.panX
 let panY = state.panY
 
 let dragging = false
+let isHoveringControls = false
 
 $: file = state.file
 $: isTransformed = $zoom !== 1 || $panX !== 0 || $panY !== 0
@@ -69,6 +71,8 @@ function onMouseMove(event: MouseEvent) {
 		$panX = $panX + event.movementX * (1/$zoom)
 		$panY = $panY + event.movementY * (1/$zoom)
 	}
+
+	isHoveringControls = event.clientY > container.getBoundingClientRect().bottom - 100
 }
 
 function resetTransform() {
@@ -93,8 +97,11 @@ function resetTransform() {
 		src={$file.cacheBustPath} alt={state.node.name}
 		style={`transform: scale(${$zoom}) translate(${$panX}px, ${$panY}px);`}
 		on:mousedown={mouseDown}/>
-	{#if isTransformed}
-		<button class="reset" on:click={resetTransform}>Reset</button>
+	{#if isTransformed || isHoveringControls}
+		<div class="controls" transition:fly={{ y: 100 }}>
+			<button class="zoomText" on:click={resetTransform}>{Math.round($zoom * 100)}%</button>
+			<input class="zoomSlider" type="range" min="{zoom.range.min}" max={zoom.range.max} step="0.1" bind:value={$zoom}/>
+		</div>
 	{/if}
 </main>
 
@@ -132,10 +139,21 @@ img {
 	cursor: zoom-out;
 }
 
-.reset {
+.controls {
 	position: absolute;
 	z-index: 1;
 	left: 1em;
 	bottom: 1em;
+
+	display: flex;
+	flex-direction: row;
+	gap: .5em;
+}
+
+.zoomText {
+	width: 4em;
+}
+.zoomSlider {
+	width: 12em;
 }
 </style>
