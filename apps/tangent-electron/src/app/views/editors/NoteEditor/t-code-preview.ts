@@ -56,7 +56,6 @@ class TangentCodePreview extends HTMLElement {
 				this.content.innerHTML = result.svg
 			})
 			.catch(error => {
-				console.log(error)
 				this.content.innerHTML = `<div>Invalid Mermaid Source</div>
 					<div style="color: red; white-space: pre-wrap; text-align: left; font-family: var(--codeFontFamily); font-size: 80%;">${error}</div>`
 			})

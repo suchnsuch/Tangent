@@ -23,3 +23,9 @@ $$
 
 
 And also inline math: $x^2$, $\sqrt4$
+
+# Math In Headers
+Math should be collapsible
+$$
+\ket{\alpha}=e^{-\frac{|\alpha|^2}{2}}\sum_{n=0}^{\infty}\frac{\alpha^n}{\sqrt{n!}}\hat{a}^{\dagger n}\ket{0}
+$$

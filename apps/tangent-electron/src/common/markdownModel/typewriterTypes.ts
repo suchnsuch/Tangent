@@ -275,9 +275,11 @@ const noteTypeset:TypesetTypes = {
 			renderMultiple: lineData => {
 				let isRevealed = false
 				let indent = -1
+				let isSectionCollapsed = false
 				const children = lineData.map(([attributes, children, id]) => {
 					if (attributes.revealed) isRevealed = true
 					if (indent === -1) indent = attributes.indent.indentSize
+					if (!isSectionCollapsed && isCollapsed(attributes.collapsed)) isSectionCollapsed = true
 
 					let props = getCoreLineProperties(attributes, 'codeLine')
 					props.key = id
@@ -287,9 +289,9 @@ const noteTypeset:TypesetTypes = {
 
 				const codeData = lineData[0][0].code as CodeData
 				const codeLanguage = codeData.language
-				const className = codeLanguage ? `language-${codeLanguage}` : 'language-none'
+				const codeClass = codeLanguage ? `language-${codeLanguage}` : 'language-none'
 
-				let preClass = className
+				let preClass = codeClass
 				let preStyle = ''
 				if (indent) {
 					preStyle += getLineIndentStyle(indent)
@@ -309,20 +311,29 @@ const noteTypeset:TypesetTypes = {
 					h(
 						'code',
 						{
-							className
+							className: codeClass
 						},
 						children
 					)
 				)
 
 				if (codeData.source) {
-					return h('figure', { }, [
-						content,
-						h('t-code-preview', {
-							language: codeData.language,
-							source: codeData.source
-						})
-					])
+					let previewStyle = ''
+					if (isSectionCollapsed && !isRevealed) {
+						previewStyle += 'display: none;'
+					}
+					return h('figure',
+						{
+							style: previewStyle
+						},
+						[
+							content,
+							h('t-code-preview', {
+								language: codeData.language,
+								source: codeData.source
+							})
+						]
+					)
 				}
 				return content
 			}
@@ -363,10 +374,13 @@ const noteTypeset:TypesetTypes = {
 				let math: MathData = null
 				let indent = -1
 				let revealed = false
+				let isSectionCollapsed = false
 				const codeChildren = lineData.map(([attributes, children, id]) => {
 					if (!math) math = attributes.math
 					if (indent === -1) indent = attributes.indent.indentSize
 					if (attributes.revealed) revealed = true
+					if (!isSectionCollapsed && isCollapsed(attributes.collapsed)) isSectionCollapsed = true
+
 					let props = getCoreLineProperties(attributes, 'mathLine')
 					props.key = id
 
@@ -386,6 +400,10 @@ const noteTypeset:TypesetTypes = {
 				if (revealed) {
 					preClass += ' revealed'
 					mathClass += ' revealed'
+				}
+
+				if (isSectionCollapsed && !revealed) {
+					mathStyle += 'display: none;'
 				}
 
 				return h('figure', { }, [
