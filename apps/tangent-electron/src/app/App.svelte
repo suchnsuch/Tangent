@@ -20,6 +20,7 @@ import { dropAllTooltips, tooltips } from './utils/tooltips'
 import Tooltip from './utils/Tooltip.svelte'
 import { setTLinkTooltipComponent } from './views/editors/NoteEditor/t-link'
 import TLinkTooltip from './views/editors/TLinkTooltip.svelte'
+import { updateMermaidStyle } from './style/mermaidStyle'
 
 // Doing this here so that mhchem is loaded
 import 'katex/contrib/mhchem/mhchem'
@@ -55,6 +56,8 @@ $: {
 	const appearanceMode = (settingsMode != null && $settingsMode != 'system') ? $settingsMode : ($osDarkMode ? 'dark' : 'light')
 	document.body.classList.remove('light', 'dark')
 	document.body.classList.add(appearanceMode)
+
+	updateMermaidStyle(appearanceMode === 'dark')
 }
 
 $: linkCursor = workspace?.settings.linkCursor

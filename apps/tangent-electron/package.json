@@ -87,6 +87,7 @@
     "katex": "^0.16.8",
     "language-name-map": "^0.3.0",
     "lorem-ipsum": "^2.0.8",
+    "mermaid": "^11.11.0",
     "mini-css-extract-plugin": "^2.9.2",
     "pdfjs-dist": "^5.4.54",
     "playwright": "^1.42.1",

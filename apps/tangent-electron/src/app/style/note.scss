@@ -268,7 +268,9 @@ article.note {
 		}
 	}
 
-	.hidden {
+	// This second term allows hidden contents of lines to remain hidden when a set of lines is revealed by an outer block
+	// but the individual line itself has not been explicitly marked as revealed. Works great for hidden code.
+	.hidden, .revealed .line.hidden:not(.revealed) .hidden:not(.revealed) {
 		/*
 		 * This is a cheaky trick that makes text invisible but allows it to be navigated as expected.
 		 * `display: none;` does _not_ handle this as well.
@@ -276,12 +278,12 @@ article.note {
 		font-size: 0;
 		line-height: 0;
 		tab-size: 0; // Without this, tabs are always rendered. Silly.
+	}
 
-		&.revealed {
-			font-size: unset;
-			line-height: unset;
-			tab-size: unset;
-		}
+	.hidden.revealed, .revealed .line.hidden {
+		font-size: unset;
+		line-height: unset;
+		tab-size: unset;
 	}
 
 	.horizontal_rule {

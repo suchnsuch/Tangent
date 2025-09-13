@@ -22,6 +22,7 @@ import { parseMarkdown } from 'common/markdownModel'
 import { getLineFormatData, getLineFormattingPrefix, IndentDefinition, lineFormatEscapeMode } from 'common/markdownModel/line'
 import TangentLink from './t-link'
 import TangentCheckbox from './t-checkbox'
+import TangentCodePreview from './t-code-preview' // No deletey
 import TangentMath from './t-math' // No deletey
 import { indentMatcher } from 'common/markdownModel/matches'
 import { getGlyphForNumber, ListDefinition, ListForm, listMatcher } from 'common/markdownModel/list'
@@ -62,9 +63,12 @@ interface VerifyListOptions {
 	basis: 'self' | 'rebasis'
 }
 
-// Force the inclusion of the variable so it is included in the variable
+// Force the inclusion of elements so it is included in the module
 if (!TangentMath) {
 	console.error('I don\'t have math!')
+}
+if (!TangentCodePreview) {
+	console.error('I don\'t have code preview!')
 }
 
 export function revealContentAroundRange(doc: TextDocument, range: EditorRange, change: TextChange) {

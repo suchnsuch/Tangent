@@ -113,6 +113,9 @@ function getCoreLineProperties(attributes, baseClass = ''): AttributeMap {
 		props.className += ' collapsed-revealed'
 	}
 
+	if (attributes.hidden) {
+		props.className += ' hidden'
+	}
 	if (attributes.revealed) {
 		props.className += ' revealed'
 	}
@@ -295,8 +298,8 @@ const noteTypeset:TypesetTypes = {
 				if (isRevealed) {
 					preClass += ' revealed'
 				}
-
-				return h(
+				
+				const content = h(
 					'pre',
 					{
 						className: preClass,
@@ -311,6 +314,17 @@ const noteTypeset:TypesetTypes = {
 						children
 					)
 				)
+
+				if (codeData.source) {
+					return h('figure', { }, [
+						content,
+						h('t-code-preview', {
+							language: codeData.language,
+							source: codeData.source
+						})
+					])
+				}
+				return content
 			}
 		},
 		{

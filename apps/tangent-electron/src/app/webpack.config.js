@@ -38,7 +38,7 @@ module.exports = {
 		filename: '[name].js',
 		chunkFilename: '[name].[id].js'
 	},
-	target: 'electron-renderer',
+	target: 'web',
 	module: {
 		rules: [
 			{

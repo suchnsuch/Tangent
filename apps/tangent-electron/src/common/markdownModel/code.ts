@@ -76,7 +76,18 @@ export type CodeParsingContext = ParsingContext & {
 }
 
 export type CodeData = {
+	/** The language used */
 	language: string
+	/** When set, the contents will be presented through a preview system */
+	source?: string
+}
+
+function shouldPreview(context: CodeParsingContext) {
+	return context.resolvedLanguage === 'mermaid'
+}
+
+function shouldHideSource(context: CodeParsingContext) {
+	return context.resolvedLanguage === 'mermaid'
 }
 
 export function parseCodeBlock(char: string, parser: NoteParser): boolean {
@@ -104,10 +115,6 @@ export function parseCodeBlock(char: string, parser: NoteParser): boolean {
 	const codeData: CodeData = {
 		language: codeFormat
 	}
-
-	builder.addOpenLineFormat('code', {
-		code: codeData
-	})
 
 	let resolvedLanguage = getLanguage(codeData.language)
 	if (resolvedLanguage === 'Loading') {
@@ -138,6 +145,15 @@ export function parseCodeBlock(char: string, parser: NoteParser): boolean {
 		},
 		reachedEnd: false
 	}
+
+	const format: AttributeMap = {
+		code: codeData
+	}
+	if (shouldHideSource(context)) {
+		format.hidden = true
+	}
+
+	builder.addOpenLineFormat('code', format)
 
 	parser.pushContext(context)
 
@@ -249,9 +265,15 @@ export function finishCodeBlock(lastIndex: number, ctxt: ParsingContext, parser:
 	const { feed, builder } = parser
 	const context = ctxt as CodeParsingContext
 
+	if (shouldPreview(context)) {
+		context.data.source = context.code
+	}
+
 	applyCodeFormat(parser, context)
 
 	builder.dropOpenLineFormat('code')
+
+	const hidden = shouldHideSource(context)
 
 	if (context.reachedEnd) {
 		parser.commitSpan({
@@ -261,9 +283,11 @@ export function finishCodeBlock(lastIndex: number, ctxt: ParsingContext, parser:
 		}, 0)
 
 		parser.lineData.code = context.data
+		if (hidden) parser.lineData.hidden = true
 	}
 	else if (lastIndex === feed.index) {
 		parser.lineData.code = context.data
+		if (hidden) parser.lineData.hidden = true
 	}
 
 	if (feed instanceof DocumentFeeder && !feed.hasMore()) {
