@@ -5,7 +5,13 @@ A local wiki embed lets you easily embed local files in your workspace. It looks
 A markdown embed can embed content from the internet. It looks like `![](https://pixnio.com/free-images/2021/10/18/2021-10-18-06-25-57-550x367.jpg)` and will display as:
 ![](https://pixnio.com/free-images/2021/10/18/2021-10-18-06-25-57-550x367.jpg)
 
-# Supported Content
+# Supported Local Content
+Tangent can embed local images, videos and audio.
+* Images: `.png`, `.jpeg`, `.gif`, `.bmp`, `.svg`.
+* Video: `.mov`, `.mp4`, `.avi`, `.webm`.
+* Audio: `.mp3`, `.m4a`, `.wav`, `.ogg`, `.flac`.
+
+# Supported Remote Content
 Tangent can display web link previews:
 https://en.wikipedia.org/wiki/Capuchin_monkey
 
