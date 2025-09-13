@@ -232,6 +232,18 @@ export let noteDetailMode: NoteDetailMode = NoteDetailMode.None
 			bottom: 2px;
 		}
 	}
+
+	&.auto {
+		.audio, .video {
+			min-height: 150px;
+			min-width: 300px;
+		}
+
+		.pdf {
+			min-height: 300px;
+			min-width: 200px;
+		}
+	}
 }
 
 </style>
