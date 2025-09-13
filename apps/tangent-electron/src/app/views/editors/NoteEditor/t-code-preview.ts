@@ -13,6 +13,7 @@ class TangentCodePreview extends HTMLElement {
 		const shadow = this.attachShadow({ mode: 'open' })
 		const content = document.createElement('div')
 		content.style.textAlign = 'center'
+		content.style.whiteSpace = 'normal'
 		shadow.appendChild(content)
 
 		this.content = content
@@ -50,17 +51,14 @@ class TangentCodePreview extends HTMLElement {
 		const language = this.getAttribute('language')
 		const source = this.getAttribute('source')
 
-		console.log('Updating code preview', {
-			language, source
-		})
-
 		if (language === 'mermaid') {
 			mermaid.render('mermaid-diagram-' + nextIdValue++, source).then(result => {
 				this.content.innerHTML = result.svg
 			})
 			.catch(error => {
-				console.error('Mermaid failed to render: ', error)
-				this.content.innerHTML = ''
+				console.log(error)
+				this.content.innerHTML = `<div>Invalid Mermaid Source</div>
+					<div style="color: red; white-space: pre-wrap; text-align: left; font-family: var(--codeFontFamily); font-size: 80%;">${error}</div>`
 			})
 		}
 		else {

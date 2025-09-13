@@ -227,3 +227,9 @@ timeline
     2005 : YouTube
     2006 : Twitter
 ```
+
+# Invalid
+```mermaid
+flowchart
+	test --> other[_other_] test
+```

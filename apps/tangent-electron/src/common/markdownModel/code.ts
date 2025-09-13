@@ -3,8 +3,6 @@ import DocumentFeeder from './DocumentFeeder'
 import NoteParser from './NoteParser'
 import { AttributeMap } from 'typewriter-editor'
 import { ParsingContext, ParsingContextType, ParsingProgram } from './parsingContext'
-import LinesBuilder from './LinesBuilder'
-import { lineToText } from 'common/typewriterUtils'
 import { negativeInlineFormats } from './typewriterTypes'
 
 export function parseInlineCode(char: string, parser: NoteParser): boolean {
