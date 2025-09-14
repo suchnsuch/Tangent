@@ -71,7 +71,7 @@ export let noteDetailMode: NoteDetailMode = NoteDetailMode.None
 				{#if embedType === EmbedType.Image}
 					<div class="image" style={`background-image: url("${node.cacheBustPath}");`}></div>
 				{:else if embedType === EmbedType.Audio}
-					<media-controller class="audio stretch" autohide="-1">
+					<media-controller class="audio stretch" autohide="-1" gesturesdisabled>
 						<audio slot="media" src={node.cacheBustPath} />
 						<!-- svelte-ignore a11y-click-events-have-key-events -->
 						<!-- svelte-ignore a11y-no-static-element-interactions -->
@@ -87,7 +87,7 @@ export let noteDetailMode: NoteDetailMode = NoteDetailMode.None
 					<!-- svelte-ignore a11y-click-events-have-key-events -->
 					<!-- svelte-ignore a11y-no-static-element-interactions -->
 					<div class="video stretch" on:click|preventDefault>
-						<media-controller class="roundedBottom">
+						<media-controller class="roundedBottom" gesturesdisabled>
 							<!-- svelte-ignore a11y-media-has-caption -->
 							<video slot="media" src={node.cacheBustPath}/>
 							<media-control-bar>
