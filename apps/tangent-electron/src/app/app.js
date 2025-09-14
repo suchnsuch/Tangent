@@ -2,7 +2,6 @@ import App from './App.svelte'
 
 import './style/input.scss'
 import './style/note.scss'
-import './style/media.scss'
 
 import * as pdfjs from 'pdfjs-dist'
 import pdfWorker from 'pdfjs-dist/build/pdf.worker.min.mjs'

@@ -9,6 +9,13 @@ import { HandleResult } from 'app/model/NodeHandle'
 import { TooltipConfig } from 'app/utils/tooltips'
 import { isExternalLink } from 'common/links'
 
+function createStyleElement(href: string) {
+	const style = document.createElement('link')
+	style.setAttribute('rel', 'stylesheet')
+	style.setAttribute('href', href)
+	return style
+}
+
 class TangentEmbed extends TangentLink {
 
 	private content: HTMLElement
@@ -21,10 +28,8 @@ class TangentEmbed extends TangentLink {
 		super()
 		const shadow = this.attachShadow({ mode: 'open' })
 		
-		const style = document.createElement('link')
-		style.setAttribute('rel', 'stylesheet')
-		style.setAttribute('href', './t-embed.css')
-		shadow.appendChild(style)
+		shadow.appendChild(createStyleElement('./t-embed.css'))
+		shadow.appendChild(createStyleElement('./media.css'))
 
 		const content = document.createElement('span')
 		content.style.textIndent = '0' // Defeats the default "revealed" textIndent funkiness.

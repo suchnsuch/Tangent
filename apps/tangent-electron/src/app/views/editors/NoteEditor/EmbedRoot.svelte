@@ -315,8 +315,6 @@ function websiteImageStyle(form: WebsiteData) {
 <svelte:options accessors={true}/>
 
 <style lang="scss">
-@use '../../../style/media';
-
 .website-preview {
 	width: 100%;
 	display: grid;
