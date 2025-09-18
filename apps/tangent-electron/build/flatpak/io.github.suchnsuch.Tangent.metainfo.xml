@@ -88,11 +88,13 @@
 
   <releases>
     <release version="0.10.2" date="2025-09-06">
-      <ul>
-        <li>Pressing escape now dismisses any active annotations or search highlights in a note.</li>
-        <li>Completed or canceled Todos are now no longer crossed out while selected.</li>
-        <li>Fixed an issue that caused scrolling up in the [[Feed Lens]] to jump around obnoxiously.</li>
-      </ul>
+      <description>
+        <ul>
+          <li>Pressing escape now dismisses any active annotations or search highlights in a note.</li>
+          <li>Completed or canceled Todos are now no longer crossed out while selected.</li>
+          <li>Fixed an issue that caused scrolling up in the [[Feed Lens]] to jump around obnoxiously.</li>
+        </ul>
+      </description>
     </release>
     <release version="0.10.1" date="2025-08-23">
       <description>
