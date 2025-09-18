@@ -1,0 +1,57 @@
+{
+  "fill" : {
+    "linear-gradient" : [
+      "display-p3:0.02745,0.16863,0.07451,1.00000",
+      "display-p3:0.00784,0.06275,0.02353,1.00000"
+    ]
+  },
+  "groups" : [
+    {
+      "layers" : [
+        {
+          "blend-mode" : "normal",
+          "fill" : "none",
+          "glass" : true,
+          "hidden" : false,
+          "image-name" : "icon-stripped.png",
+          "name" : "icon-stripped",
+          "opacity" : 0.9,
+          "position-specializations" : [
+            {
+              "value" : {
+                "scale" : 1.25,
+                "translation-in-points" : [
+                  43,
+                  -15
+                ]
+              }
+            },
+            {
+              "idiom" : "watchOS",
+              "value" : {
+                "scale" : 1.25,
+                "translation-in-points" : [
+                  24,
+                  0
+                ]
+              }
+            }
+          ]
+        }
+      ],
+      "shadow" : {
+        "kind" : "neutral",
+        "opacity" : 0.5
+      },
+      "translucency" : {
+        "enabled" : true,
+        "value" : 0.5
+      }
+    }
+  ],
+  "supported-platforms" : {
+    "squares" : [
+      "macOS"
+    ]
+  }
+}

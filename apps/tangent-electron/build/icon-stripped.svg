@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<svg viewBox="0 0 128 128" xmlns="http://www.w3.org/2000/svg" xmlns:bx="https://boxy-svg.com">
+  <defs>
+    <linearGradient id="gradient-2" bx:pinned="true">
+      <stop style="stop-color: rgb(7, 43, 19);" offset="0.094"/>
+      <stop style="stop-color: rgb(2, 16, 6);" offset="0.833"/>
+    </linearGradient>
+    <linearGradient id="gradient-1" bx:pinned="true">
+      <stop style="stop-color: rgb(25, 120, 56);" offset="0"/>
+      <stop style="stop-color: rgb(19, 86, 39);" offset="1"/>
+    </linearGradient>
+    <linearGradient id="gradient-1-0" gradientUnits="userSpaceOnUse" x1="93.123" y1="26.269" x2="93.123" y2="50.269" gradientTransform="matrix(0.895774, 0.444511, -0.476039, 0.959306, 20.448349, -33.788198)" href="#gradient-1"/>
+    <linearGradient id="gradient-1-1" gradientUnits="userSpaceOnUse" x1="30.866" y1="51" x2="30.866" y2="75" gradientTransform="matrix(0.881561, 0.472069, -0.447497, 0.835675, 33.857831, -3.654667)" href="#gradient-1"/>
+    <linearGradient id="gradient-1-2" gradientUnits="userSpaceOnUse" x1="75.336" y1="76.202" x2="75.336" y2="100.202" gradientTransform="matrix(0.900151, 0.435577, -0.417086, 0.86194, 44.489944, -20.83922)" href="#gradient-1"/>
+    <bx:export>
+      <bx:file format="png" path="icon-stripped.png" width="1024" height="1024"/>
+    </bx:export>
+  </defs>
+  <path style="fill: none; stroke-width: 3px; stroke: rgb(233, 233, 233);" d="M 43.077 63.363 C 57.888 63.475 62.591 64.543 62.473 53.804 C 62.355 43.065 74.993 44.572 74.993 44.572"/>
+  <path style="fill: none; stroke-width: 3px; stroke: rgb(233, 233, 233);" d="M 42.53 63.246 C 52.162 63.779 54.712 62.061 54.963 75.96 C 55.214 89.859 64.117 88.734 64.117 88.734"/>
+  <circle style="stroke-width: 3px; fill: url(#gradient-1-1); stroke: rgb(233, 233, 233);" cx="33.239" cy="63" r="10"/>
+  <circle style="stroke-width: 3px; fill: url(#gradient-1-0); stroke: rgb(233, 233, 233);" cx="85.177" cy="44.545" r="10"/>
+  <circle style="stroke-width: 3px; fill: url(#gradient-1-2); stroke: rgb(233, 233, 233);" cx="75.336" cy="88.202" r="10"/>
+</svg>
