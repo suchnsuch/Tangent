@@ -1,4 +1,4 @@
-import { ObjectStore } from 'common/stores'
+import { ObjectStore, PatchableMap } from 'common/stores'
 import Setting, { SettingDefinition } from './Setting'
 
 import { isLinux, isMac } from '../platform'
@@ -32,6 +32,18 @@ if (isMac) {
 		description: 'The mouse cursor points in the direction the link will open in.'
 	})
 	linkCursorDefinition.defaultValue = 'directional'
+}
+
+class KeymapSettings extends PatchableMap<string, string[], string[]> {
+	protected convertKeyToPatch(key: string): string {
+		return key
+	}
+	protected convertPatchKeyToKey(patchKey: string): string {
+		return patchKey
+	}
+	protected convertPatchValueToValue(patchValue: string[]): string[] {
+		return patchValue
+	}
 }
 
 export default class Settings extends ObjectStore {
@@ -523,6 +535,9 @@ export default class Settings extends ObjectStore {
 		description: 'Languages that will be added to the spellchecker',
 		defaultValue: []
 	})
+
+	// Keymap
+	keymap = new KeymapSettings()
 
 	// Code in notes
 	letCodeExpand = new Setting<boolean>({

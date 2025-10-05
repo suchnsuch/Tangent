@@ -9,14 +9,17 @@ export interface CommandContext {
 export type AnyCommandContet = CommandContext & { [key: string]: any }
 
 export interface CommandOptions {
-	shortcut?: string
+	/** Shortcuts set on construction are considered the default shortcuts */
 	shortcuts?: string[]
+	/** Alias for a single shortcut */
+	shortcut?: string
 }
 
 type CommandSubscriber = (command: Command) => void
 
 export default abstract class Command {
 
+	defaultShortcuts: string[]
 	shortcuts: string[]
 
 	private canExecuteDirty: boolean = false
@@ -30,6 +33,7 @@ export default abstract class Command {
 		else if (options?.shortcut) {
 			this.shortcuts = [options.shortcut]
 		}
+		this.defaultShortcuts = this.shortcuts?.slice()
 	}
 
 	protected alertDirty() {

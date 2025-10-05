@@ -14,6 +14,7 @@ import Maps from './Maps.svelte'
 import Notes from './Notes.svelte'
 import Styles from './Styles.svelte'
 import Dictionary from './Dictionary.svelte'
+import Shortcuts from './Shortcuts.svelte'
 import Debug from './Debug.svelte'
 import DocumentationLink from 'app/utils/DocumentationLink.svelte'
 
@@ -63,6 +64,10 @@ const menus = [
 	{
 		name: 'Notes',
 		component: Notes
+	},
+	{
+		name: 'Shortcuts',
+		component: Shortcuts
 	},
 	{
 		name: 'Custom Styles',

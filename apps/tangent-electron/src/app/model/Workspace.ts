@@ -180,6 +180,24 @@ export default class Workspace extends EventDispatcher {
 			}
 		})
 
+		this.settings.keymap.subscribe(keymap => {
+			// Revert to default
+			for (const key of Object.keys(this.commands)) {
+				const command = this.commands[key]
+				command.shortcuts = command.defaultShortcuts?.slice()
+			}
+
+			// Apply mappings
+			for (const key of keymap.keys())
+			{
+				const shortcuts = keymap.get(key)
+				const command = this.commands[key]
+				if (command) {
+					command.shortcuts = shortcuts
+				}
+			}
+		})
+
 		api.onWorkspaceAction((actionName, ...payload) => {
 			if (this[actionName]) {
 				try {
