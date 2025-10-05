@@ -2,13 +2,13 @@ import path from 'path'
 import fs from 'fs'
 import { load } from 'cheerio'
 import { app, BrowserWindow, clipboard, dialog, ipcMain, MenuItem, MenuItemConstructorOptions, shell } from 'electron'
-import { getDocumentationPath } from 'main/documentation'
+import { getDocumentationPath, openDocumentation } from 'main/documentation'
 import { getWindowHandle, getWorkspace, validateWorkspaceForHandleFilepath, hasShutdownWorkspaces, workspaceMap } from 'main/workspaces'
 
 import fetch from 'node-fetch'
 import type { SelectPathOptions } from 'common/WindowApi'
 import type { ContextMenuTemplate } from 'common/menus'
-import { updateMenuItems } from 'main/menus'
+import { createMenus, updateMenuItems } from 'main/menus'
 
 import fontList from 'font-list'
 
@@ -20,6 +20,7 @@ import './dictionary'
 import './themes'
 import './urlData'
 import { FileSaveResult } from 'main/File'
+import { createWindow } from 'main/windows'
 
 const log = Logger.get('messages')
 
@@ -496,6 +497,19 @@ ipcMain.on('postMenuUpdate', (event, state) => {
 	const windowHandle = getWindowHandle(event.sender)
 	if (windowHandle && windowHandle.window?.isFocused) {
 		updateMenuItems(state)
+	}
+})
+
+ipcMain.on('updateMenuAccelerators', (event, state) => {
+	const windowHandle = getWindowHandle(event.sender)
+	if (windowHandle && windowHandle.window?.isFocused) {
+		createMenus({
+			createWindow,
+			getWindowHandle,
+			openDocumentation,
+			keymap: state
+		})
+		event.sender.send('getAllMenus')
 	}
 })
 

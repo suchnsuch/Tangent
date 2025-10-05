@@ -80,6 +80,10 @@ const bridge: WindowApi = {
 		ipcRenderer.send('postMenuUpdate', content)
 	},
 
+	updateMenuAccelerators(content) {
+		ipcRenderer.send('updateMenuAccelerators', content)
+	},
+
 	showContextMenu(template) {
 		ipcRenderer.send('showContextMenu', template)
 	},

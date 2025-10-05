@@ -6,6 +6,7 @@ import { isMac } from '../common/platform'
 import { mode } from './environment'
 import { initDocumentation } from './documentation'
 
+/** Items marked with the window prefix are intended to be handled by the indicated command within the window. */
 const windowPrefix = 'window_'
 
 function actionPassthrough(item: MenuItem, browserWindow: BrowserWindow) {
@@ -16,11 +17,41 @@ function actionPassthrough(item: MenuItem, browserWindow: BrowserWindow) {
 	browserWindow.webContents.send('onMenuAction', id)
 }
 
-export function createMenus(interop: {
-	createWindow: () => void,
-	getWindowHandle: (windowReference: BrowserWindow | WebContents) => WindowHandle,
+type MenuInterop = {
+	createWindow: () => void
+	getWindowHandle: (windowReference: BrowserWindow | WebContents) => WindowHandle
 	openDocumentation: (name: string) => void
-}) {
+	keymap?: { [key: string]: string }
+}
+
+function processTemplate(
+	template: Electron.MenuItemConstructorOptions | Electron.MenuItemConstructorOptions[],
+	keymap?: { [key: string]: string }
+) {
+	if (Array.isArray(template)) {
+		for (const item of template) {
+			processTemplate(item, keymap)
+		}
+	}
+	else if (Array.isArray(template.submenu)) {
+		processTemplate(template.submenu, keymap)
+	}
+	else if (template.id?.startsWith(windowPrefix)) {
+		if (!template.click) {
+			template.click = actionPassthrough
+		}
+		if (keymap) {
+			const id = template.id.substring(windowPrefix.length)
+			const accelerator = keymap[id]
+			if (accelerator) {
+				template.accelerator = accelerator
+				template.registerAccelerator = false
+			}
+		}
+	}
+}
+
+export function createMenus(interop: MenuInterop) {
 
 	const template: Electron.MenuItemConstructorOptions[] = []
 
@@ -36,10 +67,7 @@ export function createMenus(interop: {
 				{ type: 'separator' },
 				{
 					id: 'window_openPreferences',
-					label: 'Preferences',
-					accelerator: 'CommandOrControl+,',
-					registerAccelerator: false,
-					click: actionPassthrough
+					label: 'Preferences'
 				},
 				{ type: 'separator' },
 				{ role: 'services' },
@@ -58,51 +86,32 @@ export function createMenus(interop: {
 		submenu: [
 			{
 				id: 'window_createNewFile',
-				label: 'New Note',
-				accelerator: 'CommandOrControl+N',
-				registerAccelerator: false,
-				click: actionPassthrough,
+				label: 'New Note'
 			},
 			{
 				id: 'window_createNewNoteFromRule',
-				label: 'New Note from Rule',
-				accelerator: 'CommandOrControl+Shift+N',
-				registerAccelerator: false,
-				click: actionPassthrough
+				label: 'New Note from Rule'
 			},
 			{
 				id: 'window_saveCurrentFile',
-				label: 'Save',
-				accelerator: 'CommandOrControl+S',
-				registerAccelerator: false,
-				click: actionPassthrough
+				label: 'Save'
 			},
 			{
 				id: 'window_duplicateNode',
-				label: 'Duplicate',
-				accelerator: 'CommandOrControl+Shift+D',
-				registerAccelerator: false,
-				click: actionPassthrough
+				label: 'Duplicate'
 			},
 			{ type: 'separator' },
 			{
 				id: 'window_closeCurrentFile',
-				label: 'Close Note',
-				accelerator: 'CommandOrControl+W',
-				registerAccelerator: false,
-				click: actionPassthrough
+				label: 'Close Note'
 			},
 			{
 				id: 'window_closeOtherFiles',
-				label: 'Close Other Notes',
-				accelerator: 'CommandOrControl+Shift+W',
-				registerAccelerator: false,
-				click: actionPassthrough
+				label: 'Close Other Notes'
 			},
 			{
 				id: 'window_closeLeftFiles',
-				label: 'Close Notes to the Left',
-				click: actionPassthrough
+				label: 'Close Notes to the Left'
 			},
 			{
 				id: 'window_closeRightFiles',
@@ -111,9 +120,8 @@ export function createMenus(interop: {
 			},
 			{ type: 'separator' },
 			{
+				id: 'window_openWorkspace',
 				label: 'Open Workspace',
-				accelerator: 'CommandOrControl+Shift+O',
-				registerAccelerator: false,
 				click: () => {
 					interop.createWindow()
 				}
@@ -147,81 +155,48 @@ export function createMenus(interop: {
 			submenu: [
 				{
 					id: 'window_toggleBold',
-					label: 'Toggle Bold',
-					accelerator: 'CommandOrControl+B',
-					registerAccelerator: false,
-					click: actionPassthrough
+					label: 'Toggle Bold'
 				},
 				{
 					id: 'window_toggleItalics',
-					label: 'Toggle Italics',
-					accelerator: 'CommandOrControl+I',
-					registerAccelerator: false,
-					click: actionPassthrough
+					label: 'Toggle Italics'
 				},
 				{
 					id: 'window_toggleHighlight',
-					label: 'Toggle Highlight',
-					accelerator: 'CommandOrControl+=',
-					registerAccelerator: false,
-					click: actionPassthrough
+					label: 'Toggle Highlight'
 				},
 				{
 					id: 'window_toggleInlineCode',
-					label: 'Toggle Inline Code',
-					accelerator: 'CommandOrControl+\\',
-					registerAccelerator: false,
-					click: actionPassthrough
+					label: 'Toggle Inline Code'
 				},
 				{ type: 'separator' },
 				{
 					id: 'window_setParagraph',
-					label: 'Paragraph',
-					accelerator: 'CommandOrControl+0',
-					registerAccelerator: false,
-					click: actionPassthrough
+					label: 'Paragraph'
 				},
 				{
 					id: 'window_setHeader1',
-					label: 'Header 1',
-					accelerator: 'CommandOrControl+1',
-					registerAccelerator: false,
-					click: actionPassthrough
+					label: 'Header 1'
 				},
 				{
 					id: 'window_setHeader2',
-					label: 'Header 2',
-					accelerator: 'CommandOrControl+2',
-					registerAccelerator: false,
-					click: actionPassthrough
+					label: 'Header 2'
 				},
 				{
 					id: 'window_setHeader3',
-					label: 'Header 3',
-					accelerator: 'CommandOrControl+3',
-					registerAccelerator: false,
-					click: actionPassthrough
+					label: 'Header 3'
 				},
 				{
 					id: 'window_setHeader4',
-					label: 'Header 4',
-					accelerator: 'CommandOrControl+4',
-					registerAccelerator: false,
-					click: actionPassthrough
+					label: 'Header 4'
 				},
 				{
 					id: 'window_setHeader5',
-					label: 'Header 5',
-					accelerator: 'CommandOrControl+5',
-					registerAccelerator: false,
-					click: actionPassthrough
+					label: 'Header 5'
 				},
 				{
 					id: 'window_setHeader6',
-					label: 'Header 6',
-					accelerator: 'CommandOrControl+6',
-					registerAccelerator: false,
-					click: actionPassthrough
+					label: 'Header 6'
 				}
 			]
 		},
@@ -230,17 +205,11 @@ export function createMenus(interop: {
 			submenu: [
 				{
 					id: 'window_toggleWikiLink',
-					label: 'Toggle Wiki Link',
-					accelerator: 'CommandOrControl+Alt+K',
-					registerAccelerator: false,
-					click: actionPassthrough
+					label: 'Toggle Wiki Link'
 				},
 				{
 					id: 'window_toggleMDLink',
-					label: 'Toggle External Link',
-					accelerator: 'CommandOrControl+K',
-					registerAccelerator: false,
-					click: actionPassthrough
+					label: 'Toggle External Link'
 				}
 			]
 		}
@@ -249,10 +218,7 @@ export function createMenus(interop: {
 	if (!isMac) {
 		editMenu.push({
 			id: 'window_openPreferences',
-			label: 'Preferences',
-			accelerator: 'CommandOrControl+,',
-			registerAccelerator: false,
-			click: actionPassthrough
+			label: 'Preferences'
 		})
 	}
 
@@ -268,61 +234,47 @@ export function createMenus(interop: {
 			{
 				id: 'window_setMapFocusLevel',
 				label: 'Map View',
-				type: 'checkbox',
-				accelerator: 'CommandOrControl+G',
-				registerAccelerator: false,
-				click: actionPassthrough
+				type: 'checkbox'
 			},
 
 			{
 				id: 'window_setThreadFocusLevel',
 				label: 'Thread View',
-				type: 'checkbox',
-				click: actionPassthrough
+				type: 'checkbox'
 			},
 
 			{
 				id: 'window_toggleFocusMode',
-				label: 'Toggle Focus Mode',
-				accelerator: 'CommandOrControl+D',
-				click: actionPassthrough
+				label: 'Toggle Focus Mode'
 			},
 			{
 				id: 'window_setFileFocusLevel',
 				label: '    File',
-				type: 'checkbox',
-				click: actionPassthrough
+				type: 'checkbox'
 			},
 			{
 				id: 'window_setTypewriterFocusLevel',
 				label: '    Typewriter',
-				type: 'checkbox',
-				click: actionPassthrough
+				type: 'checkbox'
 			},
 			{
 				id: 'window_setParagraphFocusLevel',
 				label: '    Paragraph',
-				type: 'checkbox',
-				click: actionPassthrough
+				type: 'checkbox'
 			},
 			{
 				id: 'window_setLineFocusLevel',
 				label: '    Line',
-				type: 'checkbox',
-				click: actionPassthrough
+				type: 'checkbox'
 			},
 			{
 				id: 'window_setSentenceFocusLevel',
 				label: '    Sentence',
-				type: 'checkbox',
-				click: actionPassthrough
+				type: 'checkbox'
 			},
 			{
 				id: 'window_showIncomingLinks',
-				label: 'Show Incoming Links',
-				accelerator: 'CommandOrControl+Alt+Down',
-				registerAccelerator: false,
-				click: actionPassthrough
+				label: 'Show Incoming Links'
 			},
 
 			{ type: 'separator' },
@@ -330,34 +282,22 @@ export function createMenus(interop: {
 			{
 				id: 'window_toggleLeftSidebar',
 				label: 'Show Left Sidebar',
-				accelerator: 'CommandOrControl+Alt+[',
-				registerAccelerator: false,
-				type: 'checkbox',
-				click: actionPassthrough
+				type: 'checkbox'
 			},
 
 			{ type: 'separator' },
 
 			{
 				id: 'window_zoomIn',
-				label: 'Zoom In',
-				accelerator: 'CommandOrControl+Shift+Plus',
-				registerAccelerator: false,
-				click: actionPassthrough
+				label: 'Zoom In'
 			},
 			{
 				id: 'window_zoomOut',
-				label: 'Zoom Out',
-				accelerator: 'CommandOrControl+Shift+numsub',
-				registerAccelerator: false,
-				click: actionPassthrough
+				label: 'Zoom Out'
 			},
 			{
 				id: 'window_resetZoom',
-				label: 'Reset Zoom',
-				accelerator: 'CommandOrControl+Shift+0',
-				registerAccelerator: false,
-				click: actionPassthrough
+				label: 'Reset Zoom'
 			},
 			
 			{ type: 'separator' },
@@ -365,8 +305,7 @@ export function createMenus(interop: {
 			{
 				id: 'window_floatWindow',
 				label: 'Float Window',
-				type: 'checkbox',
-				click: actionPassthrough
+				type: 'checkbox'
 			},
 
 			{ type: 'separator' },
@@ -384,51 +323,32 @@ export function createMenus(interop: {
 		submenu: [
 			{
 				id: 'window_shiftHistoryBack',
-				label: 'Go Back',
-				accelerator: 'CommandOrControl+Shift+[',
-				registerAccelerator: false,
-				click: actionPassthrough
+				label: 'Go Back'
 			},
 			{
 				id: 'window_shiftHistoryForward',
-				label: 'Go Forward',
-				accelerator: 'CommandOrControl+Shift+]',
-				registerAccelerator: false,
-				click: actionPassthrough
+				label: 'Go Forward'
 			},
 			{ type: 'separator' },
 			{
 				id: 'window_goTo',
-				label: 'Go To File...',
-				accelerator: 'CommandOrControl+O',
-				registerAccelerator: false,
-				click: actionPassthrough
+				label: 'Go To File...'
 			},
 			{
 				id: 'window_openQueryPane',
-				label: 'New Search Query',
-				accelerator: 'CommandOrControl+Shift+F',
-				registerAccelerator: false,
-				click: actionPassthrough
+				label: 'New Search Query'
 			},
 			{
 				id: 'window_showInFileBrowser',
-				label: isMac ? 'Show in Finder' : 'Show in Explorer',
-				click: actionPassthrough
+				label: isMac ? 'Show in Finder' : 'Show in Explorer'
 			},
 			{
 				id: 'window_moveToLeftFile',
-				label: 'Move to Left Note',
-				accelerator: 'CommandOrControl+Alt+Left',
-				registerAccelerator: false,
-				click: actionPassthrough
+				label: 'Move to Left Note'
 			},
 			{
 				id: 'window_moveToRightFile',
-				label: 'Move to Right Note',
-				accelerator: 'CommandOrControl+Alt+Right',
-				registerAccelerator: false,
-				click: actionPassthrough
+				label: 'Move to Right Note'
 			}
 		]
 	})
@@ -437,10 +357,7 @@ export function createMenus(interop: {
 	const doMenu: MenuItemConstructorOptions[] = [
 		{
 			id: 'window_do',
-			label: 'Show Command Palette',
-			accelerator: 'CommandOrControl+P',
-			registerAccelerator: false,
-			click: actionPassthrough
+			label: 'Show Command Palette'
 		}
 	]
 
@@ -518,8 +435,7 @@ export function createMenus(interop: {
 			},
 			{
 				label: 'Open Changelog',
-				id: 'window_openChangelog',
-				click: actionPassthrough
+				id: 'window_openChangelog'
 			},
 			{ type: 'separator' },
 			{
@@ -556,6 +472,8 @@ export function createMenus(interop: {
 			}
 		]
 	})
+
+	processTemplate(template, interop.keymap)
 
 	const menu = Menu.buildFromTemplate(template)
 	Menu.setApplicationMenu(menu)

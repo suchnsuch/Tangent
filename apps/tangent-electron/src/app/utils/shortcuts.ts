@@ -57,6 +57,11 @@ export function shortcutHtmlString(shortcut: string) {
 	return groups.join('+')
 }
 
+export function shortcutToElectronShortcut(shortcut: string) {
+	shortcut = shortcut.replace('Mod', 'CommandOrControl')
+	return shortcut
+}
+
 // TODO: Typewriter would probably benefit from this addition
 // Pulled from https://developer.mozilla.org/en-US/docs/Web/API/UI_Events/Keyboard_event_code_values
 const codeSubs = {

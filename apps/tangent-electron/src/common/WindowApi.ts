@@ -45,6 +45,7 @@ export default interface WindowAPI {
 	onMenuAction(handler: (actionName: string) => void)
 	onGetAllMenus(handler: () => void)
 	postMenuUpdate(content: { [key: string]: { [key: string]: any}})
+	updateMenuAccelerators(content: { [key: string]: string })
 	showContextMenu(template: ContextMenuTemplate)
 
 	// Messages

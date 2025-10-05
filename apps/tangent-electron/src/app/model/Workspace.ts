@@ -41,6 +41,7 @@ import { Readable, derived, readable } from 'svelte/store'
 import NodeHandle, { HandleResult } from './NodeHandle'
 import { swapRemove } from '@such-n-such/core'
 import CodeThemeManager from 'app/style/CodeThemeManager'
+import { shortcutToElectronShortcut } from 'app/utils/shortcuts'
 
 const menuContext = {}
 
@@ -196,6 +197,18 @@ export default class Workspace extends EventDispatcher {
 					command.shortcuts = shortcuts
 				}
 			}
+
+			// Update electron menus
+			let menuUpdate = {}
+			for (const key of Object.keys(this.commands)) {
+				const command = this.commands[key]
+				
+				if (command.shortcuts?.length) {
+					menuUpdate[key] = shortcutToElectronShortcut(command.shortcuts[0])
+				}
+			}
+
+			this.api.updateMenuAccelerators(menuUpdate)
 		})
 
 		api.onWorkspaceAction((actionName, ...payload) => {
