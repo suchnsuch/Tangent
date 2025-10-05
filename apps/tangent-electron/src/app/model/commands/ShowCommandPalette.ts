@@ -1,6 +1,6 @@
-import type Workspace from "../Workspace";
-import type { CommandContext, CommandOptions } from "./Command";
-import WorkspaceCommand, { PaletteAction } from "./WorkspaceCommand";
+import type Workspace from "../Workspace"
+import type { CommandContext, CommandOptions } from "./Command"
+import WorkspaceCommand from "./WorkspaceCommand"
 
 import CommandPalette from '../../modal/CommandPalette.svelte'
 
@@ -9,12 +9,14 @@ interface ShowCommandPaletteCommandContext extends CommandContext {
 }
 
 interface ShowCommandPaletteCommandOptions extends CommandOptions {
+	name?: string
 	prefix?: string,
 	tooltip?: string
 }
 
 export default class ShowCommandPaletteCommand extends WorkspaceCommand {
 
+	name: string
 	prefix: string
 	tooltip: string
 
@@ -22,6 +24,7 @@ export default class ShowCommandPaletteCommand extends WorkspaceCommand {
 		super(workspace, options)
 
 		if (options) {
+			this.name = options.name
 			this.prefix = options.prefix
 			this.tooltip = options.tooltip
 		}
@@ -42,6 +45,8 @@ export default class ShowCommandPaletteCommand extends WorkspaceCommand {
 	}
 
 	getLabel(context: ShowCommandPaletteCommandContext) {
+		if (this.name) return this.name
+
 		const prefix = context?.prefix ?? this.prefix
 		if (!prefix) {
 			return 'Open File'

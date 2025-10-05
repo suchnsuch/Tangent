@@ -32,7 +32,7 @@ import ShowAllChildMapNodesCommand from './ShowAllChildMapNodes'
 import ShowPreviousSessionCommand from './ShowPreviousSession'
 import DuplicateNodeCommand from './DuplicateNode'
 import { CollapseAllSectionsCommand, CollapseCurrentSectionCommand } from './CollapseSectionCommands'
-export { Command, CommandAction }
+export { Command, CommandAction, WorkspaceCommand }
 
 export interface WorkspaceCommands {
 	[key: string]: WorkspaceCommand
@@ -136,6 +136,7 @@ export default function workspaceCommands(workspace: Workspace): WorkspaceComman
 
 		createNewFile: new CreateNewFileCommand(workspace),
 		createNewNoteFromRule: new ShowCommandPaletteCommand(workspace, {
+			name: 'Create New Note From Rule',
 			prefix: '> Create ',
 			tooltip: 'Creates a new note using a define Note Creation Rule',
 			shortcut: 'Mod+Shift+N'

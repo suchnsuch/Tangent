@@ -22,12 +22,16 @@ export default class DeleteNodeCommand extends WorkspaceCommand {
 		this.workspace.api.file.delete(target)
 	}
 
+	getName() {
+		return 'Delete File'
+	}
+
 	getLabel(context: DeleteNodeCommandContext) {
 		const target = context?.target ?? this.workspace.viewState.tangent.currentNode.value
 		if (target && typeof target !== 'string') {
 			return `Delete "${target.name}"`
 		}
-		return 'Delete File'
+		return this.getName()
 	}
 
 	getTooltip(context?: CommandContext) {

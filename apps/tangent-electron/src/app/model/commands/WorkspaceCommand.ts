@@ -17,6 +17,10 @@ export default abstract class WorkspaceCommand extends Command {
 		this.workspace = workspace
 	}
 
+	getName() {
+		return this.getLabel()
+	}
+
 	getDefaultPaletteName() {
 		return this.getLabel(this.getDefaultPaletteContext())
 	}

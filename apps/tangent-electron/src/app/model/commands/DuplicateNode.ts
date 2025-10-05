@@ -48,12 +48,16 @@ export default class DuplicateNodeCommand extends WorkspaceCommand {
 		return task
 	}
 
+	getName() {
+		return 'Duplicate File'
+	}
+
 	getLabel(context?: DuplicateNodeCommandContext) {
 		const target = context?.target ?? this.workspace.viewState.tangent.currentNode.value
 		if (target) {
 			return `Duplicate "${target.name}"`
 		}
-		return 'Duplicate File'
+		return this.getName()
 	}
 
 	getTooltip(context?: CommandContext) {

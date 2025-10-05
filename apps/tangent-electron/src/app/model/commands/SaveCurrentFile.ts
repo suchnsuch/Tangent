@@ -34,6 +34,10 @@ export default class SaveCurrentFileCommand extends WorkspaceCommand {
 		}
 	}
 
+	getName() {
+		return 'Save File'
+	}
+
 	getLabel(context?: CommandContext) {
 		const node = this.workspace.viewState.tangent?.currentNode.value
 		if (node instanceof File) {

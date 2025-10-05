@@ -57,6 +57,17 @@ export default class ShiftThreadHistoryCommand extends WorkspaceCommand {
 		}
 	}
 
+	getName() {
+		const direction = this.defaultDirection
+
+		if (direction > 0) {
+			return 'Go Forward'
+		}
+		else {
+			return 'Go Back'
+		}
+	}
+
 	getLabel(context?: ShiftThreadHistoryCommandContext) {
 		const direction = context?.direction ?? this.defaultDirection
 
@@ -69,14 +80,7 @@ export default class ShiftThreadHistoryCommand extends WorkspaceCommand {
 	}
 
 	getDefaultPaletteName() {
-		const direction = this.defaultDirection
-
-		if (direction > 0) {
-			return 'Go Forward'
-		}
-		else {
-			return 'Go Back'
-		}
+		this.getName()
 	}
 
 	getTooltip(context?: ShiftThreadHistoryCommandContext) {
