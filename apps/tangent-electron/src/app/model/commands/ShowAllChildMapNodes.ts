@@ -60,7 +60,7 @@ export default class ShowAllChildMapNodesCommand extends WorkspaceCommand {
 		this.workspace.commands.setFocusLevel.execute({ targetFocusLevel: FocusLevel.Map, toggle: false })
 	}
 
-	getDefaultPaletteName() {
+	getLabel() {
 		return 'Show All Outgoing Connections in Map'
 	}
 

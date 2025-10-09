@@ -177,7 +177,7 @@ function windowClick(event: MouseEvent) {
 }
 
 function windowKey(event: KeyboardEvent) {
-	if (event.key === 'Escape') {
+	if (!event.defaultPrevented && event.key === 'Escape') {
 		showMenu = false
 	}
 }

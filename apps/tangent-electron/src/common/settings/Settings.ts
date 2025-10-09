@@ -1,4 +1,4 @@
-import { ObjectStore, PatchableMap } from 'common/stores'
+import { ObjectStore, PatchableMap, RawValueMode } from 'common/stores'
 import Setting, { SettingDefinition } from './Setting'
 
 import { isLinux, isMac } from '../platform'
@@ -43,6 +43,9 @@ class KeymapSettings extends PatchableMap<string, string[], string[]> {
 	}
 	protected convertPatchValueToValue(patchValue: string[]): string[] {
 		return patchValue
+	}
+	protected convertValueToPatch(value: string[], mode?: RawValueMode): string[] {
+		return value
 	}
 }
 

@@ -111,13 +111,17 @@ export function shortcutFromEvent(event: KeyboardEvent) {
 	if (event.altKey) shortcutArray.push('Alt')
 	if (event.shiftKey) shortcutArray.push('Shift')
 
-	if (!modifierKeys[event.key]) {
+	if (!eventIsModifier(event)) {
 		shortcutArray.push(codeToShortcutKey(event.code))
 	}
 
 	let shortcut = shortcutArray.join('+')
 
 	return shortcut
+}
+
+export function eventIsModifier(event: KeyboardEvent) {
+	return modifierKeys[event.key]
 }
 
 export function eventIsShortcutable(event: KeyboardEvent) {
