@@ -44,6 +44,11 @@ function doesCommandMatch(command: WorkspaceCommand, matcher: RegExp) {
 	return false
 }
 
+type CommandGroup = {
+	title: string
+	commands: LabeledCommand[]
+}
+
 type LabeledCommand = {
 	key: string,
 	command: WorkspaceCommand,
@@ -52,15 +57,25 @@ type LabeledCommand = {
 
 let filter = ''
 $: list = getKeyboardList(workspace.commands, $keymap, filter)
-function getKeyboardList(commands: WorkspaceCommands, keymap: Map<string, string[]>, filter: string): LabeledCommand[] {
-	let result = [] as LabeledCommand[]
+function getKeyboardList(commands: WorkspaceCommands, keymap: Map<string, string[]>, filter: string): CommandGroup[] {
+	let groups = new Map<string, CommandGroup>()
 
 	const matcher = filter ? buildMatcher(filter) : null
 
 	for (const key of Object.keys(commands)) {
 		const command = commands[key]
 		if (doesCommandMatch(command, matcher)) {
-			result.push({
+
+			let group = groups.get(command.group)
+			if (!group) {
+				group = {
+					title: command.group || 'Global',
+					commands: []
+				}
+				groups.set(command.group, group)
+			}
+
+			group.commands.push({
 				key,
 				command,
 				label: command.getName() ?? key
@@ -68,15 +83,27 @@ function getKeyboardList(commands: WorkspaceCommands, keymap: Map<string, string
 		}
 	}
 
-	result.sort((a, b) => {
-		if (a.label < b.label) {
+	let result = [...groups.values()].sort((a, b) => {
+		if (a.title < b.title) {
 			return -1
 		}
-		if (a.label > b.label) {
+		if (a.title > b.title) {
 			return 1
 		}
 		return 0
 	})
+
+	for (const group of result) {
+		group.commands.sort((a, b) => {
+			if (a.label < b.label) {
+				return -1
+			}
+			if (a.label > b.label) {
+				return 1
+			}
+			return 0
+		})
+	}
 
 	return result
 }
@@ -102,9 +129,12 @@ function stopEditing() {
 }
 
 function validate(shortcut: string) {
+	const targetCommand = workspace.commands[editTarget.key]
+
 	for (const key of Object.keys(workspace.commands)) {
 		const command = workspace.commands[key]
-		if (command.shortcuts) {
+		if (command === targetCommand) continue
+		if (command.shortcuts && (!command.group || targetCommand.group.startsWith(command.group))) {
 			for (const sc of command.shortcuts) {
 				if (sc == shortcut) {
 					return 'This shortcut is used by "' + command.getName() + '"'
@@ -141,23 +171,57 @@ function resetToDefault(key: string) {
 <main>
 	<nav><input type="search" bind:value={filter} placeholder="Search" /></nav>
 	<table>
-		<tr>
-			<th>Command</th>
-			<th>Bindings</th>
-			<th></th>
-		</tr>
-		{#each list as item (item.command)}
-			{@const shortcuts = item.command.shortcuts ?? emptyShortcuts}
+		{#each list as group (group.title)}
 			<tr>
-				<td class="label" use:tooltip={{
-					tooltip: ShortcutsEditorCommandTooltip,
-					args: item
-				}}>
-					{item.label}
-				</td>
-				<td>
-					{#each shortcuts as shortcut, index}
-						{#if editTarget && editTarget.key === item.key && editTarget.index === index}
+				<th>{group.title} Commands</th>
+				<th>Bindings</th>
+				<th></th>
+			</tr>
+			{#each group.commands as item (item.command)}
+				{@const shortcuts = item.command.shortcuts ?? emptyShortcuts}
+				<tr>
+					<td class="label" use:tooltip={{
+						tooltip: ShortcutsEditorCommandTooltip,
+						args: item
+					}}>
+						{item.label}
+					</td>
+					<td>
+						{#each shortcuts as shortcut, index}
+							{#if editTarget && editTarget.key === item.key && editTarget.index === index}
+								<div>
+									<ShortcutInput
+										{validate}
+										onCancel={stopEditing}
+										onAccept={acceptEdit}
+									/>
+								</div>
+							{:else}
+								<div class="bindingRow">
+									<button
+										on:click={() => startEditing(item, index) }
+										use:tooltip={"Click to set binding"}
+									>
+										{shortcutDisplayString(shortcut)}
+									</button>
+									<button class="action remove subtle"
+										on:click={() => removeBinding(item, index)}
+										use:tooltip={"Remove this binding"}
+									>
+										<SVGIcon size={16} ref="close.svg#close" />
+									</button>
+									{#if index === shortcuts.length - 1}
+										<button class="action add subtle"
+											on:click={() => startEditing(item, index + 1)}
+											use:tooltip={"Add a new binding"}
+										>
+											<SVGIcon size={16} ref="plus.svg#plus" />
+										</button>
+									{/if}
+								</div>
+							{/if}
+						{/each}
+						{#if editTarget && editTarget.key === item.key && editTarget.index === shortcuts.length}
 							<div>
 								<ShortcutInput
 									{validate}
@@ -165,60 +229,28 @@ function resetToDefault(key: string) {
 									onAccept={acceptEdit}
 								/>
 							</div>
-						{:else}
+						{:else if shortcuts.length === 0}
 							<div class="bindingRow">
-								<button
-									on:click={() => startEditing(item, index) }
-									use:tooltip={"Click to set binding"}
+								<button class="action add subtle"
+									on:click={() => startEditing(item, 0)}
+									use:tooltip={"Add a new binding"}
 								>
-									{shortcutDisplayString(shortcut)}
+									<SVGIcon size={16} ref="plus.svg#plus" />
 								</button>
-								<button class="action remove subtle"
-									on:click={() => removeBinding(item, index)}
-									use:tooltip={"Remove this binding"}
-								>
-									<SVGIcon size={16} ref="close.svg#close" />
-								</button>
-								{#if index === shortcuts.length - 1}
-									<button class="action add subtle"
-										on:click={() => startEditing(item, index + 1)}
-										use:tooltip={"Add a new binding"}
-									>
-										<SVGIcon size={16} ref="plus.svg#plus" />
-									</button>
-								{/if}
 							</div>
 						{/if}
-					{/each}
-					{#if editTarget && editTarget.key === item.key && editTarget.index === shortcuts.length}
-						<div>
-							<ShortcutInput
-								{validate}
-								onCancel={stopEditing}
-								onAccept={acceptEdit}
-							/>
-						</div>
-					{:else if shortcuts.length === 0}
-						<div class="bindingRow">
-							<button class="action add subtle"
-								on:click={() => startEditing(item, 0)}
-								use:tooltip={"Add a new binding"}
-							>
-								<SVGIcon size={16} ref="plus.svg#plus" />
-							</button>
-						</div>
-					{/if}
-				</td>
-				<td>
-					<button class="subtle"
-						class:hidden={deepEqual(item.command.shortcuts, item.command.defaultShortcuts)}
-						on:click={() => resetToDefault(item.key)}
-						use:tooltip={"Reset to default bindings"}
-					>
-						<SVGIcon size={16} ref="reset.svg#arc" />
-					</button>
-				</td>
-			</tr>
+					</td>
+					<td>
+						<button class="subtle"
+							class:hidden={deepEqual(item.command.shortcuts, item.command.defaultShortcuts)}
+							on:click={() => resetToDefault(item.key)}
+							use:tooltip={"Reset to default bindings"}
+						>
+							<SVGIcon size={16} ref="reset.svg#arc" />
+						</button>
+					</td>
+				</tr>
+			{/each}
 		{/each}
 	</table>
 </main>
@@ -229,6 +261,14 @@ nav {
 }
 .hidden {
 	visibility: hidden;
+}
+
+th {
+	padding-top: 1em;
+}
+
+.label {
+	line-height: 1.5em;
 }
 
 .bindingRow {

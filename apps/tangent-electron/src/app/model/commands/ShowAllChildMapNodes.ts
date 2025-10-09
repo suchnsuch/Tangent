@@ -13,7 +13,7 @@ interface ShowAllChildMapNodesCommandContext extends CommandContext {
 
 export default class ShowAllChildMapNodesCommand extends WorkspaceCommand {
 	constructor(workspace: Workspace) {
-		super(workspace)
+		super(workspace, { group: 'Map' })
 	}
 
 	getSession(context?: ShowAllChildMapNodesCommandContext) {

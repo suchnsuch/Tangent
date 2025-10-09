@@ -10,7 +10,7 @@ export interface ArchivePreviousSessionsCommandContext extends CommandContext {
 
 export default class ArchivePreviousSessionsCommand extends WorkspaceCommand {
 	constructor(workspace: Workspace) {
-		super(workspace)
+		super(workspace, { group: 'Map' })
 	}
 
 	execute(context?: ArchivePreviousSessionsCommandContext): void {

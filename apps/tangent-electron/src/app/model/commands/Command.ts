@@ -9,6 +9,13 @@ export interface CommandContext {
 export type AnyCommandContext = CommandContext & { [key: string]: any }
 
 export interface CommandOptions {
+	/**
+	 * The group this command exists in for the purposes of binding collision.
+	 * A blank group implicitly means "global".
+	 * Groups can be nested. "foo.bar" is a sub-group of "foo".
+	 */
+	group?: string
+
 	/** Shortcuts set on construction are considered the default shortcuts */
 	shortcuts?: string[]
 	/** Alias for a single shortcut */
@@ -19,6 +26,7 @@ type CommandSubscriber = (command: Command) => void
 
 export default abstract class Command {
 
+	group: string
 	defaultShortcuts: string[]
 	shortcuts: string[]
 
@@ -27,6 +35,8 @@ export default abstract class Command {
 	private subscribers: CommandSubscriber[] = []
 
 	constructor(options?: CommandOptions) {
+		this.group = options?.group ?? ''
+		
 		if (options?.shortcuts) {
 			this.shortcuts = options.shortcuts
 		}

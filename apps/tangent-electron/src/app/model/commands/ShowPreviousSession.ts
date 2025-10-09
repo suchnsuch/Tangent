@@ -9,7 +9,7 @@ interface ShowPreviousSessionCommandContext extends CommandContext {
 
 export default class ShowPreviousSessionCommand extends WorkspaceCommand {
 	constructor(workspace: Workspace) {
-		super(workspace)
+		super(workspace, { group: 'Map' })
 	}
 
 	getSession(context?: ShowPreviousSessionCommandContext): Session {

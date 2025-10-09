@@ -6,7 +6,7 @@ import WorkspaceCommand from './WorkspaceCommand'
 export class CreateNewSessionCommand extends WorkspaceCommand {
 
 	constructor(workspace: Workspace) {
-		super(workspace)
+		super(workspace, { group: 'Map' })
 	}
 
 	execute(context?: CommandContext) {
@@ -34,7 +34,7 @@ export interface CreateNewSessionFromThreadCommandContext extends CommandContext
 
 export class CreateNewSessionFromThreadCommand extends WorkspaceCommand {
 	constructor(workspace: Workspace) {
-		super(workspace)
+		super(workspace, { group: 'Map' })
 	}
 
 	execute(context?: CreateNewSessionFromThreadCommandContext) {

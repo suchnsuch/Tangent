@@ -19,9 +19,7 @@ import ModalStateView from 'app/modal/ModalStateView.svelte'
 import LeftSidebar from './LeftSidebar.svelte'
 import SvgIcon from './smart-icons/SVGIcon.svelte'
 import ThreadHistoryListView from './summaries/ThreadHistoryListView.svelte'
-import { PasteTextEvent } from 'app/events'
 import { createCommandHandler } from 'app/model/commands/Command'
-import { tooltip } from 'app/utils/tooltips'
 
 export let workspace:Workspace
 
@@ -29,7 +27,7 @@ setContext('workspace', workspace)
 
 $: focusLevel = workspace.viewState.tangent.focusLevel
 $: targetFocusModeLevel = workspace.viewState.targetFocusModeLevel
-$: topCommandHandler = createCommandHandler(Object.values(workspace.commands).filter(c => c.isTopShortcutCommand))
+$: topCommandHandler = createCommandHandler(Object.values(workspace.commands).filter(c => !c.group))
 
 // Top bar
 let hoveringForTopBar = false

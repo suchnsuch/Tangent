@@ -37,8 +37,6 @@ export default abstract class WorkspaceCommand extends Command {
 		return []
 	}
 
-	get isTopShortcutCommand() { return this.shortcuts?.length > 0 }
-
 	protected getDefaultPaletteContext(): CommandContext {
 		return {}
 	}

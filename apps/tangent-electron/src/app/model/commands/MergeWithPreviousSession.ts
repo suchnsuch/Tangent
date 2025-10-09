@@ -10,7 +10,7 @@ interface MergeWithPreviousSessionCommandContext extends CommandContext {
 
 export default class MergeWithPreviousSessionCommand extends WorkspaceCommand {
 	constructor(workspace: Workspace) {
-		super(workspace)
+		super(workspace, { group: 'Map' })
 	}
 
 	getSession(context?: MergeWithPreviousSessionCommandContext): Session {

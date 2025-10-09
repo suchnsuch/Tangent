@@ -302,8 +302,7 @@ function optionTooltip(option) {
 }
 
 function shouldShowShortcut(action: PaletteAction) {
-	if (action.shortcuts === null) return false
-	return action.command.shortcuts && action.command.isTopShortcutCommand
+	return action.shortcuts?.length > 0
 }
 
 </script>

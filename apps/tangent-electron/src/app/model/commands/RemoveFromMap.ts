@@ -108,13 +108,11 @@ export abstract class RemoveFromMapCommand extends WorkspaceCommand {
 			}
 		}
 	}
-
-	get isTopShortcutCommand() { return false }
 }
 
 export class RemoveNodeFromMapCommand extends RemoveFromMapCommand {
 	constructor(workspace: Workspace) {
-		super(workspace, { shortcuts: ['Backspace'] })
+		super(workspace, { group: 'Map', shortcuts: ['Backspace'] })
 	}
 
 	execute(context?: RemoveFromMapCommandContext): void {
@@ -144,7 +142,7 @@ export class RemoveNodeFromMapCommand extends RemoveFromMapCommand {
 
 export class RemoveNodeAndChildrenFromMapCommand extends RemoveFromMapCommand {
 	constructor(workspace: Workspace) {
-		super(workspace, { shortcuts: ['Mod+Backspace'] })
+		super(workspace, { group: 'Map', shortcuts: ['Mod+Backspace'] })
 	}
 
 	execute(context?: RemoveFromMapCommandContext): void {
@@ -185,7 +183,7 @@ export class RemoveNodeAndChildrenFromMapCommand extends RemoveFromMapCommand {
 
 export class RemoveEverythingButNodeFromMapCommand extends RemoveFromMapCommand {
 	constructor(workspace: Workspace) {
-		super(workspace, { shortcuts: ['Mod+Alt+Backspace'] })
+		super(workspace, { group: 'Map', shortcuts: ['Mod+Alt+Backspace'] })
 	}
 
 	execute(context?: RemoveFromMapCommandContext): void {
@@ -232,7 +230,7 @@ export class RemoveEverythingButNodeFromMapCommand extends RemoveFromMapCommand 
 
 export class RemoveEverythingButThreadFromMapCommand extends RemoveFromMapCommand {
 	constructor(workspace: Workspace) {
-		super(workspace, { shortcuts: ['Mod+Alt+Shift+Backspace'] })
+		super(workspace, { group: 'Map', shortcuts: ['Mod+Alt+Shift+Backspace'] })
 	}
 
 	execute(context?: RemoveFromMapCommandContext): void {
