@@ -6,7 +6,7 @@ export interface CommandContext {
 	initiatingEvent?: Event
 }
 
-export type AnyCommandContet = CommandContext & { [key: string]: any }
+export type AnyCommandContext = CommandContext & { [key: string]: any }
 
 export interface CommandOptions {
 	/** Shortcuts set on construction are considered the default shortcuts */

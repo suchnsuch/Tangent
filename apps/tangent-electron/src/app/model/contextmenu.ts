@@ -1,9 +1,9 @@
-import type { AnyCommandContet } from './commands/Command'
+import type { AnyCommandContext } from './commands/Command'
 import type WorkspaceCommand from './commands/WorkspaceCommand'
 
 export interface ContextMenuCommand {
 	command?: WorkspaceCommand
-	commandContext?: AnyCommandContet,
+	commandContext?: AnyCommandContext,
 	click?: () => void
 }
 

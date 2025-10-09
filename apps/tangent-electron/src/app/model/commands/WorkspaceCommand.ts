@@ -1,10 +1,10 @@
-import Command, { AnyCommandContet, CommandContext, CommandOptions } from "./Command"
+import Command, { AnyCommandContext, CommandContext, CommandOptions } from "./Command"
 import type Workspace from "../Workspace"
 
 export interface PaletteAction {
 	name: string,
 	command: WorkspaceCommand,
-	context?: AnyCommandContet,
+	context?: AnyCommandContext,
 	shortcuts?: string[] | null
 }
 

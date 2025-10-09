@@ -1,11 +1,11 @@
 import { shortcutsDisplayString } from 'app/utils/shortcuts';
-import Command, { AnyCommandContet, CommandContext } from "./Command";
+import Command, { AnyCommandContext, CommandContext } from "./Command";
 import { dropTooltip, requestTooltip, TooltipDefOrConfig, TooltipFunction, tooltipToConfig } from 'app/utils/tooltips';
 import { Placement } from '@floating-ui/dom';
 
 export interface CommandActionOptions {
 	command: Command
-	context?: AnyCommandContet
+	context?: AnyCommandContext
 	/** If false, click handler will not be added. Default true. */
 	includeClick?: boolean
 	/** If true, will prevent the default behavior of the click. Default false. */
