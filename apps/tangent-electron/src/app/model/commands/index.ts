@@ -37,6 +37,7 @@ export { Command, CommandAction, WorkspaceCommand }
 export interface WorkspaceCommands {
 	[key: string]: WorkspaceCommand
 
+	// Global
 	openWorkspace: OpenWorkspaceCommand
 
 	toggleLeftSidebar: ToggleSidebarCommand
@@ -47,29 +48,6 @@ export interface WorkspaceCommands {
 	createNewFolder: CreateNewFolderCommand
 
 	openQueryPane: OpenQueryPaneCommand
-
-	toggleBold: NoteKeyboardProxyCommand
-	toggleItalics: NoteKeyboardProxyCommand
-	toggleHighlight: NoteKeyboardProxyCommand
-	toggleInlineCode: NoteKeyboardProxyCommand
-	toggleWikiLink: NoteKeyboardProxyCommand
-	toggleMDLink: NoteKeyboardProxyCommand
-	showIncomingLinks: NoteKeyboardProxyCommand
-
-	setHeader1: NoteKeyboardProxyCommand
-	setHeader2: NoteKeyboardProxyCommand
-	setHeader3: NoteKeyboardProxyCommand
-	setHeader4: NoteKeyboardProxyCommand
-	setHeader5: NoteKeyboardProxyCommand
-	setHeader6: NoteKeyboardProxyCommand
-
-	setParagraph: NoteKeyboardProxyCommand
-
-	collapseCurrentSection: CollapseCurrentSectionCommand
-	collapseAllSections: CollapseAllSectionsCommand
-	expandAllSections: CollapseAllSectionsCommand
-	collapseSmallestSections: CollapseAllSectionsCommand
-	expandLargestSections: CollapseAllSectionsCommand
 
 	goTo: ShowCommandPaletteCommand
 	openInFileBrowser: ShowInFileBrowserCommand
@@ -100,22 +78,9 @@ export interface WorkspaceCommands {
 	setSentenceFocusLevel: SetFocusLevelCommand
 	toggleFocusMode: ToggleFocusModeCommand
 
-	mergeWithPreviousSession: MergeWithPreviousSessionCommand
-	createNewSession: CreateNewSessionCommand
-	createNewSessionFromThread: CreateNewSessionFromThreadCommand
-	archivePreviousSessions: ArchivePreviousSessionsCommand
-	showPreviousSession: ShowPreviousSessionCommand
-
 	shiftHistoryBack: ShiftThreadHistoryCommand
 	shiftHistoryForward: ShiftThreadHistoryCommand
 
-	showAllChildMapNodes: ShowAllChildMapNodesCommand
-	
-	removeNodeFromMap: RemoveNodeFromMapCommand
-	removeNodeAndChildrenFromMap: RemoveNodeAndChildrenFromMapCommand
-	removeEverythingButNodeFromMap: RemoveEverythingButNodeFromMapCommand
-	removeEverythingButThreadFromMap: RemoveEverythingButThreadFromMapCommand
-	
 	zoomIn: ZoomCommand
 	zoomOut: ZoomCommand
 	resetZoom: ZoomCommand
@@ -124,6 +89,46 @@ export interface WorkspaceCommands {
 
 	openLogs: OpenLogsCommand
 	openChangelog: OpenChangelogCommand
+
+
+	// Maps
+	mergeWithPreviousSession: MergeWithPreviousSessionCommand
+	createNewSession: CreateNewSessionCommand
+	createNewSessionFromThread: CreateNewSessionFromThreadCommand
+	archivePreviousSessions: ArchivePreviousSessionsCommand
+	showPreviousSession: ShowPreviousSessionCommand
+
+	showAllChildMapNodes: ShowAllChildMapNodesCommand
+	
+	removeNodeFromMap: RemoveNodeFromMapCommand
+	removeNodeAndChildrenFromMap: RemoveNodeAndChildrenFromMapCommand
+	removeEverythingButNodeFromMap: RemoveEverythingButNodeFromMapCommand
+	removeEverythingButThreadFromMap: RemoveEverythingButThreadFromMapCommand
+
+	
+	// Notes
+	toggleBold: NoteKeyboardProxyCommand
+	toggleItalics: NoteKeyboardProxyCommand
+	toggleHighlight: NoteKeyboardProxyCommand
+	toggleInlineCode: NoteKeyboardProxyCommand
+	toggleWikiLink: NoteKeyboardProxyCommand
+	toggleMDLink: NoteKeyboardProxyCommand
+	showIncomingLinks: NoteKeyboardProxyCommand
+
+	setHeader1: NoteKeyboardProxyCommand
+	setHeader2: NoteKeyboardProxyCommand
+	setHeader3: NoteKeyboardProxyCommand
+	setHeader4: NoteKeyboardProxyCommand
+	setHeader5: NoteKeyboardProxyCommand
+	setHeader6: NoteKeyboardProxyCommand
+
+	setParagraph: NoteKeyboardProxyCommand
+
+	collapseCurrentSection: CollapseCurrentSectionCommand
+	collapseAllSections: CollapseAllSectionsCommand
+	expandAllSections: CollapseAllSectionsCommand
+	collapseSmallestSections: CollapseAllSectionsCommand
+	expandLargestSections: CollapseAllSectionsCommand
 }
 
 export default function workspaceCommands(workspace: Workspace): WorkspaceCommands {
@@ -145,6 +150,95 @@ export default function workspaceCommands(workspace: Workspace): WorkspaceComman
 
 		openQueryPane: new OpenQueryPaneCommand(workspace),
 
+		goTo: new ShowCommandPaletteCommand(workspace, { shortcut: 'Mod+O' }),
+		openInFileBrowser: new ShowInFileBrowserCommand(workspace),
+		
+		do: new ShowCommandPaletteCommand(workspace, { shortcut: 'Mod+P', prefix: '> ' }),
+
+		closeCurrentFile: new CloseFileCommand(workspace, { mode: 'current', shortcut: 'Mod+W' }),
+		closeOtherFiles: new CloseFileCommand(workspace, { mode: 'others', shortcut: 'Mod+Shift+W'}),
+		closeLeftFiles: new CloseFileCommand(workspace, { mode: 'left' }),
+		closeRightFiles: new CloseFileCommand(workspace, { mode: 'right' }),
+
+		saveCurrentFile: new SaveCurrentFileCommand(workspace),
+
+		moveToLeftFile: new ChangeCurrentFileCommand(workspace, { mode: 'left', shortcut: 'Mod+Alt+Left' }),
+		moveToRightFile: new ChangeCurrentFileCommand(workspace, { mode: 'right', shortcut: 'Mod+Alt+Right' }),
+
+		moveFile: new MoveFileCommand(workspace),
+		duplicateNode: new DuplicateNodeCommand(workspace),
+		deleteNode: new DeleteNodeCommand(workspace),
+
+		setFocusLevel: new SetFocusLevelCommand(workspace, null, true),
+		setMapFocusLevel: new SetFocusLevelCommand(workspace, {
+			targetFocusLevel: FocusLevel.Map,
+			toggle: true,
+			shortcut: 'Mod+G'
+		}),
+		setThreadFocusLevel: new SetFocusLevelCommand(workspace, {
+			targetFocusLevel: FocusLevel.Thread
+		}),
+		setFileFocusLevel: new SetFocusLevelCommand(workspace, {
+			targetFocusLevel: FocusLevel.File
+		}),
+		setTypewriterFocusLevel: new SetFocusLevelCommand(workspace, {
+			targetFocusLevel: FocusLevel.Typewriter
+		}),
+		setParagraphFocusLevel: new SetFocusLevelCommand(workspace, {
+			targetFocusLevel: FocusLevel.Paragraph
+		}),
+		setLineFocusLevel: new SetFocusLevelCommand(workspace, {
+			targetFocusLevel: FocusLevel.Line
+		}),
+		setSentenceFocusLevel: new SetFocusLevelCommand(workspace, {
+			targetFocusLevel: FocusLevel.Sentence
+		}),
+		toggleFocusMode: new ToggleFocusModeCommand(workspace),
+
+		shiftHistoryBack: new ShiftThreadHistoryCommand(workspace, {
+			direction: -1,
+			shortcut: 'Mod+Shift+['
+		}),
+		shiftHistoryForward: new ShiftThreadHistoryCommand(workspace, {
+			direction: 1,
+			shortcut: 'Mod+Shift+]'
+		}),
+
+		zoomIn: new ZoomCommand(workspace, {
+			direction: 1,
+			shortcut: 'Mod+Shift+='
+		}),
+		zoomOut: new ZoomCommand(workspace, {
+			direction: -1,
+			shortcut: 'Mod+Shift+-'
+		}),
+		resetZoom: new ZoomCommand(workspace, {
+			direction: 'reset',
+			shortcut: 'Mod+Shift+0'
+		}),
+
+		floatWindow: new FloatWindowCommand(workspace),
+
+		openLogs: new OpenLogsCommand(workspace),
+		openChangelog: new OpenChangelogCommand(workspace),
+
+
+		// Maps
+		showAllChildMapNodes: new ShowAllChildMapNodesCommand(workspace),
+
+		removeNodeFromMap: new RemoveNodeFromMapCommand(workspace),
+		removeNodeAndChildrenFromMap: new RemoveNodeAndChildrenFromMapCommand(workspace),
+		removeEverythingButNodeFromMap: new RemoveEverythingButNodeFromMapCommand(workspace),
+		removeEverythingButThreadFromMap: new RemoveEverythingButThreadFromMapCommand(workspace),
+		
+		mergeWithPreviousSession: new MergeWithPreviousSessionCommand(workspace),
+		createNewSession: new CreateNewSessionCommand(workspace),
+		createNewSessionFromThread: new CreateNewSessionFromThreadCommand(workspace),
+		archivePreviousSessions: new ArchivePreviousSessionsCommand(workspace),
+		showPreviousSession: new ShowPreviousSessionCommand(workspace),
+
+
+		// Notes
 		toggleBold: new NoteKeyboardProxyCommand(workspace, {
 			shortcut: 'Mod+B',
 			label: 'Toggle Bold',
@@ -250,90 +344,5 @@ export default function workspaceCommands(workspace: Workspace): WorkspaceComman
 			focus: true,
 			tooltip: 'Opens the information panel of the current note, revealing any links to that note from other notes.'
 		}),
-
-		goTo: new ShowCommandPaletteCommand(workspace, { shortcut: 'Mod+O' }),
-		openInFileBrowser: new ShowInFileBrowserCommand(workspace),
-		
-		do: new ShowCommandPaletteCommand(workspace, { shortcut: 'Mod+P', prefix: '> ' }),
-
-		closeCurrentFile: new CloseFileCommand(workspace, { mode: 'current', shortcut: 'Mod+W' }),
-		closeOtherFiles: new CloseFileCommand(workspace, { mode: 'others', shortcut: 'Mod+Shift+W'}),
-		closeLeftFiles: new CloseFileCommand(workspace, { mode: 'left' }),
-		closeRightFiles: new CloseFileCommand(workspace, { mode: 'right' }),
-
-		saveCurrentFile: new SaveCurrentFileCommand(workspace),
-
-		moveToLeftFile: new ChangeCurrentFileCommand(workspace, { mode: 'left', shortcut: 'Mod+Alt+Left' }),
-		moveToRightFile: new ChangeCurrentFileCommand(workspace, { mode: 'right', shortcut: 'Mod+Alt+Right' }),
-
-		moveFile: new MoveFileCommand(workspace),
-		duplicateNode: new DuplicateNodeCommand(workspace),
-		deleteNode: new DeleteNodeCommand(workspace),
-
-		setFocusLevel: new SetFocusLevelCommand(workspace, null, true),
-		setMapFocusLevel: new SetFocusLevelCommand(workspace, {
-			targetFocusLevel: FocusLevel.Map,
-			toggle: true,
-			shortcut: 'Mod+G'
-		}),
-		setThreadFocusLevel: new SetFocusLevelCommand(workspace, {
-			targetFocusLevel: FocusLevel.Thread
-		}),
-		setFileFocusLevel: new SetFocusLevelCommand(workspace, {
-			targetFocusLevel: FocusLevel.File
-		}),
-		setTypewriterFocusLevel: new SetFocusLevelCommand(workspace, {
-			targetFocusLevel: FocusLevel.Typewriter
-		}),
-		setParagraphFocusLevel: new SetFocusLevelCommand(workspace, {
-			targetFocusLevel: FocusLevel.Paragraph
-		}),
-		setLineFocusLevel: new SetFocusLevelCommand(workspace, {
-			targetFocusLevel: FocusLevel.Line
-		}),
-		setSentenceFocusLevel: new SetFocusLevelCommand(workspace, {
-			targetFocusLevel: FocusLevel.Sentence
-		}),
-		toggleFocusMode: new ToggleFocusModeCommand(workspace),
-
-		showAllChildMapNodes: new ShowAllChildMapNodesCommand(workspace),
-
-		removeNodeFromMap: new RemoveNodeFromMapCommand(workspace),
-		removeNodeAndChildrenFromMap: new RemoveNodeAndChildrenFromMapCommand(workspace),
-		removeEverythingButNodeFromMap: new RemoveEverythingButNodeFromMapCommand(workspace),
-		removeEverythingButThreadFromMap: new RemoveEverythingButThreadFromMapCommand(workspace),
-		
-		mergeWithPreviousSession: new MergeWithPreviousSessionCommand(workspace),
-		createNewSession: new CreateNewSessionCommand(workspace),
-		createNewSessionFromThread: new CreateNewSessionFromThreadCommand(workspace),
-		archivePreviousSessions: new ArchivePreviousSessionsCommand(workspace),
-		showPreviousSession: new ShowPreviousSessionCommand(workspace),
-
-		shiftHistoryBack: new ShiftThreadHistoryCommand(workspace, {
-			direction: -1,
-			shortcut: 'Mod+Shift+['
-		}),
-		shiftHistoryForward: new ShiftThreadHistoryCommand(workspace, {
-			direction: 1,
-			shortcut: 'Mod+Shift+]'
-		}),
-
-		zoomIn: new ZoomCommand(workspace, {
-			direction: 1,
-			shortcut: 'Mod+Shift+='
-		}),
-		zoomOut: new ZoomCommand(workspace, {
-			direction: -1,
-			shortcut: 'Mod+Shift+-'
-		}),
-		resetZoom: new ZoomCommand(workspace, {
-			direction: 'reset',
-			shortcut: 'Mod+Shift+0'
-		}),
-
-		floatWindow: new FloatWindowCommand(workspace),
-
-		openLogs: new OpenLogsCommand(workspace),
-		openChangelog: new OpenChangelogCommand(workspace)
 	}
 }
