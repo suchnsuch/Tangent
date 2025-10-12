@@ -7,14 +7,27 @@ const fs = require('fs');
 const mode = process.env.NODE_ENV || 'production';
 const prod = mode === 'production';
 
-function findAndResolvePath(moduleName, ...partialPath) {
-	try {
-		const modulePath = require.resolve(moduleName)
-		const rootPath = modulePath.slice(0, modulePath.lastIndexOf('/node_modules'))
-		return path.join(rootPath, 'node_modules', moduleName, ...partialPath)
-	} catch {
-		console.log('Failed to resolve', moduleName, ...partialPath)
+function findAndResolvePath(partialPath) {
+	// Depending on package de-dupes, the svelte module could be
+	// at various levels of node_modules.
+	// This searches for a particular file path in the tree.
+	// Feels like a big ol hack, but if it works it works.
+	let steppingPath = partialPath
+	let max = 10
+	while (max > 0) {
+		const resolved = path.resolve(steppingPath)
+		try {
+			const stats = fs.statSync(resolved)
+			console.log('Resolved', partialPath, 'to', resolved)
+			return resolved
+		}
+		catch (e) {
+			max--
+			steppingPath = path.join('../', steppingPath)
+		}
 	}
+	console.log('Failed to resolve', partialPath)
+	return undefined;
 }
 
 module.exports = {
@@ -24,7 +37,7 @@ module.exports = {
 	resolve: {
 		alias: {
 			// We want to resolve against the runtime of svelte, not other elements
-			svelte: findAndResolvePath('svelte', 'src', 'runtime')
+			svelte: findAndResolvePath('node_modules/svelte/src/runtime')
 		},
 		extensions: ['.mjs', '.js', '.svelte', '.ts'],
 		mainFields: ['svelte', 'browser', 'module', 'main'],
@@ -133,4 +146,4 @@ module.exports = {
 	devServer: {
 		hot: true
 	}
-}
+};
