@@ -7,6 +7,7 @@ import MarkdownEditor from './MarkdownEditor'
 import { Workspace } from 'app/model'
 import { getSelectedLines, lineToText } from 'common/typewriterUtils'
 import { ShortcutEvent } from 'typewriter-editor'
+import { shiftGroup, shiftLines, toggleBold, toggleItalic, toggleLineComment, toggleLink, toggleWikiLink } from './editorActions'
 
 let editor: MarkdownEditor
 const waitTime = 10
@@ -425,7 +426,7 @@ describe('Comment Toggling', () => {
 This is an uncommented line`)
 		editor.select(7)
 		await wait(waitTime)
-		editor.mainModule.toggleLineComment()
+		toggleLineComment(editor)
 
 		expect(editor.getText()).toEqual(`
 //This is an uncommented line`)
@@ -437,7 +438,7 @@ This is an uncommented line`)
 This is line // with a comment`)
 		editor.select(20)
 		await wait(waitTime)
-		editor.mainModule.toggleLineComment()
+		toggleLineComment(editor)
 
 		// Note the removal of extra whitespace
 		expect(editor.getText()).toEqual(`
@@ -451,7 +452,7 @@ This is line 1
 This is line 2`)
 		editor.select([7, 24])
 		await wait(waitTime)
-		editor.mainModule.toggleLineComment()
+		toggleLineComment(editor)
 
 		expect(editor.getText()).toEqual(`
 //This is line 1
@@ -465,7 +466,7 @@ This is line 2`)
 //This is line 2`)
 		editor.select([7, 24])
 		await wait(waitTime)
-		editor.mainModule.toggleLineComment()
+		toggleLineComment(editor)
 
 		expect(editor.getText()).toEqual(`
 This is line 1
@@ -480,7 +481,7 @@ This is line 2`)
 //This is line 3`)
 		editor.select([7, 24])
 		await wait(waitTime)
-		editor.mainModule.toggleLineComment()
+		toggleLineComment(editor)
 
 		expect(editor.getText()).toEqual(`
 This is line 1
@@ -495,7 +496,7 @@ This is line 1
 //This is line 2`)
 		editor.select([7, 24])
 		await wait(waitTime)
-		editor.mainModule.toggleLineComment()
+		toggleLineComment(editor)
 
 		expect(editor.getText()).toEqual(`
 //This is line 1
@@ -509,7 +510,7 @@ This is line 1
 This is line 2`)
 		editor.select([7, 24])
 		await wait(waitTime)
-		editor.mainModule.toggleLineComment()
+		toggleLineComment(editor)
 
 		expect(editor.getText()).toEqual(`
 This is line 1
@@ -523,7 +524,7 @@ describe('Inline formatting', () => {
 		editor.doc = markdownToTextDocument(`This is a line of text.`)
 		editor.select(12)
 		await wait(waitTime)
-		editor.mainModule.toggleItalic()
+		toggleItalic(editor)
 
 		expect(editor.getText()).toEqual('This is a _line_ of text.')
 		expect(editor.doc.selection).toEqual([13, 13])
@@ -532,7 +533,7 @@ describe('Inline formatting', () => {
 		editor.doc = markdownToTextDocument(`This is a line of text.`)
 		editor.select(12)
 		await wait(waitTime)
-		editor.mainModule.toggleBold()
+		toggleBold(editor)
 
 		expect(editor.getText()).toEqual('This is a **line** of text.')
 		expect(editor.doc.selection).toEqual([14, 14])
@@ -542,7 +543,7 @@ describe('Inline formatting', () => {
 		editor.doc = markdownToTextDocument(`This is a line of text.`)
 		editor.select(14)
 		await wait(waitTime)
-		editor.mainModule.toggleItalic()
+		toggleItalic(editor)
 
 		expect(editor.getText()).toEqual('This is a _line_ of text.')
 		expect(editor.doc.selection).toEqual([16, 16]) // _after_ formatting characters
@@ -552,7 +553,7 @@ describe('Inline formatting', () => {
 		editor.doc = markdownToTextDocument(`This is _a line of text._`)
 		editor.select(12)
 		await wait(waitTime)
-		editor.mainModule.toggleItalic()
+		toggleItalic(editor)
 
 		expect(editor.getText()).toEqual('This is a line of text.')
 		expect(editor.doc.selection).toEqual([11, 11])
@@ -561,7 +562,7 @@ describe('Inline formatting', () => {
 		editor.doc = markdownToTextDocument(`This is **a line of text.**`)
 		editor.select(12)
 		await wait(waitTime)
-		editor.mainModule.toggleBold()
+		toggleBold(editor)
 
 		expect(editor.getText()).toEqual('This is a line of text.')
 		expect(editor.doc.selection).toEqual([10, 10])
@@ -571,7 +572,7 @@ describe('Inline formatting', () => {
 		editor.doc = markdownToTextDocument(`This is a line of text.`)
 		editor.select([8, 14])
 		await wait(waitTime)
-		editor.mainModule.toggleItalic()
+		toggleItalic(editor)
 
 		expect(editor.getText()).toEqual('This is _a line_ of text.')
 		expect(editor.doc.selection).toEqual([9, 15])
@@ -580,7 +581,7 @@ describe('Inline formatting', () => {
 		editor.doc = markdownToTextDocument(`This is a line of text.`)
 		editor.select([8, 14])
 		await wait(waitTime)
-		editor.mainModule.toggleBold()
+		toggleBold(editor)
 
 		expect(editor.getText()).toEqual('This is **a line** of text.')
 		expect(editor.doc.selection).toEqual([10, 16])
@@ -593,7 +594,7 @@ This is line two.
 `)
 		editor.select([6, 26])
 		await wait(waitTime)
-		editor.mainModule.toggleItalic()
+		toggleItalic(editor)
 
 		expect(editor.getText()).toEqual(`
 This _is line one._
@@ -608,7 +609,7 @@ This is line two.
 `)
 		editor.select([6, 26])
 		await wait(waitTime)
-		editor.mainModule.toggleBold()
+		toggleBold(editor)
 
 		expect(editor.getText()).toEqual(`
 This **is line one.**
@@ -625,7 +626,7 @@ This is line three.
 `)
 		editor.select([6, 44])
 		await wait(waitTime)
-		editor.mainModule.toggleItalic()
+		toggleItalic(editor)
 
 		expect(editor.getText()).toEqual(`
 This _is line one._
@@ -642,7 +643,7 @@ This is line three.
 `)
 		editor.select([6, 44])
 		await wait(waitTime)
-		editor.mainModule.toggleBold()
+		toggleBold(editor)
 
 		expect(editor.getText()).toEqual(`
 This **is line one.**
@@ -660,7 +661,7 @@ This is line two.
 `)
 		editor.select([6, 27])
 		await wait(waitTime)
-		editor.mainModule.toggleItalic()
+		toggleItalic(editor)
 
 		expect(editor.getText()).toEqual(`
 This _is line one._
@@ -677,7 +678,7 @@ This is line two.
 `)
 		editor.select([6, 27])
 		await wait(waitTime)
-		editor.mainModule.toggleBold()
+		toggleBold(editor)
 
 		expect(editor.getText()).toEqual(`
 This **is line one.**
@@ -691,7 +692,7 @@ This **is line one.**
 		editor.doc = markdownToTextDocument(`This is _a line_ of text.`)
 		editor.select([5, 19])
 		await wait(waitTime)
-		editor.mainModule.toggleItalic()
+		toggleItalic(editor)
 
 		expect(editor.getText()).toEqual('This is a line of text.')
 		expect(editor.doc.selection).toEqual([5, 17])
@@ -700,7 +701,7 @@ This **is line one.**
 		editor.doc = markdownToTextDocument(`This is **a line** of text.`)
 		editor.select([5, 21])
 		await wait(waitTime)
-		editor.mainModule.toggleBold()
+		toggleBold(editor)
 
 		expect(editor.getText()).toEqual('This is a line of text.')
 		expect(editor.doc.selection).toEqual([5, 17])
@@ -710,7 +711,7 @@ This **is line one.**
 		editor.doc = markdownToTextDocument(`This is _a line_ of text.`)
 		editor.select([9, 19])
 		await wait(waitTime)
-		editor.mainModule.toggleItalic()
+		toggleItalic(editor)
 
 		expect(editor.getText()).toEqual('This is a line of text.')
 		expect(editor.doc.selection).toEqual([8, 17])
@@ -719,7 +720,7 @@ This **is line one.**
 		editor.doc = markdownToTextDocument(`This is **a line** of text.`)
 		editor.select([10, 21])
 		await wait(waitTime)
-		editor.mainModule.toggleBold()
+		toggleBold(editor)
 
 		expect(editor.getText()).toEqual('This is a line of text.')
 		expect(editor.doc.selection).toEqual([8, 17])
@@ -730,7 +731,7 @@ This **is line one.**
 		editor.doc = markdownToTextDocument(`This is _a line_ of text.`)
 		editor.select([5, 11])
 		await wait(waitTime)
-		editor.mainModule.toggleItalic()
+		toggleItalic(editor)
 
 		expect(editor.getText()).toEqual('This is a line of text.')
 		expect(editor.doc.selection).toEqual([5, 10])
@@ -739,7 +740,7 @@ This **is line one.**
 		editor.doc = markdownToTextDocument(`This is **a line** of text.`)
 		editor.select([5, 11])
 		await wait(waitTime)
-		editor.mainModule.toggleBold()
+		toggleBold(editor)
 
 		expect(editor.getText()).toEqual('This is a line of text.')
 		expect(editor.doc.selection).toEqual([5, 9])
@@ -749,7 +750,7 @@ This **is line one.**
 		editor.doc = markdownToTextDocument(`This is _a_ line _of_ text.`)
 		editor.select([5, 19])
 		await wait(waitTime)
-		editor.mainModule.toggleItalic()
+		toggleItalic(editor)
 
 		expect(editor.getText()).toEqual('This is a line of text.')
 		expect(editor.doc.selection).toEqual([5, 16])
@@ -758,7 +759,7 @@ This **is line one.**
 		editor.doc = markdownToTextDocument(`This is **a** line **of** text.`)
 		editor.select([5, 22])
 		await wait(waitTime)
-		editor.mainModule.toggleBold()
+		toggleBold(editor)
 
 		expect(editor.getText()).toEqual('This is a line of text.')
 		expect(editor.doc.selection).toEqual([5, 16])
@@ -768,7 +769,7 @@ This **is line one.**
 		editor.doc = markdownToTextDocument(`Some **bold** stuff.`)
 		editor.select([6, 12])
 		await wait(waitTime)
-		editor.mainModule.toggleBold()
+		toggleBold(editor)
 
 		expect(editor.getText()).toEqual('Some bold stuff.')
 		expect(editor.doc.selection).toEqual([5, 9])
@@ -875,7 +876,7 @@ describe('Link toggling', () => {
 		editor.doc = markdownToTextDocument(`My cool link`)
 		editor.select([8, 12])
 		await wait(waitTime)
-		await editor.mainModule.toggleLink()
+		toggleLink(editor)
 
 		expect(editor.getText()).toEqual('My cool [link](https://duckduckgo.com/)')
 		expect(editor.doc.selection).toEqual([39, 39])
@@ -887,7 +888,7 @@ describe('Link toggling', () => {
 		editor.doc = markdownToTextDocument(`My cool link`)
 		editor.select(9)
 		await wait(waitTime)
-		await editor.mainModule.toggleLink()
+		toggleLink(editor)
 
 		expect(editor.getText()).toEqual('My cool [link](https://apple.com/)')
 		expect(editor.doc.selection).toEqual([39, 39])
@@ -911,7 +912,7 @@ describe('Link toggling', () => {
 		editor.select(23)
 		await wait(waitTime)
 
-		await editor.mainModule.toggleLink()
+		toggleLink(editor)
 
 		expect(editor.getText()).toEqual('I have linked to [My Cool Title](https://duckduckgo.com/)')
 	})
@@ -920,7 +921,7 @@ describe('Link toggling', () => {
 		editor.doc = markdownToTextDocument(`My cool [link](https://duckduckgo.com/) `)
 		editor.select(10)
 		await wait(waitTime)
-		editor.mainModule.toggleLink()
+		toggleLink(editor)
 
 		expect(editor.getText()).toEqual(`My cool link `)
 		expect(editor.doc.selection).toEqual([9, 9])
@@ -930,7 +931,7 @@ describe('Link toggling', () => {
 		editor.doc = markdownToTextDocument(`My cool [link](https://duckduckgo.com/) `)
 		editor.select(25)
 		await wait(waitTime)
-		editor.mainModule.toggleLink()
+		toggleLink(editor)
 
 		expect(editor.getText()).toEqual(`My cool link `)
 		expect(editor.doc.selection).toEqual([12, 12])
@@ -940,7 +941,7 @@ describe('Link toggling', () => {
 		editor.doc = markdownToTextDocument(`My cool [link](https://duckduckgo.com/) `)
 		editor.select(39)
 		await wait(waitTime)
-		editor.mainModule.toggleLink()
+		toggleLink(editor)
 
 		expect(editor.getText()).toEqual(`My cool link `)
 		expect(editor.doc.selection).toEqual([12, 12])
@@ -951,7 +952,7 @@ describe('Link toggling', () => {
 		editor.doc = markdownToTextDocument(`My cool [link](https://duckduckgo.com/) thing dude`)
 		editor.select([10, 45])
 		await wait(waitTime)
-		editor.mainModule.toggleLink()
+		toggleLink(editor)
 
 		expect(editor.getText()).toEqual(`My cool link thing dude`)
 		expect(editor.doc.selection).toEqual([9, 18])
@@ -961,7 +962,7 @@ describe('Link toggling', () => {
 		editor.doc = markdownToTextDocument(`My cool Link `)
 		editor.select(10)
 		await wait(waitTime)
-		editor.mainModule.toggleWikiLink('name')
+		toggleWikiLink(editor, 'name')
 
 		expect(editor.getText()).toEqual(`My cool [[Link]] `)
 	})
@@ -970,7 +971,7 @@ describe('Link toggling', () => {
 		editor.doc = markdownToTextDocument(`My cool [[Link]] `)
 		editor.select(10)
 		await wait(waitTime)
-		editor.mainModule.toggleWikiLink('name')
+		toggleWikiLink(editor, 'name')
 
 		expect(editor.getText()).toEqual(`My cool Link `)
 		expect(editor.doc.selection).toEqual([8, 8])
@@ -980,7 +981,7 @@ describe('Link toggling', () => {
 		editor.doc = markdownToTextDocument(`My cool [[Link]] `)
 		editor.select(9)
 		await wait(waitTime)
-		editor.mainModule.toggleWikiLink('name')
+		toggleWikiLink(editor, 'name')
 
 		expect(editor.getText()).toEqual(`My cool Link `)
 		expect(editor.doc.selection).toEqual([8, 8])
@@ -990,7 +991,7 @@ describe('Link toggling', () => {
 		editor.doc = markdownToTextDocument(`My cool [[Link]] `)
 		editor.select(15)
 		await wait(waitTime)
-		editor.mainModule.toggleWikiLink('name')
+		toggleWikiLink(editor, 'name')
 
 		expect(editor.getText()).toEqual(`My cool Link `)
 		expect(editor.doc.selection).toEqual([12, 12])
@@ -1042,7 +1043,7 @@ line two
 line three`)
 
 		editor.select(13)
-		editor.mainModule.shiftLines(new ShortcutEvent('test'), getSelectedLines(editor.doc), -1)
+		shiftLines(editor, new ShortcutEvent('test'), getSelectedLines(editor.doc), -1)
 		const result = `line two
 Line one
 line three`
@@ -1050,7 +1051,7 @@ line three`
 		expect(editor.doc.selection).toEqual([4, 4])
 
 		// Swapping up behond the doc should do nothing
-		editor.mainModule.shiftLines(new ShortcutEvent('test'), getSelectedLines(editor.doc), -1)
+		shiftLines(editor, new ShortcutEvent('test'), getSelectedLines(editor.doc), -1)
 		expect(editor.getText()).toEqual(result)
 	})
 
@@ -1060,7 +1061,7 @@ line two
 line three`)
 
 		editor.select(13)
-		editor.mainModule.shiftLines(new ShortcutEvent('test'), getSelectedLines(editor.doc), 1)
+		shiftLines(editor, new ShortcutEvent('test'), getSelectedLines(editor.doc), 1)
 		const result = `Line one
 line three
 line two`
@@ -1068,7 +1069,7 @@ line two`
 		expect(editor.doc.selection).toEqual([24, 24])
 
 		// Swapping up behond the doc should do nothing
-		editor.mainModule.shiftLines(new ShortcutEvent('test'), getSelectedLines(editor.doc), 1)
+		shiftLines(editor, new ShortcutEvent('test'), getSelectedLines(editor.doc), 1)
 		expect(editor.getText()).toEqual(result)
 	})
 
@@ -1079,7 +1080,7 @@ three
 four
 five`)
 		editor.select([10, 16])
-		editor.mainModule.shiftLines(new ShortcutEvent('test'), getSelectedLines(editor.doc), -2)
+		shiftLines(editor, new ShortcutEvent('test'), getSelectedLines(editor.doc), -2)
 		const result = `three
 four
 One
@@ -1098,7 +1099,7 @@ five
 six
 seven`)
 		editor.select([10, 16])
-		editor.mainModule.shiftLines(new ShortcutEvent('test'), getSelectedLines(editor.doc), 2)
+		shiftLines(editor, new ShortcutEvent('test'), getSelectedLines(editor.doc), 2)
 		const result = `One
 two
 five
@@ -1320,7 +1321,7 @@ Content 3`))
 			editor.collapsingSections.toggleLineCollapsed([0, 2, 4])
 
 			editor.select(2)
-			editor.mainModule.shiftGroup(new ShortcutEvent('test'), 'lines', 1)
+			shiftGroup(editor, new ShortcutEvent('test'), 'lines', 1)
 
 			expect(editor.getText()).toEqual(`# Header 2
 Content 2
@@ -1340,7 +1341,7 @@ Content 3`))
 			editor.collapsingSections.toggleLineCollapsed([0, 2, 4])
 
 			editor.select(44)
-			editor.mainModule.shiftGroup(new ShortcutEvent('test'), 'lines', -1)
+			shiftGroup(editor, new ShortcutEvent('test'), 'lines', -1)
 
 			expect(editor.getText()).toEqual(`# Header 1
 Content 1
@@ -1360,7 +1361,7 @@ Content 3`))
 			editor.collapsingSections.toggleLineCollapsed(0)
 
 			editor.select(2)
-			editor.mainModule.shiftGroup(new ShortcutEvent('test'), 'lines', 1)
+			shiftGroup(editor, new ShortcutEvent('test'), 'lines', 1)
 
 			expect(editor.getText()).toEqual(`# Header 2
 Content 2
@@ -1380,7 +1381,7 @@ Content 3`))
 			editor.collapsingSections.toggleLineCollapsed(4)
 
 			editor.select(44)
-			editor.mainModule.shiftGroup(new ShortcutEvent('test'), 'lines', -1)
+			shiftGroup(editor, new ShortcutEvent('test'), 'lines', -1)
 
 			expect(editor.getText()).toEqual(`# Header 1
 Content 1
@@ -1400,7 +1401,7 @@ Content 3`))
 			editor.collapsingSections.toggleLineCollapsed(2)
 
 			editor.select(12)
-			editor.mainModule.shiftGroup(new ShortcutEvent('test'), 'lines', 1)
+			shiftGroup(editor, new ShortcutEvent('test'), 'lines', 1)
 
 			expect(editor.getText()).toEqual(`# Header 1
 # Header 2
@@ -1423,7 +1424,7 @@ Content 3`))
 			editor.collapsingSections.toggleLineCollapsed(2)
 
 			editor.select(44)
-			editor.mainModule.shiftGroup(new ShortcutEvent('test'), 'lines', -1)
+			shiftGroup(editor, new ShortcutEvent('test'), 'lines', -1)
 
 			expect(editor.getText()).toEqual(`# Header 1
 Content 1

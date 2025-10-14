@@ -111,6 +111,9 @@ interface MarkdownEditorOptions extends EditorOptions {
 }
 
 export default class MarkdownEditor extends Editor {
+
+	readonly workspace?: Workspace
+
 	constructor(workspace: Workspace, options?: MarkdownEditorOptions) {
 
 		options = options || {}
@@ -160,6 +163,8 @@ export default class MarkdownEditor extends Editor {
 		}
 
 		super(options)
+
+		this.workspace = workspace
 	}
 
 	indent(): this {
