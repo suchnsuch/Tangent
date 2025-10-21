@@ -7,7 +7,7 @@ import { getContext, tick } from 'svelte';
 import type Workspace from 'app/model/Workspace'
 import WorkspaceTreeNode from 'app/model/WorkspaceTreeNode'
 import { isModKey } from 'app/utils/events';
-import { appendContextTemplate, ContextMenuConstructorOptions } from 'app/model/contextmenu';
+import { appendContextTemplate, ContextMenuConstructorOptions } from 'app/model/menus';
 import LazyScrolledList from 'app/utils/LazyScrolledList.svelte';
 import type { NavigationData } from 'app/events';
 import { getTreeNodeTransfer, hasTreeNodeTransfer, setTreeNodeTransfer } from 'app/utils/dragDrop';

@@ -2,7 +2,7 @@
 import { createEventDispatcher, onMount } from "svelte"
 import { Placement, createPopper } from "@popperjs/core"
 
-import type { ContextMenuConstructorOptions } from "app/model/contextmenu"
+import type { ContextMenuConstructorOptions } from "app/model/menus"
 import MenuItem, { CancelMenuDetails, CancelMenuEvent, RequestMenuDetails, RequestMenuEvent } from "./MenuItem.svelte"
 
 export let template: ContextMenuConstructorOptions[]

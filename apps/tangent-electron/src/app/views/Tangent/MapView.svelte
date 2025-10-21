@@ -14,7 +14,7 @@ import MapConnectionView from './MapConnectionView.svelte'
 
 import { CommandAction as command } from 'app/model/commands'
 import type { TreeNode } from 'common/trees'
-import { appendContextTemplate, ContextMenuConstructorOptions } from 'app/model/contextmenu';
+import { appendContextTemplate, ContextMenuConstructorOptions } from 'app/model/menus';
 import { scrollTo } from 'app/utils'
 import { clockTime, shortestDayDate } from 'common/dates'
 import { startDrag, stopDrag } from 'app/utils/dragging'

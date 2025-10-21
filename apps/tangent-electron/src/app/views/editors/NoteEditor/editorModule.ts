@@ -39,7 +39,7 @@ import {findSectionLines, isLineCollapsed, lineCollapseDepth } from 'common/mark
 import { isMac } from 'common/platform'
 import { bustIntoSelection } from '../selectionBuster'
 import type MarkdownEditor from './MarkdownEditor'
-import { appendContextTemplate, ContextMenuConstructorOptions } from 'app/model/contextmenu'
+import { appendContextTemplate, ContextMenuConstructorOptions } from 'app/model/menus'
 import { eventHasSelectionRequest } from 'app/events'
 import { setHeader, setLinePrefix, shiftGroup, toggleBold, toggleHightlight, toggleInlineCode, toggleItalic, toggleLineComment, toggleLink, toggleWikiLink } from './editorActions'
 

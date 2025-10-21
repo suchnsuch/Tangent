@@ -9,7 +9,7 @@ import type { Workspace } from 'app/model'
 import MarkdownView from '../editors/NoteEditor/MarkdownView'
 import { markdownToTextDocument } from 'common/markdownModel'
 import { writable } from 'svelte/store'
-import { appendContextTemplate } from 'app/model/contextmenu'
+import { appendContextTemplate } from 'app/model/menus'
 
 let workspace: Workspace = getContext('workspace')
 

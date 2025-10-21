@@ -6,7 +6,7 @@ import { SidebarMode } from 'common/SidebarState'
 import type { Workspace } from 'app/model'
 import command from 'app/model/commands/CommandAction'
 import { getSortModeDisplayName } from 'app/model/directoryView'
-import { appendContextTemplate, ExtendedContextEvent } from 'app/model/contextmenu'
+import { appendContextTemplate, ExtendedContextEvent } from 'app/model/menus'
 import { startDrag } from 'app/utils'
 import PopUpButton from 'app/utils/PopUpButton.svelte'
 

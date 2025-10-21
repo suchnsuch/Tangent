@@ -12,7 +12,7 @@ export type CancelMenuEvent = CustomEvent<CancelMenuDetails>
 </script>
 
 <script lang="ts">
-import type { ContextMenuConstructorOptions } from "app/model/contextmenu"
+import type { ContextMenuConstructorOptions } from "app/model/menus"
 import SvgIcon from "app/views/smart-icons/SVGIcon.svelte";
 import { createEventDispatcher } from "svelte";
 import { shortcutsHtmlString } from "./shortcuts";

@@ -39,7 +39,7 @@ import { scrollTo } from 'app/utils';
 import { type NavigationData } from 'app/events'
 import WorkspaceFileHeader from 'app/utils/WorkspaceFileHeader.svelte';
 import TangentLink from './t-link';
-import { appendContextTemplate, ContextMenuConstructorOptions } from 'app/model/contextmenu';
+import { appendContextTemplate, ContextMenuConstructorOptions } from 'app/model/menus';
 import { getInitialSelection } from 'common/markdownModel';
 import { marginToAxis, ScrollToOptions } from 'app/utils/scrollto';
 import { timedLatch } from 'app/utils/svelte';

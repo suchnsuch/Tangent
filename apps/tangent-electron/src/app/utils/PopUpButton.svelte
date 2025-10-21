@@ -14,7 +14,7 @@ import commandAction from 'app/model/commands/CommandAction'
 import type { CommandActionOptions } from 'app/model/commands/CommandAction'
 import { focusLayer } from './focus'
 import { onMount, tick } from 'svelte';
-import type { ContextMenuConstructorOptions } from 'app/model/contextmenu';
+import type { ContextMenuConstructorOptions } from 'app/model/menus';
 import Menu from './Menu.svelte'
 import { tooltip as tooltipHelper, TooltipDefOrConfig, dropTooltip } from './tooltips';
 	
