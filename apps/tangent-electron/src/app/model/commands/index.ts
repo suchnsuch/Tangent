@@ -32,6 +32,9 @@ import ShowAllChildMapNodesCommand from './ShowAllChildMapNodes'
 import ShowPreviousSessionCommand from './ShowPreviousSession'
 import DuplicateNodeCommand from './DuplicateNode'
 import { CollapseAllSectionsCommand, CollapseCurrentSectionCommand } from './CollapseSectionCommands'
+import { InlineFormatCommand, NoteLinePrefixCommand, ShiftNoteGroupCommand, ToggleMDLinkCommand as ToggleMarkdownLinkCommand, ToggleWikiLinkCommand } from './NoteFormattingCommands'
+import { attr } from 'cheerio/dist/commonjs/api/attributes'
+import { isMac } from 'common/platform'
 export { Command, CommandAction, WorkspaceCommand }
 
 export interface WorkspaceCommands {
@@ -107,22 +110,28 @@ export interface WorkspaceCommands {
 
 	
 	// Notes
-	toggleBold: NoteKeyboardProxyCommand
-	toggleItalics: NoteKeyboardProxyCommand
-	toggleHighlight: NoteKeyboardProxyCommand
-	toggleInlineCode: NoteKeyboardProxyCommand
-	toggleWikiLink: NoteKeyboardProxyCommand
-	toggleMDLink: NoteKeyboardProxyCommand
+	toggleBold: InlineFormatCommand
+	toggleItalics: InlineFormatCommand
+	toggleHighlight: InlineFormatCommand
+	toggleInlineCode: InlineFormatCommand
+	toggleWikiLink: ToggleWikiLinkCommand
+	toggleWikiLinkDisplay: ToggleWikiLinkCommand
+	toggleMDLink: ToggleMarkdownLinkCommand
 	showIncomingLinks: NoteKeyboardProxyCommand
 
-	setHeader1: NoteKeyboardProxyCommand
-	setHeader2: NoteKeyboardProxyCommand
-	setHeader3: NoteKeyboardProxyCommand
-	setHeader4: NoteKeyboardProxyCommand
-	setHeader5: NoteKeyboardProxyCommand
-	setHeader6: NoteKeyboardProxyCommand
+	setHeader1: NoteLinePrefixCommand
+	setHeader2: NoteLinePrefixCommand
+	setHeader3: NoteLinePrefixCommand
+	setHeader4: NoteLinePrefixCommand
+	setHeader5: NoteLinePrefixCommand
+	setHeader6: NoteLinePrefixCommand
 
-	setParagraph: NoteKeyboardProxyCommand
+	setParagraph: NoteLinePrefixCommand
+
+	shiftLinesUp: ShiftNoteGroupCommand
+	shiftLinesDown: ShiftNoteGroupCommand
+	shiftGroupUp: ShiftNoteGroupCommand
+	shiftGroupDown: ShiftNoteGroupCommand
 
 	collapseCurrentSection: CollapseCurrentSectionCommand
 	collapseAllSections: CollapseAllSectionsCommand
@@ -239,79 +248,109 @@ export default function workspaceCommands(workspace: Workspace): WorkspaceComman
 
 
 		// Notes
-		toggleBold: new NoteKeyboardProxyCommand(workspace, {
+		toggleBold: new InlineFormatCommand(workspace, {
+			label: 'Bold',
+			tooltip: 'Toggles whether the selected text is bold.',
 			shortcut: 'Mod+B',
-			label: 'Toggle Bold',
-			tooltip: 'Toggles whether the selected text is bold.'
+			formattingCharacters: () => workspace.settings?.boldCharacters.value ?? '**',
+			attributePredicate: attr => attr?.bold
 		}),
-		toggleItalics: new NoteKeyboardProxyCommand(workspace, {
+		toggleItalics: new InlineFormatCommand(workspace, {
+			label: 'Italics',
+			tooltip: 'Toggles whether the selected text is italic.',
 			shortcut: 'Mod+I',
-			label: 'Toggle Italics',
-			tooltip: 'Toggles whether the selected text is italic.'
+			formattingCharacters: () => workspace.settings?.italicsCharacters.value ?? '_',
+			attributePredicate: attr => attr?.italic
 		}),
-		toggleHighlight: new NoteKeyboardProxyCommand(workspace, {
+		toggleHighlight: new InlineFormatCommand(workspace, {
+			label: 'Highlight',
+			tooltip: 'Toggles whether the selected text is highlighted.',
 			shortcut: 'Mod+=',
-			label: 'Toggle Highlight',
-			tooltip: 'Toggles whether the selected text is highlighted.'
+			formattingCharacters: () => '==',
+			attributePredicate: attr => attr?.highlight
 		}),
-		toggleInlineCode: new NoteKeyboardProxyCommand(workspace, {
+		toggleInlineCode: new InlineFormatCommand(workspace, {
+			label: 'Inline Code',
+			tooltip: 'Toggles whether the selected text is rendered as code.',
 			shortcut: 'Mod+\\',
-			label: 'Toggle Inline Code',
-			tooltip: 'Toggles whether the selected text is rendered as code.'
+			formattingCharacters: () => '`',
+			attributePredicate: attr => attr?.inline_code
 		}),
-		toggleWikiLink: new NoteKeyboardProxyCommand(workspace, {
+		toggleWikiLink: new ToggleWikiLinkCommand(workspace, {
 			shortcut: 'Mod+Alt+K',
-			label: 'Toggle Wiki Link',
-			tooltip: 'Turns selected text into a wiki link or removes an existing wiki link.'
+			mode: 'name'
 		}),
-		toggleMDLink: new NoteKeyboardProxyCommand(workspace, {
-			shortcut: 'Mod+K',
-			label: 'Toggle Markdown Link',
-			tooltip: 'Turns selected text into a markdown link or removes an existing link.'
+		toggleWikiLinkDisplay: new ToggleWikiLinkCommand(workspace, {
+			shortcut: 'Mod+Alt+Shift+K',
+			mode: 'display'
+		}),
+		toggleMDLink: new ToggleMarkdownLinkCommand(workspace, {
+			shortcut: 'Mod+K'
 		}),
 
-		setHeader1: new NoteKeyboardProxyCommand(workspace, {
+		setHeader1: new NoteLinePrefixCommand(workspace, {
 			shortcut: 'Mod+1',
 			label: 'Header 1',
-			paletteLabel: 'Set Header 1',
-			tooltip: 'Changes the currently selected line(s) to a 1st level header.'
+			tooltip: 'Changes the currently selected line(s) to a 1st level header.',
+			prefix: '#'
 		}),
-		setHeader2: new NoteKeyboardProxyCommand(workspace, {
+		setHeader2: new NoteLinePrefixCommand(workspace, {
 			shortcut: 'Mod+2',
 			label: 'Header 2',
-			paletteLabel: 'Set Header 2',
-			tooltip: 'Changes the currently selected line(s) to a 2nd level header.'
+			tooltip: 'Changes the currently selected line(s) to a 2nd level header.',
+			prefix: '##'
 		}),
-		setHeader3: new NoteKeyboardProxyCommand(workspace, {
+		setHeader3: new NoteLinePrefixCommand(workspace, {
 			shortcut: 'Mod+3',
 			label: 'Header 3',
-			paletteLabel: 'Set Header 3',
-			tooltip: 'Changes the currently selected line(s) to a 3rd level header.'
+			tooltip: 'Changes the currently selected line(s) to a 3rd level header.',
+			prefix: '###'
 		}),
-		setHeader4: new NoteKeyboardProxyCommand(workspace, {
+		setHeader4: new NoteLinePrefixCommand(workspace, {
 			shortcut: 'Mod+4',
 			label: 'Header 4',
-			paletteLabel: 'Set Header 4',
-			tooltip: 'Changes the currently selected line(s) to a 4th level header.'
+			tooltip: 'Changes the currently selected line(s) to a 4th level header.',
+			prefix: '####'
 		}),
-		setHeader5: new NoteKeyboardProxyCommand(workspace, {
+		setHeader5: new NoteLinePrefixCommand(workspace, {
 			shortcut: 'Mod+5',
 			label: 'Header 5',
-			paletteLabel: 'Set Header 5',
-			tooltip: 'Changes the currently selected line(s) to a 5th level header.'
+			tooltip: 'Changes the currently selected line(s) to a 5th level header.',
+			prefix: '#####'
 		}),
-		setHeader6: new NoteKeyboardProxyCommand(workspace, {
+		setHeader6: new NoteLinePrefixCommand(workspace, {
 			shortcut: 'Mod+6',
 			label: 'Header 6',
-			paletteLabel: 'Set Header 6',
-			tooltip: 'Changes the currently selected line(s) to a 6th level header.'
+			tooltip: 'Changes the currently selected line(s) to a 6th level header.',
+			prefix: '######'
 		}),
 
-		setParagraph: new NoteKeyboardProxyCommand(workspace, {
+		setParagraph: new NoteLinePrefixCommand(workspace, {
 			shortcut: 'Mod+0',
 			label: 'Paragraph',
-			paletteLabel: 'Set Paragraph',
-			tooltip: 'Changes the currently selected line(s) to be paragraphs.'
+			tooltip: 'Changes the currently selected line(s) to be paragraphs.',
+			prefix: ''
+		}),
+
+		shiftLinesUp: new ShiftNoteGroupCommand(workspace, {
+			mode: 'lines',
+			direction: -1,
+			shortcut: 'Alt+ArrowUp'
+		}),
+		shiftLinesDown: new ShiftNoteGroupCommand(workspace, {
+			mode: 'lines',
+			direction: 1,
+			shortcut: 'Alt+ArrowDown'
+		}),
+		shiftGroupUp: new ShiftNoteGroupCommand(workspace, {
+			mode: 'section',
+			direction: -1,
+			shortcut: isMac ? 'Ctrl+Alt+ArrowUp' : 'Alt+Shift+ArrowUp'
+		}),
+		shiftGroupDown: new ShiftNoteGroupCommand(workspace, {
+			mode: 'section',
+			direction: 1,
+			shortcut: isMac ? 'Ctrl+Alt+ArrowDown' : 'Alt+Shift+ArrowDown'
 		}),
 
 		collapseCurrentSection: new CollapseCurrentSectionCommand(workspace, {

@@ -269,6 +269,7 @@ th {
 
 .label {
 	line-height: 1.5em;
+	min-width: 200px;
 }
 
 .bindingRow {

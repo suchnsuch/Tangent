@@ -6,16 +6,16 @@ import type { Line } from '@typewriter/document'
 import { Tangent, Workspace } from '..'
 
 function getNoteView(tangent: Tangent) {
-	let view = tangent.currentThreadState.value
-	if (!view) return null
-	if (view.currentLens.value.currentlyRepresenting) {
-		view = view.currentLens.value.currentlyRepresentingView
-	}
+	const view = tangent.getCurrentViewState()
 	if (!view || !(view instanceof NoteViewState) || !view.editor) return null
 	return view
 }
 
 export class CollapseCurrentSectionCommand extends WorkspaceCommand {
+
+	constructor(workspace: Workspace, options: CommandOptions) {
+		super(workspace, { group: 'Notes', ...options })
+	}
 
 	getTargets() {
 		const view = getNoteView(this.workspace.viewState.tangent)
@@ -76,7 +76,7 @@ export class CollapseAllSectionsCommand extends WorkspaceCommand {
 	scope: 'all'|'edge'
 
 	constructor(workspace: Workspace, options: CollapseAllSectionsOptions) {
-		super(workspace, options)
+		super(workspace, { group: 'Notes', ...options })
 
 		this.scope = options?.scope ?? 'all'
 		this.mode = options?.mode ?? 'collapse'

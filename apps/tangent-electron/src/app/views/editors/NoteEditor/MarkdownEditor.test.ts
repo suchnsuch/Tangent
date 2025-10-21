@@ -876,7 +876,7 @@ describe('Link toggling', () => {
 		editor.doc = markdownToTextDocument(`My cool link`)
 		editor.select([8, 12])
 		await wait(waitTime)
-		toggleLink(editor)
+		toggleLink(editor, editor.doc.selection)
 
 		expect(editor.getText()).toEqual('My cool [link](https://duckduckgo.com/)')
 		expect(editor.doc.selection).toEqual([39, 39])
@@ -888,7 +888,7 @@ describe('Link toggling', () => {
 		editor.doc = markdownToTextDocument(`My cool link`)
 		editor.select(9)
 		await wait(waitTime)
-		toggleLink(editor)
+		toggleLink(editor, editor.doc.selection)
 
 		expect(editor.getText()).toEqual('My cool [link](https://apple.com/)')
 		expect(editor.doc.selection).toEqual([39, 39])
@@ -912,7 +912,7 @@ describe('Link toggling', () => {
 		editor.select(23)
 		await wait(waitTime)
 
-		toggleLink(editor)
+		toggleLink(editor, editor.doc.selection)
 
 		expect(editor.getText()).toEqual('I have linked to [My Cool Title](https://duckduckgo.com/)')
 	})
@@ -921,7 +921,7 @@ describe('Link toggling', () => {
 		editor.doc = markdownToTextDocument(`My cool [link](https://duckduckgo.com/) `)
 		editor.select(10)
 		await wait(waitTime)
-		toggleLink(editor)
+		toggleLink(editor, editor.doc.selection)
 
 		expect(editor.getText()).toEqual(`My cool link `)
 		expect(editor.doc.selection).toEqual([9, 9])
@@ -931,7 +931,7 @@ describe('Link toggling', () => {
 		editor.doc = markdownToTextDocument(`My cool [link](https://duckduckgo.com/) `)
 		editor.select(25)
 		await wait(waitTime)
-		toggleLink(editor)
+		toggleLink(editor, editor.doc.selection)
 
 		expect(editor.getText()).toEqual(`My cool link `)
 		expect(editor.doc.selection).toEqual([12, 12])
@@ -941,7 +941,7 @@ describe('Link toggling', () => {
 		editor.doc = markdownToTextDocument(`My cool [link](https://duckduckgo.com/) `)
 		editor.select(39)
 		await wait(waitTime)
-		toggleLink(editor)
+		toggleLink(editor, editor.doc.selection)
 
 		expect(editor.getText()).toEqual(`My cool link `)
 		expect(editor.doc.selection).toEqual([12, 12])
@@ -952,7 +952,7 @@ describe('Link toggling', () => {
 		editor.doc = markdownToTextDocument(`My cool [link](https://duckduckgo.com/) thing dude`)
 		editor.select([10, 45])
 		await wait(waitTime)
-		toggleLink(editor)
+		toggleLink(editor, editor.doc.selection)
 
 		expect(editor.getText()).toEqual(`My cool link thing dude`)
 		expect(editor.doc.selection).toEqual([9, 18])
@@ -962,7 +962,7 @@ describe('Link toggling', () => {
 		editor.doc = markdownToTextDocument(`My cool Link `)
 		editor.select(10)
 		await wait(waitTime)
-		toggleWikiLink(editor, 'name')
+		toggleWikiLink(editor, editor.doc.selection, 'name')
 
 		expect(editor.getText()).toEqual(`My cool [[Link]] `)
 	})
@@ -971,7 +971,7 @@ describe('Link toggling', () => {
 		editor.doc = markdownToTextDocument(`My cool [[Link]] `)
 		editor.select(10)
 		await wait(waitTime)
-		toggleWikiLink(editor, 'name')
+		toggleWikiLink(editor, editor.doc.selection, 'name')
 
 		expect(editor.getText()).toEqual(`My cool Link `)
 		expect(editor.doc.selection).toEqual([8, 8])
@@ -981,7 +981,7 @@ describe('Link toggling', () => {
 		editor.doc = markdownToTextDocument(`My cool [[Link]] `)
 		editor.select(9)
 		await wait(waitTime)
-		toggleWikiLink(editor, 'name')
+		toggleWikiLink(editor, editor.doc.selection, 'name')
 
 		expect(editor.getText()).toEqual(`My cool Link `)
 		expect(editor.doc.selection).toEqual([8, 8])
@@ -991,7 +991,7 @@ describe('Link toggling', () => {
 		editor.doc = markdownToTextDocument(`My cool [[Link]] `)
 		editor.select(15)
 		await wait(waitTime)
-		toggleWikiLink(editor, 'name')
+		toggleWikiLink(editor, editor.doc.selection, 'name')
 
 		expect(editor.getText()).toEqual(`My cool Link `)
 		expect(editor.doc.selection).toEqual([12, 12])
@@ -1321,7 +1321,7 @@ Content 3`))
 			editor.collapsingSections.toggleLineCollapsed([0, 2, 4])
 
 			editor.select(2)
-			shiftGroup(editor, new ShortcutEvent('test'), 'lines', 1)
+			shiftGroup(editor, editor.doc.selection, new ShortcutEvent('test'), 'lines', 1)
 
 			expect(editor.getText()).toEqual(`# Header 2
 Content 2
@@ -1341,7 +1341,7 @@ Content 3`))
 			editor.collapsingSections.toggleLineCollapsed([0, 2, 4])
 
 			editor.select(44)
-			shiftGroup(editor, new ShortcutEvent('test'), 'lines', -1)
+			shiftGroup(editor, editor.doc.selection, new ShortcutEvent('test'), 'lines', -1)
 
 			expect(editor.getText()).toEqual(`# Header 1
 Content 1
@@ -1361,7 +1361,7 @@ Content 3`))
 			editor.collapsingSections.toggleLineCollapsed(0)
 
 			editor.select(2)
-			shiftGroup(editor, new ShortcutEvent('test'), 'lines', 1)
+			shiftGroup(editor, editor.doc.selection, new ShortcutEvent('test'), 'lines', 1)
 
 			expect(editor.getText()).toEqual(`# Header 2
 Content 2
@@ -1381,7 +1381,7 @@ Content 3`))
 			editor.collapsingSections.toggleLineCollapsed(4)
 
 			editor.select(44)
-			shiftGroup(editor, new ShortcutEvent('test'), 'lines', -1)
+			shiftGroup(editor, editor.doc.selection, new ShortcutEvent('test'), 'lines', -1)
 
 			expect(editor.getText()).toEqual(`# Header 1
 Content 1
@@ -1401,7 +1401,7 @@ Content 3`))
 			editor.collapsingSections.toggleLineCollapsed(2)
 
 			editor.select(12)
-			shiftGroup(editor, new ShortcutEvent('test'), 'lines', 1)
+			shiftGroup(editor, editor.doc.selection, new ShortcutEvent('test'), 'lines', 1)
 
 			expect(editor.getText()).toEqual(`# Header 1
 # Header 2
@@ -1424,7 +1424,7 @@ Content 3`))
 			editor.collapsingSections.toggleLineCollapsed(2)
 
 			editor.select(44)
-			shiftGroup(editor, new ShortcutEvent('test'), 'lines', -1)
+			shiftGroup(editor, editor.doc.selection, new ShortcutEvent('test'), 'lines', -1)
 
 			expect(editor.getText()).toEqual(`# Header 1
 Content 1

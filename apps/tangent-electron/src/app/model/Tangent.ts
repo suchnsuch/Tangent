@@ -340,4 +340,13 @@ export default class Tangent {
 			}
 		}
 	}
+
+	getCurrentViewState() {
+		let view = this.currentThreadState.value
+		if (!view) return null
+		if (view.currentLens.value.currentlyRepresenting) {
+			return view.currentLens.value.currentlyRepresentingView
+		}
+		return view
+	}
 }

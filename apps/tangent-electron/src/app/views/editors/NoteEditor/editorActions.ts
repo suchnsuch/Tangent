@@ -7,9 +7,9 @@ import { getLineFormattingPrefix } from 'common/markdownModel/line'
 import { repeatString } from '@such-n-such/core'
 import { findSectionLines } from 'common/markdownModel/sections'
 
-function toggleInlineFormat(editor: Editor, formattingCharacters: string, predicate: AttributePredicate, event?: Event) {
+export function toggleInlineFormat(editor: Editor, selection: EditorRange, formattingCharacters: string, predicate: AttributePredicate, event?: Event) {
 	const { doc } = editor
-	const selection = normalizeRange(doc.selection)
+	selection = normalizeRange(selection)
 	if (!selection) return
 	const [at, to] = selection
 	event?.preventDefault()
@@ -130,6 +130,7 @@ function toggleInlineFormat(editor: Editor, formattingCharacters: string, predic
 export function toggleItalic(editor: MarkdownEditor, event?: Event) {
 	toggleInlineFormat(
 		editor,
+		editor.doc.selection,
 		editor.workspace?.settings?.italicsCharacters.value ?? '_',
 		attr => attr?.italic,
 		event
@@ -139,6 +140,7 @@ export function toggleItalic(editor: MarkdownEditor, event?: Event) {
 export function toggleBold(editor: MarkdownEditor, event?: Event) {
 	return toggleInlineFormat(
 		editor,
+		editor.doc.selection,
 		editor.workspace?.settings?.boldCharacters.value ?? '**',
 		attr => attr?.bold,
 		event
@@ -148,6 +150,7 @@ export function toggleBold(editor: MarkdownEditor, event?: Event) {
 export function toggleHightlight(editor: MarkdownEditor, event?: Event) {
 	return toggleInlineFormat(
 		editor,
+		editor.doc.selection,
 		'==',
 		attr => attr?.highlight,
 		event
@@ -157,15 +160,16 @@ export function toggleHightlight(editor: MarkdownEditor, event?: Event) {
 export function toggleInlineCode(editor: MarkdownEditor, event?: Event) {
 	return toggleInlineFormat(
 		editor,
+		editor.doc.selection,
 		'`',
 		attr => attr?.inline_code,
 		event
 	)
 }
 
-export async function toggleLink(editor: MarkdownEditor, event?: Event) {
+export async function toggleLink(editor: MarkdownEditor, selection: EditorRange, event?: Event) {
 	const { doc, workspace } = editor
-	const selection = normalizeRange(doc.selection)
+	selection = normalizeRange(selection)
 	if (!selection || !workspace) return
 	const [at, to] = selection
 	
@@ -294,9 +298,9 @@ export async function toggleLink(editor: MarkdownEditor, event?: Event) {
 * @param event 
 * @param mode 'name' uses the selected text as the name of the note to link to. 'display' uses the selected text as the display text.
 */
-export function toggleWikiLink(editor: MarkdownEditor, mode: 'name'|'display', event?: ShortcutEvent) {
+export function toggleWikiLink(editor: MarkdownEditor, selection: EditorRange, mode: 'name'|'display', event?: Event) {
 	const { doc, workspace } = editor
-	const selection = normalizeRange(doc.selection)
+	selection = normalizeRange(selection)
 	if (!selection) return
 	const [at, to] = selection
 	
@@ -452,11 +456,10 @@ export function toggleLineComment(editor: MarkdownEditor, event?: ShortcutEvent)
 	change.apply()
 }
 
-export function setLinePrefix(editor: MarkdownEditor, newPrefix: string, event?: ShortcutEvent) {
+export function setLinePrefix(editor: MarkdownEditor, selection: EditorRange, newPrefix: string, event?: Event) {
 	const { doc } = editor
-	const selection = doc.selection
 	if (!selection) return
-	const [at, to] = doc.selection
+	const [at, to] = selection
 
 	event?.preventDefault()
 
@@ -508,10 +511,10 @@ export function setLinePrefix(editor: MarkdownEditor, newPrefix: string, event?:
 
 export function setHeader(editor: MarkdownEditor, level: number, event?: ShortcutEvent) {
 	if (level <= 0) return
-	return setLinePrefix(editor, repeatString('#', level) + ' ', event)
+	return setLinePrefix(editor, editor.doc.selection, repeatString('#', level) + ' ', event)
 }
 
-export function shiftLines(editor: MarkdownEditor, event: ShortcutEvent, lines: Line[], shift: number) {
+export function shiftLines(editor: MarkdownEditor, event: Event, lines: Line[], shift: number) {
 	if (!lines) return
 	if (shift === 0) return
 	const { doc } = editor
@@ -596,11 +599,11 @@ export function shiftLines(editor: MarkdownEditor, event: ShortcutEvent, lines: 
 	}
 }
 
-export function shiftGroup(editor: MarkdownEditor, event: ShortcutEvent, mode: 'lines'|'section', direction: -1 | 1) {
+export function shiftGroup(editor: MarkdownEditor, selection: EditorRange, event: Event, mode: 'lines'|'section', direction: -1 | 1) {
 	const { doc } = editor
-	const selection = normalizeRange(doc.selection)
 	if (!selection) return
-	const [at, to] = doc.selection
+	selection = normalizeRange(selection)
+	const [at, to] = selection
 
 	let lines: Line[]
 

@@ -841,11 +841,11 @@ export default function editorModule(editor: Editor, options: {
 			case 'Backspace':
 				return onBackspace(event)
 			case 'Mod+K':
-				return toggleLink(markdownEditor, event)
+				return toggleLink(markdownEditor, markdownEditor.doc.selection, event)
 			case 'Mod+Alt+K':
-				return toggleWikiLink(markdownEditor, 'name', event)
+				return toggleWikiLink(markdownEditor, markdownEditor.doc.selection, 'name', event)
 			case 'Mod+Alt+Shift+K':
-				return toggleWikiLink(markdownEditor, 'display', event)
+				return toggleWikiLink(markdownEditor, markdownEditor.doc.selection, 'display', event)
 			case 'Mod+I':
 				return toggleItalic(markdownEditor, event)
 			case 'Mod+B':
@@ -870,12 +870,12 @@ export default function editorModule(editor: Editor, options: {
 			case 'Mod+6':
 				return setHeader(markdownEditor, 6, event)
 			case 'Mod+0':
-				return setLinePrefix(markdownEditor, '', event)
+				return setLinePrefix(markdownEditor, markdownEditor.doc.selection, '', event)
 
 			case 'Alt+ArrowUp':
-				return shiftGroup(markdownEditor, event, 'lines', -1)
+				return shiftGroup(markdownEditor, markdownEditor.doc.selection, event, 'lines', -1)
 			case 'Alt+ArrowDown':
-				return shiftGroup(markdownEditor, event, 'lines', 1)
+				return shiftGroup(markdownEditor, markdownEditor.doc.selection, event, 'lines', 1)
 
 			case 'Escape':
 				return onEscape(event)
@@ -884,17 +884,17 @@ export default function editorModule(editor: Editor, options: {
 		if (isMac) {
 			switch (event.shortcut) {
 				case 'Ctrl+Alt+ArrowUp':
-					return shiftGroup(markdownEditor, event, 'section', -1)
+					return shiftGroup(markdownEditor, markdownEditor.doc.selection, event, 'section', -1)
 				case 'Ctrl+Alt+ArrowDown':
-					return shiftGroup(markdownEditor, event, 'section', 1)
+					return shiftGroup(markdownEditor, markdownEditor.doc.selection, event, 'section', 1)
 			}
 		}
 		else {
 			switch (event.modShortcut) {
 				case 'Alt+Shift+ArrowUp':
-					return shiftGroup(markdownEditor, event, 'section', -1)
+					return shiftGroup(markdownEditor, markdownEditor.doc.selection, event, 'section', -1)
 				case 'Alt+Shift+ArrowDown':
-					return shiftGroup(markdownEditor, event, 'section', 1)
+					return shiftGroup(markdownEditor, markdownEditor.doc.selection, event, 'section', 1)
 			}
 		}
 			
@@ -964,7 +964,7 @@ export default function editorModule(editor: Editor, options: {
 					label: (link ? 'Remove' : 'Create') + ' Wikilink',
 					accelerator: 'CommandOrControl+Alt+K',
 					click() {
-						toggleWikiLink(markdownEditor, 'name')
+						toggleWikiLink(markdownEditor, markdownEditor.doc.selection, 'name')
 					}
 				})
 			}
@@ -975,7 +975,7 @@ export default function editorModule(editor: Editor, options: {
 					accelerator: 'CommandOrControl+K',
 					checked: link?.form === 'md',
 					click() {
-						toggleLink(markdownEditor)
+						toggleLink(markdownEditor, markdownEditor.doc.selection)
 					}
 				})
 			}
