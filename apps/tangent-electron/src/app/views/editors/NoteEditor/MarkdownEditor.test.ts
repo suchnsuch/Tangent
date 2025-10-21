@@ -859,6 +859,16 @@ This **is line one.**
 		])
 	})
 
+	it('Should toggle formatting on for adacent, non-formatted words', async () => {
+		editor.doc = markdownToTextDocument(`Some text _that_ is emphasized.`)
+		editor.select([6, 6])
+		await wait(waitTime)
+		toggleItalic(editor)
+
+		expect(editor.getText()).toEqual('Some _text_ _that_ is emphasized.')
+		expect(editor.doc.selection).toEqual([7, 7])
+	})
+
 })
 
 async function setClipboard(text: string) {
