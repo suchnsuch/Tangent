@@ -33,8 +33,9 @@ import ShowPreviousSessionCommand from './ShowPreviousSession'
 import DuplicateNodeCommand from './DuplicateNode'
 import { CollapseAllSectionsCommand, CollapseCurrentSectionCommand } from './CollapseSectionCommands'
 import { InlineFormatCommand, NoteLinePrefixCommand, ShiftNoteGroupCommand, ToggleMDLinkCommand as ToggleMarkdownLinkCommand, ToggleWikiLinkCommand } from './NoteFormattingCommands'
-import { attr } from 'cheerio/dist/commonjs/api/attributes'
 import { isMac } from 'common/platform'
+import { NativeCommand } from './NativeCommand'
+import { OpenDocumentationCommand } from './OpenDocumentation'
 export { Command, CommandAction, WorkspaceCommand }
 
 export interface WorkspaceCommands {
@@ -45,10 +46,19 @@ export interface WorkspaceCommands {
 
 	toggleLeftSidebar: ToggleSidebarCommand
 	openPreferences: OpenPreferencesCommand
+	openDocumenation: OpenDocumentationCommand
 
 	createNewFile: CreateNewFileCommand
 	createNewNoteFromRule: ShowCommandPaletteCommand
 	createNewFolder: CreateNewFolderCommand
+
+	undo: NativeCommand,
+	redo: NativeCommand,
+	cut: NativeCommand,
+	copy: NativeCommand,
+	paste: NativeCommand,
+	pasteAndMatchStyle: NativeCommand,
+	selectAll: NativeCommand,
 
 	openQueryPane: OpenQueryPaneCommand
 
@@ -141,12 +151,13 @@ export interface WorkspaceCommands {
 }
 
 export default function workspaceCommands(workspace: Workspace): WorkspaceCommands {
-	return {
+	const commands = {
 
 		openWorkspace: new OpenWorkspaceCommand(workspace),
 
 		toggleLeftSidebar: new ToggleSidebarCommand(workspace),
 		openPreferences: new OpenPreferencesCommand(workspace),
+		openDocumenation: new OpenDocumentationCommand(workspace),
 
 		createNewFile: new CreateNewFileCommand(workspace),
 		createNewNoteFromRule: new ShowCommandPaletteCommand(workspace, {
@@ -156,6 +167,35 @@ export default function workspaceCommands(workspace: Workspace): WorkspaceComman
 			shortcut: 'Mod+Shift+N'
 		}),
 		createNewFolder: new CreateNewFolderCommand(workspace),
+
+		undo: new NativeCommand(workspace, {
+			role: 'undo', label: 'Undo', tooltip: 'Undo the last action.',
+			shortcut: 'Mod+Z'
+		}),
+		redo: new NativeCommand(workspace, {
+			role: 'redo', label: 'Redo', tooltip: 'Redo the last undone action.',
+			shortcut: isMac ? 'Mod+Shift+Z' : 'Mod+Y'
+		}),
+		cut: new NativeCommand(workspace, {
+			role: 'cut', label: 'Cut', tooltip: 'Remove the selected content and place it in the system clipboard.',
+			shortcut: 'Mod+X'
+		}),
+		copy: new NativeCommand(workspace, {
+			role: 'copy', label: 'Copy', tooltip: 'Place the selected content in the system clipboard.',
+			shortcut: 'Mod+C'
+		}),
+		paste: new NativeCommand(workspace, {
+			role: 'paste', label: 'Paste', tooltip: 'Insert content from the system clipboard.',
+			shortcut: 'Mod+V'
+		}),
+		pasteAndMatchStyle: new NativeCommand(workspace, {
+			role: 'pasteAndMatchStyle', label: 'Paste Without Formatting', tooltip: 'Insert plain text content from the system clipboard.',
+			shortcut: 'Mod+Shift+V'
+		}),
+		selectAll: new NativeCommand(workspace, {
+			role: 'selectAll', label: 'Select All', tooltip: 'Selects all content in the current scole.',
+			shortcut: 'Mod+A'
+		}),
 
 		openQueryPane: new OpenQueryPaneCommand(workspace),
 
@@ -383,5 +423,12 @@ export default function workspaceCommands(workspace: Workspace): WorkspaceComman
 			focus: true,
 			tooltip: 'Opens the information panel of the current note, revealing any links to that note from other notes.'
 		}),
+	} as WorkspaceCommands
+
+	// Give all of the commands their id
+	for (const key of Object.keys(commands)) {
+		commands[key].id = key
 	}
+
+	return commands
 }

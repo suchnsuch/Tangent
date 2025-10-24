@@ -1,5 +1,8 @@
+import { shortcutToElectronShortcut } from 'app/utils/shortcuts'
+import type { Workspace } from '.'
 import type { AnyCommandContext } from './commands/Command'
 import type WorkspaceCommand from './commands/WorkspaceCommand'
+import { isMac } from 'common/platform'
 
 export interface ContextMenuCommand {
 	command?: WorkspaceCommand
@@ -7,16 +10,25 @@ export interface ContextMenuCommand {
 	click?: () => void
 }
 
-export interface ContextMenuConstructorOptions extends ContextMenuCommand {
+export interface MenuItemConstructorOptions extends ContextMenuCommand {
 	id?: string
 	type?: 'normal' | 'separator' | 'submenu' | 'checkbox' | 'radio',
 	label?: string
 	sublabel?: string
 	toolTip?: string
-	accelerator?: string
 
+	/** An external link to open */
+	link?: string
+	
 	enabled?: boolean
 	checked?: boolean
+
+	submenu?: MenuItemConstructorOptions[]
+}
+
+export interface ContextMenuConstructorOptions extends MenuItemConstructorOptions {
+	/** @deprecated Use workspace commands instead */
+	accelerator?: string
 
 	submenu?: ContextMenuConstructorOptions[]
 }
@@ -146,4 +158,247 @@ export function prepareContextMenuCommands(template: SplitContextMenuTemplate | 
 	}
 
 	return context
+}
+
+export function buildMainMenu(workspace: Workspace): MenuItemConstructorOptions[] {
+
+	const cmds = workspace.commands
+
+	const template: MenuItemConstructorOptions[] = [
+		{
+			label: 'File',
+			submenu: [
+				{ command: cmds.createNewFile },
+				{
+					label: 'Create New Note From Rule',
+					command: cmds.createNewNoteFromRule
+				},
+				{
+					label: 'Save',
+					command: cmds.saveCurrentFile
+				},
+				{
+					label: 'Duplicate',
+					command: cmds.duplicateNode
+				},
+				{ type: 'separator' },
+				{ command: cmds.closeCurrentFile },
+				{ command: cmds.closeOtherFiles },
+				{ command: cmds.closeLeftFiles },
+				{ command: cmds.closeRightFiles },
+				{ type: 'separator' },
+				{ command: cmds.openWorkspace }
+			]
+		}
+	]
+
+	const editMenu: MenuItemConstructorOptions[] = [
+		{ command: cmds.undo },
+		{ command: cmds.redo },
+		{ type: 'separator' },
+		{ command: cmds.cut },
+		{ command: cmds.copy },
+		{ command: cmds.paste },
+		{ command: cmds.pasteAndMatchStyle },
+		{ command: cmds.selectAll },
+		{ type: 'separator' },
+		{
+			label: 'Formatting',
+			submenu: [
+				{ command: cmds.toggleBold },
+				{ command: cmds.toggleItalics },
+				{ command: cmds.toggleHighlight },
+				{ command: cmds.toggleInlineCode },
+				{ type: 'separator' },
+				{ command: cmds.setParagraph },
+				{ command: cmds.setHeader1 },
+				{ command: cmds.setHeader2 },
+				{ command: cmds.setHeader3 },
+				{ command: cmds.setHeader4 },
+				{ command: cmds.setHeader5 },
+				{ command: cmds.setHeader6 }
+			]
+		},
+		{
+			label: 'Links',
+			submenu: [
+				{ command: cmds.toggleWikiLink },
+				{ command: cmds.toggleMDLink }
+			]
+		},
+		{ type: 'separator' },
+		{ command: cmds.shiftLinesUp },
+		{ command: cmds.shiftLinesDown },
+		{ command: cmds.shiftGroupUp },
+		{ command: cmds.shiftGroupDown }
+	]
+
+	if (!isMac) {
+		editMenu.push({
+			command: cmds.openPreferences,
+			click: () => {
+				// Delay opening so menus know not be a derp
+				setTimeout(() => {
+					cmds.openPreferences.execute()
+				}, 100)
+			}
+		})
+	}
+
+	template.push(
+		{
+			label: 'Edit',
+			submenu: editMenu
+		},
+		{
+			label: 'View',
+			submenu: [
+				{
+					command: cmds.setMapFocusLevel
+				},
+				{
+					command: cmds.setThreadFocusLevel
+				},
+				{
+					label: 'Toggle Focus',
+					command: cmds.toggleFocusMode
+				},
+				{
+					label: '    File',
+					command: cmds.setFileFocusLevel
+				},
+				{
+					label: '    Typewriter',
+					command: cmds.setTypewriterFocusLevel
+				},
+				{
+					label: '    Paragraph',
+					command: cmds.setParagraphFocusLevel
+				},
+				{
+					label: '    Sentence',
+					command: cmds.setSentenceFocusLevel
+				},
+				{ command: cmds.showIncomingLinks },
+				{ type: 'separator' },
+				{
+					label: 'Show Left Sidebar',
+					command: cmds.toggleLeftSidebar,
+				},
+				{ type: 'separator' },
+				{ command: cmds.zoomIn },
+				{ command: cmds.zoomOut },
+				{ command: cmds.resetZoom },
+				{ type: 'separator' },
+				{
+					command: cmds.floatWindow
+				}
+			]
+		},
+		{
+			label: 'Go',
+			submenu: [
+				{ command: cmds.shiftHistoryBack, label: 'Go Back' },
+				{ command: cmds.shiftHistoryForward, label: 'Go Forward' },
+				{ type: 'separator' },
+				{ command: cmds.goTo },
+				{ command: cmds.openQueryPane },
+				{ command: cmds.openInFileBrowser },
+				{ command: cmds.moveToLeftFile },
+				{ command: cmds.moveToRightFile },
+			]
+		},
+		{
+			label: 'Do',
+			submenu: [
+				{ command: cmds.do }
+			]
+		},
+		{
+			label: 'Help',
+			submenu: [
+				{ command: cmds.openDocumenation },
+				{ command: cmds.openChangelog },
+				{ type: 'separator' },
+				{
+					label: 'Tangent\'s Website',
+					link: 'http://tangentnotes.com'
+				},
+				{
+					label: 'Email Tangent\'s Team',
+					link: `mailto:contact@tangentnotes.com?subject=Tangent v${workspace.version}`
+				},
+				{ type: 'separator' },
+				{
+					label: 'Tangent on Discord',
+					link: 'https://discord.gg/6VpvhUnxFe'
+				},
+				{
+					label: 'Tangent on Mastodon',
+					link: 'https://mastodon.social/@tangentnotes'
+				},
+				{ type: 'separator' },
+				{ command: cmds.openLogs }
+			]
+		}
+	)
+
+	return template
+}
+
+export function prepareMainMenuForElectron(template: MenuItemConstructorOptions[]) {
+	function recursiveConverter(item: MenuItemConstructorOptions) {
+		if (item.commandContext) {
+			console.error('Main Menu items may not have additional context', item)
+			delete item.commandContext
+		}
+		// Clicks are not allowed, but not an error
+		if (item.click) delete item.click
+
+		const command = item.command
+		if (command) {
+			delete item.command // Can't send commands
+			if (!command.id) console.error('Commands must have IDs', command.getName())
+			item.id = 'window_' + command.id
+
+			item.label = item.label ?? command.getLabel()
+			if (!item.label) {
+				console.error('Main Menu items need labels!', item)
+			}
+
+			item.toolTip = item.toolTip ?? command.getTooltip()
+			const checked = command.getChecked()
+			if (checked !== null) {
+				item.checked = checked
+				if (!item.type) {
+					item.type = 'checkbox'
+				}
+			}
+
+			if (command.shortcuts?.length) {
+				;(item as any).registerAccelerator = false
+				;(item as any).accelerator = shortcutToElectronShortcut(command.shortcuts[0])
+			}
+		}
+		else if (item.link) {
+			if (!item.label) console.error('Menu link items must have a label!', item)
+		}
+		else if (Array.isArray(item.submenu)) {
+			for (const sub of item.submenu) {
+				recursiveConverter(sub)
+			}
+		}
+		else if (item.type === 'separator') {
+			// this is fine
+		}
+		else {
+			console.error('Menu items must have a `command`, `link`, or `submenu`!', item)
+		}
+	}
+
+	for (const item of template) {
+		recursiveConverter(item)
+	}
+
+	return template
 }

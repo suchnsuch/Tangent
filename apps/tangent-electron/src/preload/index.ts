@@ -68,26 +68,6 @@ const bridge: WindowApi = {
 		ipcRenderer.send('receiveWorkspaceViewState', state)
 	},
 
-	onMenuAction(handler) {
-		on('onMenuAction', handler)
-	},
-
-	onGetAllMenus(handler) {
-		on('getAllMenus', handler)
-	},
-
-	postMenuUpdate(content) {
-		ipcRenderer.send('postMenuUpdate', content)
-	},
-
-	updateMenuAccelerators(content) {
-		ipcRenderer.send('updateMenuAccelerators', content)
-	},
-
-	showContextMenu(template) {
-		ipcRenderer.send('showContextMenu', template)
-	},
-
 	onWorkspaceAction(handler) {
 		on('workspaceAction', handler)
 	},
@@ -135,6 +115,23 @@ const bridge: WindowApi = {
 		messageDialog(options) {
 			return ipcRenderer.invoke('messageDialog', options)
 		}
+	},
+	menus: {
+		onRequestAllMenus(handler) {
+			on('getAllMenus', handler)
+		},
+		onMenuCommand(handler) {
+			on('onMenuAction', handler)
+		},
+		setMainMenu(content: any) {
+			ipcRenderer.send('menus.setMainMenu', content)
+		},
+		updateCommandState(content) {
+			ipcRenderer.send('menus.updateCommandState', content)
+		},
+		showContextMenu(template) {
+			ipcRenderer.send('showContextMenu', template)
+		},
 	},
 	file: {
 		onTreeChange(handler) {

@@ -12,9 +12,10 @@ export type CancelMenuEvent = CustomEvent<CancelMenuDetails>
 </script>
 
 <script lang="ts">
+import type { Workspace } from 'app/model'
 import type { ContextMenuConstructorOptions } from "app/model/menus"
 import SvgIcon from "app/views/smart-icons/SVGIcon.svelte";
-import { createEventDispatcher } from "svelte";
+import { createEventDispatcher, getContext } from "svelte";
 import { shortcutsHtmlString } from "./shortcuts";
 import commandAction from '../model/commands/CommandAction'
 
@@ -23,6 +24,8 @@ let dispatch = createEventDispatcher<{
 	requestMenu: RequestMenuDetails
 	cancelMenu: CancelMenuDetails
 }>()
+
+const workspace = getContext('workspace') as Workspace
 
 export let template: ContextMenuConstructorOptions
 export let forceCheckboxSpace = false
@@ -48,13 +51,16 @@ function onMouseLeave(event: MouseEvent) {
 }
 
 function onClick() {
-	const { command, commandContext, click } = template
+	const { command, commandContext, click, link } = template
 	if (command && command.canExecute(commandContext)) {
 		command.execute(commandContext)
 		dispatch('executed')	
 	}
 	if (click) {
 		click()
+	}
+	if (link) {
+		workspace.api.links.openExternal(link)
 	}
 }
 </script>

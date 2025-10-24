@@ -26,7 +26,6 @@ import {
 	contentsMap,
 	hasShutdownWorkspaces
 } from './workspaces'
-import { createMenus } from './menus'
 
 import Logger from 'js-logger'
 import { setupLogging } from './logging'
@@ -242,13 +241,6 @@ Tangent ${app.getVersion()} Launched With Arguments:`, process.argv)
 			}
 		})
 	}
-
-	// Create the menus and pass along needed delegates
-	createMenus({
-		createWindow,
-		getWindowHandle,
-		openDocumentation
-	})
 
 	/**
 	 * Application Event Handlers

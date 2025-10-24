@@ -12,9 +12,19 @@ export default abstract class WorkspaceCommand extends Command {
 
 	readonly workspace: Workspace
 
+	private _id: string
+
 	constructor(workspace: Workspace, options?: CommandOptions) {
 		super(options)
 		this.workspace = workspace
+	}
+	
+	get id () { return this._id }
+	set id (id: string) {
+		if (this._id) {
+			console.error(`Attempted to give workspace command with an existing id of "${this._id}" a new id "${id}". Ids should only be set once.`)
+		}
+		this._id = id 
 	}
 
 	getName() {

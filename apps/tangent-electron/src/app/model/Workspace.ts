@@ -19,7 +19,7 @@ import { NoteViewState } from './nodeViewStates'
 import Settings from 'common/settings/Settings'
 import { EmbedType, getEmbedType } from 'common/embedding'
 import EmbedFile from './EmbedFile'
-import { ContextMenuCommand, ContextMenuConstructorOptions, extractRawTemplate, prepareContextMenuCommands, SplitContextMenuTemplate } from './menus'
+import { buildMainMenu, ContextMenuCommand, ContextMenuConstructorOptions, extractRawTemplate, prepareContextMenuCommands, prepareMainMenuForElectron, SplitContextMenuTemplate } from './menus'
 import DataFile from './DataFile'
 import { dataTypes, DataType } from 'common/dataTypes'
 import type WorkspaceSettings from 'common/dataTypes/WorkspaceSettings'
@@ -162,7 +162,7 @@ export default class Workspace extends EventDispatcher {
 			const command = this.commands[key] as Command
 			return command.subscribe(() => {
 				// TODO: Send menu updates
-				api.postMenuUpdate({
+				api.menus.updateCommandState({
 					[key]: this.translateCommandToMenu(command)
 				})
 			})
@@ -181,6 +181,18 @@ export default class Workspace extends EventDispatcher {
 			}
 		})
 
+		const sendMainMenu = () => {
+			const template = buildMainMenu(this)
+			const electronTemplate = prepareMainMenuForElectron(template)
+
+			try {
+				this.api.menus.setMainMenu(electronTemplate)
+			}
+			catch (e) {
+				console.error('Could not send main menu', e, electronTemplate)
+			}
+		}
+
 		this.settings.keymap.subscribe(keymap => {
 			// Revert to default
 			for (const key of Object.keys(this.commands)) {
@@ -198,17 +210,7 @@ export default class Workspace extends EventDispatcher {
 				}
 			}
 
-			// Update electron menus
-			let menuUpdate = {}
-			for (const key of Object.keys(this.commands)) {
-				const command = this.commands[key]
-				
-				if (command.shortcuts?.length) {
-					menuUpdate[key] = shortcutToElectronShortcut(command.shortcuts[0])
-				}
-			}
-
-			this.api.updateMenuAccelerators(menuUpdate)
+			sendMainMenu()
 		})
 
 		api.onWorkspaceAction((actionName, ...payload) => {
@@ -223,10 +225,10 @@ export default class Workspace extends EventDispatcher {
 			}	
 		})
 
-		api.onMenuAction(async actionName => {
+		api.menus.onMenuCommand(async commandId => {
 			try {
 				if (this.contextMenuCommands) {
-					const contextCommand = this.contextMenuCommands.get(actionName)
+					const contextCommand = this.contextMenuCommands.get(commandId)
 					if (contextCommand) {
 						const { command, commandContext, click } = contextCommand
 						if (command instanceof WorkspaceCommand) {
@@ -251,42 +253,24 @@ export default class Workspace extends EventDispatcher {
 					console.log('Denied! Modal is open.')
 					return
 				}
-				const command = this.commands[actionName]
+				const command = this.commands[commandId]
 				if (command) {
 					if (command.canExecute(menuContext)) {
-						console.log('Invoking command', actionName, 'from main')
+						console.log('Invoking command', commandId, 'from main')
 						command.execute(menuContext)
 					}
 				}
 				else {
-					console.error('No command found for', actionName)
+					console.error('No command found for', commandId)
 				}
 			}
 			catch (err) {
-				console.error('Failed to run command', actionName)
+				console.error('Failed to run command', commandId)
 				console.error(err)
 			}
 		})
 
-		const sendAllCommands = () => {
-			try {
-				let result:any = {}
-				
-				for (const key of Object.keys(this.commands)) {
-					result[key] = this.translateCommandToMenu(this.commands[key])
-				}
-
-				api.postMenuUpdate(result)
-			}
-			catch (e) {
-				console.error('Sending all commands failed')
-				console.log(e)
-			}
-		}
-
-		sendAllCommands()
-
-		api.onGetAllMenus(sendAllCommands)
+		api.menus.onRequestAllMenus(sendMainMenu)
 
 		this.updateState = new UpdateState(api.update)
 
@@ -734,7 +718,7 @@ export default class Workspace extends EventDispatcher {
 		const raw = extractRawTemplate(context)
 
 		try {
-			this.api.showContextMenu(raw)
+			this.api.menus.showContextMenu(raw)
 		} catch (e) {
 			console.error('Could not show context menu', raw)
 		}

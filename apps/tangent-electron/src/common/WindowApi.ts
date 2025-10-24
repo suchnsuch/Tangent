@@ -41,13 +41,6 @@ export default interface WindowAPI {
 
 	onWorkspaceAction(handler: (actionName: string) => void)
 
-	// Menus
-	onMenuAction(handler: (actionName: string) => void)
-	onGetAllMenus(handler: () => void)
-	postMenuUpdate(content: { [key: string]: { [key: string]: any}})
-	updateMenuAccelerators(content: { [key: string]: string })
-	showContextMenu(template: ContextMenuTemplate)
-
 	// Messages
 	postMessage(message: UserMessage)
 	onMessage(handler: (message: UserMessage) => void)
@@ -67,6 +60,19 @@ export default interface WindowAPI {
 		getAllLanguages(): Promise<string[]>
 		saveImageFromClipboard(contextPath: string): Promise<string>
 		messageDialog(options: Electron.MessageBoxOptions): Promise<Electron.MessageBoxReturnValue>
+	}
+
+	menus: {
+		/** Called when a window is created or comes into focus. The window should do whatever it needs to ensure the menus are in the right state. */
+		onRequestAllMenus(handler: () => void)
+		/** Called when a command has been invoked from the system-level menus. */
+		onMenuCommand(handler: (commandId: string) => void)
+		/** Call with a compatible menu template to set the menu for the window. */
+		setMainMenu(content: any)
+		/** Call to update the checked/enabled status of any commands in the system menu. */
+		updateCommandState(content: { [key: string]: { [key: string]: any }})
+		/** Displays a context menu at the current cursor position based on the supplied template. */
+		showContextMenu(template: ContextMenuTemplate)
 	}
 
 	file: {

@@ -1,14 +1,12 @@
 import path from 'path'
 import fs from 'fs'
 import { load } from 'cheerio'
-import { app, BrowserWindow, clipboard, dialog, ipcMain, MenuItem, MenuItemConstructorOptions, shell } from 'electron'
-import { getDocumentationPath, openDocumentation } from 'main/documentation'
+import { app, BrowserWindow, clipboard, dialog, ipcMain, shell } from 'electron'
+import { getDocumentationPath } from 'main/documentation'
 import { getWindowHandle, getWorkspace, validateWorkspaceForHandleFilepath, hasShutdownWorkspaces, workspaceMap } from 'main/workspaces'
 
 import fetch from 'node-fetch'
 import type { SelectPathOptions } from 'common/WindowApi'
-import type { ContextMenuTemplate } from 'common/menus'
-import { createMenus, updateMenuItems } from 'main/menus'
 
 import fontList from 'font-list'
 
@@ -20,7 +18,6 @@ import './dictionary'
 import './themes'
 import './urlData'
 import { FileSaveResult } from 'main/File'
-import { createWindow } from 'main/windows'
 
 const log = Logger.get('messages')
 
@@ -493,69 +490,10 @@ ipcMain.handle('openExternal', async (event, path) => {
 	}
 })
 
-ipcMain.on('postMenuUpdate', (event, state) => {
-	const windowHandle = getWindowHandle(event.sender)
-	if (windowHandle && windowHandle.window?.isFocused) {
-		updateMenuItems(state)
-	}
-})
-
-ipcMain.on('updateMenuAccelerators', (event, state) => {
-	const windowHandle = getWindowHandle(event.sender)
-	if (windowHandle && windowHandle.window?.isFocused) {
-		createMenus({
-			createWindow,
-			getWindowHandle,
-			openDocumentation,
-			keymap: state
-		})
-		event.sender.send('getAllMenus')
-	}
-})
-
-ipcMain.on('showContextMenu', (event, template: ContextMenuTemplate) => {
-	function actionPassthrough(item: MenuItem, browserWindow: BrowserWindow) {
-		// TODO: Maybe I need items here?
-		// Fallback to default menu item forwarding
-		event.sender.send('onMenuAction', item.id)
-	}
-
-	function recursivePassthrough(item: MenuItemConstructorOptions) {
-		item.click = actionPassthrough
-		if (Array.isArray(item.submenu)) {
-			for (const sub of item.submenu) {
-				recursivePassthrough(sub)
-			}
-		}
-	}
-
-	if (template.top) {
-		for (const item of template.top) {
-			recursivePassthrough(item)
-		}
-	}
-
-	if (template.middle) {
-		for (const item of template.middle) {
-			recursivePassthrough(item)
-		}
-	}
-
-	if (template.bottom) {
-		for (const item of template.bottom) {
-			recursivePassthrough(item)
-		}
-	}
-
-	const windowHandle = getWindowHandle(event.sender)
-	if (windowHandle) {
-		windowHandle.contextMenuCustomizations = template	
-	}
-})
-
 ipcMain.on('edit-native', (event, action) => {
 	const windowHandle = getWindowHandle(event.sender)
 	if (windowHandle) {
+		console.log('executing', action)
 		windowHandle.window.webContents[action]()
 	}
 })
