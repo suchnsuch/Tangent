@@ -41,7 +41,8 @@ export default abstract class WorkspaceCommand extends Command {
 			return [{
 				name,
 				command: this,
-				context: this.getDefaultPaletteContext()
+				context: this.getDefaultPaletteContext(),
+				shortcuts: this.shortcuts
 			}]
 		}
 		return []

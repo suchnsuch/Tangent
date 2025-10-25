@@ -11,6 +11,7 @@ import { ipcMain } from 'electron'
 import { cleanMenuTemplate } from '../common/menus'
 import { getSettings } from './settings'
 import { addShutDownTask } from './shutdown'
+import { wait } from '@such-n-such/core'
 
 let defaultLanguages = null
 
@@ -59,97 +60,101 @@ export function createWindow(assignedWorkspace?: string) {
 	})
 
 	newWindow.webContents.on('context-menu', (event, input) => {
+		// This delay is _sketchy_.
+		// The window (see Workspace.showContextMenu) wants to delay to the next loop so that selection changes can propegate.
+		// That means that the customization wouldn't make it in time. This delay lets the customizations arrive.
+		wait(10).then(() => {
+			const template: MenuItemConstructorOptions[] = []
 
-		const template: MenuItemConstructorOptions[] = []
+			const customizations = handle.contextMenuCustomizations
+			delete handle.contextMenuCustomizations
 
-		const customizations = handle.contextMenuCustomizations
-		delete handle.contextMenuCustomizations
-
-		if (customizations?.top) {
-			template.push(...customizations.top)
-		}
-
-		if (input.misspelledWord) {
-
-			template.push({ type: 'separator' })
-
-			if (input.dictionarySuggestions.length === 0) {
-				template.push({
-					label: 'No Guesses Found',
-					enabled: false
-				})
+			if (customizations?.top) {
+				template.push(...customizations.top)
 			}
 
-			for (const suggestion of input.dictionarySuggestions) {
-				template.push({
-					label: `Replace with "${suggestion}"`,
-					click: () => newWindow.webContents.replaceMisspelling(suggestion)
-				})
+			if (input.misspelledWord) {
+
+				template.push({ type: 'separator' })
+
+				if (input.dictionarySuggestions.length === 0) {
+					template.push({
+						label: 'No Guesses Found',
+						enabled: false
+					})
+				}
+
+				for (const suggestion of input.dictionarySuggestions) {
+					template.push({
+						label: `Replace with "${suggestion}"`,
+						click: () => newWindow.webContents.replaceMisspelling(suggestion)
+					})
+				}
+
+				template.push(
+					{
+						label: `Add "${input.misspelledWord}" to dictionary`,
+						click: () => newWindow.webContents.session.addWordToSpellCheckerDictionary(input.misspelledWord)
+					},
+					{ type: 'separator' }
+				)
 			}
 
-			template.push(
-				{
-					label: `Add "${input.misspelledWord}" to dictionary`,
-					click: () => newWindow.webContents.session.addWordToSpellCheckerDictionary(input.misspelledWord)
-				},
-				{ type: 'separator' }
-			)
-		}
+			if (input.isEditable) {
 
-		if (input.isEditable) {
+				template.push(
+					{ type: 'separator' },
+					{
+						label: 'Copy',
+						accelerator: 'CommandOrControl+C',
+						registerAccelerator: false,
+						enabled: input.editFlags.canCopy,
+						click: () => {
+							newWindow.webContents.copy()
+						}
+					},
+					{
+						label: 'Cut',
+						accelerator: 'CommandOrControl+X',
+						registerAccelerator: false,
+						enabled: input.editFlags.canCut,
+						click: () => {
+							newWindow.webContents.cut()
+						}
+					},
+					{
+						label: 'Paste',
+						accelerator: 'CommandOrControl+V',
+						registerAccelerator: false,
+						enabled: input.editFlags.canPaste,
+						click: () => {
+							newWindow.webContents.paste()
+						}
+					},
+					{
+						label: 'Paste and Match Style',
+						accelerator: 'CommandOrControl+Shift+V',
+						registerAccelerator: false,
+						enabled: input.editFlags.canPaste,
+						click: () => {
+							newWindow.webContents.pasteAndMatchStyle()
+						}
+					},
+					{ type: 'separator' }
+				)
+			}
 
-			template.push(
-				{ type: 'separator' },
-				{
-					label: 'Copy',
-					accelerator: 'CommandOrControl+C',
-					registerAccelerator: false,
-					enabled: input.editFlags.canCopy,
-					click: () => {
-						newWindow.webContents.copy()
-					}
-				},
-				{
-					label: 'Cut',
-					accelerator: 'CommandOrControl+X',
-					registerAccelerator: false,
-					enabled: input.editFlags.canCut,
-					click: () => {
-						newWindow.webContents.cut()
-					}
-				},
-				{
-					label: 'Paste',
-					accelerator: 'CommandOrControl+V',
-					registerAccelerator: false,
-					enabled: input.editFlags.canPaste,
-					click: () => {
-						newWindow.webContents.paste()
-					}
-				},
-				{
-					label: 'Paste and Match Style',
-					accelerator: 'CommandOrControl+Shift+V',
-					registerAccelerator: false,
-					enabled: input.editFlags.canPaste,
-					click: () => {
-						newWindow.webContents.pasteAndMatchStyle()
-					}
-				},
-				{ type: 'separator' }
-			)
-		}
+			if (customizations?.middle) {
+				template.push(...customizations.middle)
+			}
 
-		if (customizations?.middle) {
-			template.push(...customizations.middle)
-		}
+			if (customizations?.bottom) {
+				template.push(...customizations.bottom)
+			}
 
-		if (customizations?.bottom) {
-			template.push(...customizations.bottom)
-		}
-
-		const menu = Menu.buildFromTemplate(cleanMenuTemplate(template))
-		menu.popup()
+			const menu = Menu.buildFromTemplate(cleanMenuTemplate(template))
+			menu.popup()
+		})
 	})
 
 	// Handle links by default

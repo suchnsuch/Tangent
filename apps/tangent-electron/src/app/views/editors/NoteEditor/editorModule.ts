@@ -42,6 +42,7 @@ import type MarkdownEditor from './MarkdownEditor'
 import { appendContextTemplate, ContextMenuConstructorOptions } from 'app/model/menus'
 import { eventHasSelectionRequest } from 'app/events'
 import { setHeader, setLinePrefix, shiftGroup, toggleBold, toggleHightlight, toggleInlineCode, toggleItalic, toggleLineComment, toggleLink, toggleWikiLink } from './editorActions'
+import { createCommandHandler } from 'app/model/commands/Command'
 
 function clampRange(range: EditorRange, clampingRange: EditorRange): EditorRange {
 	range = normalizeRange(range)
@@ -668,6 +669,15 @@ export default function editorModule(editor: Editor, options: {
 		}
 	}
 
+	const commandHandler = workspace ? createCommandHandler([
+		...Object.values(workspace.commands).filter(c => c.group === 'Notes')
+	], {
+		buildContext(context: any) {
+			context.editor = markdownEditor
+			context.selection = editor.doc.selection
+		}
+	}) : null
+
 	function onEnter(event: ShortcutEvent) {
 		const { doc } = editor
     	let { selection } = doc
@@ -840,64 +850,15 @@ export default function editorModule(editor: Editor, options: {
 				return onEnter(event)
 			case 'Backspace':
 				return onBackspace(event)
-			case 'Mod+K':
-				return toggleLink(markdownEditor, markdownEditor.doc.selection, event)
-			case 'Mod+Alt+K':
-				return toggleWikiLink(markdownEditor, markdownEditor.doc.selection, 'name', event)
-			case 'Mod+Alt+Shift+K':
-				return toggleWikiLink(markdownEditor, markdownEditor.doc.selection, 'display', event)
-			case 'Mod+I':
-				return toggleItalic(markdownEditor, event)
-			case 'Mod+B':
-				return toggleBold(markdownEditor, event)
-			case 'Mod+=':
-				return toggleHightlight(markdownEditor, event)
-			case 'Mod+\\':
-				return toggleInlineCode(markdownEditor, event)
-			case 'Mod+/':
-				return toggleLineComment(markdownEditor, event)
-
-			case 'Mod+1':
-				return setHeader(markdownEditor, 1, event)
-			case 'Mod+2':
-				return setHeader(markdownEditor, 2, event)
-			case 'Mod+3':
-				return setHeader(markdownEditor, 3, event)
-			case 'Mod+4':
-				return setHeader(markdownEditor, 4, event)
-			case 'Mod+5':
-				return setHeader(markdownEditor, 5, event)
-			case 'Mod+6':
-				return setHeader(markdownEditor, 6, event)
-			case 'Mod+0':
-				return setLinePrefix(markdownEditor, markdownEditor.doc.selection, '', event)
-
-			case 'Alt+ArrowUp':
-				return shiftGroup(markdownEditor, markdownEditor.doc.selection, event, 'lines', -1)
-			case 'Alt+ArrowDown':
-				return shiftGroup(markdownEditor, markdownEditor.doc.selection, event, 'lines', 1)
-
 			case 'Escape':
 				return onEscape(event)
+			default:
+				if (commandHandler(event)) {
+					return
+				}
+				break
 		}
 
-		if (isMac) {
-			switch (event.shortcut) {
-				case 'Ctrl+Alt+ArrowUp':
-					return shiftGroup(markdownEditor, markdownEditor.doc.selection, event, 'section', -1)
-				case 'Ctrl+Alt+ArrowDown':
-					return shiftGroup(markdownEditor, markdownEditor.doc.selection, event, 'section', 1)
-			}
-		}
-		else {
-			switch (event.modShortcut) {
-				case 'Alt+Shift+ArrowUp':
-					return shiftGroup(markdownEditor, markdownEditor.doc.selection, event, 'section', -1)
-				case 'Alt+Shift+ArrowDown':
-					return shiftGroup(markdownEditor, markdownEditor.doc.selection, event, 'section', 1)
-			}
-		}
-			
 		switch(event.shortcut) {
 			case 'Home':
 			case 'Cmd+ArrowLeft':
@@ -946,135 +907,41 @@ export default function editorModule(editor: Editor, options: {
 	function onContextMenu(event: MouseEvent) {
 		handleSelectionRequest(event, 'all')
 
+		if (!workspace) return
+
 		const menu: ContextMenuConstructorOptions[] = []
 
-		{
-			const linkItems: ContextMenuConstructorOptions[] = []
-
-			// need to get the link from the event as selection change caused by this click hasn't propegated yet
-			let linkElement: TangentLink = null
-			let link: HrefFormedLink = null
-			if (TangentLink.isTangentLinkEvent(event)) {
-				linkElement = TangentLink.getTangentLinkFromEvent(event)
-				link = linkElement.getLinkInfo()
-			}
-
-			if (!link || link.form === 'wiki') {
-				linkItems.push({
-					label: (link ? 'Remove' : 'Create') + ' Wikilink',
-					accelerator: 'CommandOrControl+Alt+K',
-					click() {
-						toggleWikiLink(markdownEditor, markdownEditor.doc.selection, 'name')
-					}
-				})
-			}
-			
-			if (!link || link.form === 'md' || link.form === 'raw') {
-				linkItems.push({
-					label: (link?.form === 'md' ? 'Remove' : 'Create') + ' Markdown Link',
-					accelerator: 'CommandOrControl+K',
-					checked: link?.form === 'md',
-					click() {
-						toggleLink(markdownEditor, markdownEditor.doc.selection)
-					}
-				})
-			}
-
-			if (linkItems.length > 1) {
-				menu.push({
-					label: 'Links',
-					submenu: linkItems
-				})
-			}
-			else if (linkItems.length === 1) {
-				menu.push(linkItems[0])
-			}
+		const cmds = workspace.commands
+		const commandContext = {
+			initiatingEvent: event,
+			editor: markdownEditor
 		}
+
+		console.log(commandContext, editor.doc.selection )
+
+		menu.push({
+			label: 'Links',
+			submenu: [
+				{ command: cmds.toggleWikiLink, commandContext },
+				{ command: cmds.toggleMDLink, commandContext }
+			]
+		})
 
 		menu.push({
 			label: 'Formatting',
 			submenu: [
-				{
-					id: 'window_toggleBold',
-					label: 'Toggle Bold',
-					accelerator: 'CommandOrControl+B',
-					//click: toggleBold
-				},
-				{
-					id: 'window_toggleItalics',
-					label: 'Toggle Italics',
-					accelerator: 'CommandOrControl+I',
-					//click: toggleItalic
-				},
-				{
-					id: 'window_toggleHighlight',
-					label: 'Toggle Highlight',
-					accelerator: 'CommandOrControl+=',
-					//click: toggleHightlight
-				},
-				{
-					id: 'window_toggleInlineCode',
-					label: 'Toggle Inline Code',
-					accelerator: 'CommandOrControl+\\',
-					//click: toggleInlineCode
-				},
+				{ command: cmds.toggleBold, commandContext },
+				{ command: cmds.toggleItalics, commandContext },
+				{ command: cmds.toggleHighlight, commandContext },
+				{ command: cmds.toggleInlineCode, commandContext },
 				{ type: 'separator' },
-				{
-					id: 'window_setParagraph',
-					label: 'Paragraph',
-					accelerator: 'CommandOrControl+0',
-					click() {
-						//setLinePrefix('')
-					}
-				},
-				{
-					id: 'window_setHeader1',
-					label: 'Header 1',
-					accelerator: 'CommandOrControl+1',
-					click() {
-						//setHeader(1)
-					}
-				},
-				{
-					id: 'window_setHeader2',
-					label: 'Header 2',
-					accelerator: 'CommandOrControl+2',
-					click() {
-						//setHeader(2)
-					}
-				},
-				{
-					id: 'window_setHeader3',
-					label: 'Header 3',
-					accelerator: 'CommandOrControl+3',
-					click() {
-						//setHeader(3)
-					}
-				},
-				{
-					id: 'window_setHeader4',
-					label: 'Header 4',
-					accelerator: 'CommandOrControl+4',
-					click() {
-						//setHeader(4)
-					}
-				},
-				{
-					id: 'window_setHeader5',
-					label: 'Header 5',
-					accelerator: 'CommandOrControl+5',
-					click() {
-						//setHeader(5)
-					}
-				},
-				{
-					id: 'window_setHeader6',
-					label: 'Header 6',
-					accelerator: 'CommandOrControl+6',
-					click() {
-						//setHeader(6)
-					}
-				}
+				{ command: cmds.setParagraph, commandContext },
+				{ command: cmds.setHeader1, commandContext },
+				{ command: cmds.setHeader2, commandContext },
+				{ command: cmds.setHeader3, commandContext },
+				{ command: cmds.setHeader4, commandContext },
+				{ command: cmds.setHeader5, commandContext },
+				{ command: cmds.setHeader6, commandContext }
 			]
 		})
 

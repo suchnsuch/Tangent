@@ -7,6 +7,7 @@ import { setLinePrefix, shiftGroup, toggleInlineFormat, toggleLink, toggleWikiLi
 import { EditorRange } from 'typewriter-editor'
 import MarkdownEditor from 'app/views/editors/NoteEditor/MarkdownEditor'
 import { HrefFormedLink } from 'common/indexing/indexTypes'
+import { getLineFormattingPrefix } from 'common/markdownModel/line'
 
 function getNoteView(tangent: Tangent) {
 	const view = tangent.getCurrentViewState()
@@ -240,6 +241,14 @@ export class NoteLinePrefixCommand extends NoteEditorCommand {
 		const { editor, selection } = targets
 
 		setLinePrefix(editor, selection, this.prefix, context?.initiatingEvent)
+	}
+
+	getChecked(context?: NoteEditorCommandContext): boolean | null {
+		const targets = this.getTargets(context)
+		if (!targets) return
+		const { editor, selection } = targets
+		const lines = editor.doc.getLinesAt(selection)
+		return lines.every(line => getLineFormattingPrefix(line) === this.prefix)
 	}
 
 	getName() {

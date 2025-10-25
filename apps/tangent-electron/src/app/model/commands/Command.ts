@@ -89,7 +89,11 @@ export default abstract class Command {
 	}
 }
 
-export function createCommandHandler(commands: Command[]) {
+type CommandHandlerOptions = {
+	buildContext?(context: CommandContext)
+}
+
+export function createCommandHandler(commands: Command[], options?: CommandHandlerOptions) {
 	return (event: KeyboardEvent) => {
 		if (event.defaultPrevented) return
 		if (!eventIsShortcutable(event)) return
@@ -97,13 +101,19 @@ export function createCommandHandler(commands: Command[]) {
 		const shortcut = shortcutFromEvent(event)
 		const context = { initiatingEvent: event }
 
+		if (options?.buildContext) {
+			options.buildContext(context)
+		}
+
 		for (const command of commands) {
 			if (command.shortcuts?.includes(shortcut) && command.canExecute(context)) {
 				event.preventDefault()
 				console.log(`Executing "${command.getLabel(context)}" by way of ${shortcut}`)
 				command.execute(context)
-				return
+				return true
 			}
 		}
+
+		return false
 	}
 }

@@ -39,7 +39,7 @@ import CustomStyleManager from 'app/style/CustomStyleManager'
 import { HrefFormedLink } from 'common/indexing/indexTypes'
 import { Readable, derived, readable } from 'svelte/store'
 import NodeHandle, { HandleResult } from './NodeHandle'
-import { swapRemove } from '@such-n-such/core'
+import { swapRemove, wait } from '@such-n-such/core'
 import CodeThemeManager from 'app/style/CodeThemeManager'
 import { shortcutToElectronShortcut } from 'app/utils/shortcuts'
 
@@ -728,17 +728,19 @@ export default class Workspace extends EventDispatcher {
 	}
 
 	showContextMenu(template: SplitContextMenuTemplate | ContextMenuConstructorOptions[]) {
+		// Delay context menu processing so that selection from the click has propagated 
+		wait().then(() => {
+			const context = prepareContextMenuCommands(template)
+			this.contextMenuCommands = context.commands
+			
+			const raw = extractRawTemplate(context)
 
-		const context = prepareContextMenuCommands(template)
-		this.contextMenuCommands = context.commands
-		
-		const raw = extractRawTemplate(context)
-
-		try {
-			this.api.menus.showContextMenu(raw)
-		} catch (e) {
-			console.error('Could not show context menu', raw)
-		}
+			try {
+				this.api.menus.showContextMenu(raw)
+			} catch (e) {
+				console.error('Could not show context menu', raw)
+			}
+		})
 	}
 
 	shutdown() {

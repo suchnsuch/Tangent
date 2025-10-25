@@ -79,14 +79,16 @@ ipcMain.on('menus.setMainMenu', (event, template) => {
 			}
 			delete item.link
 		}
-		else {
-			log.error('Menu template items must have a valid "window_" command id or a `link`.', item)
-		}
-		
-		if (Array.isArray(item.submenu)) {
+		else if (Array.isArray(item.submenu)) {
 			for (const sub of item.submenu) {
 				recursiveConverter(sub)
 			}
+		}
+		else if (item.type === 'separator') {
+			// this is fine
+		}
+		else {
+			log.error('Menu template items must have a valid "window_" command id or a `link`.', item)
 		}
 	}
 

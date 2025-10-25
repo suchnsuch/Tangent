@@ -332,37 +332,37 @@ export default function workspaceCommands(workspace: Workspace): WorkspaceComman
 			shortcut: 'Mod+1',
 			label: 'Header 1',
 			tooltip: 'Changes the currently selected line(s) to a 1st level header.',
-			prefix: '#'
+			prefix: '# '
 		}),
 		setHeader2: new NoteLinePrefixCommand(workspace, {
 			shortcut: 'Mod+2',
 			label: 'Header 2',
 			tooltip: 'Changes the currently selected line(s) to a 2nd level header.',
-			prefix: '##'
+			prefix: '## '
 		}),
 		setHeader3: new NoteLinePrefixCommand(workspace, {
 			shortcut: 'Mod+3',
 			label: 'Header 3',
 			tooltip: 'Changes the currently selected line(s) to a 3rd level header.',
-			prefix: '###'
+			prefix: '### '
 		}),
 		setHeader4: new NoteLinePrefixCommand(workspace, {
 			shortcut: 'Mod+4',
 			label: 'Header 4',
 			tooltip: 'Changes the currently selected line(s) to a 4th level header.',
-			prefix: '####'
+			prefix: '#### '
 		}),
 		setHeader5: new NoteLinePrefixCommand(workspace, {
 			shortcut: 'Mod+5',
 			label: 'Header 5',
 			tooltip: 'Changes the currently selected line(s) to a 5th level header.',
-			prefix: '#####'
+			prefix: '##### '
 		}),
 		setHeader6: new NoteLinePrefixCommand(workspace, {
 			shortcut: 'Mod+6',
 			label: 'Header 6',
 			tooltip: 'Changes the currently selected line(s) to a 6th level header.',
-			prefix: '######'
+			prefix: '###### '
 		}),
 
 		setParagraph: new NoteLinePrefixCommand(workspace, {
@@ -375,22 +375,22 @@ export default function workspaceCommands(workspace: Workspace): WorkspaceComman
 		shiftLinesUp: new ShiftNoteGroupCommand(workspace, {
 			mode: 'lines',
 			direction: -1,
-			shortcut: 'Alt+ArrowUp'
+			shortcut: 'Alt+Up'
 		}),
 		shiftLinesDown: new ShiftNoteGroupCommand(workspace, {
 			mode: 'lines',
 			direction: 1,
-			shortcut: 'Alt+ArrowDown'
+			shortcut: 'Alt+Down'
 		}),
 		shiftGroupUp: new ShiftNoteGroupCommand(workspace, {
 			mode: 'section',
 			direction: -1,
-			shortcut: isMac ? 'Ctrl+Alt+ArrowUp' : 'Alt+Shift+ArrowUp'
+			shortcut: isMac ? 'Ctrl+Alt+Up' : 'Alt+Shift+Up'
 		}),
 		shiftGroupDown: new ShiftNoteGroupCommand(workspace, {
 			mode: 'section',
 			direction: 1,
-			shortcut: isMac ? 'Ctrl+Alt+ArrowDown' : 'Alt+Shift+ArrowDown'
+			shortcut: isMac ? 'Ctrl+Alt+Down' : 'Alt+Shift+Down'
 		}),
 
 		collapseCurrentSection: new CollapseCurrentSectionCommand(workspace, {

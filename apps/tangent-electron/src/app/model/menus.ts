@@ -102,8 +102,11 @@ export function prepareContextMenuCommands(template: SplitContextMenuTemplate | 
 				}
 
 				const checked = command.getChecked(commandContext)
-				if (checked) {
-					item.checked = true
+				if (checked != null) {
+					item.checked = checked
+					if (!item.type) {
+						item.type = 'checkbox'
+					}
 				}
 
 				if (!item.label) {
