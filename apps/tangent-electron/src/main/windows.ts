@@ -102,11 +102,18 @@ export function createWindow(assignedWorkspace?: string) {
 
 			if (input.isEditable) {
 
+				// Pull the main menu items for accelerator rebinding
+				const mainMenu = Menu.getApplicationMenu()
+				const copy = mainMenu.getMenuItemById('window_copy')
+				const cut = mainMenu.getMenuItemById('window_cut')
+				const paste = mainMenu.getMenuItemById('window_paste')
+				const pasteAndMatchStyle = mainMenu.getMenuItemById('window_pasteAndMatchStyle')
+
 				template.push(
 					{ type: 'separator' },
 					{
 						label: 'Copy',
-						accelerator: 'CommandOrControl+C',
+						accelerator: copy?.accelerator,
 						registerAccelerator: false,
 						enabled: input.editFlags.canCopy,
 						click: () => {
@@ -115,7 +122,7 @@ export function createWindow(assignedWorkspace?: string) {
 					},
 					{
 						label: 'Cut',
-						accelerator: 'CommandOrControl+X',
+						accelerator: cut?.accelerator,
 						registerAccelerator: false,
 						enabled: input.editFlags.canCut,
 						click: () => {
@@ -124,7 +131,7 @@ export function createWindow(assignedWorkspace?: string) {
 					},
 					{
 						label: 'Paste',
-						accelerator: 'CommandOrControl+V',
+						accelerator: paste?.accelerator,
 						registerAccelerator: false,
 						enabled: input.editFlags.canPaste,
 						click: () => {
@@ -133,7 +140,7 @@ export function createWindow(assignedWorkspace?: string) {
 					},
 					{
 						label: 'Paste and Match Style',
-						accelerator: 'CommandOrControl+Shift+V',
+						accelerator: pasteAndMatchStyle?.accelerator,
 						registerAccelerator: false,
 						enabled: input.editFlags.canPaste,
 						click: () => {
