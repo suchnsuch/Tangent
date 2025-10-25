@@ -20,7 +20,7 @@ import { clockTime, shortestDayDate } from 'common/dates'
 import { startDrag, stopDrag } from 'app/utils/dragging'
 import type Session from 'common/dataTypes/Session'
 import { readable } from 'svelte/store'
-import { markEventAsShortcutable } from 'app/utils/shortcuts'
+import { markEventAsShortcutable, shortcutFromEvent } from 'app/utils/shortcuts'
 import SvgIcon from '../smart-icons/SVGIcon.svelte'
 import type { RemoveFromMapCommandContext } from 'app/model/commands/RemoveFromMap'
 import { ThreadHistoryItem, UpdateThreadOptions } from 'common/dataTypes/Session'
@@ -695,19 +695,15 @@ function interpretKeyboardEvent(event: KeyboardEvent) {
 				workspace.commands.setThreadFocusLevel.execute({})
 			}
 			return true
-		case 'z':
-			if (event.ctrlKey || event.metaKey) {
-				if (event.shiftKey) {
-					session.undoStack.redo()
-				}
-				else {
-					session.undoStack.undo()
-				}
+		default:
+			// TODO: Some kind of command override/derive system
+			const shortcut = shortcutFromEvent(event)
+			console.log(shortcut, event)
+			if (workspace.commands.undo.shortcuts.includes(shortcut)) {
+				session.undoStack.undo()
 				return true
 			}
-			return false
-		case 'y':
-			if (event.ctrlKey || event.metaKey) {
+			else if (workspace.commands.redo.shortcuts.includes(shortcut)) {
 				session.undoStack.redo()
 				return true
 			}
