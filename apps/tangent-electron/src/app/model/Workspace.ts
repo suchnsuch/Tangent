@@ -292,6 +292,23 @@ export default class Workspace extends EventDispatcher {
 	 * Utility Functions
 	 */
 	nodeConstructor(raw: TreeNode) {
+		if (!raw) {
+			this.api.postMessage({
+				type: 'error',
+				title: 'File Model Error',
+				message: 'The workspace attempted to construct a null node. This is invalid. Please reach out to the developers with your logs.'
+			})
+			return null
+		}
+		if (typeof raw.fileType !== 'string') {
+			this.api.postMessage({
+				type: 'error',
+				title: 'File Model Error',
+				message: 'The workspaces attempted to construct a node with an invalid fileType field. Please reach out to the developers with your logs.'
+			})
+			console.error('Tree node has an invalid filetype:', raw)
+			return null
+		}
 		switch (raw.fileType) {
 			case 'folder':
 				return new Folder(raw, this)
