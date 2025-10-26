@@ -84,6 +84,14 @@ ipcMain.on('menus.setMainMenu', (event, template) => {
 				recursiveConverter(sub)
 			}
 		}
+		else if (typeof item.role === 'string') {
+			// Assuming other roles are correct
+		}
+		else if (item.tangentRole === 'checkForUpdates') {
+			delete item.tangentRole
+			item.label = 'Check for Updates...'
+			item.click = () => checkForUpdates()
+		}
 		else if (item.type === 'separator') {
 			// this is fine
 		}
@@ -98,54 +106,9 @@ ipcMain.on('menus.setMainMenu', (event, template) => {
 	}
 
 	// Inject & tweak mac-specific menus
-	if (isMac) {
-		template.unshift({
-			label: 'Tangent',
-			submenu: [
-				{ 'role': 'about' },
-				{
-					label: 'Check for Updates…',
-					click: () => checkForUpdates()
-				},
-				{ type: 'separator' },
-				{
-					id: 'window_openPreferences',
-					label: 'Preferences'
-				},
-				{ type: 'separator' },
-				{ role: 'services' },
-				{ type: 'separator' },
-				{ role: 'hide' },
-				{ role: 'hideOthers' },
-				{ role: 'unhide' },
-				{ type: 'separator' },
-				{ role: 'quit' }
-			]
-		})
-
-		const doIndex = template.findIndex(i => i.label === 'Do')
-		if (doIndex >= 0) {
-			// Inject speech options
-			template[doIndex].submenu.push({
-				label: 'Speech',
-				submenu: [
-					{ role: 'startSpeaking' },
-					{ role: 'stopSpeaking' }
-				]
-			})
-
-			// Inject window menu
-			template.splice(doIndex, 0, { role: 'windowMenu' })
-		}
-
+	if (isMac && mode === 'development') {
 		const helpIndex = template.findIndex(i => i.label === 'Help')
 		if (helpIndex >= 0) {
-			if (isMac) {
-				template[helpIndex].role = 'help'
-			}
-		}
-
-		if (mode === 'development') {
 			template.splice(helpIndex >= 0 ? helpIndex : template.length - 2, 0,
 				{
 					label: 'Dev',

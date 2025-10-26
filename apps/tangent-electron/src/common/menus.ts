@@ -1,9 +1,15 @@
 import type { MenuItemConstructorOptions } from 'electron/common';
 
+export type TangentRoleOptions = {
+	tangentRole?: 'checkForUpdates'
+}
+
+export type TangentMenuItemConstructorOptions = MenuItemConstructorOptions & TangentRoleOptions
+
 export interface ContextMenuTemplate {
-	top?: MenuItemConstructorOptions[]
-	middle?: MenuItemConstructorOptions[]
-	bottom?: MenuItemConstructorOptions[]
+	top?: TangentMenuItemConstructorOptions[]
+	middle?: TangentMenuItemConstructorOptions[]
+	bottom?: TangentMenuItemConstructorOptions[]
 	mixWithDefaultContext?: boolean
 }
 
@@ -11,9 +17,9 @@ export interface ContextMenuTemplate {
  * Strips out leading, adjacent, and trailing seperators.
  * Windows does not do this automatically, unlike MacOS.
  */
-export function cleanMenuTemplate(template: MenuItemConstructorOptions[]) {
-	const newTemplate: MenuItemConstructorOptions[] = []
-	let lastAddedItem: MenuItemConstructorOptions = null
+export function cleanMenuTemplate(template: TangentMenuItemConstructorOptions[]) {
+	const newTemplate: TangentMenuItemConstructorOptions[] = []
+	let lastAddedItem: TangentMenuItemConstructorOptions = null
 
 	for (let i = 0; i < template.length; i++) {
 		const item = template[i]

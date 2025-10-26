@@ -3,6 +3,7 @@ import type { Workspace } from '.'
 import type { AnyCommandContext } from './commands/Command'
 import type WorkspaceCommand from './commands/WorkspaceCommand'
 import { isMac } from 'common/platform'
+import { TangentRoleOptions } from 'common/menus'
 
 export interface ContextMenuCommand {
 	command?: WorkspaceCommand
@@ -10,11 +11,11 @@ export interface ContextMenuCommand {
 	click?: () => void
 }
 
-export interface MenuItemConstructorOptions extends ContextMenuCommand {
+export interface MenuItemConstructorOptions extends ContextMenuCommand, TangentRoleOptions {
 	id?: string
 	type?: 'normal' | 'separator' | 'submenu' | 'checkbox' | 'radio',
+	role?: 'about'|'services'|'hide'|'hideOthers'|'unhide'|'quit'|'windowMenu'|'help'|'startSpeaking'|'stopSpeaking'
 	label?: string
-	sublabel?: string
 	toolTip?: string
 
 	/** An external link to open */
@@ -167,33 +168,53 @@ export function buildMainMenu(workspace: Workspace): MenuItemConstructorOptions[
 
 	const cmds = workspace.commands
 
-	const template: MenuItemConstructorOptions[] = [
-		{
-			label: 'File',
+	const template: MenuItemConstructorOptions[] = []
+
+	if (isMac) {
+		template.push({
+			label: 'Tangent',
 			submenu: [
-				{ command: cmds.createNewFile },
-				{
-					label: 'Create New Note From Rule',
-					command: cmds.createNewNoteFromRule
-				},
-				{
-					label: 'Save',
-					command: cmds.saveCurrentFile
-				},
-				{
-					label: 'Duplicate',
-					command: cmds.duplicateNode
-				},
+				{ role: 'about' },
+				{ tangentRole: 'checkForUpdates' },
 				{ type: 'separator' },
-				{ command: cmds.closeCurrentFile },
-				{ command: cmds.closeOtherFiles },
-				{ command: cmds.closeLeftFiles },
-				{ command: cmds.closeRightFiles },
+				{ command: cmds.openPreferences },
 				{ type: 'separator' },
-				{ command: cmds.openWorkspace }
+				{ role: 'services' },
+				{ type: 'separator' },
+				{ role: 'hide' },
+				{ role: 'hideOthers' },
+				{ role: 'unhide' },
+				{ type: 'separator' },
+				{ role: 'quit' }
 			]
-		}
-	]
+		})
+	}
+	
+	template.push({
+		label: 'File',
+		submenu: [
+			{ command: cmds.createNewFile },
+			{
+				label: 'Create New Note From Rule',
+				command: cmds.createNewNoteFromRule
+			},
+			{
+				label: 'Save',
+				command: cmds.saveCurrentFile
+			},
+			{
+				label: 'Duplicate',
+				command: cmds.duplicateNode
+			},
+			{ type: 'separator' },
+			{ command: cmds.closeCurrentFile },
+			{ command: cmds.closeOtherFiles },
+			{ command: cmds.closeLeftFiles },
+			{ command: cmds.closeRightFiles },
+			{ type: 'separator' },
+			{ command: cmds.openWorkspace }
+		]
+	})
 
 	const editMenu: MenuItemConstructorOptions[] = [
 		{ command: cmds.undo },
@@ -316,35 +337,60 @@ export function buildMainMenu(workspace: Workspace): MenuItemConstructorOptions[
 			submenu: [
 				{ command: cmds.do }
 			]
-		},
-		{
-			label: 'Help',
-			submenu: [
-				{ command: cmds.openDocumenation },
-				{ command: cmds.openChangelog },
-				{ type: 'separator' },
-				{
-					label: 'Tangent\'s Website',
-					link: 'http://tangentnotes.com'
-				},
-				{
-					label: 'Email Tangent\'s Team',
-					link: `mailto:contact@tangentnotes.com?subject=Tangent v${workspace.version}`
-				},
-				{ type: 'separator' },
-				{
-					label: 'Tangent on Discord',
-					link: 'https://discord.gg/6VpvhUnxFe'
-				},
-				{
-					label: 'Tangent on Mastodon',
-					link: 'https://mastodon.social/@tangentnotes'
-				},
-				{ type: 'separator' },
-				{ command: cmds.openLogs }
-			]
 		}
 	)
+
+	const doMenu: MenuItemConstructorOptions = {
+		label: 'Do',
+		submenu: [
+			{ command: cmds.do }
+		]
+	}
+
+	if (isMac) {
+		doMenu.submenu.push({
+			label: 'Speech',
+			submenu: [
+				{ role: 'startSpeaking' },
+				{ role: 'stopSpeaking' }
+			]
+		})
+	}
+
+	template.push(doMenu)
+
+	if (isMac) {
+		template.push({ role: 'windowMenu' })
+	}
+
+	template.push({
+		label: 'Help',
+		role: 'help',
+		submenu: [
+			{ command: cmds.openDocumenation },
+			{ command: cmds.openChangelog },
+			{ type: 'separator' },
+			{
+				label: 'Tangent\'s Website',
+				link: 'http://tangentnotes.com'
+			},
+			{
+				label: 'Email Tangent\'s Team',
+				link: `mailto:contact@tangentnotes.com?subject=Tangent v${workspace.version}`
+			},
+			{ type: 'separator' },
+			{
+				label: 'Tangent on Discord',
+				link: 'https://discord.gg/6VpvhUnxFe'
+			},
+			{
+				label: 'Tangent on Mastodon',
+				link: 'https://mastodon.social/@tangentnotes'
+			},
+			{ type: 'separator' },
+			{ command: cmds.openLogs }
+		]
+	})
 
 	return template
 }
@@ -391,11 +437,11 @@ export function prepareMainMenuForElectron(template: MenuItemConstructorOptions[
 				recursiveConverter(sub)
 			}
 		}
-		else if (item.type === 'separator') {
+		else if (item.type === 'separator' || item.role || item.tangentRole) {
 			// this is fine
 		}
 		else {
-			console.error('Menu items must have a `command`, `link`, or `submenu`!', item)
+			console.error('Menu items must have a `command`, `link`, `submenu`, `role`, `tangentRole`, or be of `type: submenu`!', item)
 		}
 	}
 
