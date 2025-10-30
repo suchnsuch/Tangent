@@ -8,6 +8,10 @@ export interface PaletteAction {
 	shortcuts?: string[] | null
 }
 
+export interface WorkspaceCommandContext extends CommandContext {
+	context?: 'main-menu' // Add more like context-menu, command-palette, etc. as needed
+}
+
 export default abstract class WorkspaceCommand extends Command {
 
 	readonly workspace: Workspace
@@ -27,6 +31,7 @@ export default abstract class WorkspaceCommand extends Command {
 		this._id = id 
 	}
 
+	/** Describes the command in the context of shortcuts and debugging */
 	getName() {
 		return this.getLabel()
 	}

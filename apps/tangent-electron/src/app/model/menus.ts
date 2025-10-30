@@ -4,6 +4,7 @@ import type { AnyCommandContext } from './commands/Command'
 import type WorkspaceCommand from './commands/WorkspaceCommand'
 import { isMac } from 'common/platform'
 import { TangentRoleOptions } from 'common/menus'
+import { WorkspaceCommandContext } from './commands/WorkspaceCommand'
 
 export interface ContextMenuCommand {
 	command?: WorkspaceCommand
@@ -305,6 +306,12 @@ export function buildMainMenu(workspace: Workspace): MenuItemConstructorOptions[
 				},
 				{ command: cmds.showIncomingLinks },
 				{ type: 'separator' },
+				{ command: cmds.collapseCurrentSection },
+				{ command: cmds.collapseAllSections },
+				{ command: cmds.expandAllSections },
+				{ command: cmds.collapseSmallestSections },
+				{ command: cmds.expandLargestSections },
+				{ type: 'separator' },
 				{
 					label: 'Show Left Sidebar',
 					command: cmds.toggleLeftSidebar,
@@ -330,12 +337,6 @@ export function buildMainMenu(workspace: Workspace): MenuItemConstructorOptions[
 				{ command: cmds.openInFileBrowser },
 				{ command: cmds.moveToLeftFile },
 				{ command: cmds.moveToRightFile },
-			]
-		},
-		{
-			label: 'Do',
-			submenu: [
-				{ command: cmds.do }
 			]
 		}
 	)
@@ -396,6 +397,11 @@ export function buildMainMenu(workspace: Workspace): MenuItemConstructorOptions[
 }
 
 export function prepareMainMenuForElectron(template: MenuItemConstructorOptions[]) {
+
+	const context: WorkspaceCommandContext = {
+		context: 'main-menu'
+	}
+
 	function recursiveConverter(item: MenuItemConstructorOptions) {
 		if (item.commandContext) {
 			console.error('Main Menu items may not have additional context', item)
@@ -410,12 +416,12 @@ export function prepareMainMenuForElectron(template: MenuItemConstructorOptions[
 			if (!command.id) console.error('Commands must have IDs', command.getName())
 			item.id = 'window_' + command.id
 
-			item.label = item.label ?? command.getLabel()
+			item.label = item.label ?? command.getLabel(context)
 			if (!item.label) {
 				console.error('Main Menu items need labels!', item)
 			}
 
-			item.toolTip = item.toolTip ?? command.getTooltip()
+			item.toolTip = item.toolTip ?? command.getTooltip(context)
 			const checked = command.getChecked()
 			if (checked !== null) {
 				item.checked = checked

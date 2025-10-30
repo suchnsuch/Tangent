@@ -26,22 +26,16 @@ import TangentCodePreview from './t-code-preview' // No deletey
 import TangentMath from './t-math' // No deletey
 import { indentMatcher } from 'common/markdownModel/matches'
 import { getGlyphForNumber, ListDefinition, ListForm, listMatcher } from 'common/markdownModel/list'
-import type { HrefFormedLink } from 'common/indexing/indexTypes'
 import type { Workspace } from 'app/model'
-import type { AutocompleteModule } from '../autocomplete/autocompleteModule'
-import { findLinkAround, matchMarkdownLink, matchWikiLink, resolveLink } from 'common/markdownModel/links'
-import { AttributePredicate, findWordAroundPositionInDocument, getEditInfo, getLineRangeWhile, getRangeWhile, getRangesIntersecting, getSelectedLines, intersectRanges, lineToText } from 'common/typewriterUtils'
+import { getEditInfo, getLineRangeWhile, getRangeWhile, getRangesIntersecting, getSelectedLines, intersectRanges, lineToText } from 'common/typewriterUtils'
 import { isLeftClick, startDrag } from 'app/utils'
-import { repeatString } from '@such-n-such/core'
 import { subscribeUntil } from 'common/stores'
 import { handleIsNode } from 'app/model/NodeHandle'
-import {findSectionLines, isLineCollapsed, lineCollapseDepth } from 'common/markdownModel/sections'
-import { isMac } from 'common/platform'
+import { isLineCollapsed, lineCollapseDepth } from 'common/markdownModel/sections'
 import { bustIntoSelection } from '../selectionBuster'
 import type MarkdownEditor from './MarkdownEditor'
 import { appendContextTemplate, ContextMenuConstructorOptions } from 'app/model/menus'
 import { eventHasSelectionRequest } from 'app/events'
-import { setHeader, setLinePrefix, shiftGroup, toggleBold, toggleHightlight, toggleInlineCode, toggleItalic, toggleLineComment, toggleLink, toggleWikiLink } from './editorActions'
 import { createCommandHandler } from 'app/model/commands/Command'
 
 function clampRange(range: EditorRange, clampingRange: EditorRange): EditorRange {
@@ -943,7 +937,13 @@ export default function editorModule(editor: Editor, options: {
 				{ command: cmds.setHeader5, commandContext },
 				{ command: cmds.setHeader6, commandContext }
 			]
-		})
+		}),
+
+		menu.push({ type: 'separator' })
+
+		menu.push({ command: cmds.collapseCurrentSection, commandContext })
+		menu.push({ command: cmds.collapseAllSections, commandContext })
+		menu.push({ command: cmds.expandAllSections, commandContext })
 
 		appendContextTemplate(event, menu, 'middle')
 	}

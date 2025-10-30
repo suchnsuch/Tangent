@@ -8,6 +8,7 @@ import { EditorRange } from 'typewriter-editor'
 import MarkdownEditor from 'app/views/editors/NoteEditor/MarkdownEditor'
 import { HrefFormedLink } from 'common/indexing/indexTypes'
 import { getLineFormattingPrefix } from 'common/markdownModel/line'
+import { derived } from 'svelte/store'
 
 function getNoteView(tangent: Tangent) {
 	const view = tangent.getCurrentViewState()
@@ -34,6 +35,15 @@ class NoteEditorCommand extends WorkspaceCommand {
 
 	constructor(workspace: Workspace, options: CommandOptions) {
 		super(workspace, { group: 'Notes', ...options })
+
+		derived(this.workspace.viewState.tangent.currentThreadState, (state, set) => {
+			if (state instanceof NoteViewState) {
+				return state.selection.subscribe(set)
+			}
+			else set(null)
+		}).subscribe(_ => {
+			this.alertDirty()
+		})
 	}
 
 	getTargets(context?: NoteEditorCommandContext) {
@@ -86,7 +96,7 @@ export class InlineFormatCommand extends NoteEditorCommand {
 		const targets = this.getTargets(context)
 		if (!targets) return null
 		const { editor, selection } = targets
-		return this.attributePredicate(editor.doc.getFormats(selection))
+		return this.attributePredicate(editor.doc.getFormats(selection)) != null
 	}
 
 	getLabel(context?: InlineFormatCommandContext) {

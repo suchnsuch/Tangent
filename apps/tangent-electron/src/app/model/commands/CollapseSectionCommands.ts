@@ -1,9 +1,10 @@
 import { compareSectionDepth, getFirstCollapseableParentIndex, isLineCollapsible } from 'common/markdownModel/sections'
 import { NoteViewState } from '../nodeViewStates'
 import { CommandContext, CommandOptions } from './Command'
-import WorkspaceCommand from './WorkspaceCommand'
+import WorkspaceCommand, { WorkspaceCommandContext } from './WorkspaceCommand'
 import type { Line } from '@typewriter/document'
 import { Tangent, Workspace } from '..'
+import { derived } from 'svelte/store'
 
 function getNoteView(tangent: Tangent) {
 	const view = tangent.getCurrentViewState()
@@ -15,6 +16,15 @@ export class CollapseCurrentSectionCommand extends WorkspaceCommand {
 
 	constructor(workspace: Workspace, options: CommandOptions) {
 		super(workspace, { group: 'Notes', ...options })
+
+		derived(this.workspace.viewState.tangent.currentThreadState, (state, set) => {
+			if (state instanceof NoteViewState) {
+				return state.selection.subscribe(set)
+			}
+			else set(null)
+		}).subscribe(_ => {
+			this.alertDirty()
+		})
 	}
 
 	getTargets() {
@@ -30,11 +40,11 @@ export class CollapseCurrentSectionCommand extends WorkspaceCommand {
 		return { editor, index }
 	}
 
-	canExecute(context?: CommandContext): boolean {
+	canExecute(context?: WorkspaceCommandContext): boolean {
 		return this.getTargets() != null
 	}
 
-	execute(context?: CommandContext): void {
+	execute(context?: WorkspaceCommandContext): void {
 		const targets = this.getTargets()
 		if (targets) {
 			const { editor, index } = targets
@@ -42,20 +52,24 @@ export class CollapseCurrentSectionCommand extends WorkspaceCommand {
 		}
 	}
 
-	getLabel(context?: CommandContext) {
+	getName() {
+		return 'Toggle Current Selection'
+	}
+
+	getLabel(context?: WorkspaceCommandContext) {
 		const targets = this.getTargets()
-		if (targets) {
+		if (targets && context?.context !== 'main-menu') {
 			if (targets.editor.collapsingSections.lineHasCollapsedChildren(targets.index)) {
 				return 'Expand Current Section'
 			}
 			return 'Collapse Current Section'
 		}
-		return 'Toggle Current Section'
+		return this.getName()
 	}
 
-	getTooltip(context?: CommandContext) {
+	getTooltip(context?: WorkspaceCommandContext) {
 		const targets = this.getTargets()
-		if (targets) {
+		if (targets && context?.context !== 'main-menu') {
 			if (targets.editor.collapsingSections.lineHasCollapsedChildren(targets.index)) {
 				return 'Expands the current note section, revealing hidden content.'
 			}
@@ -80,6 +94,15 @@ export class CollapseAllSectionsCommand extends WorkspaceCommand {
 
 		this.scope = options?.scope ?? 'all'
 		this.mode = options?.mode ?? 'collapse'
+
+		derived(this.workspace.viewState.tangent.currentThreadState, (state, set) => {
+			if (state instanceof NoteViewState) {
+				return state.selection.subscribe(set)
+			}
+			else set(null)
+		}).subscribe(_ => {
+			this.alertDirty()
+		})
 	}
 
 	getView() {

@@ -41,7 +41,6 @@ import { Readable, derived, readable } from 'svelte/store'
 import NodeHandle, { HandleResult } from './NodeHandle'
 import { swapRemove, wait } from '@such-n-such/core'
 import CodeThemeManager from 'app/style/CodeThemeManager'
-import { shortcutToElectronShortcut } from 'app/utils/shortcuts'
 
 const menuContext = {}
 
@@ -70,6 +69,7 @@ export default class Workspace extends EventDispatcher {
 
 	commands: WorkspaceCommands
 	private commandUnsubs:  (() => void)[]
+	private dirtyCommands: WorkspaceCommand[] = []
 
 	updateState: UpdateState
 
@@ -159,12 +159,19 @@ export default class Workspace extends EventDispatcher {
 
 		this.commands = workspaceCommands(this)
 		this.commandUnsubs = Object.keys(this.commands).map(key => {
-			const command = this.commands[key] as Command
+			const command = this.commands[key]
 			return command.subscribe(() => {
-				// TODO: Send menu updates
-				api.menus.updateCommandState({
-					[key]: this.translateCommandToMenu(command)
-				})
+				if (!this.dirtyCommands.length) {
+					wait().then(() => {
+						const payload: any = {}
+						for (const command of this.dirtyCommands) {
+							payload[command.id] = this.translateCommandToMenu(command)
+						}
+						api.menus.updateCommandState(payload)
+						this.dirtyCommands = []
+					})
+				}
+				this.dirtyCommands.push(command)
 			})
 		})
 
