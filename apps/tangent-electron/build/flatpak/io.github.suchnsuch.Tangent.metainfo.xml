@@ -87,6 +87,13 @@
   <update_contact>k8ie_AT_mcld.eu</update_contact>
 
   <releases>
+    <release version="0.10.3" date="2025-11-01">
+      <description>
+        <ul>
+          <li>Fixed a crash that could occur at startup. Added logging to gain more information.</li>
+        </ul>
+      </description>
+    </release>
     <release version="0.10.2" date="2025-09-06">
       <description>
         <ul>
