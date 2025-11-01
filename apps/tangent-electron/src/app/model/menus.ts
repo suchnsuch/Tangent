@@ -15,7 +15,7 @@ export interface ContextMenuCommand {
 export interface MenuItemConstructorOptions extends ContextMenuCommand, TangentRoleOptions {
 	id?: string
 	type?: 'normal' | 'separator' | 'submenu' | 'checkbox' | 'radio',
-	role?: 'about'|'services'|'hide'|'hideOthers'|'unhide'|'quit'|'windowMenu'|'help'|'startSpeaking'|'stopSpeaking'
+	role?: 'about'|'services'|'hide'|'hideOthers'|'unhide'|'quit'|'windowMenu'|'help'|'startSpeaking'|'stopSpeaking'|'toggleDevTools'
 	label?: string
 	toolTip?: string
 
@@ -389,7 +389,8 @@ export function buildMainMenu(workspace: Workspace): MenuItemConstructorOptions[
 				link: 'https://mastodon.social/@tangentnotes'
 			},
 			{ type: 'separator' },
-			{ command: cmds.openLogs }
+			{ command: cmds.openLogs },
+			{ role: 'toggleDevTools' }
 		]
 	})
 
