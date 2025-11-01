@@ -170,7 +170,7 @@ export function toggleInlineCode(editor: MarkdownEditor, event?: Event) {
 export async function toggleLink(editor: MarkdownEditor, selection: EditorRange, event?: Event) {
 	const { doc, workspace } = editor
 	selection = normalizeRange(selection)
-	if (!selection || !workspace) return
+	if (!selection) return
 	const [at, to] = selection
 	
 	const activeFormats = doc.getFormats(selection)
@@ -183,6 +183,7 @@ export async function toggleLink(editor: MarkdownEditor, selection: EditorRange,
 	
 	if (link) {
 		if (link.form === 'raw') {
+			if (!workspace) return
 			// Convert a raw link into a named link
 			const line = doc.getLineAt(at)
 			const [start, end] = doc.getLineRange(line)

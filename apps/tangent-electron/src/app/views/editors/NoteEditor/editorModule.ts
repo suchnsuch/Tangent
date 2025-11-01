@@ -663,7 +663,7 @@ export default function editorModule(editor: Editor, options: {
 		}
 	}
 
-	const commandHandler = workspace ? createCommandHandler([
+	const commandHandler = workspace?.commands ? createCommandHandler([
 		...Object.values(workspace.commands).filter(c => c.group === 'Notes')
 	], {
 		buildContext(context: any) {

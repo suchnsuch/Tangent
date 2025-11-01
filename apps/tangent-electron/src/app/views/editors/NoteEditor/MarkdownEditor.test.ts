@@ -922,7 +922,7 @@ describe('Link toggling', () => {
 		editor.select(23)
 		await wait(waitTime)
 
-		toggleLink(editor, editor.doc.selection)
+		await toggleLink(editor, editor.doc.selection)
 
 		expect(editor.getText()).toEqual('I have linked to [My Cool Title](https://duckduckgo.com/)')
 	})
