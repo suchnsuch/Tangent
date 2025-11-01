@@ -3,16 +3,18 @@ import { wait } from '@such-n-such/core'
 import type { TreeNode } from 'common/trees'
 
 import type DirectoryView from 'app/model/directoryView'
-import { getContext, tick } from 'svelte';
+import { getContext } from 'svelte'
 import type Workspace from 'app/model/Workspace'
 import WorkspaceTreeNode from 'app/model/WorkspaceTreeNode'
-import { isModKey } from 'app/utils/events';
-import { appendContextTemplate, ContextMenuConstructorOptions } from 'app/model/menus';
-import LazyScrolledList from 'app/utils/LazyScrolledList.svelte';
-import type { NavigationData } from 'app/events';
-import { getTreeNodeTransfer, hasTreeNodeTransfer, setTreeNodeTransfer } from 'app/utils/dragDrop';
-import { queryFileType } from 'common/dataTypes/QueryInfo';
-import NodeIcon from '../smart-icons/NodeIcon.svelte';
+import { isModKey } from 'app/utils/events'
+import { appendContextTemplate, ContextMenuConstructorOptions } from 'app/model/menus'
+import LazyScrolledList from 'app/utils/LazyScrolledList.svelte'
+import { tooltip } from 'app/utils/tooltips'
+import type { NavigationData } from 'app/events'
+import { getTreeNodeTransfer, hasTreeNodeTransfer, setTreeNodeTransfer } from 'app/utils/dragDrop'
+import { queryFileType } from 'common/dataTypes/QueryInfo'
+import NodeIcon from '../smart-icons/NodeIcon.svelte'
+import NodeTooltip from '../node-views/NodeTooltip.svelte'
 
 let workspace = getContext('workspace') as Workspace
 
@@ -285,6 +287,13 @@ function drop(event: DragEvent, item: TreeNode) {
 		on:dragenter={event => dragEnter(event, item)}
 		on:dragleave={event => dragLeave(event, item)}
 		on:drop={event => drop(event, item)}
+		
+		use:tooltip={{
+			tooltip: NodeTooltip,
+			args: { node: item },
+			interactive: true,
+			placement: 'right'
+		}}
 		>
 		{#each {length: item.depth ? item.depth - 1 : 0} as _, i}
 			<span class="depth"

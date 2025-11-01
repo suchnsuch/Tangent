@@ -104,6 +104,15 @@ function onMouseLeave() {
 	}
 }
 
+function getStyle(config: TooltipConfig) {
+	let style = ''
+
+	if (config.minWidth) style += `min-width: ${config.minWidth};`
+	if (config.maxWidth) style += `max-width: ${config.maxWidth};`
+
+	return style
+}
+
 </script>
 
 <main
@@ -113,8 +122,7 @@ function onMouseLeave() {
 	on:introend={() => tooltipElement.style.pointerEvents = ''}
 	on:mouseenter={onMouseEnter}
 	on:mouseleave={onMouseLeave}
-	style:min-width={config.minWidth ?? ''}
-	style:max-width={config.maxWidth ?? '300px'}
+	style={getStyle(config)}
 >
 	{#if typeof config.tooltip === 'string'}
 		<p>
@@ -136,7 +144,7 @@ main {
 	top: 0;
 	left: 0;
 	width: fit-content;
-	max-width: 300px;
+	max-width: 50vw;
 
 	font-size: max(80%, 10px);
 	
