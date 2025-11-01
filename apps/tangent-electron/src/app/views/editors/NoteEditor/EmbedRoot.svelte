@@ -211,7 +211,7 @@ function websiteStyle(form: WebsiteData) {
 }
 
 function websiteImageStyle(form: WebsiteData) {
-	if (form.images.length) {
+	if (form.images?.length) {
 		return `background: url("${form.images[0]}"); background-size: cover;`
 	}
 	return ''
@@ -292,7 +292,9 @@ function websiteImageStyle(form: WebsiteData) {
 {:else if form.mode === 'website'}
 	<div class={'website-preview ' + form.mediaType} class:description={form.description} style={websiteStyle(form)}>
 		<div class="info">
-			<h1>{form.title.trim()}</h1>
+			{#if form.title}
+				<h1>{form.title.trim()}</h1>
+			{/if}
 			{#if form.description}
 				<p>
 					{form.description}
