@@ -69,7 +69,7 @@ export let noteDetailMode: NoteDetailMode = NoteDetailMode.None
 			<div class={"embedCard " + layout}>
 				<WorkspaceFileHeader {node} editable={false} />
 				{#if embedType === EmbedType.Image}
-					<div class="image" style={`background-image: url("${node.cacheBustPath}");`}></div>
+					<div class="image" style={`background-image: url("${node.cacheBustPath}"); ${layout === 'auto' ? 'height: 250px;' : ''}`}></div>
 				{:else if embedType === EmbedType.Audio}
 					<media-controller class="audio stretch" autohide="-1" gesturesdisabled>
 						<audio slot="media" src={node.cacheBustPath} />
