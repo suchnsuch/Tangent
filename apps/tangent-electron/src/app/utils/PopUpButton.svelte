@@ -228,8 +228,9 @@ function windowKey(event: KeyboardEvent) {
 <style lang="scss">
 .menu {
 	z-index: 1000000000; // LOL
-	background: var(--backgroundColor);
 	
+	background-color: var(--transparentBackgroundColor);
+	backdrop-filter: blur(20px);
 	border-radius: var(--inputBorderRadius);
 	box-shadow: 0 0 10px rgba(0, 0, 0, .3);
 
@@ -241,6 +242,7 @@ function windowKey(event: KeyboardEvent) {
 
 	&.templated {
 		background: none;
+		backdrop-filter: none;
 		box-shadow: none;
 		padding: 0;
 	}

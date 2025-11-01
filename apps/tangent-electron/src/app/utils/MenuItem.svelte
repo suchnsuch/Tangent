@@ -81,7 +81,7 @@ function onClick() {
 	{#if template.type === 'checkbox' || forceCheckboxSpace}
 		<span class="checkbox">✓</span>
 	{/if}
-	<span class="label">{template.label || template.command?.getLabel(template.commandContext)}</span>
+	<span class="label">{template.label || template.command?.getLabel(template.commandContext) || template.role}</span>
 	{#if shortcut}
 		<span class="shortcut">{@html shortcutsHtmlString(shortcut)}</span>
 	{/if}

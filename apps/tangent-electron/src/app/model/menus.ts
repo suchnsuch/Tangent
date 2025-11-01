@@ -396,6 +396,30 @@ export function buildMainMenu(workspace: Workspace): MenuItemConstructorOptions[
 	return template
 }
 
+export function prepareMainMenuForWindow(template: MenuItemConstructorOptions[]) {
+	function recursiveConverter(item: MenuItemConstructorOptions) {
+
+		if (item.command) {
+			const checked = item.command.getChecked(item.commandContext)
+			if (checked != null && !item.type) {
+				item.type = 'checkbox'
+			}
+		}
+
+		if (item.submenu) {
+			for (const subItem of item.submenu) {
+				recursiveConverter(subItem)
+			}
+		}
+	}
+
+	for (const item of template) {
+		recursiveConverter(item)
+	}
+
+	return template
+}
+
 export function prepareMainMenuForElectron(template: MenuItemConstructorOptions[]) {
 
 	const context: WorkspaceCommandContext = {

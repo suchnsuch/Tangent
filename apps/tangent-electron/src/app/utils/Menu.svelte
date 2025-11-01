@@ -188,15 +188,16 @@ nav {
 	min-width: 10em;
 
 	box-shadow: 0 0 10px rgba(0, 0, 0, .3);
-	background: var(--backgroundColor);
+	background-color: var(--transparentBackgroundColor);
+	backdrop-filter: blur(20px);
 
 	border-radius: var(--inputBorderRadius);
 	padding: var(--inputBorderRadius) 0;
 }
 
 .separator {
-	border-top: 1px solid var(--deemphasizedTextColor);
+	border-top: 1px solid var(--borderColor);
 	opacity: .7;
-	margin: .25em .5em;
+	margin: .5em 0em;
 }
 </style>

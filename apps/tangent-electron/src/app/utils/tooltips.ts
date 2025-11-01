@@ -135,6 +135,7 @@ export function dropAllTooltips() {
 }
 
 export function tooltipToConfig(configIsh: TooltipDefOrConfig) {
+	if (!configIsh) return null
 	if (typeof configIsh === 'string' || !('tooltip' in configIsh)) {
 		configIsh = { tooltip: configIsh }
 	}
@@ -155,7 +156,9 @@ export function tooltip(node: HTMLElement, def: TooltipDefOrConfig) {
 		if ('tooltip' in node) {
 			config = tooltipToConfig(node.tooltip as any)
 		}
-		requestTooltip(node, config, event)
+		if (config) {
+			requestTooltip(node, config, event)
+		}
 	}
 
 	function onLeave() {
