@@ -168,6 +168,13 @@ function createAllCommands(workspace: Workspace) {
 		openChangelog: new OpenChangelogCommand(workspace),
 
 
+		// Sidebar
+		renameSidebarItem: new RenameSidebarItem(workspace, {
+			shortcut: isMac ? 'Mod+R' : 'F2'
+		}),
+		deleteSidebarItem: new DeleteSidebarItem(workspace, { shortcut: 'Backspace' }),
+
+
 		// Maps
 		showAllChildMapNodes: new ShowAllChildMapNodesCommand(workspace),
 

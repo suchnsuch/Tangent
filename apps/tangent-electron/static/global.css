@@ -65,6 +65,7 @@
 	--emptyLinkTextColor: #9b321f;
 
 	--selectionBackgroundColor: var(--accentBackgroundColor);
+	--keySelectionBackgroundColor: rgba(0, 0, 0, .1);
 	--selectionPressedBackgroundColor: rgba(0, 0, 0, .2);
 
 	--highlightRedBGColor: #fa9d9d;
@@ -134,6 +135,7 @@
 	--emptyLinkTextColor: #d65a49;
 
 	--selectionBackgroundColor: rgba(255, 255, 255, .16);
+	--keySelectionBackgroundColor: rgba(255, 255, 255, .08);
 	--selectionPressedBackgroundColor: rgba(255, 255, 255, .13);
 
 	--highlightRedBGColor: #ed5454;

@@ -90,13 +90,14 @@ export default abstract class Command {
 }
 
 type CommandHandlerOptions = {
+	restrictForInput?: boolean
 	buildContext?(context: CommandContext)
 }
 
 export function createCommandHandler(commands: Command[], options?: CommandHandlerOptions) {
 	return (event: KeyboardEvent) => {
 		if (event.defaultPrevented) return
-		if (!eventIsShortcutable(event)) return
+		if ((options?.restrictForInput ?? true) && !eventIsShortcutable(event)) return
 
 		const shortcut = shortcutFromEvent(event)
 		const context = { initiatingEvent: event }

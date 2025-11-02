@@ -6,6 +6,8 @@ import type DirectoryView from 'app/model/directoryView'
 import { getContext } from 'svelte'
 import type Workspace from 'app/model/Workspace'
 import WorkspaceTreeNode from 'app/model/WorkspaceTreeNode'
+import { createCommandHandler } from 'app/model/commands/Command'
+import { SidebarCommandContext } from 'app/model/commands/SidebarCommands'
 import { isModKey } from 'app/utils/events'
 import { appendContextTemplate, ContextMenuConstructorOptions } from 'app/model/menus'
 import LazyScrolledList from 'app/utils/LazyScrolledList.svelte'
@@ -28,6 +30,7 @@ export let directoryView: DirectoryView
 let container: HTMLElement = null
 let renameTarget: TreeNode = null
 let renameElement: HTMLElement = null
+let focusedItem: TreeNode = null
 
 $: {
 	if (renameElement) {
@@ -77,7 +80,7 @@ function itemChildrenClass(item: WorkspaceTreeNode) {
 	return 'ChildOf_' + item.localId
 }
 
-function itemClicked(event: MouseEvent, item:TreeNode) {
+function itemClicked(event: MouseEvent | KeyboardEvent, item:TreeNode) {
 
 	if (workspace.viewState.tangent.currentNode.value === item) {
 		return
@@ -263,6 +266,57 @@ function drop(event: DragEvent, item: TreeNode) {
 	}
 }
 
+const commandHandler = createCommandHandler(
+	Object.values(workspace.commands).filter(c => c.group === 'Sidebar'),
+	{
+		restrictForInput: false,
+		buildContext(context: SidebarCommandContext) {
+			context.currentItem = focusedItem
+			context.setRenameTarget = (node: TreeNode) => {
+				renameTarget = node
+			}
+		}
+	}
+)
+
+function onKeydown(event: KeyboardEvent, item: TreeNode) {
+	if (commandHandler(event)) {
+		return
+	}
+
+	const index = visibleItems.indexOf(item)
+	if (index < 0) return
+
+	const isOpen = directoryView.isItemOpen(item)
+
+	if (index > 0 && (event.key === 'ArrowUp' || event.key === 'ArrowLeft' && !isOpen)) {
+		const previous = (event.target as HTMLElement).previousElementSibling
+		if (previous instanceof HTMLElement) {
+			previous.focus()
+			event.preventDefault()
+			return
+		}
+	}
+	if (index < visibleItems.length - 1 && (event.key === 'ArrowDown' || event.key === 'ArrowRight' && isOpen)) {
+		const next = (event.target as HTMLElement).nextElementSibling
+		if (next instanceof HTMLElement) {
+			next.focus()
+			event.preventDefault()
+			return
+		}
+	}
+
+	if (event.key === 'ArrowLeft' || event.key === 'ArrowRight') {
+		directoryView.toggleOpen(item)
+		event.preventDefault()
+		return
+	}
+
+	if (event.key === 'Enter') {
+		return itemClicked(event, item)
+	}
+}
+
 </script>
 
 <div bind:this={container}>
@@ -270,6 +324,7 @@ function drop(event: DragEvent, item: TreeNode) {
 	<!-- svelte-ignore a11y-click-events-have-key-events -->
 	<!-- svelte-ignore a11y-no-static-element-interactions -->
 	<div
+		tabindex="-1"
 		slot="item" let:item
 		class={itemClass(item)}
 		class:isSelected={$selection.includes(item)}
@@ -287,6 +342,9 @@ function drop(event: DragEvent, item: TreeNode) {
 		on:dragenter={event => dragEnter(event, item)}
 		on:dragleave={event => dragLeave(event, item)}
 		on:drop={event => drop(event, item)}
+		on:focus={event => focusedItem = item}
+
+		on:keydown={event => onKeydown(event, item)}
 		
 		use:tooltip={{
 			tooltip: NodeTooltip,
@@ -361,6 +419,10 @@ function drop(event: DragEvent, item: TreeNode) {
 			border-top-right-radius: var(--borderRadius);
 			border-bottom-right-radius: var(--borderRadius);
 		}
+	}
+
+	&:focus {
+		background-color: var(--keySelectionBackgroundColor);
 	}
 
 	&:hover, &.isSelected {
