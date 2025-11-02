@@ -36,122 +36,18 @@ import { InlineFormatCommand, NoteLinePrefixCommand, ShiftNoteGroupCommand, Togg
 import { isMac } from 'common/platform'
 import { NativeCommand } from './NativeCommand'
 import { OpenDocumentationCommand } from './OpenDocumentation'
+import { DeleteSidebarItem, RenameSidebarItem } from './SidebarCommands'
 export { Command, CommandAction, WorkspaceCommand }
 
-export interface WorkspaceCommands {
+type LiteralCommands = ReturnType<typeof createAllCommands>
+type GenericCommands = {
 	[key: string]: WorkspaceCommand
-
-	// Global
-	openWorkspace: OpenWorkspaceCommand
-
-	toggleLeftSidebar: ToggleSidebarCommand
-	openPreferences: OpenPreferencesCommand
-	openDocumenation: OpenDocumentationCommand
-
-	createNewFile: CreateNewFileCommand
-	createNewNoteFromRule: ShowCommandPaletteCommand
-	createNewFolder: CreateNewFolderCommand
-
-	undo: NativeCommand,
-	redo: NativeCommand,
-	cut: NativeCommand,
-	copy: NativeCommand,
-	paste: NativeCommand,
-	pasteAndMatchStyle: NativeCommand,
-	selectAll: NativeCommand,
-
-	openQueryPane: OpenQueryPaneCommand
-
-	goTo: ShowCommandPaletteCommand
-	openInFileBrowser: ShowInFileBrowserCommand
-
-	do: ShowCommandPaletteCommand
-
-	closeCurrentFile: CloseFileCommand
-	closeOtherFiles: CloseFileCommand
-	closeLeftFiles: CloseFileCommand
-	closeRightFiles: CloseFileCommand
-
-	saveCurrentFile: SaveCurrentFileCommand
-
-	moveToLeftFile: ChangeCurrentFileCommand
-	moveToRightFile: ChangeCurrentFileCommand
-
-	moveFile: MoveFileCommand
-	duplicateNode: DuplicateNodeCommand
-	deleteNode: DeleteNodeCommand
-
-	setFocusLevel: SetFocusLevelCommand
-	setMapFocusLevel: SetFocusLevelCommand
-	setThreadFocusLevel: SetFocusLevelCommand
-	setFileFocusLevel: SetFocusLevelCommand
-	setTypewriterFocusLevel: SetFocusLevelCommand
-	setParagraphFocusLevel: SetFocusLevelCommand
-	setLineFocusLevel: SetFocusLevelCommand
-	setSentenceFocusLevel: SetFocusLevelCommand
-	toggleFocusMode: ToggleFocusModeCommand
-
-	shiftHistoryBack: ShiftThreadHistoryCommand
-	shiftHistoryForward: ShiftThreadHistoryCommand
-
-	zoomIn: ZoomCommand
-	zoomOut: ZoomCommand
-	resetZoom: ZoomCommand
-
-	floatWindow: FloatWindowCommand
-
-	openLogs: OpenLogsCommand
-	openChangelog: OpenChangelogCommand
-
-
-	// Maps
-	mergeWithPreviousSession: MergeWithPreviousSessionCommand
-	createNewSession: CreateNewSessionCommand
-	createNewSessionFromThread: CreateNewSessionFromThreadCommand
-	archivePreviousSessions: ArchivePreviousSessionsCommand
-	showPreviousSession: ShowPreviousSessionCommand
-
-	showAllChildMapNodes: ShowAllChildMapNodesCommand
-	
-	removeNodeFromMap: RemoveNodeFromMapCommand
-	removeNodeAndChildrenFromMap: RemoveNodeAndChildrenFromMapCommand
-	removeEverythingButNodeFromMap: RemoveEverythingButNodeFromMapCommand
-	removeEverythingButThreadFromMap: RemoveEverythingButThreadFromMapCommand
-
-	
-	// Notes
-	toggleBold: InlineFormatCommand
-	toggleItalics: InlineFormatCommand
-	toggleHighlight: InlineFormatCommand
-	toggleInlineCode: InlineFormatCommand
-	toggleWikiLink: ToggleWikiLinkCommand
-	toggleWikiLinkDisplay: ToggleWikiLinkCommand
-	toggleMDLink: ToggleMarkdownLinkCommand
-	showIncomingLinks: NoteKeyboardProxyCommand
-
-	setHeader1: NoteLinePrefixCommand
-	setHeader2: NoteLinePrefixCommand
-	setHeader3: NoteLinePrefixCommand
-	setHeader4: NoteLinePrefixCommand
-	setHeader5: NoteLinePrefixCommand
-	setHeader6: NoteLinePrefixCommand
-
-	setParagraph: NoteLinePrefixCommand
-
-	shiftLinesUp: ShiftNoteGroupCommand
-	shiftLinesDown: ShiftNoteGroupCommand
-	shiftGroupUp: ShiftNoteGroupCommand
-	shiftGroupDown: ShiftNoteGroupCommand
-
-	collapseCurrentSection: CollapseCurrentSectionCommand
-	collapseAllSections: CollapseAllSectionsCommand
-	expandAllSections: CollapseAllSectionsCommand
-	collapseSmallestSections: CollapseAllSectionsCommand
-	expandLargestSections: CollapseAllSectionsCommand
 }
 
-export default function workspaceCommands(workspace: Workspace): WorkspaceCommands {
-	const commands = {
+export type WorkspaceCommands = LiteralCommands & GenericCommands
+
+function createAllCommands(workspace: Workspace) {
+	return {
 
 		openWorkspace: new OpenWorkspaceCommand(workspace),
 
@@ -423,7 +319,11 @@ export default function workspaceCommands(workspace: Workspace): WorkspaceComman
 			focus: true,
 			tooltip: 'Opens the information panel of the current note, revealing any links to that note from other notes.'
 		}),
-	} as WorkspaceCommands
+	}
+}
+
+export default function workspaceCommands(workspace: Workspace): WorkspaceCommands {
+	const commands = createAllCommands(workspace) as WorkspaceCommands
 
 	// Give all of the commands their id
 	for (const key of Object.keys(commands)) {
