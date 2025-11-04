@@ -117,10 +117,14 @@ div {
 
 .copy {
 	opacity: 0;
-	transition: opacity .4s;
+	transition: opacity .5s;
 	:hover > & {
-		transition-delay: .5s;
+		transition-delay: .75s;
 		opacity: 1;
+
+		&:hover {
+			transition: none;
+		}
 	}
 }
 </style>
