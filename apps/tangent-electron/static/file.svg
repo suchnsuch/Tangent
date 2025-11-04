@@ -7,6 +7,13 @@
 			d="M15,2 15,7 20,7"/>
 	</symbol>
 
+	<symbol id="clipboard" viewBox="0 0 24 24">
+		<rect style="stroke: var(--iconStroke, black); stroke-width: 1.5px; fill: none;"
+			x="4" y="3" width="16" height="19" rx="2"/>
+		<rect style="stroke: none; fill: var(--iconStroke, black);"
+			x="7" y="1" width="10" height="4" rx="2"/>
+	</symbol>
+
 	<symbol id="plus" viewBox="0 0 24 24">
 		<line x1="8" y1="13" x2="16" y2="13" style="fill: none; stroke: var(--iconStroke, black); stroke-width: 2px;"/>
 		<line x1="12" y1="9" x2="12" y2="17" style="fill: none; stroke: var(--iconStroke, black); stroke-width: 2px;"/>

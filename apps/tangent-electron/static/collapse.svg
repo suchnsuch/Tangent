@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <svg xmlns="http://www.w3.org/2000/svg">
 	<symbol id="open" viewBox="0 0 16 16">
-		<path d="M4,8 8,13 12,8" style="fill: none; stroke: var(--iconStroke, black); stroke-width: 2px; stroke-linecap: round; stroke-linejoin: round;"/>
+		<path d="M4,6 8,11 12,6" style="fill: none; stroke: var(--iconStroke, black); stroke-width: 2px; stroke-linecap: round; stroke-linejoin: round;"/>
 	</symbol>
 	<symbol id="closed" viewBox="0 0 16 16">
-		<path d="M6,6 11,10 6,14" style="fill: none; stroke: var(--iconStroke, black); stroke-width: 2px; stroke-linecap: round; stroke-linejoin: round;"/>
+		<path d="M6,4 11,8 6,12" style="fill: none; stroke: var(--iconStroke, black); stroke-width: 2px; stroke-linecap: round; stroke-linejoin: round;"/>
 	</symbol>
 </svg>
