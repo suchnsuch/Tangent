@@ -53,22 +53,6 @@ function searchDataToRegex(search: NoteSearchData): RegExp {
 	return null
 }
 
-function getFolderInfoFile(context: ViewStateContext, file: NoteFile): DataFile | null {
-	if (!file.meta?.uuid) {
-		// TODO: Does this need to be handled?
-		console.error('No UUID for', file.path)
-		return null
-	}
-	const directory = context.getRelativePersistentStateDirectory()
-	if (!directory) return null
-
-	return context.workspace.commands.createNewFile.execute({
-		relativePath: paths.join(directory, file.meta?.uuid + NoteViewInfo.fileType),
-		creationMode: 'createOrOpenCaseInsensitive',
-		updateSelection: false
-	}) as DataFile
-}
-
 export default class NoteViewState implements NodeViewState, LensViewState {
 	// Core Values
 	readonly context: ViewStateContext
@@ -107,7 +91,7 @@ export default class NoteViewState implements NodeViewState, LensViewState {
 		this.collapsedLines = new ForwardingStore<number[]>(undefined)
 
 		this.note.loadFile()
-		this.noteViewInfoFile = getFolderInfoFile(context, file)
+		this.noteViewInfoFile = context.getOrCreatePersistentUuidFile(file, NoteViewInfo.fileType) as DataFile
 		this.noteViewInfoFile?.loadData<NoteViewInfo>().then(info => {
 			this.noteViewInfo.set(info)
 			if (info) {

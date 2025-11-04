@@ -126,7 +126,7 @@ export default class Tangent {
 							return new ImageViewState(node)
 						case EmbedType.Audio:
 						case EmbedType.Video:
-							return new AudioVideoViewState(node)
+							return new AudioVideoViewState(context, node)
 						case EmbedType.PDF:
 							return new PdfViewState(node)
 					}

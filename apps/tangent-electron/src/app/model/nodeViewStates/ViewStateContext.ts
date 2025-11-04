@@ -6,6 +6,7 @@ import type Workspace from '../Workspace'
 import type NodeViewState from './NodeViewState'
 import type { Tangent } from '..'
 import UnhandledViewState from './UnhandledViewState'
+import File from '../File'
 
 export type ViewStateContextCreator = (workspace: Workspace, tangent: Tangent, parent: ViewStateContext) => ViewStateContext
 export type ViewStateCreator = (context: ViewStateContext, node: TreeNode, reference: TreeNodeReference) => NodeViewState
@@ -79,6 +80,22 @@ export default class ViewStateContext {
 	getRelativePersistentStateDirectory(): string | null {
 		const result = this.workspace.directoryStore.pathToRelativePath(paths.dirname(this.tangent.tangentInfoFile.path))
 		return result === false ? null : paths.join(result, 'state')
+	}
+
+	getOrCreatePersistentUuidFile(node: TreeNode, fileType: string): File | null {
+		if (!node.meta?.uuid) {
+			// TODO: Does this need to be handled?
+			console.error('No UUID for', node.path)
+			return null
+		}
+		const directory = this.getRelativePersistentStateDirectory()
+		if (!directory) return null
+
+		return this.workspace.commands.createNewFile.execute({
+			relativePath: paths.join(directory, node.meta?.uuid + fileType),
+			creationMode: 'createOrOpenCaseInsensitive',
+			updateSelection: false
+		}) as File
 	}
 
 	protected createNodeViewState(item: TreeNodeOrReference, allowUnhandled=true): NodeViewState {

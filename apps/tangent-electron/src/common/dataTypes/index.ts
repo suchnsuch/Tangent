@@ -7,11 +7,13 @@ import TagSettingsSet from './TagSettingsSet'
 import TagInfo from './TagInfo'
 import Session from './Session'
 import TangentInfo from './TangentInfo'
+import AudioVideoViewInfo from './AudioVideoViewInfo'
 
 export const dataTypes: DataType[] = [
 	WorkspaceSettings,
 	FolderInfo,
 	NoteViewInfo,
+	AudioVideoViewInfo,
 	QueryInfo,
 	Session,
 	TagSettingsSet,

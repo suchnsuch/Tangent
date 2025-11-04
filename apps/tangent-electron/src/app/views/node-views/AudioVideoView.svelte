@@ -19,7 +19,17 @@ export let editable: boolean = true
 export let layout: 'fill' | 'auto' = 'fill'
 export let extraTop: number = 0
 
+$: playbackPosition = state?.playbackPosition
+
 $: embedType = state?.file?.embedType
+
+function updatePlayback(this: HTMLAudioElement | HTMLVideoElement, event: Event) {
+	playbackPosition.set(this.currentTime)
+}
+
+function setPlayback(this: HTMLAudioElement | HTMLVideoElement, event: Event) {
+	this.currentTime = playbackPosition.value
+}
 
 </script>
 
@@ -41,12 +51,22 @@ $: embedType = state?.file?.embedType
 				<audio
 					slot="media"
 					src={state.file.cacheBustPath}
+					currenttime={$playbackPosition}
+
+					on:loadedmetadata={setPlayback}
+					on:seeked={updatePlayback}
+					on:pause={updatePlayback}
 				/>
 			{:else if embedType === EmbedType.Video}
 				<!-- svelte-ignore a11y-media-has-caption -->
 				<video
 					slot="media" preload="auto"
 					src={state.file.cacheBustPath}
+					currenttime={$playbackPosition}
+
+					on:loadedmetadata={setPlayback}
+					on:seeked={updatePlayback}
+					on:pause={updatePlayback}
 				/>
 			{/if}
 			<media-settings-menu hidden anchor="auto">
