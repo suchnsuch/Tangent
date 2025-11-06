@@ -135,7 +135,10 @@ export default function command(node: HTMLElement, params: commandParams) {
 	function clickHandler(event: MouseEvent) {
 		onLeave(event) // Disable tooltips
 		if (event.defaultPrevented) return
-		command.execute(Object.assign({ event }, context))
+		command.execute({
+			initiatingEvent: event,
+			...context
+		})
 		if (options.preventDefault) {
 			event.preventDefault()
 		}
