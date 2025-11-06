@@ -24,14 +24,15 @@ function onMainKeyDown(event: KeyboardEvent) {
 		event.preventDefault()
 
 		if (nameText) {
-			create()
+			create(event)
 		}
 	}
 }
 
-function create() {
+function create(event: KeyboardEvent | MouseEvent) {
 	workspace.commands.createNewFile.execute({
 		...context,
+		initiatingEvent: event,
 		name: preName + nameText + postName
 	})
 
