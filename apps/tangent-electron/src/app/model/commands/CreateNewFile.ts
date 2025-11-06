@@ -252,7 +252,9 @@ export default class CreateNewFileCommand extends WorkspaceCommand {
 		if (debug) console.log('Creating file', context)
 		
 		// Forward to createNode for easy post-creation handling here
-		let newNode = this.createNode(this.resolveContext(context)) 
+		const values = this.resolveContext(context)
+		if (!values) return
+		let newNode = this.createNode(values) 
 		if (newNode) {
 			if (context?.updateSelection ?? true) {
 				const nav: NavigationData = {
