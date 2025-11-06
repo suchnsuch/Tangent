@@ -55,7 +55,25 @@ function positionOnLine(line: HTMLElement, container: HTMLElement) {
 	})
 }
 
-function copySection() {
+function getCopyToolTip() {
+	const index = target?.index
+	if (index === undefined) return
+
+	const line = editor.doc.lines.at(index)
+	if (!line) return
+
+	let tooltip = 'Copy this section.'
+
+	if ('code' in line.attributes ||
+		'front_matter' in line.attributes ||
+		'math' in line.attributes
+	) {
+		tooltip += ' Hold shift to copy block formatting.'
+	}
+	return tooltip
+}
+
+function copySection(event: MouseEvent) {
 	const index = target?.index
 	if (index === undefined) return
 
@@ -65,7 +83,23 @@ function copySection() {
 	const { lines } = findSectionLines(editor.doc, [line], false)
 	if (!lines.length) return
 
-	const text = typewriterToText(lines)
+	let text = typewriterToText(lines)
+
+	if (!event.shiftKey) {
+		// Truncate blocks to not include the opening & closing formatting
+		if ('code' in line.attributes) {
+			text = text.replace(/^```\w+\n/m, '').replace(/\n```$/m, '')
+		}
+		else if ('math' in line.attributes) {
+			text = text.replace(/^\$\$\n/m, '').replace(/\n\$\$$/m, '')
+		}
+		else if ('front_matter' in line.attributes) {
+			text = text.replace(/^---\n/m, '').replace(/\n---$/m, '')
+		}
+	}
+
+	console.log(text)
+
 	navigator.clipboard.writeText(text)
 }
 
@@ -85,7 +119,7 @@ function toggleLineCollapse() {
 	{#if isLineCollapsible(doc.lines, target.index)}
 		<button class="subtle collapse copy"
 			on:click={copySection}
-			use:tooltip={"Copy this section"}
+			use:tooltip={getCopyToolTip()}
 		>
 			<SvgIcon size={16} ref={['file.svg#clipboard']} />
 		</button>
