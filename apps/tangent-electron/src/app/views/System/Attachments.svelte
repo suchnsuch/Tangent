@@ -18,5 +18,8 @@ let settings = workspace.settings
 		<p class="value-details explanation">
 			Relative paths (e.g. "./Path", "./", "../") will resolve based on the note the attachment is coming from.
 		</p>
+		<p class="value-details explanation">
+			The <code>$filename</code> token can be used to inject the name of the file that the attachment is being pasted into.
+		</p>
 	</div>
 </main>

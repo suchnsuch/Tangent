@@ -1079,15 +1079,20 @@ export default class Workspace {
 		if (!targetDirectory) {
 			targetDirectory = this.rootPath
 		}
-		else if (targetDirectory.match(/^\.\.?[\\\/]/)) {
-			targetDirectory = path.resolve(path.join(contextDir, targetDirectory))
-			if (!targetDirectory.startsWith(this.rootPath)) {
-				log.info('Relative attachment path would have brought us outside the workspace. Will use the root instead. Original:', targetDirectory)
-				targetDirectory = this.rootPath
-			}
-		}
 		else {
-			targetDirectory = path.join(this.rootPath, targetDirectory)
+			const extension = path.extname(contextPath)
+			targetDirectory = targetDirectory.replace('$filename', path.basename(contextPath, extension))
+
+			if (targetDirectory.match(/^\.\.?[\\\/]/)) {
+				targetDirectory = path.resolve(path.join(contextDir, targetDirectory))
+				if (!targetDirectory.startsWith(this.rootPath)) {
+					log.info('Relative attachment path would have brought us outside the workspace. Will use the root instead. Original:', targetDirectory)
+					targetDirectory = this.rootPath
+				}
+			}
+			else {
+				targetDirectory = path.join(this.rootPath, targetDirectory)
+			}
 		}
 
 		return this.contentsStore.getUniquePath(path.join(targetDirectory, idealFilepath))
