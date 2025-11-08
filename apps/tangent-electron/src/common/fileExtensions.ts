@@ -59,6 +59,7 @@ export const audioExtensionMatch = getExtensionRegex(audioFileExtensions)
 export const videoFileExtensions = [
 	'.mov',
 	'.mp4',
+	'.mkv',
 	'.avi',
 	'.webm'
 ]
