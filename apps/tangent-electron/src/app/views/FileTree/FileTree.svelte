@@ -164,8 +164,6 @@ function renameNode() {
 	if (renameTarget instanceof WorkspaceTreeNode && renameTarget.name !== newName) {
 		renameTarget.rename(newName)
 	}
-
-	renameTarget = null
 }
 
 function startNodeRename(item: TreeNode) {
@@ -179,8 +177,20 @@ function onRenameKeydown(event: KeyboardEvent) {
 	if (event.key === 'Enter') {
 		event.preventDefault()
 		event.stopPropagation()
+		renameNode()
 		renameElement.blur()
+		return
 	}
+	if (event.key === 'Escape') {
+		event.preventDefault()
+		event.stopPropagation()
+		renameElement.blur()
+		return
+	}
+}
+
+function onRenameBlur(event: Event) {
+	renameTarget = null
 }
 
 function showFileType(item: TreeNode) {
@@ -280,7 +290,7 @@ const commandHandler = createCommandHandler(
 )
 
 function onKeydown(event: KeyboardEvent, item: TreeNode) {
-	if (commandHandler(event)) {
+	if (commandHandler(event) || renameElement) {
 		return
 	}
 
@@ -380,8 +390,8 @@ function onKeydown(event: KeyboardEvent, item: TreeNode) {
 			<span class="name rename"
 				contenteditable="true"
 				bind:this={renameElement}
-				on:blur={renameNode}
 				on:keydown={onRenameKeydown}
+				on:blur={onRenameBlur}
 			>{item.name}</span>
 		{:else}
 			<span class="name"
