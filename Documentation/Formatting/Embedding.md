@@ -8,7 +8,7 @@ A markdown embed can embed content from the internet. It looks like `![](https:/
 # Supported Local Content
 Tangent can embed local images, videos and audio.
 * Images: `.png`, `.jpeg`, `.gif`, `.bmp`, `.svg`.
-* Video: `.mov`, `.mp4`, `.avi`, `.webm`.
+* Video: `.mov`, `.mp4`, `.mkv`, `.avi`, `.webm`.
 * Audio: `.mp3`, `.m4a`, `.wav`, `.ogg`, `.flac`.
 
 # Supported Remote Content
