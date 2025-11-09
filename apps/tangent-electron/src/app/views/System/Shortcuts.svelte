@@ -146,7 +146,7 @@ function validate(shortcut: string) {
 }
 
 function acceptEdit(shortcut: string) {
-	let currentShortcuts = keymap.get(editTarget.key)?.slice() ?? []
+	let currentShortcuts = keymap.get(editTarget.key)?.slice() ?? workspace.commands[editTarget.key]?.shortcuts?.slice() ?? []
 
 	if (currentShortcuts.length > editTarget.index) currentShortcuts[editTarget.index] = shortcut
 	else currentShortcuts.push(shortcut)
