@@ -2,7 +2,9 @@
 import { fly } from 'svelte/transition'
 import type { ImageViewState } from 'app/model/nodeViewStates'
 import WorkspaceFileHeader from 'app/utils/WorkspaceFileHeader.svelte'
-import { clamp } from 'common/utils';
+import { clamp } from 'common/utils'
+import { appendContextTemplate, ContextMenuConstructorOptions } from 'app/model/menus'
+import { getEmbedDisplayname } from 'common/embedding'
 
 export let state: ImageViewState
 export let editable: boolean = true
@@ -43,8 +45,13 @@ function onKeydown(event: KeyboardEvent) {
 
 function mouseDown(event: MouseEvent) {
 
-	event.preventDefault()
-	container.focus()
+	if (event.button === 0) {
+		event.preventDefault()
+	}
+
+	if (document.activeElement !== container) {
+		container.focus()
+	}
 
 	if (event.altKey) {
 		let targetZoom = $zoom
@@ -80,6 +87,21 @@ function resetTransform() {
 	$panX = 0
 	$panY = 0
 }
+
+function onContextMenu(event: MouseEvent) {
+	const menu: ContextMenuConstructorOptions[] = []
+
+	if (file.canCopyToClipboard) {
+		const type = file.embedType
+		menu.push({
+			command: file.workspace.commands.copyFileToClipboard,
+			commandContext: { file }
+		})
+	}
+
+	appendContextTemplate(event, menu)
+}
+
 </script>
 
 <!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
@@ -88,6 +110,7 @@ function resetTransform() {
 	on:wheel={onWheel}
 	on:keydown={onKeydown}
 	on:mousemove={onMouseMove}
+	on:contextmenu={onContextMenu}
 	tabindex="-1">
 	<WorkspaceFileHeader
 		node={state.file}

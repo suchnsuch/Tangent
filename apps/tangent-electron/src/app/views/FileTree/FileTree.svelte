@@ -17,6 +17,7 @@ import { getTreeNodeTransfer, hasTreeNodeTransfer, setTreeNodeTransfer } from 'a
 import { queryFileType } from 'common/dataTypes/QueryInfo'
 import NodeIcon from '../smart-icons/NodeIcon.svelte'
 import NodeTooltip from '../node-views/NodeTooltip.svelte'
+import { EmbedFile } from 'app/model'
 
 let workspace = getContext('workspace') as Workspace
 
@@ -139,6 +140,13 @@ function itemContext(event: MouseEvent, item: TreeNode) {
 				target: item
 			}
 		})
+
+		if (item instanceof EmbedFile && item.canCopyToClipboard()) {
+			menu.push({
+				command: workspace.commands.copyFileToClipboard,
+				commandContext: { file: item }
+			})
+		}
 
 		menu.push({
 			command: workspace.commands.duplicateNode,

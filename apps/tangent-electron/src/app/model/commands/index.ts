@@ -37,6 +37,7 @@ import { isMac } from 'common/platform'
 import { NativeCommand } from './NativeCommand'
 import { OpenDocumentationCommand } from './OpenDocumentation'
 import { DeleteSidebarItem, RenameSidebarItem } from './SidebarCommands'
+import { CopyFileToClipboardCommand } from './CopyFileToClipboard'
 export { Command, CommandAction, WorkspaceCommand }
 
 type LiteralCommands = ReturnType<typeof createAllCommands>
@@ -113,6 +114,8 @@ function createAllCommands(workspace: Workspace) {
 		moveFile: new MoveFileCommand(workspace),
 		duplicateNode: new DuplicateNodeCommand(workspace),
 		deleteNode: new DeleteNodeCommand(workspace),
+
+		copyFileToClipboard: new CopyFileToClipboardCommand(workspace),
 
 		setFocusLevel: new SetFocusLevelCommand(workspace, null, true),
 		setMapFocusLevel: new SetFocusLevelCommand(workspace, {

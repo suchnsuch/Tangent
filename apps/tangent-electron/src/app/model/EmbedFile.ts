@@ -1,7 +1,7 @@
 import type { TreeNode } from 'common/trees'
 import WorkspaceTreeNode from './WorkspaceTreeNode'
 import type Workspace from './Workspace'
-import { getEmbedType } from 'common/embedding'
+import { EmbedType, getEmbedType } from 'common/embedding'
 import { normalizeSeperators } from 'common/paths'
 
 export default class EmbedFile extends WorkspaceTreeNode {
@@ -23,5 +23,18 @@ export default class EmbedFile extends WorkspaceTreeNode {
 			.replace(/#/g, encodeURIComponent('#'))
 
 		return normalizedPath + '?t=' + this.modified
+	}
+
+	canCopyToClipboard() {
+		return this.embedType === EmbedType.Image && this.fileType.match(/(png|jpeg|jpg)/i) !== null
+	}
+
+	copyToClipboard() {
+		if (this.canCopyToClipboard()) {
+			switch (this.embedType) {
+				case EmbedType.Image:
+					return this.workspace.api.system.copyImageToClipboard(this.path)
+			}
+		}
 	}
 }

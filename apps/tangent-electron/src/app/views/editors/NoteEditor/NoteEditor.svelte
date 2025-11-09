@@ -63,6 +63,7 @@ import { revealContentAroundRange } from './editorModule';
 import { fly } from 'svelte/transition';
 import LineGutter from './LineGutter.svelte';
 import { derived } from 'svelte/store';
+import { EmbedFile } from 'app/model';
 
 // Technically, this just needs to exist _somewhere_. Putting it here because of the svelte dependency
 // Force the use of the variable so that it is included in the bundle
@@ -1055,6 +1056,15 @@ function onContextMenu(event: MouseEvent) {
 						}
 					}
 				)
+
+				if (resolution instanceof EmbedFile) {
+					if (resolution.canCopyToClipboard()) {
+						menu.push({
+							command: workspace.commands.copyFileToClipboard,
+							commandContext: { file: resolution }
+						})
+					}
+				}
 			}
 		}
 		else if (linkState === 'untracked') {

@@ -32,3 +32,13 @@ export function getEmbedType(target: TreeNode) {
 	}
 	return EmbedType.Invalid
 }
+
+export function getEmbedDisplayname(type: EmbedType, capitalized=true) {
+	switch (type) {
+		case (EmbedType.Image): return capitalized ? 'Image' : 'image'
+		case (EmbedType.Audio): return capitalized ? 'Audio' : 'audio'
+		case (EmbedType.Video): return capitalized ? 'Video' : 'video'
+		case (EmbedType.PDF): return capitalized ? 'PDF' : 'pdf'
+		case (EmbedType.Style): return capitalized ? 'Style' : 'style'
+	}
+}

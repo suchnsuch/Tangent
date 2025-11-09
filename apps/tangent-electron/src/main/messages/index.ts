@@ -1,7 +1,7 @@
 import path from 'path'
 import fs from 'fs'
 import { load } from 'cheerio'
-import { app, BrowserWindow, clipboard, dialog, ipcMain, shell } from 'electron'
+import { app, BrowserWindow, clipboard, dialog, ipcMain, nativeImage, shell } from 'electron'
 import { getDocumentationPath } from 'main/documentation'
 import { getWindowHandle, getWorkspace, validateWorkspaceForHandleFilepath, hasShutdownWorkspaces, workspaceMap } from 'main/workspaces'
 
@@ -579,6 +579,13 @@ ipcMain.handle('saveImageFromClipboard', (event, contextPath) => {
 	}
 	catch (error) {
 		log.error('Could not pull image from clipboard', error)
+	}
+})
+
+ipcMain.handle('copyImageToClipboard', async (event, path: string) => {
+	const image = nativeImage.createFromPath(path)
+	if (!image.isEmpty()) {
+		clipboard.writeImage(image)
 	}
 })
 
