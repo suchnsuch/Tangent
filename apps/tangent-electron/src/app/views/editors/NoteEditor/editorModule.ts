@@ -664,6 +664,14 @@ export default function editorModule(editor: Editor, options: {
 	}
 
 	const commandHandler = workspace?.commands ? createCommandHandler([
+		// Include native commands so that they can interrupt other actions
+		workspace.commands.undo,
+		workspace.commands.redo,
+		workspace.commands.cut,
+		workspace.commands.copy,
+		workspace.commands.paste,
+		workspace.commands.pasteAndMatchStyle,
+		workspace.commands.selectAll,
 		...Object.values(workspace.commands).filter(c => c.group === 'Notes')
 	], {
 		buildContext(context: any) {
@@ -839,6 +847,8 @@ export default function editorModule(editor: Editor, options: {
 	function onKeyDown(event: ShortcutEvent) {
 		if (event.defaultPrevented) return
 
+		if (commandHandler(event)) return
+
 		switch (event.modShortcut) {
 			case 'Enter':
 				return onEnter(event)
@@ -846,11 +856,6 @@ export default function editorModule(editor: Editor, options: {
 				return onBackspace(event)
 			case 'Escape':
 				return onEscape(event)
-			default:
-				if (commandHandler(event)) {
-					return
-				}
-				break
 		}
 
 		switch(event.shortcut) {

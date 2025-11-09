@@ -124,7 +124,7 @@ export function eventIsModifier(event: KeyboardEvent) {
 }
 
 export function eventIsShortcutable(event: KeyboardEvent) {
-	return event.metaKey || event.altKey || event.ctrlKey || (event as any).shortcutable === true
+	return event.metaKey || event.altKey || event.ctrlKey || event.key.length > 1 || (event as any).shortcutable === true
 }
 
 export function markEventAsShortcutable(event: KeyboardEvent) {

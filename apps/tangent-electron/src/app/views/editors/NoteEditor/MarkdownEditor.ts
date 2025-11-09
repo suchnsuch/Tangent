@@ -127,8 +127,16 @@ export default class MarkdownEditor extends Editor {
 			const {
 				copy,
 				paste,
+				history,
 				... trimmedDefaultModules
 			} = defaultModules
+
+			const newHistory = editor => {
+				const result = history(editor)
+				// We handle our own shortcuts. See `NativeCommand`.
+				delete result.shortcuts
+				return result
+			}
 
 			options.modules = {
 				autocomplete: (workspace && (options?.includeAutocomplete ?? true)) ? autocompleteBuilder([
@@ -139,6 +147,7 @@ export default class MarkdownEditor extends Editor {
 				]) : null,
 
 				...trimmedDefaultModules,
+				history: newHistory,
 
 				tLink: editor => tlinkModule(editor, {
 					linkFollowRequirement: workspace?.settings?.noteLinkFollowBehavior as any ?? 'mod'

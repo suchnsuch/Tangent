@@ -1,6 +1,8 @@
-import { Workspace } from '..';
-import { CommandContext, CommandOptions } from './Command';
-import WorkspaceCommand from './WorkspaceCommand';
+import MarkdownEditor from 'app/views/editors/NoteEditor/MarkdownEditor'
+import { Workspace } from '..'
+import { CommandContext, CommandOptions } from './Command'
+import WorkspaceCommand from './WorkspaceCommand'
+import { EditorRange } from '@typewriter/document'
 
 type NativeCommandRole = 'cut' | 'copy' | 'paste' | 'pasteAndMatchStyle' | 'selectAll' | 'undo' | 'redo'
 
@@ -8,6 +10,11 @@ interface NativeCommandOptions extends CommandOptions {
 	role: NativeCommandRole
 	label: string
 	tooltip: string
+}
+
+interface NativeCommandContext extends CommandContext {
+	editor?: MarkdownEditor
+	selection?: EditorRange
 }
 
 export class NativeCommand extends WorkspaceCommand {
@@ -22,15 +29,28 @@ export class NativeCommand extends WorkspaceCommand {
 		this.tooltip = options.tooltip
 	}
 
-	execute(context?: CommandContext): void {
+	execute(context?: NativeCommandContext): void {
+		if (context?.editor) {
+			// Bypass these with direct actions
+			// This fixes a strange bug where undo after a 'cut' on initialization doesn't trigger the expected `InputEvent`
+			// Solid argument that this should be a subclass, but we'll cross that bridge if necessary.
+			switch (this.role) {
+				case 'undo':
+					context.editor.modules.history.undo()
+					return
+				case 'redo':
+					context.editor.modules.history.redo()
+					return
+			}
+		}
 		this.workspace.api.edit.nativeAction(this.role)
 	}
 
-	getLabel(context?: CommandContext) {
+	getLabel(context?: NativeCommandContext) {
 		return this.label
 	}
 
-	getTooltip(context?: CommandContext) {
+	getTooltip(context?: NativeCommandContext) {
 		return this.tooltip
 	}
 
