@@ -261,8 +261,6 @@ export default class WikiLinkAutocompleter implements AutocompleteHandler {
 			nodes = store.getMatchesForPath(searchMatcher, {
 				fuzzy: true,
 				root: store.files,
-				orderByDistance: true,
-				alwaysReturnArray: true,
 				includeMatches: 'all',
 				filter: this._nodeFilter
 			})

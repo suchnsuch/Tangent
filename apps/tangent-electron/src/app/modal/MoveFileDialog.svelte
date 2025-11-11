@@ -38,7 +38,6 @@ function updateOptions(text: string) {
 	if (text) {
 		pathMatch = buildMatcher(text, { fuzzy: true })
 		nodes = workspace.directoryStore.getMatchesForPath(pathMatch, {
-			alwaysReturnArray: true,
 			includeMatches: 'best',
 			fuzzy: true,
 			filter: nodeFilter

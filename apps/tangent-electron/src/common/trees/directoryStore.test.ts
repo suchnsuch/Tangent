@@ -245,6 +245,11 @@ describe('Resolving & Creating Partial Path Matches', () => {
 					name: 'Note Name',
 					path: 'some/root/Note Name.md',
 					fileType: '.md'
+				},
+				{
+					name: 'Note Name.foo',
+					path: 'some/root/Note Name.foo',
+					fileType: 'folder'
 				}
 			]
 		}
@@ -378,7 +383,8 @@ describe('Resolving & Creating Partial Path Matches', () => {
 				root.children[2],
 				root.children[4],
 				root.children[6],
-				root.children[7]
+				root.children[7],
+				root.children[8]
 			])
 	})
 

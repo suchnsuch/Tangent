@@ -159,8 +159,6 @@ export default class TagAutocompleter implements AutocompleteHandler {
 			nodes = store.getMatchesForPath(searchMatcher, {
 				fuzzy: true,
 				root: store.tags,
-				orderByDistance: true,
-				alwaysReturnArray: true,
 				includeMatches: 'all'
 			}) as TagOption[]
 		}
