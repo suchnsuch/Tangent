@@ -105,18 +105,27 @@ export function shortcutFromEvent(event: KeyboardEvent) {
 	const shortcutArray: string[] = []
 	if (!event.key) return ''
 
+	let key = event.key
+
 	if (event.metaKey) shortcutArray.push(isMac ? 'Mod' : 'Meta')
 	if (event.ctrlKey) shortcutArray.push(isMac ? 'Ctrl' : 'Mod')
 	if (event.altKey) shortcutArray.push('Alt')
 	if (event.shiftKey) shortcutArray.push('Shift')
 
 	if (!eventIsModifier(event)) {
-		shortcutArray.push(codeToShortcutKey(event.code))
+
+		if (isMac && event.altKey && event.code) {
+			// The altKey on mac can change the key value (e.g. Cmd+Alt+R will show up as Cmd+Alt+® if we don't do this)
+			// This will only work properly on QWERTY keyboard layouts… The alternative is a map of mac option characters to keys…
+			key = codeToShortcutKey(event.code)
+		}
+
+		if (key.length === 1) key = key.toUpperCase()
+
+		shortcutArray.push(key)
 	}
 
-	let shortcut = shortcutArray.join('+')
-
-	return shortcut
+	return shortcutArray.join('+')
 }
 
 export function eventIsModifier(event: KeyboardEvent) {
