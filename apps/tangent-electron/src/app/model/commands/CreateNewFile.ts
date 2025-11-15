@@ -278,11 +278,20 @@ export default class CreateNewFileCommand extends WorkspaceCommand {
 		let newNode = this.createNode(values) 
 		if (newNode) {
 			if (context?.updateSelection ?? true) {
+				const { directoryStore, viewState } = this.workspace
+
+				if (viewState.tangent.thread.value?.includes(newNode)) {
+					// If we're already looking at it, just focus it
+					viewState.tangent.activeSession.value.updateThread({
+						currentNode: newNode,
+						thread: 'retain'
+					})
+					return
+				}
+
 				const nav: NavigationData = {
 					target: newNode
 				}
-
-				const { directoryStore, viewState } = this.workspace
 
 				let navigateFrom = context?.navigateFrom
 				const rule = context?.rule
