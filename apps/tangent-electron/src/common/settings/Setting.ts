@@ -43,7 +43,7 @@ interface SettingRange {
 	softMax?: number
 }
 
-export type SettingForm = 'default' | 'folder' | 'path' | 'textarea' | 'select'
+export type SettingForm = 'default' | 'folder' | 'path' | 'textarea' | 'select' | 'shortcut'
 
 /**
  * This type malarky means the base type _must_ be simple (T), and the real value type

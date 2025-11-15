@@ -247,6 +247,27 @@ export default class CreateNewFileCommand extends WorkspaceCommand {
 		return newNode
 	}
 
+	canExecute(context?: CreateNewFileCommandContext): boolean {
+		return true
+	}
+
+	canExecuteFromShortcut(shortcut: string, context?: CreateNewFileCommandContext): boolean {
+		// Do shenanigans to check for other rules, modifying the context if necessary
+		if (!super.canExecuteFromShortcut(shortcut, context) && !context?.rule) {
+			for (const rule of this.workspace.workspaceSettings.value.creationRules.value) {
+				if (rule.shortcut.value === shortcut) {
+					if (context) context.rule = rule
+					if (this.canExecute(context)) {
+						return true
+					}
+				}
+			}
+			if (context) delete context.rule
+			return false
+		}
+		return true
+	}
+
 	execute(context: CreateNewFileCommandContext): TreeNode {
 		const debug = this.workspace.debug.fileCreation
 		if (debug) console.log('Creating file', context)
@@ -300,7 +321,7 @@ export default class CreateNewFileCommand extends WorkspaceCommand {
 				context: {
 					rule
 				},
-				shortcuts: null
+				shortcuts: rule.shortcut.value ? [rule.shortcut.value] : null
 			})
 		}
 

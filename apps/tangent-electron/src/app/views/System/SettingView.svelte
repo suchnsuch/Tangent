@@ -5,6 +5,7 @@ import type Workspace from 'app/model/Workspace'
 import SvgIcon from '../smart-icons/SVGIcon.svelte'
 import PopUpButton from 'app/utils/PopUpButton.svelte'
 import { tooltip } from 'app/utils/tooltips'
+import ShortcutInput from 'app/utils/ShortcutInput.svelte'
 
 const workspace = getContext('workspace') as Workspace
 
@@ -21,6 +22,8 @@ export let includeDefault = true
 export let getValuesImmediately = false
 let procuredValues: SettingList = null
 let hasProcuredValues = false
+
+export let onValidateShortcut: (shortcut: string) => string = null
 
 if (getValues) {
 	if (setting.defaultValue === setting.value) {
@@ -229,11 +232,19 @@ function toggleItem(item) {
 						spellcheck="true"
 						rows="3"
 						placeholder={setting.placeholder}/>
+				{:else if form === 'shortcut'}
+					<div style="display: flex; align-items: center;">
+						<ShortcutInput
+							bind:value={$setting}
+							validate={onValidateShortcut}
+						/>
+					</div>
 				{:else}
 					<input type="text"
 						class="grow"
 						bind:value={$setting}
-						placeholder={setting.placeholder ?? (setting.form === 'folder' ? 'Workspace Root' : '')}/>
+						placeholder={setting.placeholder ?? (setting.form === 'folder' ? 'Workspace Root' : '')}
+					/>
 					{#if setting.form === 'folder' || setting.form === 'path'}
 						<button on:click={selectPath} class="iconButton">
 							<SvgIcon ref={'folder.svg#folder'} size={16} />

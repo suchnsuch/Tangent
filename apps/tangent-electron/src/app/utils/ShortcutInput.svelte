@@ -4,17 +4,31 @@ import { tooltip } from './tooltips'
 
 export let validate: (shortcut: string) => string = null
 export let onCancel: () => void = null
-export let onAccept: (shortcut: string) => void
+export let onAccept: (shortcut: string) => void = null
 
-let editText: string = ''
+export let value: string = null
+
+let editText: string = value ?? ''
 let errorText: string = ''
 let editElement: HTMLInputElement = null
-$: editElement?.focus()
+let placeholder = 'Add Shortcut'
+$: if (value === null) editElement?.focus(); else if (document.activeElement !== editElement) editText = value
+
+function onFocus() {
+	editText = ''
+	placeholder = 'Press Shortcut'
+}
+
+function onBlur() {
+	editText = value ?? ''
+	if (onCancel) onCancel()
+	placeholder = 'Add Shortcut'
+}
 
 function onEditKeyDown(event: KeyboardEvent) {
 	event.preventDefault()
 	if (event.key === 'Escape') {
-		if (onCancel) onCancel()
+		editElement.blur()
 		return
 	}
 
@@ -24,7 +38,11 @@ function onEditKeyDown(event: KeyboardEvent) {
 	editText = shortcutDisplayString(shortcut)
 	errorText = validate ? validate(shortcut) : null
 
-	if (!errorText) onAccept(shortcut)
+	if (!errorText) {
+		if (value !== null) value = shortcut
+		if (onAccept) onAccept(shortcut)
+		editElement.blur()
+	}
 }
 
 function onEditKeyUp(event: KeyboardEvent) {
@@ -37,8 +55,9 @@ function onEditKeyUp(event: KeyboardEvent) {
 	bind:value={editText}
 	on:keydown={onEditKeyDown}
 	on:keyup={onEditKeyUp}
-	on:blur={onCancel}
-	placeholder="Press Shortcut"
+	on:focus={onFocus}
+	on:blur={onBlur}
+	{placeholder}
 />
 {#if errorText}
 	<span use:tooltip={errorText}>⚠</span>

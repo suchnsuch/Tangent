@@ -129,20 +129,7 @@ function stopEditing() {
 }
 
 function validate(shortcut: string) {
-	const targetCommand = workspace.commands[editTarget.key]
-
-	for (const key of Object.keys(workspace.commands)) {
-		const command = workspace.commands[key]
-		if (command === targetCommand) continue
-		if (command.shortcuts && (!command.group || targetCommand.group.startsWith(command.group))) {
-			for (const sc of command.shortcuts) {
-				if (sc == shortcut) {
-					return 'This shortcut is used by "' + command.getName() + '"'
-				}
-			}
-		}
-	}
-	return null
+	return workspace.validateShortcut(shortcut, workspace.commands[editTarget.key])
 }
 
 function acceptEdit(shortcut: string) {

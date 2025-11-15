@@ -1,13 +1,15 @@
 <script lang="ts">
+import { getContext, tick } from 'svelte'
+import { PathValidationMessages, validatePath } from 'common/trees'
 import type CreationRule from 'common/settings/CreationRule'
 import { nameFromRule, willPromptForName } from 'common/settings/CreationRule'
+import { Workspace } from 'app/model'
 import editable from 'app/utils/editable'
 import SettingView from '../System/SettingView.svelte'
 import { tooltip } from 'app/utils/tooltips'
-import { PathValidationMessages, validatePath } from 'common/trees'
-import { tick } from 'svelte';
 import CreationRuleTemplateButton from './CreationRuleTemplateButton.svelte'
 
+const workspace = getContext('workspace') as Workspace
 export let rule: CreationRule
 
 $: ruleName = rule.name
@@ -110,6 +112,10 @@ function insertTextIntoTemplate(
 	}
 }
 
+function onValidateShortcut(shortcut: string) {
+	return workspace.validateShortcut(shortcut, rule)
+}
+
 </script>
 
 <main>
@@ -172,6 +178,7 @@ function insertTextIntoTemplate(
 		</figure>
 	</details>
 	<div class="settingsGroup">
+		<SettingView setting={rule.shortcut} {onValidateShortcut} />
 		<SettingView setting={rule.folder} />
 		<SettingView setting={rule.mode} />
 		<SettingView setting={rule.showInMenu} />

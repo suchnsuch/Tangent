@@ -51,6 +51,13 @@ export function willPromptForName(template: string) {
 	return template.indexOf(nameToken) >= 0
 }
 
+const shortcutDefinition: SettingDefinition<string> = {
+	name: 'Shortcut',
+	description: 'If set, this shortcut will invoke this creation rule.',
+	defaultValue: '',
+	form: 'shortcut'
+}
+
 const folderStoreDefinition: SettingDefinition<string> = {
 	name: 'Target Folder',
 	description: 'The folder in which the note will be created.',
@@ -111,6 +118,8 @@ export default class CreationRule extends ObjectStore {
 	name: ValidatingStore<string>
 	nameTemplate: WritableStore<string>
 
+	shortcut: Setting<string>
+
 	folder: Setting<string>
 	mode: Setting<CreationMode>
 
@@ -133,6 +142,7 @@ export default class CreationRule extends ObjectStore {
 		this.mode = new Setting(creationModeDefinition)
 		this.description = new Setting(descriptionDefinition)
 		this.showInMenu = new Setting(showInMenuDefinition)
+		this.shortcut = new Setting(shortcutDefinition)
 		this.openInContext = new Setting(openInContextDefinition)
 
 		if (initialPatch) this.applyPatch(initialPatch)

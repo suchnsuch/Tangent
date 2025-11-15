@@ -41,6 +41,7 @@ import { Readable, derived, readable } from 'svelte/store'
 import NodeHandle, { HandleResult } from './NodeHandle'
 import { swapRemove, wait } from '@such-n-such/core'
 import CodeThemeManager from 'app/style/CodeThemeManager'
+import CreationRule from 'common/settings/CreationRule'
 
 const menuContext = {}
 
@@ -748,6 +749,30 @@ export default class Workspace extends EventDispatcher {
 				console.error('Could not show context menu', raw)
 			}
 		})
+	}
+
+	validateShortcut(shortcut: string, target: any) {
+		const targetIsCommand = target instanceof WorkspaceCommand
+		for (const key of Object.keys(this.commands)) {
+			const command = this.commands[key]
+			if (command === target) continue
+			if (command.shortcuts && (!command.group || (targetIsCommand && target.group.startsWith(command.group)))) {
+				for (const sc of command.shortcuts) {
+					if (sc == shortcut) {
+						return 'This shortcut is used by "' + command.getName() + '"'
+					}
+				}
+			}
+		}
+
+		for (const rule of this.workspaceSettings.value.creationRules.value) {
+			if (rule === target) continue
+			if (rule.shortcut.value === shortcut) {
+				return 'This shortcut is used by the creation rule "' + rule.name.value + '"'
+			}
+		}
+
+		return null
 	}
 
 	shutdown() {
