@@ -99,7 +99,7 @@ function getContent(node: TreeNode, relativeTo: string | TreeNode, showFileType:
 			}, [0, dirName.length + 1])
 			annotations = applyAnnotation(annotations, {
 				className: 'name'
-			}, [dirname.length + 1, extenstionStart])
+			}, [dirName.length + 1, extenstionStart])
 		}
 		else {
 			annotations = applyAnnotation(annotations, {
@@ -169,7 +169,6 @@ div > :global(svg) {
 
 	.shrinkNonHighlights & {
 		font-size: 80%;
-		line-height: 125%;
 	}
 }
 
@@ -179,7 +178,6 @@ div > :global(svg) {
 }
 .NodeLine.header.shrinkNonHighlights :global(.name) {
 	font-size: 80%;
-	line-height: 125%;	
 }
 
 .path :global(.headerHash) {
@@ -187,12 +185,14 @@ div > :global(svg) {
 	padding: 0 .2em;
 }
 
-.path :global(.fileType) {
-	align-self: last baseline;
-}
-
 .path :global(.directory) {
 	margin-right: .125em;
+}
+
+.NodeLine.shrinkNonHighlights .path :global(.fileType):last-child {
+	align-self: last baseline;
+	position: relative;
+	bottom: .1em;
 }
 
 .date {
