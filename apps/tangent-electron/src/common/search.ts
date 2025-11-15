@@ -175,11 +175,15 @@ export function compareNodeSearch(a: SearchMatchResult, b: SearchMatchResult, di
 	if (!b) return -1
 
 	// Find the local directory start here
-	const aDirStart = directoryRelative ? a.input.lastIndexOf('/', a.index) : 0
-	const bDirStart = directoryRelative ? b.input.lastIndexOf('/', b.index) : 0
+	const aDirStart = directoryRelative ? a.input.lastIndexOf('/') : 0
+	const bDirStart = directoryRelative ? b.input.lastIndexOf('/') : 0
 
 	const aRelSart = a.index - aDirStart
 	const bRelStart = b.index - bDirStart
+
+	// Prefer results that start at the beginning of the filename rather than a parent directory
+	if (aRelSart < 0 && bRelStart >= 1) return 1
+	if (bRelStart < 0 && aRelSart >= 1) return -1
 
 	// A start index earlier in the string is better
 	if (aRelSart < bRelStart) return -1
