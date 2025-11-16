@@ -31,9 +31,11 @@ test('File path validation', () => {
 
 	expect(validatePath('some folder/and file.md')).toEqual('some folder/and file.md')
 	expect(validatePath('/root/some folder/and file.md')).toEqual('/root/some folder/and file.md')
+	expect(validatePath('path/ending/with/')).toEqual('path/ending/with/')
 
 	expect(validatePath('path//with blank folder')).toEqual(false)
 	expect(validatePath('path/ /with empty folder')).toEqual(false)
 	expect(validatePath('path/:/with invalid folder')).toEqual(false)
 	expect(validatePath('path/aux/with invalid folder')).toEqual(false)
+
 })

@@ -433,6 +433,25 @@ export default class DirectoryStore extends SelfStore implements DirectoryLookup
 		let result: TreeNode[] | SegmentSearchNodePair[] = []
 
 		if (typeof pathMatch === 'string') {
+
+			if (pathMatch.endsWith('/')) {
+				// Strip the trailing slash
+				pathMatch = pathMatch.substring(0, pathMatch.length - 1)
+
+				// Require that the node be a folder
+				const oldFilter = options.filter
+				if (oldFilter) {
+					options.filter = item => {
+						if (item.fileType !== 'folder') return false
+						return oldFilter ? oldFilter(item) : true
+					}
+				}
+				else {
+					options.filter = item => item.fileType === 'folder'
+				}
+				
+			}
+
 			pathMatch = buildMatcher(pathMatch, { ...options, caseSensitive: this.caseSensitive })
 		}
 
@@ -474,8 +493,6 @@ export default class DirectoryStore extends SelfStore implements DirectoryLookup
 					bestNodes.push(item.item)
 				}
 			}
-
-			console.log(result)
 
 			if (bestNodes.length === 2) {
 				// When a link resolves to a file and a note with the same name at the same
@@ -604,18 +621,31 @@ export default class DirectoryStore extends SelfStore implements DirectoryLookup
 		let length = options.length || 'full'
 		const root = this.getRoot(target)
 
-		let walker = this.getParent(target)
-		while (walker && walker !== root) {
+		let walker = target
+
+		const matchesOptions = {
+			root: options.root ?? root,
+			bestOnly: true
+		} as const
+
+		while (walker) {
 			if (length !== 'full') {
-				const result = this.getMatchesForPath(path, {
-					root: options.root ?? root,
-					bestOnly: true
-				})
+				const result = this.getMatchesForPath(path, matchesOptions)
 				if (result === target) break
+				if (target.name === path && !Array.isArray(result) && target.fileType === 'folder'
+					&& result.fileType !== 'folder' && result.name === path
+				) {
+					const disambiguatedResult = this.getMatchesForPath(path + '/', matchesOptions)
+					if (disambiguatedResult === target) {
+						return path + '/'
+					}
+				}
 			}
 
-			path = walker.name + '/' + path
 			walker = this.getParent(walker)
+			if (walker === root) break
+
+			path = walker.name + '/' + path
 		}
 
 		return path

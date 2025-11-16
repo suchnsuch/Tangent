@@ -333,6 +333,18 @@ export function validateFileSegment(segment: string, messages?: PathValidationMe
  * @returns The path if it is valid, a cleaned path if it is cleanable, or false if it cannot be cleaned.
  */
 export function validatePath(path: string, messages?: PathValidationMessages): string | false {
+
+	if (!path) {
+		messages?.push({
+			level: 'error',
+			message: 'Blank path'
+		})
+		return false
+	}
+
+	const slashStart = path.startsWith('/')
+	const slashEnd = path.endsWith('/')
+
 	let segments = paths.segment(path)
 	if (segments == null) {
 		messages?.push({
@@ -342,11 +354,13 @@ export function validatePath(path: string, messages?: PathValidationMessages): s
 		return false
 	}
 
-	for (let i = 0; i < segments.length; i++) {
+	const start = slashStart ? 1 : 0
+	const end = segments.length - (slashEnd ? 1 : 0)
+	for (let i = start; i < end; i++) {
 		const cleaned = validateFileSegment(segments[i], messages)
 		if (cleaned === false) return false
 		segments[i] = cleaned
-		if (cleaned === '' && (i || segments[0] !== '')) {
+		if (cleaned === '') {
 			messages?.push({
 				level: 'error',
 				message: 'Empty folder paths are not allowed'
@@ -355,9 +369,9 @@ export function validatePath(path: string, messages?: PathValidationMessages): s
 		}
 	}
 
-	if (segments[0] === '') {
-		return paths.join('/', ...segments)
-	}
-
-	return paths.join(...segments)
+	let result = paths.join(...segments)
+	if (slashStart) result = '/' + result
+	if (slashEnd) result += '/'
+	
+	return result
 }

@@ -459,6 +459,12 @@ describe('Resolving & Creating Partial Path Matches', () => {
 				root.children[5].children[0], { length: 'short', includeExtension: false }
 			)).toEqual('Test Name/Test Name')
 		})
+
+		it('Should identify a folder by a trailing `/` if there is ambiguity', () => {
+			expect(store.getPathToItem(
+				root.children[6], { length: 'short' }
+			)).toEqual('Note Name/')
+		})
 	})
 
 	test('Find folders', () => {
@@ -473,6 +479,13 @@ describe('Resolving & Creating Partial Path Matches', () => {
 
 		expect(store.getMatchesForPath('Note Name', { bestOnly: true }))
 			.toBe(store.getRoot(0).children[7])
+	})
+
+	it('Can identify a folder with `/` when a folder and a file share the same name', () => {
+		const store = getTestStore()
+
+		expect(store.getMatchesForPath('Note Name/', { bestOnly: true }))
+			.toBe(store.getRoot(0).children[6])
 	})
 })
 

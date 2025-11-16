@@ -328,7 +328,9 @@ export function parseLink(char: string, parser: NoteParser): boolean {
 			hiddenGroup: true
 		})
 
-		let slashIndex = wikiLinkInfo.href.lastIndexOf('/')
+		const endsWithSlash = wikiLinkInfo.href.at(-1) === '/'
+		const slashIndex = wikiLinkInfo.href.lastIndexOf('/', endsWithSlash ? wikiLinkInfo.href.length - 2 : undefined)
+		const effectiveLength = wikiLinkInfo.href.length - (endsWithSlash ? 1 : 0)
 		if (slashIndex >= 0) {
 			// Hide the directory section of the link
 			feed.next(slashIndex + 1)
@@ -339,10 +341,10 @@ export function parseLink(char: string, parser: NoteParser): boolean {
 				hidden: true
 			})
 
-			feed.nextByLength(wikiLinkInfo.href.length - slashIndex - 1)
+			feed.nextByLength(effectiveLength - slashIndex - 1)
 		}
 		else {
-			feed.nextByLength(wikiLinkInfo.href.length)
+			feed.nextByLength(effectiveLength)
 		}
 
 		// Close the href portion
@@ -350,6 +352,16 @@ export function parseLink(char: string, parser: NoteParser): boolean {
 			link_internal: 'href',
 			spellcheck: false
 		})
+
+		// Hide the trailing slash
+		if (endsWithSlash) {
+			feed.next()
+			parser.commitSpan({
+				link_internal: 'href directory',
+				spellcheck: false,
+				hidden: true
+			})
+		}
 
 		if (wikiLinkInfo.content_id != undefined) {
 			// Mark and consume the `#`

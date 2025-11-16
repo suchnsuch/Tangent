@@ -4,13 +4,14 @@ You can follow a link goes by command-clicking on Mac or control-clicking on Win
 
 Wiki links to notes will resolve to your chosen accent color (green by default). Wiki links to notes that do not exist will show in red. This is not necessarily a bad thing! I can be useful to create a link to a topic or thought without adding content. Tangent will autocomplete to that link either way.
 
-## Autocomplete
+# Autocomplete
 Typing the first two brackets `[[` will bring up the autocomplete menu. You can also summon autocomplete from within an existing wiki link by pressing `Control+Space`.
 ![[Wiki Link Autocomplete Example.png|250]]
 The autocomplete menu will present a series of notes that you have recently edited. You can type to search for a note by name. You can autocomplete a link to the note by clicking on an option or using the cursor keys to select and the enter key to accept.
 
 You can customize whether wiki links autocomplete with a short path or with a full, workspace-relative path in the [[Database]] settings.
 
+# Advanced Formatting
 ## Custom Wiki Link Text
 Linking to notes by name is convenient, but sometimes it's not good enough. You can change the text that a wiki link appears as by adding a `|` character to the end of the note name and typing whatever text you please. For example: `[[Note Name|the text you want]]`.
 
@@ -21,7 +22,7 @@ You can link to headers within the same note by not including the note name: `[[
 
 The autocomplete menu will assist you in finding and linking to the right header.
 
-## Advanced Link Interactions
+# Advanced Link Interactions
 You can open a link in the current pane by `Cmd/Ctrl+Shift`-clicking it or pressing `Cmd/Ctrl+Shift+Enter` with the cursor in the link. This effectively replaces the current item in the thread with the linked item.
 
 You can open a link to the _left_ of the current pane by `Cmd/Ctrl+Alt`-clocking it or pressing `Cmd/Ctrl+Alt+Enter` with the cursor in the link. This effectively "rebases" the thread with the linked item acting as the new root of the thread.
@@ -33,3 +34,17 @@ Wiki links can be created directly from selected text:
 When creating a new link in autocomplete, the following shortcuts may be useful:
 * `Cmd/Ctrl+Enter` will complete and open the link immediately.
 * `Shift+Enter` will end autocomplete with the current text, making it quick and easy to create new notes that have names similar to other notes.
+
+# Link Resolution Mechanics
+## Depth
+Wiki links are based on direct name matches. Of course, you may have multiple files in a workspace with the same name. With a given name, Tangent will link to the file or folder that is closest to the root of the workspace. Ambiguity can be defeated by providing the full workspace-relative path to the target file.
+
+## File Extensions
+Wiki links let you link to files without extensions so long as there is no name conflict. If there _is_ a name conflict, Tangent will prefer `.md` files over all other file type. i.e. `[[File]]` will link to `File.md` over `File.png`. Adding the extension to the wiki link will link to the exact file.
+
+## Files vs Folders
+If a file and a folder at the same depth have the same name, Tangent will link to the _file_. This may be somewhat counterintuitive at first, but it allows for handy namespacing of topics into adjacent folders.
+	
+	For instance, you may have a `Physics.md` note and a `Physics` folder with notes like `Physics/Radiation.md` within it. In this case a wiki link of `[[Physics]]` will link to the `Physics.md` _note_.
+	
+If you want to link to the folder rather than the file in this instance, you can append a `/` to the end of the name, i.e. `[[Physics/]]`. This trailing slash acts like the "folder extension", specifying that you're searching for the folder.
