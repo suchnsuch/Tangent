@@ -50,51 +50,86 @@ export function matchWikiLink(text: string, startIndex=0, options?: {
 	return null
 }
 
-export const linkStartMatcher = /(\[)([^\[\]\n]*)(\])(\()/
-const bracketMatch = /[\(\)]/ 
+// A `[` that is at the beginning of a string or has a non=`\` character in front
+const linkStartMatcher = /(?<=^|[^\\])(\[)/
 
+/**
+ * Identifies and extracts information about a markdown link in a string
+ * @param text The text to check and extract markdown link information from
+ * @param startIndex An offset to be applied to the found information (e.g. if the provided text is a slice of a larger string.)
+ * @returns Information about the matched link, or null if no link was found
+ */
 export function matchMarkdownLink(text: string, startIndex=0): LinkInfo {
 	const match = text.match(linkStartMatcher)
-	if (match) {
+	if (!match) return null
 
-		const linkStart = match.index + match[0].length
+	const linkStart = match.index
 
-		let depth = 1
-		let index = linkStart + 1
-		for (; depth > 0 && index < text.length; index++) {
-			let char = text[index]
-			if (char === '(') {
-				depth++
-			}
-			else if (char === ')') {
-				depth--
-			}
+	// Move through matched `[]` pairs
+	let depth = 1
+	let index = linkStart + 1
+	for (; depth > 0 && index < text.length; index++) {
+		let char = text[index]
+		if (char === '[') {
+			depth++
 		}
-
-		if (depth !== 0 || text[index - 1] !== ')') {
-			return null
+		else if (char === ']') {
+			depth--
 		}
-
-		let href = text.substring(linkStart, index - 1)
-		const idIndex = href.indexOf('#')
-		const content_id = idIndex >= 0 ? href.substring(idIndex + 1) : undefined
-		href = idIndex >= 0 ? href.substring(0, idIndex) : href
-
-		let details: LinkInfo = {
-			type: StructureType.Link,
-			form: 'md',
-			start: startIndex + match.index,
-			end: startIndex + index,
-			href,
-			content_id
+		else if (char === '\\') {
+			// Jump the next character
+			index++
 		}
-
-		if (match[2]) {
-			details.text = match[2]
-		}
-		return details
 	}
-	return null
+
+	const textEnd = index - 1
+
+	if (depth !== 0 || text[textEnd] !== ']') {
+		// A matching `]` could not be found
+		return null
+	}
+
+	// The next char should be a `(`
+	if (text[index] !== '(') return null
+	
+	index++ 
+	depth = 1
+	const hrefStart = index
+	
+	// Move through matched `()` pairs
+	for (; depth > 0 && index < text.length; index++) {
+		let char = text[index]
+		if (char === '(') {
+			depth++
+		}
+		else if (char === ')') {
+			depth--
+		}
+	}
+
+	if (depth !== 0 || text[index - 1] !== ')') {
+		return null
+	}
+
+	let href = text.substring(hrefStart, index - 1)
+	const idIndex = href.indexOf('#')
+	const content_id = idIndex >= 0 ? href.substring(idIndex + 1) : undefined
+	href = idIndex >= 0 ? href.substring(0, idIndex) : href
+
+	const details: LinkInfo = {
+		type: StructureType.Link,
+		form: 'md',
+		start: startIndex + linkStart,
+		end: startIndex + index,
+		href,
+		content_id
+	}
+
+	if (linkStart + 1 !== textEnd) {
+		details.text = text.substring(linkStart + 1, textEnd)
+	}
+
+	return details
 }
 
 export function findLinkAround(doc: TextDocument, position: number, linkMatcher: (text: string, startIndex: number) => LinkInfo) {

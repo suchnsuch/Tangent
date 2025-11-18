@@ -26,7 +26,7 @@ describe('Markdown Links', () => {
 		})
 	})
 
-	it('should be able to handle nested brackets', () => {
+	it('should be able to handle nested brackets within the href', () => {
 		expect(matchMarkdownLink('[text](link())')).toEqual({
 			type: StructureType.Link,
 			start: 0,
@@ -61,6 +61,28 @@ describe('Markdown Links', () => {
 			form: 'md',
 			text: 'md link',
 			href: 'link(with)[brackets]'
+		})
+	})
+
+	it('Should handle paired brackets within the text', () => {
+		expect(matchMarkdownLink('My [md [link]](with/an/href)')).toEqual({
+			type: StructureType.Link,
+			start: 3,
+			end: 28,
+			form: 'md',
+			text: 'md [link]',
+			href: 'with/an/href'
+		})
+	})
+
+	it('Should ignore escaped brackets within the text', () => {
+		expect(matchMarkdownLink('My [md \\[link\\]](with/an/href)')).toEqual({
+			type: StructureType.Link,
+			start: 3,
+			end: 30,
+			form: 'md',
+			text: 'md \\[link\\]',
+			href: 'with/an/href'
 		})
 	})
 
