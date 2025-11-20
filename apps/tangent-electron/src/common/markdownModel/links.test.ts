@@ -109,6 +109,30 @@ describe('Markdown Links', () => {
 			content_id: ''
 		})
 	})
+
+	it('Can extract custom title text', () => {
+		expect(matchMarkdownLink('foo [text](link "Title") boo')).toEqual({
+			type: StructureType.Link,
+			start: 4,
+			end: 24,
+			form: 'md',
+			text: 'text',
+			href: 'link',
+			title: 'Title'
+		})
+	})
+
+	it('Supports multi-word titles with escapes', () => {
+		expect(matchMarkdownLink('foo [text](link "Title of \\"Doom\\"") boo')).toEqual({
+			type: StructureType.Link,
+			start: 4,
+			end: 36,
+			form: 'md',
+			text: 'text',
+			href: 'link',
+			title: 'Title of "Doom"'
+		})
+	})
 })
 
 describe('Content ID Matching', () => {

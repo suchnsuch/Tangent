@@ -96,7 +96,13 @@ export function matchMarkdownLink(text: string, startIndex=0): LinkInfo {
 	depth = 1
 	const hrefStart = index
 	
-	// Move through matched `()` pairs
+	let hrefEnd = -1
+	let contentIdStart = -1
+	let contentIdEnd = -1
+	let titleStart = -1
+	let titleEnd = -1
+
+	// Move through matched `()` pairs, finding content id & title
 	for (; depth > 0 && index < text.length; index++) {
 		let char = text[index]
 		if (char === '(') {
@@ -105,16 +111,41 @@ export function matchMarkdownLink(text: string, startIndex=0): LinkInfo {
 		else if (char === ')') {
 			depth--
 		}
+		else if (char === '#' && depth === 1) {
+			if (hrefEnd === -1) hrefEnd = index
+			contentIdStart = index + 1
+		}
+		else if (char === ' ' && depth === 1 && titleStart === -1 && text[index + 1] === '"') {
+			if (hrefEnd === -1) hrefEnd = index
+			if (contentIdStart > 0) contentIdEnd = index
+			titleStart = index + 2
+			index++ // Hop the `"`
+		}
+		else if (char === '"' && depth === 1 && titleStart > 0) {
+			titleEnd = index
+		}
+		else if (char === '\\' && titleStart > 0) {
+			index++ // Hop the next character
+		}
 	}
 
 	if (depth !== 0 || text[index - 1] !== ')') {
 		return null
 	}
 
-	let href = text.substring(hrefStart, index - 1)
-	const idIndex = href.indexOf('#')
-	const content_id = idIndex >= 0 ? href.substring(idIndex + 1) : undefined
-	href = idIndex >= 0 ? href.substring(0, idIndex) : href
+	if (hrefEnd === -1) hrefEnd = index - 1
+
+	if (contentIdStart > 0 && contentIdEnd === -1 && titleStart === -1) {
+		contentIdEnd = index - 1
+	}
+
+	if (contentIdStart > 0 && contentIdEnd === -1 || titleStart > 0 && titleEnd === -1) {
+		return null
+	}
+
+	const href = text.substring(hrefStart, hrefEnd)
+	const content_id = contentIdStart >= 0 ? text.substring(contentIdStart, contentIdEnd) : undefined
+	const title = titleStart >= 0 ? text.substring(titleStart, titleEnd).replaceAll('\\', '') : undefined
 
 	const details: LinkInfo = {
 		type: StructureType.Link,
@@ -122,7 +153,8 @@ export function matchMarkdownLink(text: string, startIndex=0): LinkInfo {
 		start: startIndex + linkStart,
 		end: startIndex + index,
 		href,
-		content_id
+		content_id,
+		title
 	}
 
 	if (linkStart + 1 !== textEnd) {
@@ -453,7 +485,8 @@ export function parseLink(char: string, parser: NoteParser): boolean {
 			href: mdLinkInfo.href,
 			form: 'md',
 			text: mdLinkInfo.text ?? null,
-			content_id: mdLinkInfo.content_id ?? null
+			content_id: mdLinkInfo.content_id ?? null,
+			title: mdLinkInfo.title ?? null
 		}
 
 		// Avoiding adding the key unless the value exists
@@ -590,6 +623,10 @@ function finishMarkdownLink(parser: NoteParser, linkInfo: LinkInfo, offset=0) {
 	if (linkInfo.content_id !== undefined) {
 		// Consume the '#' character and the id
 		feed.nextByLength(1 + linkInfo.content_id.length)
+	}
+	if (linkInfo.title !== undefined) {
+		// Consume the leading ` "` and trailing `"`
+		feed.nextByLength(3 + linkInfo.title.length)
 	}
 	parser.commitSpan({
 		link_internal: true,

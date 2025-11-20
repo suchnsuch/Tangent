@@ -162,6 +162,9 @@ interface UntypedLinkInfo {
 	
 	// The textual override, if any. "text" of [[abc|text]]
 	text?: string
+
+	// The custom title of a link, if any. "Title" of [text](href "Title")
+	title?: string
 	
 	// The header/block link. "header" of [[abc#header]]; "^foo" of [[abc#^foo]]
 	content_id?: string
