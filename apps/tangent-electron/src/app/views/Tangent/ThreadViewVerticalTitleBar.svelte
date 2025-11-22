@@ -65,6 +65,7 @@ const {
 	top: 0;
 	bottom: 0;
 	left: 0;
+	display: none;
 
 	padding-top: var(--topBarHeight);
 
