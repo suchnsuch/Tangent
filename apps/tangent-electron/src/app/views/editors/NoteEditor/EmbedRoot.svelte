@@ -25,7 +25,7 @@ type Form = {
 	src: string
 } | {
 	mode: 'pdf',
-	url: string
+	src: string
 } | {
 	mode: 'youtube'
 	src: string
@@ -92,6 +92,12 @@ function onNodeHandleChanged(value: HandleResult) {
 					src: (value as EmbedFile).cacheBustPath
 				}
 				break
+			case EmbedType.PDF:
+				form = {
+					mode: 'pdf',
+					src: (value as EmbedFile).cacheBustPath
+				}
+				break
 			default:
 				error(`Invalid file type. Cannot embed a "${value.fileType}" file.`)
 				break
@@ -149,7 +155,7 @@ function onNodeHandleChanged(value: HandleResult) {
 	else if (link.href.endsWith('.pdf')) {
 		form = {
 			mode: 'pdf',
-			url: link.href
+			src: link.href
 		}
 	}
 	else {
@@ -301,7 +307,7 @@ function websiteImageStyle(form: WebsiteData) {
 	</media-controller>
 {:else if form.mode === 'pdf'}
 	<div class="pdf">
-		<PdfPreview path={form.url} />
+		<PdfPreview path={form.src} />
 		<div class="pdf-cover"></div>
 	</div>
 {:else if form.mode === 'website'}
