@@ -34,6 +34,7 @@
 			"target": "default",
 			"arch": "universal"
 		},
+		"icon": "build/Icon.icon",
 		"notarize": false,
 		"extendInfo": {
 			"CFBundleDocumentTypes": [
