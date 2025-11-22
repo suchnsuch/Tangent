@@ -376,7 +376,8 @@ describe('Link parsing', () => {
 				form: 'md',
 				href: 'https://google.com',
 				text: 'web link',
-				content_id: null
+				content_id: null,
+				title: null
 			})
 		})
 
