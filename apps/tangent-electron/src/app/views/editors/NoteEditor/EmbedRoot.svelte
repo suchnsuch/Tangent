@@ -6,6 +6,7 @@ import type { Workspace } from 'app/model'
 import type EmbedFile from 'app/model/EmbedFile'
 import { HandleResult, isNode } from 'app/model/NodeHandle'
 import type { UrlDataError, WebsiteData } from 'common/urlData'
+    import PdfPreview from 'app/views/node-views/PdfPreview.svelte';
 
 type Form = {
 	mode: 'error'
@@ -22,6 +23,9 @@ type Form = {
 } | {
 	mode: 'video'
 	src: string
+} | {
+	mode: 'pdf',
+	url: string
 } | {
 	mode: 'youtube'
 	src: string
@@ -141,6 +145,12 @@ function onNodeHandleChanged(value: HandleResult) {
 	}
 	else if (value.mediaType === 'error') {
 		error((value as UrlDataError).message)
+	}
+	else if (link.href.endsWith('.pdf')) {
+		form = {
+			mode: 'pdf',
+			url: link.href
+		}
 	}
 	else {
 		// Fall back to website info
@@ -289,6 +299,11 @@ function websiteImageStyle(form: WebsiteData) {
 			<media-fullscreen-button/>
 		</media-control-bar>
 	</media-controller>
+{:else if form.mode === 'pdf'}
+	<div class="pdf">
+		<PdfPreview path={form.url} />
+		<div class="pdf-cover"></div>
+	</div>
 {:else if form.mode === 'website'}
 	<div class={'website-preview ' + form.mediaType} class:description={form.description} style={websiteStyle(form)}>
 		<div class="info">
@@ -385,6 +400,18 @@ function websiteImageStyle(form: WebsiteData) {
 			white-space: nowrap;
 			text-overflow: ellipsis;
 		}
+	}
+}
+
+.pdf {
+	position: relative;
+	width: 100%;
+	min-height: 16em;
+
+	.pdf-cover {
+		position: absolute;
+		inset: 0;
+		background: linear-gradient(180deg, transparent 75%, var(--noteBackgroundColor) 100%);
 	}
 }
 

@@ -1,16 +1,15 @@
 <script lang="ts">
 import { onMount } from 'svelte'
 import * as pdfjs from 'pdfjs-dist'
-import { EmbedFile } from 'app/model'
 import { resizeObserver } from 'app/utils/resizeObserver'
 
-export let file: EmbedFile
+export let path: string
 
 let container: HTMLElement
 let canvas: HTMLCanvasElement
 
 async function getFirstPage() {
-	let pdf = await pdfjs.getDocument(file.cacheBustPath).promise
+	let pdf = await pdfjs.getDocument(path).promise
 	return pdf.getPage(1)
 }
 

@@ -101,7 +101,7 @@ export let noteDetailMode: NoteDetailMode = NoteDetailMode.None
 					</div>
 				{:else if embedType === EmbedType.PDF}
 					<div class="pdf stretch">
-						<PdfPreview file={node} />
+						<PdfPreview path={node.cacheBustPath} />
 					</div>
 				{/if}
 			</div>
