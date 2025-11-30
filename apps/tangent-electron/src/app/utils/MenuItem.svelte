@@ -50,10 +50,13 @@ function onMouseLeave(event: MouseEvent) {
 	}
 }
 
-function onClick() {
+function onClick(event: Event) {
 	const { command, commandContext, click, link } = template
 	if (command && command.canExecute(commandContext)) {
-		command.execute(commandContext)
+		command.execute({
+			initiatingEvent: event,
+			...commandContext
+		})
 		dispatch('executed')	
 	}
 	if (click) {
