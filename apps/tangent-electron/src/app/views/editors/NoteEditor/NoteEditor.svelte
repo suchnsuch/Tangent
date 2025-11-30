@@ -961,11 +961,6 @@ function onMouseMove(event: MouseEvent) {
 		const lineBounds = lineElement.getBoundingClientRect()
 
 		if (event.clientY > lineBounds.top && event.clientY <= lineBounds.bottom) {
-			console.log({
-				left: lineBounds.left,
-				right: lineBounds.right,
-				x: event.x
-			})
 			if (event.clientX > lineBounds.left - 50 && event.clientX < lineBounds.left + 150) {
 				if (leftHoverdLineTarget?.element !== lineElement) {
 					leftHoverdLineTarget = {
