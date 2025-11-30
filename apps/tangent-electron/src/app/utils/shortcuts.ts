@@ -105,7 +105,7 @@ export function shortcutFromEvent(event: KeyboardEvent) {
 	const shortcutArray: string[] = []
 	if (!event.key) return ''
 
-	let key = event.key
+	let key = codeSubs[event.key] ?? event.key
 
 	if (event.metaKey) shortcutArray.push(isMac ? 'Mod' : 'Meta')
 	if (event.ctrlKey) shortcutArray.push(isMac ? 'Ctrl' : 'Mod')
