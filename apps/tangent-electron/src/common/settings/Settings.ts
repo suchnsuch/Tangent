@@ -127,7 +127,7 @@ export default class Settings extends ObjectStore {
 		defaultValue: 141,
 		range: {
 			min: 0,
-			max: 255,
+			max: 360,
 			step: 1
 		}
 	})
