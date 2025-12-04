@@ -52,6 +52,8 @@ export default interface WindowAPI {
 		create()
 		isAlwaysOnTop(): Promise<boolean>
 		setAlwaysOnTop(value: boolean)
+		isFullscreen(): Promise<boolean>
+		setFullscreen(value: boolean)
 		setSize(size: { width: number, height: number }): Promise<void>
 	}
 

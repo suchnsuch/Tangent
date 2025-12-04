@@ -150,6 +150,10 @@ ipcMain.handle('window', (event, message, param) => {
 			case 'setAlwaysOnTop':
 				browserWindow.setAlwaysOnTop(param)
 				break
+			case 'isFullscreen':
+				return browserWindow.isFullScreen();
+			case 'setFullscreen':
+				return browserWindow.setFullScreen(param)
 			case 'setSize':
 				const { width, height } = param
 				if (typeof width === 'number' && typeof height === 'number') {

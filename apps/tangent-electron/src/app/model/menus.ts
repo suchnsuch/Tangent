@@ -321,9 +321,8 @@ export function buildMainMenu(workspace: Workspace): MenuItemConstructorOptions[
 				{ command: cmds.zoomOut },
 				{ command: cmds.resetZoom },
 				{ type: 'separator' },
-				{
-					command: cmds.floatWindow
-				}
+				{ command: cmds.floatWindow },
+				{ command: cmds.fullscreenWindow },
 			]
 		},
 		{

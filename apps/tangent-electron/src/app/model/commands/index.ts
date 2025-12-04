@@ -19,7 +19,7 @@ import OpenLogsCommand from './OpenLogs'
 import OpenWorkspaceCommand from './OpenWorkspace'
 import ZoomCommand from './Zoom'
 import SaveCurrentFileCommand from './SaveCurrentFile'
-import FloatWindowCommand from './FloatWindow'
+import { FloatWindowCommand, FullscreenWindowCommand } from './WindowCommands'
 import NoteKeyboardProxyCommand from './NoteKeyboardProxy'
 import OpenChangelogCommand from './OpenChangelog'
 import OpenQueryPaneCommand from './OpenQueryPane'
@@ -166,6 +166,9 @@ function createAllCommands(workspace: Workspace) {
 		}),
 
 		floatWindow: new FloatWindowCommand(workspace),
+		fullscreenWindow: new FullscreenWindowCommand(workspace, {
+			shortcut: 'F11'
+		}),
 
 		openLogs: new OpenLogsCommand(workspace),
 		openChangelog: new OpenChangelogCommand(workspace),

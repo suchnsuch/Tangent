@@ -98,6 +98,12 @@ const bridge: WindowApi = {
 		setAlwaysOnTop(value) {
 			ipcRenderer.invoke('window', 'setAlwaysOnTop', value)
 		},
+		isFullscreen() {
+			return ipcRenderer.invoke('window', 'isFullscreen')
+		},
+		setFullscreen(value) {
+			ipcRenderer.invoke('window', 'setFullscreen', value)
+		},
 		setSize(size) {
 			return ipcRenderer.invoke('window', 'setSize', size)
 		}
