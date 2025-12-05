@@ -153,6 +153,13 @@ header {
 	padding: calc(3em / 2.5) calc(3em / 2.5);
 }
 
+:global(.lens-settings-row) > header {
+	margin: 0;
+	padding: .25em 0;
+	font-size: 200%;
+	flex-grow: 1;
+}
+
 .icon {
 	position: relative;
 	top: .125em;

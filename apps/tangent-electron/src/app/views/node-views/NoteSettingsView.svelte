@@ -2,7 +2,8 @@
 import { tick } from 'svelte'
 import { NoteViewState } from 'app/model/nodeViewStates'
 import SvgIcon from '../smart-icons/SVGIcon.svelte'
-    import { focusLayer } from 'app/utils';
+import { focusLayer } from 'app/utils'
+import WorkspaceFileHeader from 'app/utils/WorkspaceFileHeader.svelte'
 
 export let state: NoteViewState
 
@@ -70,6 +71,7 @@ function onSearchChange(event) {
 </script>
 
 <div class="lens-settings-row">
+	<WorkspaceFileHeader node={state.node} showExtension={true} />
 	<span class="spacer"></span>
 	<span class="search buttonBar">
 		{#if $search?.enabled}

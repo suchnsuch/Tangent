@@ -16,14 +16,3 @@ $: info = state.folderInfo
 	{/if}
 	<slot></slot>
 </div>
-
-<style lang="scss">
-.lens-settings-row {
-	> :global(header) {
-		margin: 0;
-		padding: .25em 0;
-		font-size: 200%;
-		flex-grow: 1;
-	}
-}
-</style>

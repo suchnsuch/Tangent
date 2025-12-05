@@ -20,12 +20,11 @@ $: info = state.tagInfo
 </div>
 
 <style lang="scss">
-.lens-settings-row {
-	> :global(header) {
-		margin: 0;
-		padding: .25em 0;
-		font-size: 200%;
-		flex-grow: 1;
-	}
+// TODO: The `WorkspaceFileHeader` should support this
+.lens-settings-row > header {
+	margin: 0;
+	padding: .25em 0;
+	font-size: 200%;
+	flex-grow: 1;
 }
 </style>
