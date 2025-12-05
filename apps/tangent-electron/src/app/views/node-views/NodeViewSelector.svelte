@@ -55,6 +55,15 @@ function onSettingsResize(entries: ResizeObserverEntry[]) {
 	}
 }
 
+function onMouseEnterContainer(event: MouseEvent) {
+	hintSettings = true
+}
+
+function onMouseLeaveContainer(event: MouseEvent) {
+	hintSettings = false
+	showSettingsFromMouse = false
+}
+
 function onMouseMoveContainer(event: MouseEvent) {
 
 	let { clientX, clientY } = event
@@ -65,7 +74,7 @@ function onMouseMoveContainer(event: MouseEvent) {
 	clientY -= rect.y + extraTop
 
 	const showThreshold = panelSettingsHoverHotspot.value
-	const hintThreshold = showThreshold * 1.75
+	const hintThreshold = showThreshold * 2
 
 	hintSettings = clientY < hintThreshold
 	if (layout === 'fill') {
@@ -126,8 +135,8 @@ function getClassNamesForNode(node: TreeNode) {
 <main
 	bind:this={container}
 	class={"NodeViewSelector" + getClassNamesForNode(state.node)  + ' ' + layout}
-	on:mouseenter={_ => hintSettings = true}
-	on:mouseleave={_ => hintSettings = false}
+	on:mouseenter={onMouseEnterContainer}
+	on:mouseleave={onMouseLeaveContainer}
 	on:mousemove={onMouseMoveContainer}
 >
 	{#if lensState && viewComponent}
