@@ -1,9 +1,8 @@
 import { Workspace } from 'app/model'
 import { AutocompleteHandler, AutocompleteModule } from './autocompleteModule'
-import { Editor, EditorRange, ShortcutEvent, TextDocument, normalizeRange } from 'typewriter-editor'
-import { findCharactersBetweenWhiteSpaceAtPositionInDocument, findWordAroundPositionInDocument, lineToText } from 'common/typewriterUtils'
+import { Editor, EditorRange, TextDocument, normalizeRange } from 'typewriter-editor'
+import { lineToText } from 'common/typewriterUtils'
 import { WritableStore } from 'common/stores'
-import { clamp } from 'common/utils'
 import { findCharactersBetweenWhitespace } from 'common/stringUtils'
 import { wrappedIndex } from 'common/collections'
 
@@ -61,10 +60,14 @@ const matches: MatcherItem[] = [
 			'—'
 		],
 		mustBeMidLine: true
+	},
+	{
+		match: /\.\.+/, // Only require two periods so that overall keystroke is the same as three (. . enter)
+		replace: ['…']
 	}
 ]
 
-const activateChars = '-><'
+const activateChars = '-><.'
 
 export default class UnicodeAutocompleter implements AutocompleteHandler {
 	workspace: Workspace
