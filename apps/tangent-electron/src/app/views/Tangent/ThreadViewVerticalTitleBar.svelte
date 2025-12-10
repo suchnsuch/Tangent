@@ -75,6 +75,8 @@ const {
 	transition: color .3s;
 
 	box-sizing: border-box;
+	white-space: nowrap;
+	overflow: hidden;
 
 	:global(.current) & {
 		color: var(--textColor);
