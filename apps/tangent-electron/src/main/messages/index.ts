@@ -131,13 +131,15 @@ ipcMain.handle('window', (event, message, param) => {
 				browserWindow.close()
 				break
 			case 'toggleMaximize':
-				if (browserWindow.isMaximizable()) {
-					if (browserWindow.isMaximized()) {
-						browserWindow.unmaximize()
-					}
-					else {
-						browserWindow.maximize()
-					}
+				if (browserWindow.isFullScreen()) {
+					browserWindow.setFullScreen(false)
+					browserWindow.unmaximize()
+				}
+				else if (browserWindow.isMaximized()) {
+					browserWindow.unmaximize()
+				}
+				else if (browserWindow.isMaximizable()) {
+					browserWindow.maximize()
 				}
 				break
 			case 'minimize':
