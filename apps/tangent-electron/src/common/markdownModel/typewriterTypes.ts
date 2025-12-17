@@ -172,6 +172,20 @@ function codeFormatAltClass(type: string) {
 	}
 }
 
+function fillTooltip(source: string|object, props: AttributeMap) {
+	if (typeof source === 'string') {
+		props['data-tooltip'] = source
+	}
+	else {
+		if ('message' in source) {
+			props['data-tooltip'] = source.message
+		}
+		if ('type' in source) {
+			props['data-tooltip-type'] = source.type
+		}
+	}
+}
+
 const noteTypeset:TypesetTypes = {
 	lines: [
 		{
@@ -586,9 +600,11 @@ const noteTypeset:TypesetTypes = {
 			render: (attributes, children) => {
 
 				const className = 'error'
-				const title = attributes.error
+				const props: AttributeMap = { className }
 
-				return h('span', { className, title }, children)
+				fillTooltip(attributes.error, props)
+
+				return h('span', props, children)
 			}
 		},
 
@@ -598,9 +614,10 @@ const noteTypeset:TypesetTypes = {
 			render: (attributes, children) => {
 
 				const className = 'warning'
-				const title = attributes.warning
+				const props: AttributeMap = { className }
+				fillTooltip(attributes.warning, props)
 
-				return h('span', { className, title }, children)
+				return h('span', props, children)
 			}
 		},
 

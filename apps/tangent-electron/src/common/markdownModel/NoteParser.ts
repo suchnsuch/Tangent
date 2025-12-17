@@ -338,7 +338,10 @@ function parseFrontMatter(parser: NoteParser): boolean {
 		const delta = new Delta()
 			.retain(startIndex + error.pos[0])
 			.retain(error.pos[1] - error.pos[0], {
-				error: error.toString()
+				error: {
+					type: 'yaml',
+					message: error.toString()
+				}
 			})
 
 		builder.applyFormatting(delta)
@@ -348,7 +351,10 @@ function parseFrontMatter(parser: NoteParser): boolean {
 		const delta = new Delta()
 		.retain(startIndex + warning.pos[0])
 		.retain(warning.pos[1] - warning.pos[0], {
-			warning: warning.toString()
+			error: {
+				type: 'yaml',
+				warning: warning.toString()
+			}
 		})
 
 		builder.applyFormatting(delta)

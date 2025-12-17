@@ -64,9 +64,10 @@ import { fly } from 'svelte/transition';
 import LineGutter from './LineGutter.svelte';
 import { derived } from 'svelte/store';
 import { EmbedFile } from 'app/model';
-    import LineGutterLeft from './LineGutterLeft.svelte';
-    import LineGutterRight from './LineGutterRight.svelte';
-    import { target } from 'app/webpack.config';
+import LineGutterLeft from './LineGutterLeft.svelte';
+import LineGutterRight from './LineGutterRight.svelte';
+import { dropTooltip, requestTooltip, TooltipConfig } from 'app/utils/tooltips';
+import YamlTooltip from './YamlTooltip.svelte';
 
 // Technically, this just needs to exist _somewhere_. Putting it here because of the svelte dependency
 // Force the use of the variable so that it is included in the bundle
@@ -177,6 +178,8 @@ const unsubs: (() => void)[] = []
 function onEditorRoot() {
 	editor.root.addEventListener('resumeFocus', resumeFocus)
 	editor.root.addEventListener('navigate', navigationForward)
+	editor.root.addEventListener('mouseover', onEditorMouseOver)
+	editor.root.addEventListener('mouseout', onEditorMouseOut)
 
 	updateDetails()
 	
@@ -231,6 +234,8 @@ onDestroy(() => {
 	if (editor) {
 		editor.root.removeEventListener('resumeFocus', resumeFocus)
 		editor.root.removeEventListener('navigate', navigationForward)
+		editor.root.removeEventListener('mouseover', onEditorMouseOver)
+		editor.root.removeEventListener('mouseout', onEditorMouseOut)
 		editor.off('root', onEditorRoot)
 		editor.off('change', onEditorChange)
 		editor.off('decorate', onEditorDecorate)
@@ -936,6 +941,58 @@ function onEditorMouseUp(event: MouseEvent) {
 		if (editor.doc.selection) {
 			centerOnEditorRange(editor.doc.selection, 500)
 		}
+	}
+}
+
+//////////////////////////////////
+// Custom tooltips from editor //
+////////////////////////////////
+let tooltipTarget: HTMLElement = null;
+
+function getTooltipTarget(event: MouseEvent) {
+	let target = event.target
+	while (target instanceof HTMLElement) {
+		const data = target.getAttribute('data-tooltip')
+		const type = target.getAttribute('data-tooltip-type')
+		if (data || type) {
+			return target
+		}
+		target = target.parentElement
+	}
+}
+
+function getTooltipConfig(target: HTMLElement): TooltipConfig {
+	const message = target.getAttribute('data-tooltip')
+	const type = target.getAttribute('data-tooltip-type')
+	switch (type) {
+		case 'yaml':
+			return {
+				tooltip: YamlTooltip,
+				args: {
+					message
+				}
+			}
+	}
+	
+	return { tooltip: message }
+}
+
+function onEditorMouseOver(event: MouseEvent) {
+	const target = getTooltipTarget(event)
+	if (!target) return
+	const config = getTooltipConfig(target)
+	if (!config) return
+
+	tooltipTarget = target
+	requestTooltip(target, config, event)
+}
+
+function onEditorMouseOut(event: MouseEvent) {
+	if (!tooltipTarget) return
+	const target = getTooltipTarget(event)
+	if (target !== tooltipTarget) {
+		dropTooltip(tooltipTarget)
+		tooltipTarget = null
 	}
 }
 
