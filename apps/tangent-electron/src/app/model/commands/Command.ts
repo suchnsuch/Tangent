@@ -105,6 +105,8 @@ export function createCommandHandler(commands: Command[], options?: CommandHandl
 		if ((options?.restrictForInput ?? true) && !eventIsShortcutable(event)) return
 
 		const shortcut = shortcutFromEvent(event)
+		if (!shortcut) return
+		
 		const context = { initiatingEvent: event }
 
 		if (options?.buildContext) {
@@ -114,7 +116,7 @@ export function createCommandHandler(commands: Command[], options?: CommandHandl
 		for (const command of commands) {
 			if (command.canExecuteFromShortcut(shortcut, context)) {
 				event.preventDefault()
-				console.log(`Executing "${command.getLabel(context)}" by way of ${shortcut}`)
+				console.log(`Executing "${command.getLabel(context)}" by way of "${shortcut}"`)
 				command.execute(context)
 				return true
 			}
