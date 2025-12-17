@@ -351,44 +351,58 @@ function parseFrontMatter(parser: NoteParser): boolean {
 			warning: warning.toString()
 		})
 
-	builder.applyFormatting(delta)
+		builder.applyFormatting(delta)
 	}
 
-	const data = document.toJS()
+	try {
+		const data = document.toJS()
 
-	parser.pushStructure({
-		type: StructureType.FrontMatter,
-		start: 0,
-		end: feed.index,
-		data
-	})
+		parser.pushStructure({
+			type: StructureType.FrontMatter,
+			start: 0,
+			end: feed.index,
+			data
+		})
 
-	if (data) {
-		// Push links
-		if (data.tags) {
-			const tags = data.tags
-			if (typeof tags === 'string') {
-				// Technically not correct, but we'll allow it
-				parser.pushStructure({
-					type: StructureType.Tag,
-					form: 'front-matter',
-					start: 0, end: 0,
-					href: tags
-				})
-			}
-			else if (Array.isArray(tags)) {
-				for (const item of tags) {
-					if (typeof item === 'string') {
-						parser.pushStructure({
-							type: StructureType.Tag,
-							form: 'front-matter',
-							start: 0, end: 0,
-							href: item
-						})
+		if (data) {
+			// Push links
+			if (data.tags) {
+				const tags = data.tags
+				if (typeof tags === 'string') {
+					// Technically not correct, but we'll allow it
+					parser.pushStructure({
+						type: StructureType.Tag,
+						form: 'front-matter',
+						start: 0, end: 0,
+						href: tags
+					})
+				}
+				else if (Array.isArray(tags)) {
+					for (const item of tags) {
+						if (typeof item === 'string') {
+							parser.pushStructure({
+								type: StructureType.Tag,
+								form: 'front-matter',
+								start: 0, end: 0,
+								href: item
+							})
+						}
 					}
 				}
 			}
 		}
+	}
+	catch (e) {
+		// Cannot reliably pull out positional data. Mark the whole block as bad.
+		parser.errors.push('Could not translate YAML document to JS: ' + e)
+
+		const delta = new Delta()
+			.retain(startIndex)
+			.retain(feed.index - startIndex, {
+				error: 'message' in e ? e.message : e.toString()
+			})
+		
+		builder.applyFormatting(delta)
 	}
 
 	if (hitEnd) {
