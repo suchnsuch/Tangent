@@ -106,6 +106,7 @@ export default class LinesBuilder {
 	 * This is inherently slower than just building content serially. Prefer the normal process if possible.
 	 */
 	applyFormatting(delta: Delta) {
+		const targetLenth = delta.length()
 		let index = 0
 
 		for (const line of this.lines) {
@@ -119,6 +120,14 @@ export default class LinesBuilder {
 			}
 
 			index += line.length // Include the implicit newline
+		}
+
+		if (index < targetLenth) {
+			// Apply transformation on not-yet committed spans
+			let spanDelta = new Delta(this.spans)
+			const lineDelta = delta.slice(index, spanDelta.length())
+			spanDelta = spanDelta.compose(lineDelta)
+			this.spans = spanDelta.ops
 		}
 	}
 }
