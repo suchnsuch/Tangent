@@ -211,14 +211,18 @@ function isOnThread(item: TreeNode) {
 
 // Dragged Item Events
 function dragStart(event: DragEvent, item: TreeNode) {
-	setTreeNodeTransfer(event.dataTransfer, item)
 	const target = event.target as HTMLElement
-	target.classList.add('dragging')
+	if (target) {
+		setTreeNodeTransfer(event.dataTransfer, item)
+		target.classList.add('dragging')
+	}
 }
 
 function dragEnd(event: DragEvent, item: TreeNode) {
 	const target = event.target as HTMLElement
-	target.classList.remove('dragging')
+	if (target) {
+		target.classList.remove('dragging')
+	}
 }
 
 // Drop Target Events
