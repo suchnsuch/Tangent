@@ -59,6 +59,12 @@ export function createWindow(assignedWorkspace?: string) {
 		checkForUpdatesThrottled()
 	})
 
+	newWindow.webContents.session.webRequest.onBeforeSendHeaders((details, callback) => {
+		// Inject a non-local-host referer so that YouTube embeds work properly
+		details.requestHeaders.Referer = 'https://www.tangentnotes.com/'
+		callback(details)
+	})
+
 	newWindow.webContents.on('context-menu', (event, input) => {
 		// This delay is _sketchy_.
 		// The window (see Workspace.showContextMenu) wants to delay to the next loop so that selection changes can propegate.
