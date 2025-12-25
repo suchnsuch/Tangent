@@ -20,6 +20,7 @@ import LeftSidebar from './LeftSidebar.svelte'
 import SvgIcon from './smart-icons/SVGIcon.svelte'
 import ThreadHistoryListView from './summaries/ThreadHistoryListView.svelte'
 import { createCommandHandler } from 'app/model/commands/Command'
+import { shortcutDisplayString } from 'app/utils/shortcuts'
 
 export let workspace:Workspace
 
@@ -283,7 +284,10 @@ function onViewContextMenu(event: MouseEvent) {
 								tooltipShortcut: false,
 							}}
 						>
-							<CreationRuleName {rule}/>
+							<span class="creation-rule-name"><CreationRuleName {rule}/></span>
+							{#if rule.shortcut.value}
+								<span class="shortcut">{shortcutDisplayString(rule.shortcut.value)}</span>
+							{/if}
 						</button>
 					{/each}
 
@@ -468,6 +472,18 @@ main {
 	button {
 		padding-top: .1em;
 		padding-bottom: .1em;
+
+		display: flex;
+	}
+
+	.creation-rule-name {
+		flex-grow: 1;
+		text-align: left;
+	}
+
+	.shortcut {
+		color: var(--deemphasizedTextColor);
+		padding-inline-start: 1em;
 	}
 
 	.manageRules {
