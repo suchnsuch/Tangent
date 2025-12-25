@@ -87,6 +87,34 @@
   <update_contact>k8ie_AT_mcld.eu</update_contact>
 
   <releases>
+    <release version="0.11.0" date="2025-12-25">
+      <description>
+        <ul>
+          <li>Added support for displaying and embedding local video, audio, and pdf files.</li>
+          <li>Added support for displaying Mermaid Diagrams inside of Code blocks.</li>
+          <li>Added the ability to customize keyboard shortcuts throughout Tangent.</li>
+          <li>Added support for checked and enabled status for note formatting commands.</li>
+          <li>Added tooltips for files in the sidebar.</li>
+          <li>Added a "copy section" button to the line gutter. Code, math, and front-matter blocks copy their contents. Hold "Shift" to copy surrounding markdown syntax.</li>
+          <li>Added support for copying local .png .jpeg files directly to the clipboard.</li>
+          <li>Added support for navigating the sidebar with keyboard keys and invoking "rename" via a shortcut.</li>
+          <li>Added support for custom shortcuts for [[Creation Rules]].</li>
+          <li>Updated the icon for macOS Tahoe.</li>
+          <li>Added support for specifying a folder over a note with a trailing slash.</li>
+          <li>Added support for nested and escaped brackets in markdown links.</li>
+          <li>Added support for autocompleting ... to … (ellipses).</li>
+          <li>Mirrored the name of the note in the note settings pane for consistency.</li>
+          <li>Improved the readability and reliability of YAML parsing errors.</li>
+          <li>Fixed an issue where parsing could crash from YAML that parsed but could not be translated to a JS object.</li>
+          <li>Fixed an issue where link preview cards lacked all style in production.</li>
+          <li>Fixed an issue where directory-based search matches could be prioritized over direct filename matches.</li>
+          <li>Fixed an issue where the YouTube embedder rejected Tangent's requests due to a missing "referrer" header.</li>
+          <li>Fixed an issue where the accent color hue could not be set to the full 360° hue space.</li>
+          <li>Fixed an issue where the settings panel for a pane could remain open even when your mouse leaves the panel.</li>
+          <li>Fixed an issue where long note titles wrapped in the vertical toolbar.</li>
+        </ul>
+      </description>
+    </release>
     <release version="0.10.3" date="2025-11-01">
       <description>
         <ul>
