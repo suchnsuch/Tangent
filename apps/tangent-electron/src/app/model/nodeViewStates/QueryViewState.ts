@@ -1,13 +1,13 @@
 import { BaseSetViewState } from './SetViewState'
 import type ViewStateContext from './ViewStateContext'
 import type DataFile from '../DataFile'
-import { derived, readable, Readable } from 'svelte/store'
+import { derived, readable, type Readable } from 'svelte/store'
 import type QueryInfo from 'common/dataTypes/QueryInfo'
 import { ReadableStore, WritableStore } from 'common/stores'
 import QuerySettingsView from 'app/views/node-views/QuerySettingsView.svelte'
 import type { QueryResult } from 'common/indexing/queryResults'
 import { SelectEvent } from 'app/views/editors/selectionEvents'
-import { allChangedPaths, TreeChange } from 'common/trees'
+import { allChangedPaths, type TreeChange } from 'common/trees'
 import { getInitialQuerySelection } from 'common/queryModel'
 
 export default class QueryViewState extends BaseSetViewState {

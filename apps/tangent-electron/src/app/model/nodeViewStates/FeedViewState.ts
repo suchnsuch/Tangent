@@ -1,16 +1,16 @@
 import type FeedLensSettings from 'common/settings/FeedLensSettings'
 import { sortNodes } from 'common/settings/Sorting'
 import { WritableStore } from 'common/stores'
-import { derived, get, Readable } from 'svelte/store'
+import { derived, get, type Readable } from 'svelte/store'
 import type { SetLensViewState } from './LensViewState'
 import { BaseSetViewState, type SetViewState } from './SetViewState'
 
 import FeedView from 'app/views/node-views/FeedView.svelte'
 import FeedSettingsView from 'app/views/node-views/FeedSettingsView.svelte'
 import ViewStateContext from './ViewStateContext'
-import { areNodesOrReferencesEquivalent, getNode, indexOfMatch, TreeNodeOrReference } from 'common/nodeReferences'
+import { areNodesOrReferencesEquivalent, getNode, indexOfMatch, type TreeNodeOrReference } from 'common/nodeReferences'
 import NoteViewState, { NoteDetailMode } from './NoteViewState'
-import NodeViewState from './NodeViewState'
+import type NodeViewState from './NodeViewState'
 
 class FeedViewStateContext extends ViewStateContext {
 	protected createNodeViewState(item: TreeNodeOrReference, allowUnhandled?: boolean): NodeViewState {

@@ -80,6 +80,7 @@
     "@types/node": "^22.15.21",
     "@types/prismjs": "^1.16.6",
     "@vitest/browser": "^4.0.16",
+    "@vitest/browser-playwright": "^4.0.16",
     "cross-env": "^7.0.3",
     "css-loader": "^7.1.2",
     "electron": "^37.2.4",

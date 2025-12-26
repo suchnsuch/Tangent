@@ -1,9 +1,9 @@
-import { derived, Readable } from 'svelte/store'
+import { derived, type Readable } from 'svelte/store'
 import type { EditorRange } from "@typewriter/document"
 import { escapeRegExp } from '@such-n-such/core'
 import type NodeViewState from "./NodeViewState"
 import type NoteFile from "../NoteFile"
-import { PartialLink, StructureType } from "common/indexing/indexTypes"
+import { type PartialLink, StructureType } from "common/indexing/indexTypes"
 import { ForwardingStore, ReadableStore, subscribeUntil, WritableStore } from 'common/stores'
 import type { StructureDelta } from 'common/indexing/structureUtils'
 import type LensViewState from './LensViewState'

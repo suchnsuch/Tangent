@@ -1,6 +1,6 @@
-import { ObjectStore, PatchableList, RawValueMode, ReadableStore, StoreUndoStack, WritableStore } from 'common/stores'
+import { ObjectStore, PatchableList, type RawValueMode, ReadableStore, StoreUndoStack, WritableStore } from 'common/stores'
 import { RESAVE_DATA_FILE, type DataTypeConstructionContext } from './DataType'
-import { DirectoryLookup, DirectoryStore, TreeChange, TreeNode, nodeFromPath } from 'common/trees'
+import { type DirectoryLookup, DirectoryStore, type TreeChange, type TreeNode, nodeFromPath } from 'common/trees'
 import { clamp } from 'common/utils'
 import TangentMap from 'common/tangentMap/TangentMap'
 import type DataType from './DataType'

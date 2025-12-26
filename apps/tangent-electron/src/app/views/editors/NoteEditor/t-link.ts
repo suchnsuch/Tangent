@@ -1,10 +1,10 @@
 import { requestCallbackOnIdle } from '@such-n-such/core'
 import type { Workspace } from 'app/model'
-import { HrefForm, HrefFormedLink, StructureType } from 'common/indexing/indexTypes'
+import { type HrefForm, type HrefFormedLink, StructureType } from 'common/indexing/indexTypes'
 import { isExternalLink } from 'common/links'
-import { HandleResult, isNode } from 'app/model/NodeHandle'
-import { dropTooltip, requestTooltip, TooltipConfig } from 'app/utils/tooltips'
-import { SvelteConstructor } from 'app/utils/svelte'
+import { type HandleResult, isNode } from 'app/model/NodeHandle'
+import { dropTooltip, requestTooltip, type TooltipConfig } from 'app/utils/tooltips'
+import type { SvelteConstructor } from 'app/utils/svelte'
 
 export type LinkState = 'uninitialized' | 'empty' | 'resolved' | 'ambiguous' | 'untracked' | 'external' | 'error'
 

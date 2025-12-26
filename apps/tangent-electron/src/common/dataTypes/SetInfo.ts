@@ -1,7 +1,7 @@
 import { ObjectStore } from 'common/stores'
 import CardsLensSettings from 'common/settings/CardsLensSettings';
 import FeedLensSettings from 'common/settings/FeedLensSettings';
-import Setting, { SettingDefinition } from 'common/settings/Setting';
+import Setting, { type SettingDefinition } from 'common/settings/Setting';
 import ListLensSettings from 'common/settings/ListLensSettings';
 
 // TODO: This needs to be derived from some other list

@@ -1,4 +1,4 @@
-import { defaultModules, Editor, EditorOptions, h } from 'typewriter-editor'
+import { defaultModules, Editor, type EditorOptions, h } from 'typewriter-editor'
 import { selectionBusterModule } from '../selectionBuster'
 import { Workspace } from 'app/model'
 import UnicodeAutocompleter from '../autocomplete/UnicodeAutocompleter'

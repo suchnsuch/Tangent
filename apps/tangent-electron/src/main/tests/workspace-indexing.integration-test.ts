@@ -5,7 +5,7 @@ import fs from 'fs'
 import { wait } from '@such-n-such/core'
 import Workspace from '../Workspace'
 import type { TreeNode } from 'common/trees'
-import { EmbedInfo, IndexData, LinkInfo, StructureType, TagInfo } from 'common/indexing/indexTypes'
+import { type EmbedInfo, IndexData, type LinkInfo, StructureType, type TagInfo } from 'common/indexing/indexTypes'
 import type File from '../File'
 import type { FileWatcher } from '../File'
 

@@ -1,5 +1,5 @@
 import { ObjectStore, WritableStore } from 'common/stores'
-import { DirectoryStore, TreeItemListReference, TreeItemReference, TreeNode } from 'common/trees'
+import { DirectoryStore, TreeItemListReference, TreeItemReference, type TreeNode } from 'common/trees'
 import type { DataTypeConstructionContext } from './DataType'
 import type DataType from './DataType'
 import { enumKeys } from 'common/utils'

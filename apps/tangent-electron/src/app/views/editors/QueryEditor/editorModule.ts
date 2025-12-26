@@ -1,5 +1,5 @@
 import { firstOfType } from '@such-n-such/core'
-import { QueryParseResult, KEYWORD } from '@such-n-such/tangent-query-parser'
+import { type QueryParseResult, KEYWORD } from '@such-n-such/tangent-query-parser'
 import type { Workspace } from 'app/model'
 import { getEditInfo } from 'common/typewriterUtils'
 import { Decorator, Delta, Editor, EditorChangeEvent, Source } from 'typewriter-editor'

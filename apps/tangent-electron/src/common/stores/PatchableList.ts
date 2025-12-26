@@ -2,7 +2,7 @@ import { deepEqual } from 'fast-equals'
 
 import { lazyInitializeSubscriptionList } from './EventList'
 import type { RawValueMode } from './ObjectStore'
-import { Patchable, PatchObserver } from './Patchable'
+import { Patchable, type PatchObserver } from './Patchable'
 import { PatchableStore } from './PatchableStore'
 
 export enum PatchableListPatchType {

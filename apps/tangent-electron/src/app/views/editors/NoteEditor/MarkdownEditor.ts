@@ -1,4 +1,4 @@
-import { defaultModules, Editor, EditorOptions, Delta, EditorRange, Source } from "typewriter-editor"
+import { defaultModules, Editor, type EditorOptions, Delta, type EditorRange, Source } from "typewriter-editor"
 
 import htmlToMarkdown from '@such-n-such/tangent-html-to-markdown'
 import editorModule from './editorModule'
@@ -14,7 +14,7 @@ import { getRegexMatchIndices } from '@such-n-such/core'
 import UnicodeAutocompleter from '../autocomplete/UnicodeAutocompleter'
 import CodeBlockAutocompleter from '../autocomplete/CodeBlockAutoCompleter'
 import autoWrapping from '../autobraces/autoWrappingModule'
-import { collapsingSections, CollapsingSectionsModule } from './collapsingSections'
+import { collapsingSections, type CollapsingSectionsModule } from './collapsingSections'
 
 function indentLines(editor: MarkdownEditor, direction: -1 | 1) {
 	const { doc } = editor

@@ -4,7 +4,7 @@ import type { Workspace } from '..'
 import Folder from '../Folder'
 import type { CommandContext } from './Command'
 import WorkspaceCommand from './WorkspaceCommand'
-import { CreationMode } from 'common/settings/CreationRule'
+import type { CreationMode } from 'common/settings/CreationRule'
 
 interface CreateNewFolderCommandContext extends CommandContext {
 	name?: string

@@ -1,6 +1,6 @@
 import fs from 'fs'
 import path from 'path'
-import { Registry, parseRawGrammar, IOnigLib } from 'vscode-textmate'
+import { Registry, parseRawGrammar, type IOnigLib } from 'vscode-textmate'
 import { loadWASM, createOnigScanner, createOnigString } from 'vscode-oniguruma'
 
 import Logger from 'js-logger'

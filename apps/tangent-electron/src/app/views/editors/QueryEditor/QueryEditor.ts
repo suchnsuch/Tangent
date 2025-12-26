@@ -1,5 +1,5 @@
 import type { Workspace } from 'app/model';
-import { defaultModules, Editor, EditorOptions } from 'typewriter-editor';
+import { defaultModules, Editor, type EditorOptions } from 'typewriter-editor';
 import WikiLinkAutocompleter from '../autocomplete/WikiLinkAutocompleter'
 import autocompleteBuilder from '../autocomplete/autocompleteModule'
 import autoBraces from '../autobraces/autoBracesModule'

@@ -1,6 +1,6 @@
 import { describe, test, expect, it } from 'vitest'
 
-import { ObjectStore, WritableStore, PatchableMap, PatchableMapPatch, PatchableMapPatchType } from './'
+import { ObjectStore, WritableStore, PatchableMap, type PatchableMapPatch, PatchableMapPatchType } from './'
 
 interface SimpleTestItem {
 	id: string

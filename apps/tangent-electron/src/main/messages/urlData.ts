@@ -1,7 +1,7 @@
 import { getLinkPreview } from 'link-preview-js'
 import { ipcMain } from 'electron'
 import Logger from 'js-logger'
-import { UrlData } from 'common/urlData'
+import type { UrlData } from 'common/urlData'
 import { getWindowHandle } from 'main/workspaces'
 import chalk from 'chalk'
 import { isExternalLink } from 'common/links'

@@ -1,4 +1,5 @@
-import Command, { AnyCommandContext, CommandContext, CommandOptions } from "./Command"
+import Command from "./Command"
+import type { AnyCommandContext, CommandContext, CommandOptions } from "./Command"
 import type Workspace from "../Workspace"
 
 export interface PaletteAction {

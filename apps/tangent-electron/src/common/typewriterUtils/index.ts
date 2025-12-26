@@ -1,4 +1,4 @@
-import { TextDocument, Line, Delta, Op, AttributeMap, EditorRange, normalizeRange } from '@typewriter/document'
+import { TextDocument, Line, Delta, Op, AttributeMap, type EditorRange, normalizeRange } from '@typewriter/document'
 import { findCharactersBetweenWhitespace, findWordAround } from '../stringUtils'
 
 export function rangeContainsRange(container: EditorRange, contained: EditorRange) {

@@ -1,6 +1,6 @@
-import { ObjectStore, ObjectStoreOptions, WritableStore, ValidatingStore, rawOrStoreValue } from 'common/stores'
+import { ObjectStore, type ObjectStoreOptions, WritableStore, ValidatingStore, rawOrStoreValue } from 'common/stores'
 import { fillDateFormat } from '../dates'
-import Setting, { SettingDefinition } from './Setting'
+import Setting, { type SettingDefinition } from './Setting'
 
 export type CreationMode = 'create' | 'createOrOpen' | 'createOrOpenCaseInsensitive'
 

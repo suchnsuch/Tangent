@@ -2,9 +2,9 @@ import { ObjectStore } from 'common/stores'
 import type { DirectoryStore } from 'common/trees'
 import type { SettingDefinition } from './Setting'
 import Setting from './Setting'
-import { derived, Readable } from 'svelte/store'
-import { getNodeFromReference, isNode, TreeNodeOrReference } from 'common/nodeReferences'
-import { numberedStringSort, NumberedStringSortCache } from 'common/sorting'
+import { derived, type Readable } from 'svelte/store'
+import { getNodeFromReference, isNode, type TreeNodeOrReference } from 'common/nodeReferences'
+import { numberedStringSort, type NumberedStringSortCache } from 'common/sorting'
 
 export type SortOrder = 'ascending' | 'descending'
 

@@ -1,5 +1,5 @@
 import NoteParser from './NoteParser';
-import { ParsingContext, ParsingContextType, ParsingProgram } from './parsingContext';
+import { type ParsingContext, ParsingContextType, type ParsingProgram } from './parsingContext';
 import { htmlTagNames } from 'html-tag-names'
 import { svgTagNames } from 'svg-tag-names'
 

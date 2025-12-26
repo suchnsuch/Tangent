@@ -1,9 +1,8 @@
-import { TreeNode, shallowCopyTreeNodeWithoutChildren } from 'common/trees'
+import type { TreeNode } from 'common/trees'
 import Workspace from '../Workspace'
-import { CommandContext } from './Command'
+import type { CommandContext } from './Command'
 import WorkspaceCommand from './WorkspaceCommand'
-import paths from 'common/paths'
-import { NavigationData } from 'app/events'
+import type { NavigationData } from 'app/events'
 
 interface DuplicateNodeCommandContext extends CommandContext {
 	target?: TreeNode

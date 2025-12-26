@@ -2,11 +2,11 @@ import type { Workspace } from 'app/model'
 import { StructureType } from 'common/indexing/indexTypes'
 
 import EmbedRoot from './EmbedRoot.svelte'
-import TangentLink, { LinkState } from './t-link'
+import TangentLink, { type LinkState } from './t-link'
 import { markAsSelectionRequest } from 'app/events'
 import { deepEqual } from 'fast-equals'
-import { HandleResult } from 'app/model/NodeHandle'
-import { TooltipConfig } from 'app/utils/tooltips'
+import type { HandleResult } from 'app/model/NodeHandle'
+import type { TooltipConfig } from 'app/utils/tooltips'
 import { isExternalLink } from 'common/links'
 
 function createStyleElement(href: string) {

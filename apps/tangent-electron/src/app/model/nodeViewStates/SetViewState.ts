@@ -1,11 +1,11 @@
 import { CachingStore, ReadableStore, SelfStore } from 'common/stores'
 import type SetInfo from 'common/dataTypes/SetInfo';
-import { SetLensMode } from 'common/dataTypes/SetInfo';
+import type { SetLensMode } from 'common/dataTypes/SetInfo';
 import type { TreeNode } from 'common/trees'
 import type { TreeNodeOrReference } from 'common/nodeReferences';
 import type NodeSet from 'common/NodeSet'
 import type { CreationRuleOrDefinition } from 'common/settings/CreationRule';
-import { derived, Readable } from 'svelte/store';
+import { derived, type Readable } from 'svelte/store';
 import type { NodeViewState } from '.';
 import ListViewState from './ListViewState';
 import CardsViewState from './CardsViewState';

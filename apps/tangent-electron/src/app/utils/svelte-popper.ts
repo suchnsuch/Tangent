@@ -1,4 +1,4 @@
-import { createPopper, Options, VirtualElement } from '@popperjs/core'
+import { createPopper, type Options, type VirtualElement } from '@popperjs/core'
 
 type OurOptions = Partial<Options> & {
 	reference?: HTMLElement | VirtualElement

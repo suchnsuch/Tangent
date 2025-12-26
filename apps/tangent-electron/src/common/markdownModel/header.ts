@@ -1,7 +1,7 @@
 import { StructureType } from 'common/indexing/indexTypes'
 import { matchMarkdownLink, matchWikiLink } from './links'
 import NoteParser from './NoteParser'
-import { AttributeMap } from 'typewriter-editor'
+import type { AttributeMap } from 'typewriter-editor'
 
 export const headerMatcher = /^(#+ )(.*)/
 

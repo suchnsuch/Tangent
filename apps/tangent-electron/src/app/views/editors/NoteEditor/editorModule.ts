@@ -1,7 +1,7 @@
 import {
 	Editor,
 	EditorChangeEvent,
-	EditorRange,
+	type EditorRange,
 	normalizeRange,
 	deltaToText, 
 	Op,
@@ -19,7 +19,7 @@ import {
 
 import { requestCallbackOnIdle, wait } from '@such-n-such/core'
 import { parseMarkdown } from 'common/markdownModel'
-import { getLineFormatData, getLineFormattingPrefix, IndentDefinition, lineFormatEscapeMode } from 'common/markdownModel/line'
+import { getLineFormatData, getLineFormattingPrefix, type IndentDefinition, lineFormatEscapeMode } from 'common/markdownModel/line'
 import TangentLink from './t-link'
 import TangentCheckbox from './t-checkbox'
 import TangentCodePreview from './t-code-preview' // No deletey
@@ -34,7 +34,7 @@ import { handleIsNode } from 'app/model/NodeHandle'
 import { isLineCollapsed, lineCollapseDepth } from 'common/markdownModel/sections'
 import { bustIntoSelection } from '../selectionBuster'
 import type MarkdownEditor from './MarkdownEditor'
-import { appendContextTemplate, ContextMenuConstructorOptions } from 'app/model/menus'
+import { appendContextTemplate, type ContextMenuConstructorOptions } from 'app/model/menus'
 import { eventHasSelectionRequest } from 'app/events'
 import { createCommandHandler } from 'app/model/commands/Command'
 

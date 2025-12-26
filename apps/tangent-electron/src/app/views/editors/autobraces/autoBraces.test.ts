@@ -2,7 +2,7 @@ import { describe, test, expect } from 'vitest'
 
 import { wait } from '@such-n-such/core'
 import { Editor } from 'typewriter-editor'
-import autoBraces, { AutoBracesModulOptions } from './autoBracesModule'
+import autoBraces, { type AutoBracesModulOptions } from './autoBracesModule'
 
 function getEditor(options?: AutoBracesModulOptions) {
 

@@ -4,7 +4,7 @@ import Logger from 'js-logger'
 
 import type { TreeNode } from 'common/trees'
 import { ObjectStore } from 'common/stores'
-import File, { FileContent, FileSaveResult, FileWatcher } from './File'
+import File, { type FileContent, FileSaveResult, type FileWatcher } from './File'
 import type DataType from 'common/dataTypes/DataType'
 import type Workspace from './Workspace'
 import { RESAVE_DATA_FILE } from 'common/dataTypes/DataType'

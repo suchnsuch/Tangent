@@ -1,9 +1,9 @@
 import { mapIterator } from '@such-n-such/core'
-import { TreeNode, forAllNodes, DirectoryStore, TreePredicateResult, defaultStoreFilter } from 'common/trees'
+import { type TreeNode, forAllNodes, TreePredicateResult, defaultStoreFilter } from 'common/trees'
 import type { ObjectStore } from 'common/stores'
-import { ConnectionInfo, HrefFormedLink, IndexData, IndexDataUpdate, StructureData, StructureType } from './indexTypes'
+import { type ConnectionInfo, type HrefFormedLink, IndexData, type IndexDataUpdate, type StructureData, StructureType } from './indexTypes'
 
-import { linkInfoToText, MarkdownParsingOptions, parseMarkdown } from '../markdownModel/parser'
+import { linkInfoToText, type MarkdownParsingOptions, parseMarkdown } from '../markdownModel/parser'
 import { getExtensionRegex } from '../fileExtensions'
 
 import Logger from 'js-logger'

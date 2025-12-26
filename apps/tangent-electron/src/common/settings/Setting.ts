@@ -1,4 +1,4 @@
-import { RawValueMode, PatchableStore } from 'common/stores'
+import { type RawValueMode, PatchableStore } from 'common/stores'
 import { clamp } from '../utils'
 
 interface SettingValueDescription<T> {

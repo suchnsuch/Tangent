@@ -1,6 +1,6 @@
 import { Workspace } from 'app/model'
-import { AutocompleteHandler, AutocompleteModule } from './autocompleteModule'
-import { Editor, EditorRange, TextDocument, normalizeRange } from 'typewriter-editor'
+import { type AutocompleteHandler, AutocompleteModule } from './autocompleteModule'
+import { Editor, type EditorRange, TextDocument, normalizeRange } from 'typewriter-editor'
 import { lineToText } from 'common/typewriterUtils'
 import { WritableStore } from 'common/stores'
 import { findCharactersBetweenWhitespace } from 'common/stringUtils'

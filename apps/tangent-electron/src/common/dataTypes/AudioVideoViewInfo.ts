@@ -1,6 +1,6 @@
 import { ObjectStore, WritableStore } from 'common/stores'
-import DataType from './DataType'
-import { DirectoryStore, TreeNode } from 'common/trees'
+import type DataType from './DataType'
+import { DirectoryStore, type TreeNode } from 'common/trees'
 
 const fileType = '.avview'
 

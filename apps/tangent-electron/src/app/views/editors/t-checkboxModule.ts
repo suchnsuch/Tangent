@@ -2,8 +2,8 @@ import { checkboxMatcher, matchList } from 'common/markdownModel/list';
 import { getIndexFromNode, type Editor, type Line } from 'typewriter-editor';
 import TangentCheckbox from './NoteEditor/t-checkbox';
 import { tick } from 'svelte';
-import { ContextMenuConstructorOptions, appendContextTemplate } from 'app/model/menus';
-import { TodoState } from 'common/indexing/indexTypes';
+import { type ContextMenuConstructorOptions, appendContextTemplate } from 'app/model/menus'
+import type { TodoState } from 'common/indexing/indexTypes'
 
 export default function tCheckboxModule(editor: Editor) {
 	function onClick(event: MouseEvent) {

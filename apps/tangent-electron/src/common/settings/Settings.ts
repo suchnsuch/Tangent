@@ -1,5 +1,5 @@
-import { ObjectStore, PatchableMap, RawValueMode } from 'common/stores'
-import Setting, { SettingDefinition } from './Setting'
+import { ObjectStore, PatchableMap, type RawValueMode } from 'common/stores'
+import Setting, { type SettingDefinition } from './Setting'
 
 import { isLinux, isMac } from '../platform'
 

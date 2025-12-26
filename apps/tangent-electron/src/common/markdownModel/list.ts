@@ -1,4 +1,4 @@
-import { StructureType, TodoState } from 'common/indexing/indexTypes'
+import { StructureType, type TodoState } from 'common/indexing/indexTypes'
 import NoteParser from './NoteParser'
 
 /**

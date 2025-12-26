@@ -11,7 +11,8 @@
 		"paths": {
 			"main/*": ["../main/*"],
 			"common/*": ["../common/*"]
-		}
+		},
+		"verbatimModuleSyntax": true
 	},
 	"include": [
 		".",

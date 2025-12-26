@@ -1,6 +1,6 @@
 import { describe, test, expect, it } from 'vitest'
 
-import { forAllNodes, TreeNode, DirectoryStore, DirectoryStoreAddResult } from 'common/trees'
+import { forAllNodes, type TreeNode, DirectoryStore, DirectoryStoreAddResult } from 'common/trees'
 
 describe('Adding and removing nodes', () => {
 

@@ -1,9 +1,9 @@
 import { TextDocument, Line } from '@typewriter/document'
-import { ConnectionInfo, StructureData, StructureType } from '../indexing/indexTypes'
+import { type ConnectionInfo, type StructureData, StructureType } from '../indexing/indexTypes'
 import CharacterFeeder from './CharacterFeeder'
 import DocumentFeeder from './DocumentFeeder'
 import { lineIsMultiLineFormat } from './line'
-import NoteParser, { MarkdownParsingOptions } from './NoteParser'
+import NoteParser, { type MarkdownParsingOptions } from './NoteParser'
 
 export type { MarkdownParsingOptions } from './NoteParser'
 

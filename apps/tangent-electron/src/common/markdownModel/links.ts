@@ -1,12 +1,12 @@
-import { EmbedInfo, HrefFormedLink, LinkInfo, StructureType } from "../indexing/indexTypes"
+import { type EmbedInfo, type HrefFormedLink, type LinkInfo, StructureType } from "../indexing/indexTypes"
 import type { AttributeMap, TextDocument } from '@typewriter/document'
 import { lineToText } from '../typewriterUtils'
-import { TreeNode, TreePredicateResult, validatePath } from 'common/trees'
+import { type TreeNode, validatePath } from 'common/trees'
 import paths from '../paths'
 import type { DefaultIndexStore } from 'common/indexing/IndexTreeStore'
 import { getTagPath } from 'common/indexing/TagNode'
 import NoteParser from './NoteParser'
-import { ParsingContextType, ParsingProgram } from './parsingContext'
+import { ParsingContextType, type ParsingProgram } from './parsingContext'
 import { isExternalLink } from 'common/links'
 
 export const wikiLinkMatcher = /(\[\[)([^\[\]\n|#]*)(#[^\[\]\n|#]*)?(\|[^\[\]\n|#]*)?(\]\])?/

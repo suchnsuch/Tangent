@@ -1,6 +1,6 @@
 import Session from 'common/dataTypes/Session'
 import Workspace from '../Workspace'
-import { CommandContext } from './Command'
+import type { CommandContext } from './Command'
 import WorkspaceCommand from './WorkspaceCommand'
 
 interface ShowPreviousSessionCommandContext extends CommandContext {

@@ -1,7 +1,7 @@
 import { last } from '@such-n-such/core'
 import { tagNameSeperatorMatch, tokenizeTagName } from '@such-n-such/tangent-query-parser'
 import NoteParser from './NoteParser'
-import { StructureType, TagInfo } from '../indexing/indexTypes'
+import { StructureType, type TagInfo } from '../indexing/indexTypes'
 
 /**
  * Group 1: The name of the tag

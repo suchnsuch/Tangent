@@ -1,5 +1,5 @@
 import type Workspace from '../Workspace';
-import KeyboardEventProxyCommand, { KeyboardEventProxyCommandOptions } from './KeyboardEventProxy';
+import KeyboardEventProxyCommand, { type KeyboardEventProxyCommandOptions } from './KeyboardEventProxy';
 
 export type NoteKeyboardProxyCommandOptions =
 	Partial<KeyboardEventProxyCommandOptions>

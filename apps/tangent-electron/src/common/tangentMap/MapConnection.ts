@@ -1,6 +1,6 @@
 import { swapRemove } from '@such-n-such/core'
 import { coerceToDate } from 'common/dates'
-import { ObjectStore, RawValueMode, PatchableList, PatchableListPatchType } from 'common/stores'
+import { ObjectStore, type RawValueMode, PatchableList } from 'common/stores'
 import type MapNode from './MapNode'
 import { MapStrength, MapStrengthStore } from './MapNode'
 import { MapNodeReference, MapNodeStore } from './MapNodeStore'

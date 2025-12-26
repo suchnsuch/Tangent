@@ -1,4 +1,5 @@
-import { ConnectionInfo, HeaderInfo, StructureData, StructureType, TagInfo, TodoInfo } from './indexTypes'
+import { StructureType } from './indexTypes'
+import type { ConnectionInfo, HeaderInfo, StructureData, TodoInfo } from './indexTypes'
 
 /**
  * Returns if the two pieces of structure are the same, even if any position data is different

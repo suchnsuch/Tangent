@@ -1,5 +1,4 @@
-import { EditorRange, Line, normalizeRange, TextChange, TextDocument } from '@typewriter/document'
-import { lineToText } from 'common/typewriterUtils'
+import { type EditorRange, Line, normalizeRange, TextChange, TextDocument } from '@typewriter/document'
 import { lineIsMultiLineFormat } from './line'
 
 /**

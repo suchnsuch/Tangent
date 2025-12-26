@@ -1,5 +1,5 @@
 import type { TreeNode } from './directory'
-import { PatchableStore, PatchableList, PatchableListOptions } from '../stores'
+import { PatchableStore, PatchableList, type PatchableListOptions } from '../stores'
 import type { DirectoryLookup } from './directoryStore';
 
 export class TreeItemReference<T extends TreeNode> extends PatchableStore<T, string> {

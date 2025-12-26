@@ -5,8 +5,8 @@ import type { IndentDefinition } from './line'
 import { isEqual, type AttributeMap } from '@typewriter/document'
 import type { ListDefinition } from './list'
 import type { TagSectionData } from './tag'
-import { CodeData } from './code'
-import { MathData } from './math'
+import type { CodeData } from './code'
+import type { MathData } from './math'
 import { hasCollapsedChildren, isCollapsed } from './sections'
 
 const defaultOptions = {}

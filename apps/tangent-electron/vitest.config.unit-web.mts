@@ -1,6 +1,7 @@
 import path from 'path'
 import { defineProject, mergeConfig } from 'vitest/config'
 import { svelte } from '@sveltejs/vite-plugin-svelte'
+import { playwright } from '@vitest/browser-playwright'
 import sharedConfig from './vitest.shared.mjs'
 
 export default mergeConfig(
@@ -14,8 +15,8 @@ export default mergeConfig(
 			],
 			browser: {
 				enabled: true,
-				provider: 'playwright',
-				name: 'chromium',
+				provider: playwright(),
+				instances: [{ browser: 'chromium' }],
 				headless: true,
 				screenshotFailures: false
 			}

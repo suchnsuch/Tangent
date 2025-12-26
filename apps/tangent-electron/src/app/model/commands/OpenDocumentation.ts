@@ -1,5 +1,5 @@
-import { CommandContext } from './Command';
-import WorkspaceCommand from './WorkspaceCommand';
+import type { CommandContext } from './Command'
+import WorkspaceCommand from './WorkspaceCommand'
 
 export class OpenDocumentationCommand extends WorkspaceCommand {
 

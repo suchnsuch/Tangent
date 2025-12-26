@@ -1,6 +1,6 @@
 import { WritableStore } from 'common/stores'
-import { SvelteConstructor } from './svelte'
-import { Placement } from '@floating-ui/dom'
+import type { SvelteConstructor } from './svelte'
+import type { Placement } from '@floating-ui/dom'
 
 export type TooltipFunction = () => TooltipDefOrConfig
 export type TooltipLiteral = string | SvelteConstructor

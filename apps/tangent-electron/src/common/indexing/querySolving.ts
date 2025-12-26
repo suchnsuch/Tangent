@@ -1,14 +1,14 @@
 import { filterIterator, mapIterator } from '@such-n-such/core'
-import { Clause, ClauseGroup, ClauseType, ClauseMod, isGroup, parseQueryText, PartialClauseReference, PartialClauseValue, Query, QueryError, PartialClauseType, TodoQueryState, tagContainsTag, ClauseGroupMod } from '@such-n-such/tangent-query-parser'
+import { type Clause, type ClauseGroup, ClauseType, ClauseMod, isGroup, parseQueryText, type PartialClauseReference, type PartialClauseValue, type Query, type QueryError, type PartialClauseType, TodoQueryState, tagContainsTag, ClauseGroupMod } from '@such-n-such/tangent-query-parser'
 import QueryInfo, { queryFileType } from 'common/dataTypes/QueryInfo'
-import { DirectoryStore, iterateOverChildren, TreeNode, TreePredicateResult, validatePath } from 'common/trees'
+import { DirectoryStore, type TreeNode, TreePredicateResult, validatePath } from 'common/trees'
 import { getFileTypeRegex, imageFileExtensions } from 'common/fileExtensions'
-import { addPreviewToReference, Annotation, areNodesOrReferencesEquivalent, cleanReference, createReference, getNode, getNodeFromReference, isNode, isReference, isSubReference, TreeNodeOrReference } from 'common/nodeReferences'
+import { addPreviewToReference, type Annotation, areNodesOrReferencesEquivalent, cleanReference, createReference, getNode, getNodeFromReference, isNode, isReference, isSubReference, type TreeNodeOrReference } from 'common/nodeReferences'
 import type { ObjectStore } from 'common/stores'
-import { IndexData, TodoState } from './indexTypes'
+import { IndexData, type TodoState } from './indexTypes'
 import { getTextAnnotations } from './queryAnnotations'
 import type { QueryResult } from './queryResults'
-import { getTagPath, isTagTreeNode, TagTreeNode } from './TagNode'
+import { getTagPath, isTagTreeNode } from './TagNode'
 
 export interface QuerySolverInterop {
 	directory: DirectoryStore

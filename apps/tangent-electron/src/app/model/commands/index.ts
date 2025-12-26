@@ -38,7 +38,7 @@ import { NativeCommand } from './NativeCommand'
 import { OpenDocumentationCommand } from './OpenDocumentation'
 import { DeleteSidebarItem, RenameSidebarItem } from './SidebarCommands'
 import { CopyFileToClipboardCommand } from './CopyFileToClipboard'
-export { Command, CommandAction, WorkspaceCommand }
+export { Command, CommandAction, type WorkspaceCommand }
 
 type LiteralCommands = ReturnType<typeof createAllCommands>
 type GenericCommands = {

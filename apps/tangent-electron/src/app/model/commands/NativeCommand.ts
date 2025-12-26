@@ -1,8 +1,8 @@
 import MarkdownEditor from 'app/views/editors/NoteEditor/MarkdownEditor'
 import { Workspace } from '..'
-import { CommandContext, CommandOptions } from './Command'
+import type { CommandContext, CommandOptions } from './Command'
 import WorkspaceCommand from './WorkspaceCommand'
-import { EditorRange } from '@typewriter/document'
+import type { EditorRange } from '@typewriter/document'
 
 type NativeCommandRole = 'cut' | 'copy' | 'paste' | 'pasteAndMatchStyle' | 'selectAll' | 'undo' | 'redo'
 

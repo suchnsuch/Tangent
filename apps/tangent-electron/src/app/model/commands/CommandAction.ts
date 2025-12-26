@@ -1,7 +1,8 @@
 import { shortcutsDisplayString } from 'app/utils/shortcuts';
-import Command, { AnyCommandContext, CommandContext } from "./Command";
-import { dropTooltip, requestTooltip, TooltipDefOrConfig, TooltipFunction, tooltipToConfig } from 'app/utils/tooltips';
-import { Placement } from '@floating-ui/dom';
+import Command from "./Command"
+import type { AnyCommandContext, CommandContext } from './Command'
+import { dropTooltip, requestTooltip, type TooltipDefOrConfig, type TooltipFunction, tooltipToConfig } from 'app/utils/tooltips'
+import type { Placement } from '@floating-ui/dom'
 
 export interface CommandActionOptions {
 	command: Command

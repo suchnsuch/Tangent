@@ -1,7 +1,6 @@
 import { describe, it, expect, beforeEach } from 'vitest'
-import CreateNewFileCommand, { CreateNewFileCommandContext } from './CreateNewFile'
+import CreateNewFileCommand, { type CreateNewFileCommandContext } from './CreateNewFile'
 import type { Workspace } from '..'
-import { TreeNode } from 'common/trees'
 import IndexTreeStore from 'common/indexing/IndexTreeStore'
 import { knownExtensions } from 'common/fileExtensions'
 

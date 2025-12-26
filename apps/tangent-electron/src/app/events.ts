@@ -2,7 +2,7 @@ import type { HrefFormedLink } from 'common/indexing/indexTypes'
 import type { TreeNode } from 'common/trees'
 import type { TreeNodeOrReference } from 'common/nodeReferences'
 import type { Tangent } from './model'
-import { AttributePredicate } from 'common/typewriterUtils'
+import type { AttributePredicate } from 'common/typewriterUtils'
 
 export interface NavigationData {
 	link?: HrefFormedLink

@@ -1,5 +1,5 @@
-import { tick } from 'svelte';
-import { get, Writable } from 'svelte/store';
+import { tick } from 'svelte'
+import { get, type Writable } from 'svelte/store'
 
 interface scrollParams {
 	scrollY: Writable<number>,

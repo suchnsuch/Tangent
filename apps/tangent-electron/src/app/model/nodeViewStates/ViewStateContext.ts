@@ -1,7 +1,7 @@
 import { swapRemove } from '@such-n-such/core'
 import paths from 'common/paths'
 import type { TreeChange, TreeNode } from 'common/trees'
-import { getNodeFromReference, isNode, isSubReference, TreeNodeOrReference, TreeNodeReference } from 'common/nodeReferences'
+import { getNodeFromReference, isNode, isSubReference, type TreeNodeOrReference, type TreeNodeReference } from 'common/nodeReferences'
 import type Workspace from '../Workspace'
 import type NodeViewState from './NodeViewState'
 import type { Tangent } from '..'

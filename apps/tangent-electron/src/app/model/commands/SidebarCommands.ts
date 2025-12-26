@@ -1,6 +1,6 @@
-import { TreeNode } from 'common/trees'
+import type { TreeNode } from 'common/trees'
 import { Workspace } from '..'
-import { CommandContext, CommandOptions } from './Command'
+import type { CommandContext, CommandOptions } from './Command'
 import WorkspaceCommand from './WorkspaceCommand'
 
 export interface SidebarCommandContext extends CommandContext {

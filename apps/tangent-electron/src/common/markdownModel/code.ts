@@ -1,8 +1,8 @@
 import { getLanguage, parseTokens, tokenize, tokensToOps } from './codeSyntax'
 import DocumentFeeder from './DocumentFeeder'
 import NoteParser from './NoteParser'
-import { AttributeMap } from 'typewriter-editor'
-import { ParsingContext, ParsingContextType, ParsingProgram } from './parsingContext'
+import type { AttributeMap } from 'typewriter-editor'
+import { type ParsingContext, ParsingContextType, type ParsingProgram } from './parsingContext'
 import { negativeInlineFormats } from './typewriterTypes'
 
 export function parseInlineCode(char: string, parser: NoteParser): boolean {

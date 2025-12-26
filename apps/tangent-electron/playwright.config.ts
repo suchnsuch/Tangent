@@ -1,6 +1,6 @@
 import path from 'path'
 import { defineConfig } from '@playwright/test'
-import { TangentOptions } from './tests-integration/tangent'
+import type { TangentOptions } from './tests-integration/tangent'
 
 export default defineConfig<TangentOptions>({
 	projects: [

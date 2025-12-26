@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
 import { nodeFromPath } from 'common/trees'
-import Session, { ThreadHistoryItem, fixThreadHistoryItem } from './Session'
+import Session, { type ThreadHistoryItem, fixThreadHistoryItem } from './Session'
 import IndexTreeStore from 'common/indexing/IndexTreeStore'
 
 describe('Fixing Thread History Items', () => {

@@ -1,6 +1,6 @@
 import { getEmbedDisplayname } from 'common/embedding'
 import EmbedFile from '../EmbedFile'
-import { CommandContext } from './Command'
+import type { CommandContext } from './Command'
 import WorkspaceCommand from './WorkspaceCommand'
 
 interface CopyFileToClipboardCommandContext extends CommandContext {

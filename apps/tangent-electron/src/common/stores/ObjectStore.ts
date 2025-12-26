@@ -1,8 +1,8 @@
 import { get } from 'svelte/store'
 import type { PatchObserver } from './Patchable'
 import type { Patchable } from './Patchable'
-import { PatchableListPatchType, PatchableListSubPatch } from './PatchableList'
-import { PatchableMapPatchType, PatchableMapSubPatch } from './PatchableMap'
+import { PatchableListPatchType, type PatchableListSubPatch } from './PatchableList'
+import { PatchableMapPatchType, type PatchableMapSubPatch } from './PatchableMap'
 import { SelfStore } from './SelfStore'
 
 function getPropertyDescriptor(o, name:PropertyKey): PropertyDescriptor {

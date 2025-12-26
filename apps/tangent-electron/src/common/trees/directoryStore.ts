@@ -2,8 +2,8 @@ import * as paths from '../paths'
 
 import { SelfStore } from 'common/stores'
 
-import { forAllNodes, integrateTrees, iterateOverChildren, TreeNode, TreePredicate, TreePredicateResult } from './directory'
-import { bestMatchForSearch, buildMatcher, nodeSearchResults, PathMatch, SegmentSearchNodePair, SearchMatchResult, isSearchArray } from '../search'
+import { forAllNodes, integrateTrees, iterateOverChildren, type TreeNode, type TreePredicate, TreePredicateResult } from './directory'
+import { bestMatchForSearch, buildMatcher, nodeSearchResults, type PathMatch, type SegmentSearchNodePair, isSearchArray } from '../search'
 
 interface GetMatches_Base {
 	/** The node to look under */

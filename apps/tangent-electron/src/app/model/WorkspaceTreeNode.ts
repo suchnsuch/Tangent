@@ -1,7 +1,7 @@
-import { TreeNode, validateFileSegment } from 'common/trees'
+import { type TreeNode, validateFileSegment } from 'common/trees'
 import { SelfStore, applyPatch, lazyInitializeSubscriptionList } from 'common/stores'
 import type { IndexData } from 'common/indexing/indexTypes'
-import { diffStructure, StructureDelta } from 'common/indexing/structureUtils';
+import { diffStructure, type StructureDelta } from 'common/indexing/structureUtils';
 import paths from "common/paths";
 import type Workspace from "./Workspace";
 

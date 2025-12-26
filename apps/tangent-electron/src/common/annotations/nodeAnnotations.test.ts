@@ -1,6 +1,6 @@
 import { describe, test, expect, it } from 'vitest'
 
-import { applyAnnotation, ChildList, childrenToHTML } from './nodeAnnotations'
+import { applyAnnotation, type ChildList, childrenToHTML } from './nodeAnnotations'
 
 describe('annotateWithNode()', () => {
 	it('Should split text appropriately', () => {

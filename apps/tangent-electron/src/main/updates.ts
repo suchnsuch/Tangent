@@ -1,6 +1,6 @@
 import { wait } from '@such-n-such/core'
-import { app, ipcMain } from 'electron'
-import { autoUpdater, ProgressInfo, UpdateInfo } from 'electron-updater'
+import { ipcMain } from 'electron'
+import { autoUpdater, type ProgressInfo, type UpdateInfo } from 'electron-updater'
 import { mode } from './environment'
 
 import { contentsMap, saveAndCloseWorkspaces } from './workspaces'

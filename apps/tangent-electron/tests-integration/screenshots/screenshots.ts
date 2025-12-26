@@ -1,7 +1,7 @@
 import { join } from 'path'
 import { Workspace } from 'app/model'
 import { wait } from '../tangent'
-import { PageScreenshotOptions } from 'playwright'
+import type { PageScreenshotOptions } from 'playwright'
 import TangentWindow from '../TangentWindow'
 
 type PrepOptions = {

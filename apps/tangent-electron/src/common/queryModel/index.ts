@@ -1,4 +1,4 @@
-import { EditorRange } from '@typewriter/document'
+import type { EditorRange } from '@typewriter/document'
 
 export function getInitialQuerySelection(text: string, previous: EditorRange = null): EditorRange | null {
 	if (!text) return null

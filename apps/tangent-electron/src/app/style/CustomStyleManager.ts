@@ -2,11 +2,10 @@ import { swapRemove } from '@such-n-such/core'
 import { Workspace } from 'app/model'
 import EmbedFile from 'app/model/EmbedFile'
 import Folder from 'app/model/Folder'
-import { HandleResult } from 'app/model/NodeHandle'
-import WorkspaceTreeNode from 'app/model/WorkspaceTreeNode'
+import type { HandleResult } from 'app/model/NodeHandle'
 import paths from 'common/paths'
-import { TreeNode, forAllNodes } from 'common/trees'
-import { Readable, derived } from 'svelte/store'
+import { type TreeNode, forAllNodes } from 'common/trees'
+import { type Readable, derived } from 'svelte/store'
 
 class StyleFileHandle {
 

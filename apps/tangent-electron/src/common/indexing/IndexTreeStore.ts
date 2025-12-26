@@ -1,5 +1,5 @@
 import paths, { normalizeSeperators } from 'common/paths';
-import { DirectoryStore, TreeNode } from 'common/trees';
+import { DirectoryStore, type TreeNode } from 'common/trees';
 import type { TagTreeNode } from './TagNode';
 
 export interface IndexTreeStoreInit<FileRoot, TagRoot> {

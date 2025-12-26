@@ -2,7 +2,7 @@ import type { SetLensViewState } from './LensViewState';
 import type { SetViewState } from './SetViewState';
 
 import CardsView from 'app/views/node-views/CardsView.svelte'
-import { derived, Readable } from 'svelte/store';
+import { derived, type Readable } from 'svelte/store';
 import type { TreeNodeOrReference } from 'common/nodeReferences';
 import type CardsLensSettings from 'common/settings/CardsLensSettings';
 import { sortNodes } from 'common/settings/Sorting';

@@ -1,11 +1,11 @@
-import { BrowserWindow, Menu, MenuItem, shell, screen, ipcMain, MenuItemConstructorOptions } from 'electron'
+import { BrowserWindow, Menu, MenuItem, shell, screen, ipcMain, type MenuItemConstructorOptions } from 'electron'
 import { checkForUpdates } from './updates'
 import { isMac } from '../common/platform'
 import { mode } from './environment'
 import { initDocumentation } from './documentation'
 import { getWindowHandle } from './workspaces'
 import Logger from 'js-logger'
-import { ContextMenuTemplate } from 'common/menus'
+import type { ContextMenuTemplate } from 'common/menus'
 
 const log = Logger.get('menus')
 

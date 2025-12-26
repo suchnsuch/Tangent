@@ -1,14 +1,14 @@
 import type Workspace from "app/model/Workspace";
-import { TextDocument, EditorRange, Editor, normalizeRange, ShortcutEvent } from "typewriter-editor";
+import { TextDocument, type EditorRange, Editor, normalizeRange, ShortcutEvent } from "typewriter-editor";
 import type { AutocompleteHandler, AutocompleteModule } from "./autocompleteModule";
-import { iterateOverChildren, TreeNode, TreePredicate, TreePredicateResult } from 'common/trees'
-import { ReadableStore, WritableStore } from 'common/stores'
+import { iterateOverChildren, type TreeNode, type TreePredicate, TreePredicateResult } from 'common/trees'
+import { WritableStore } from 'common/stores'
 import { matchWikiLink, wikiLinkMatcher } from 'common/markdownModel/links'
-import { HeaderInfo, IndexData } from "common/indexing/indexTypes";
+import { type HeaderInfo, IndexData } from "common/indexing/indexTypes";
 import { safeHeaderLine } from "common/markdownModel/header";
 import { rangeContainsRange } from 'common/typewriterUtils';
 import { EmbedType, getEmbedType } from 'common/embedding';
-import { buildFuzzySegementMatcher, buildMatcher, orderTreeNodesForSearch, SegmentSearchNodePair, SearchMatchResult } from 'common/search';
+import { buildFuzzySegementMatcher, buildMatcher, orderTreeNodesForSearch, type SegmentSearchNodePair, type SearchMatchResult } from 'common/search';
 import { implicitExtensionsMatch } from 'common/fileExtensions';
 import paths, { normalizeSeperators } from "common/paths";
 import { wrappedIndex } from 'common/collections';

@@ -3,8 +3,8 @@ import type { Workspace } from '.'
 import type { AnyCommandContext } from './commands/Command'
 import type WorkspaceCommand from './commands/WorkspaceCommand'
 import { isMac } from 'common/platform'
-import { TangentRoleOptions } from 'common/menus'
-import { WorkspaceCommandContext } from './commands/WorkspaceCommand'
+import type { TangentRoleOptions } from 'common/menus'
+import type { WorkspaceCommandContext } from './commands/WorkspaceCommand'
 
 export interface ContextMenuCommand {
 	command?: WorkspaceCommand

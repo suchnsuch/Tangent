@@ -1,5 +1,5 @@
 import { SparseRingBuffer } from 'common/collections'
-import { promises as fs, PathLike } from 'fs'
+import { promises as fs, type PathLike } from 'fs'
 import Logger from 'js-logger'
 import { getSettings } from './settings'
 

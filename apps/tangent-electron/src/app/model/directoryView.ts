@@ -1,5 +1,5 @@
 import { ObjectStore, WritableStore } from 'common/stores'
-import { DirectoryStore, iterateOverSortedChildren, TreePredicateResult, TreeNode } from 'common/trees'
+import { DirectoryStore, iterateOverSortedChildren, TreePredicateResult, type TreeNode } from 'common/trees'
 import { TreeItemListReference, TreeItemSetReference } from 'common/trees/treeReferences'
 import { numberedStringSort } from 'common/sorting'
 import { visibleFileTypeMatch } from 'common/fileExtensions'

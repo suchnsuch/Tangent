@@ -1,5 +1,5 @@
-import { ObjectStore, RawPatchableList, SimplePatchableStore, WritableStore } from 'common/stores'
-import { DirectoryStore, TreeNode } from 'common/trees'
+import { ObjectStore, SimplePatchableStore, WritableStore } from 'common/stores'
+import { DirectoryStore, type TreeNode } from 'common/trees'
 import type DataType from './DataType'
 import type { EditorRange } from '@typewriter/document'
 

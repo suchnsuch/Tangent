@@ -1,7 +1,7 @@
-import { TreeNode } from 'common/trees'
-import NodeViewState from './NodeViewState'
+import type { TreeNode } from 'common/trees'
+import type NodeViewState from './NodeViewState'
 import { ReadableStore } from 'common/stores'
-import LensViewState from './LensViewState'
+import type LensViewState from './LensViewState'
 import UnhandledView from 'app/views/node-views/UnhandledView.svelte'
 
 /**

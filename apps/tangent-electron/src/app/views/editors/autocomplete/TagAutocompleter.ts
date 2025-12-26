@@ -1,10 +1,10 @@
 import { tagNameSeperatorMatch, tokenizeTagName } from '@such-n-such/tangent-query-parser';
 import type { Workspace } from 'app/model';
-import { matchTag, TagDefinition } from 'common/markdownModel/tag';
-import { buildMatcher, orderTreeNodesForSearch, SegmentSearchNodePair, SearchMatchResult } from 'common/search';
+import { matchTag, type TagDefinition } from 'common/markdownModel/tag';
+import { buildMatcher, orderTreeNodesForSearch, type SearchMatchResult } from 'common/search';
 import { rangeContainsRange } from 'common/typewriterUtils';
 import { WritableStore } from 'common/stores'
-import { TextDocument, EditorRange, Editor, normalizeRange, ShortcutEvent } from 'typewriter-editor';
+import { TextDocument, type EditorRange, Editor, normalizeRange, ShortcutEvent } from 'typewriter-editor';
 import type { AutocompleteHandler, AutocompleteModule } from './autocompleteModule';
 import { iterateOverChildren } from 'common/trees';
 import type { TagTreeNode } from 'common/indexing/TagNode';

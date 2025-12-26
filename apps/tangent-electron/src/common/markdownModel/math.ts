@@ -1,8 +1,8 @@
-import { applyCodeFormat, CodeParsingContext, parseCodeLine, readCodeLines } from './code'
+import { applyCodeFormat, type CodeParsingContext, parseCodeLine } from './code'
 import DocumentFeeder from './DocumentFeeder'
 import { isWhitespace } from './matches'
 import NoteParser from './NoteParser'
-import { ParsingContext, ParsingContextType } from './parsingContext'
+import { type ParsingContext, ParsingContextType } from './parsingContext'
 
 export type MathData = {
 	source?: string

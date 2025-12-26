@@ -1,7 +1,7 @@
 import { ReadableStore } from 'common/stores'
-import { NodeViewState } from '.'
+import type { NodeViewState } from '.'
 import EmbedFile from '../EmbedFile'
-import LensViewState from './LensViewState'
+import type LensViewState from './LensViewState'
 import PdfView from 'app/views/node-views/PdfView.svelte'
 
 export default class PdfViewState implements NodeViewState, LensViewState {

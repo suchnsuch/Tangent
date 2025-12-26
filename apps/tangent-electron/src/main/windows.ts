@@ -1,4 +1,4 @@
-import { BrowserWindow, Menu, MenuItemConstructorOptions, shell } from 'electron'
+import { BrowserWindow, Menu, type MenuItemConstructorOptions, shell } from 'electron'
 import path from 'path'
 import os from 'os'
 import { mode } from './environment'

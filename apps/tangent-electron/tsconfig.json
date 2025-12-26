@@ -14,7 +14,7 @@
 		"allowJs": true,
 		"esModuleInterop": true,
 		"strict": false,
-		"verbatimModuleSyntax": false
+		"verbatimModuleSyntax": true
 	},
 	"exclude": [ "__build", "node_modules", "out" ]
 }

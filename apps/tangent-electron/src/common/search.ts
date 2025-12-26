@@ -3,7 +3,7 @@ import { daysIntoYear } from './dates'
 import type { TreeNode } from './trees'
 import { IndexData, StructureType } from './indexing/indexTypes'
 import paths, { normalizeSeperators } from './paths'
-import { applyAnnotation, ChildList } from './annotations/nodeAnnotations'
+import { applyAnnotation, type ChildList } from './annotations/nodeAnnotations'
 
 export type PathMatch = RegExp
 export type SearchMatchResult = RegExpMatchArray & {

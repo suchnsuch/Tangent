@@ -1,5 +1,5 @@
 import type WindowApi from 'common/WindowApi'
-import { UserMessage } from 'common/WindowApi'
+import type { UserMessage } from 'common/WindowApi'
 import { contextBridge, ipcRenderer } from 'electron'
 
 function on(channel:string,  handler: (...args) => void) {

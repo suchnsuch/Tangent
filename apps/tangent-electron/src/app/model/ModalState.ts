@@ -1,6 +1,6 @@
 import type { SvelteConstructor } from 'app/utils/svelte'
 import type { Props } from 'app/utils/types'
-import { writable, Writable } from 'svelte/store'
+import { writable, type Writable } from 'svelte/store'
 import ModalConfirm from 'app/modal/ModalConfirm.svelte'
 
 interface ModalStackItem {

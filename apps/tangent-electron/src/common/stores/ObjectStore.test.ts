@@ -1,6 +1,6 @@
 import { describe, test, expect } from 'vitest'
 
-import { derived, Readable } from 'svelte/store'
+import { derived, type Readable } from 'svelte/store'
 import { WritableStore, ObjectStore, PatchableList, PatchableMap } from './'
 
 test('Nested object stores', () => {

@@ -1,4 +1,4 @@
-import { Line, deltaToText, EditorRange, TextDocument } from '@typewriter/document'
+import { Line, deltaToText, type EditorRange, TextDocument } from '@typewriter/document'
 import noteTypeset from './typewriterTypes'
 import { getGlyphForNumber, ListForm, matchList } from './list'
 import { indentMatcher } from './matches'

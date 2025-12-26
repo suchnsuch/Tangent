@@ -1,8 +1,8 @@
 import ListLensSettings from 'common/settings/ListLensSettings';
-import { SetLensViewState } from './LensViewState';
-import { SetViewState } from './SetViewState';
-import { derived, Readable } from 'svelte/store';
-import { TreeNodeOrReference } from 'common/nodeReferences';
+import type { SetLensViewState } from './LensViewState';
+import type { SetViewState } from './SetViewState';
+import { derived, type Readable } from 'svelte/store';
+import type { TreeNodeOrReference } from 'common/nodeReferences';
 import { sortNodes } from 'common/settings/Sorting';
 import ListView from 'app/views/node-views/ListView.svelte';
 import ListSettingsView from 'app/views/node-views/ListSettingsView.svelte';
