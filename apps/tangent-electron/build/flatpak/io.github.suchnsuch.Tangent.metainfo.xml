@@ -87,6 +87,13 @@
   <update_contact>k8ie_AT_mcld.eu</update_contact>
 
   <releases>
+     <release version="0.11.1" date="2025-12-26">
+      <description>
+        <ul>
+          <li>Fixed an issue where pressing Delete while renaming elements in the sidebar deleted those items.</li>
+        </ul>
+      </description>
+    </release>
     <release version="0.11.0" date="2025-12-25">
       <description>
         <ul>
