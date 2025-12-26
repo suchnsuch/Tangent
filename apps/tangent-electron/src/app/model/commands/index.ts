@@ -178,7 +178,7 @@ function createAllCommands(workspace: Workspace) {
 		renameSidebarItem: new RenameSidebarItem(workspace, {
 			shortcut: isMac ? 'Mod+R' : 'F2'
 		}),
-		deleteSidebarItem: new DeleteSidebarItem(workspace, { shortcut: 'Backspace' }),
+		deleteSidebarItem: new DeleteSidebarItem(workspace, { shortcut: 'Mod+Backspace' }),
 
 
 		// Maps
