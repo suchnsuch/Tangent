@@ -302,7 +302,7 @@ const commandHandler = createCommandHandler(
 )
 
 function onKeydown(event: KeyboardEvent, item: TreeNode) {
-	if (commandHandler(event) || renameElement) {
+	if (renameElement || commandHandler(event)) {
 		return
 	}
 
