@@ -32,7 +32,8 @@
     "test:unit": "vitest run --project unit-core --project unit-web",
     "test:integration": "vitest --project integration",
     "test:end-to-end": "playwright test --project Tests",
-    "svelte-dev": "webpack watch"
+    "svelte-dev": "webpack watch",
+    "screenshots": "playwright test --project Screenshots"
   },
   "keywords": [],
   "author": {
