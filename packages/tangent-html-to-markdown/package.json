@@ -39,7 +39,7 @@
     "turndown": "^7.1.1"
   },
   "devDependencies": {
-    "@vitest/browser": "^3.2.4",
-    "vitest": "^3.2.4"
+    "@vitest/browser": "^4.0.16",
+    "vitest": "^4.0.16"
   }
 }

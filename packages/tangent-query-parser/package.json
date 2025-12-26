@@ -26,7 +26,7 @@
   },
   "devDependencies": {
     "typescript": "^5.1.6",
-    "vitest": "^3.2.4",
+    "vitest": "^4.0.16",
     "vscode-oniguruma": "^2.0.1",
     "vscode-textmate": "^9.2.0",
     "vscode-tmgrammar-test": "^0.1.1"
