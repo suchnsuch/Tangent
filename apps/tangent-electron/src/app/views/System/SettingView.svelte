@@ -232,8 +232,7 @@ function toggleItem(item) {
 						class="grow"
 						spellcheck="true"
 						rows="3"
-						placeholder={setting.placeholder}>
-					</textarea>
+						placeholder={setting.placeholder}></textarea>
 				{:else if form === 'shortcut'}
 					<div style="display: flex; align-items: center;">
 						<ShortcutInput
