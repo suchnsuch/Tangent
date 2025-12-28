@@ -4,7 +4,7 @@ import { fade } from 'svelte/transition'
 
 import type { TreeNode } from 'common/trees'
 
-import type { Tangent, Workspace } from 'app/model'
+import type { Tangent } from 'app/model'
 import type MapNode from 'common/tangentMap/MapNode'
 import { mapStrengthClass } from 'common/tangentMap/MapNode'
 import { clockTime, shortestDayDate } from 'common/dates'

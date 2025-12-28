@@ -11,7 +11,7 @@ import System from './System/System.svelte'
 
 import command from 'app/model/commands/CommandAction'
 import FocusLevelIcon from './smart-icons/FocusLevelIcon.svelte'
-import { appendContextTemplate, buildMainMenu, ContextMenuConstructorOptions, ExtendedContextEvent, extractRawTemplate, prepareMainMenuForWindow } from 'app/model/menus'
+import { appendContextTemplate, buildMainMenu, type ExtendedContextEvent, extractRawTemplate, prepareMainMenuForWindow } from 'app/model/menus'
 import { isMac } from 'common/platform'
 import CreationRuleName from './summaries/CreationRuleName.svelte'
 import PopUpButton from 'app/utils/PopUpButton.svelte'
@@ -245,6 +245,7 @@ function onViewContextMenu(event: MouseEvent) {
 			<div class="spacer"></div>
 		{/if}
 
+		<!-- svelte-ignore a11y_consider_explicit_label -->
 		<button class="subtle"
 			use:command={{
 				command: workspace.commands.toggleLeftSidebar,

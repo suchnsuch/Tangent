@@ -20,7 +20,7 @@ import {
 import { requestCallbackOnIdle, wait } from '@such-n-such/core'
 import { parseMarkdown } from 'common/markdownModel'
 import { getLineFormatData, getLineFormattingPrefix, type IndentDefinition, lineFormatEscapeMode } from 'common/markdownModel/line'
-import TangentLink from './t-link'
+import { TangentLink } from './t-link'
 import TangentCheckbox from './t-checkbox'
 import TangentCodePreview from './t-code-preview' // No deletey
 import TangentMath from './t-math' // No deletey

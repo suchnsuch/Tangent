@@ -1,5 +1,5 @@
 <script lang="ts">
-import { WorkspaceCommand } from 'app/model/commands'
+import type { WorkspaceCommand } from 'app/model/commands'
 
 export let key: string
 export let label: string

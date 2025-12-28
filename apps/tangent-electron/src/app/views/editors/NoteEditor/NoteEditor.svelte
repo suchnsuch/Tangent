@@ -3,10 +3,10 @@ import { createEventDispatcher, getContext, onDestroy, onMount, tick } from 'sve
 import {
 	addShortcutsToEvent,
 	DecorateEvent,
-	DecorationsModule,
+	type DecorationsModule,
 	EditorChangeEvent,
-	EditorRange,
-	KeyboardEventWithShortcut,
+	type EditorRange,
+	type KeyboardEventWithShortcut,
 	Line,
 	normalizeRange,
 	Source,
@@ -32,16 +32,16 @@ import { FocusLevel } from 'common/dataTypes/TangentInfo'
 import LinkInfoView from 'app/views/summaries/LinkInfoView.svelte'
 import { pluralize } from 'common/plurals'
 import arrowNavigate from 'app/utils/arrowNavigate'
-import { HrefFormedLink, StructureType } from 'common/indexing/indexTypes'
+import { type HrefFormedLink, StructureType } from 'common/indexing/indexTypes'
 import type { ConnectionInfo } from 'common/indexing/indexTypes'
-import { areLineArraysOpTextEquivalent, EditInfo, getEditInfo, getLineRangeWhile, getRangeWhile, lineToText, rangesAreEquivalent, stripLineAttributes } from 'common/typewriterUtils'
+import { areLineArraysOpTextEquivalent, type EditInfo, getEditInfo, getRangeWhile, rangesAreEquivalent, stripLineAttributes } from 'common/typewriterUtils'
 import { scrollTo } from 'app/utils';
 import { type NavigationData } from 'app/events'
 import WorkspaceFileHeader from 'app/utils/WorkspaceFileHeader.svelte';
-import TangentLink from './t-link';
-import { appendContextTemplate, ContextMenuConstructorOptions } from 'app/model/menus';
+import { TangentLink } from './t-link';
+import { appendContextTemplate, type ContextMenuConstructorOptions } from 'app/model/menus';
 import { getInitialSelection } from 'common/markdownModel';
-import { marginToAxis, ScrollToOptions } from 'app/utils/scrollto';
+import { marginToAxis, type ScrollToOptions } from 'app/utils/scrollto';
 import { timedLatch } from 'app/utils/svelte';
 import LazyScrolledList from 'app/utils/LazyScrolledList.svelte';
 import { resolveLink } from 'common/markdownModel/links';
@@ -61,12 +61,11 @@ import CodeBlockAutocompleteMenu from '../autocomplete/CodeBlockAutocompleteMenu
 import { handleIsNode } from 'app/model/NodeHandle';
 import { revealContentAroundRange } from './editorModule';
 import { fly } from 'svelte/transition';
-import LineGutter from './LineGutter.svelte';
 import { derived } from 'svelte/store';
 import { EmbedFile } from 'app/model';
 import LineGutterLeft from './LineGutterLeft.svelte';
 import LineGutterRight from './LineGutterRight.svelte';
-import { dropTooltip, requestTooltip, TooltipConfig } from 'app/utils/tooltips';
+import { dropTooltip, requestTooltip, type TooltipConfig } from 'app/utils/tooltips';
 import YamlTooltip from './YamlTooltip.svelte';
 
 // Technically, this just needs to exist _somewhere_. Putting it here because of the svelte dependency

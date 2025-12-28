@@ -14,6 +14,7 @@ function click() {
 </script>
 
 <button class="doc-link"
+	aria-label="Open Documentation"
 	on:click={click}
 	{style}
 	use:tooltip={`Documentation for ${pageName}`}

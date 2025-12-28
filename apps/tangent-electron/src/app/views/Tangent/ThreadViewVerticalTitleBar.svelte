@@ -41,6 +41,7 @@ const {
 		><SvgIcon
 			ref={isDirty ? 'close.svg#close-dirty' : 'close.svg#close'}
 		/></button>
+		<!-- svelte-ignore a11y_consider_explicit_label -->
 		<button use:command={{
 			command: closeLeftFiles,
 			context: { node, tangent }
@@ -48,6 +49,7 @@ const {
 		><svg style={`width: 24px; height: 24px;`}>
 			<use href="close.svg#close-left"/>
 		</svg></button>
+		<!-- svelte-ignore a11y_consider_explicit_label -->
 		<button use:command={{
 			command: closeRightFiles,
 			context: { node, tangent }

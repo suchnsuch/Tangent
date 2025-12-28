@@ -1,7 +1,7 @@
 <script lang="ts">
-import { autoUpdate, computePosition, flip, offset, Placement, VirtualElement } from '@floating-ui/dom'
+import { autoUpdate, computePosition, flip, offset, type Placement, type VirtualElement } from '@floating-ui/dom'
 import { cubicInOut } from 'svelte/easing'
-import { dropTooltip, pinTooltip, TooltipConfig } from './tooltips'
+import { dropTooltip, pinTooltip, type TooltipConfig } from './tooltips'
 import { onDestroy, setContext } from 'svelte'
 
 export let origin: HTMLElement

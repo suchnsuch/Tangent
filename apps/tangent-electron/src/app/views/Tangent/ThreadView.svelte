@@ -236,14 +236,17 @@ function onWheel(event: WheelEvent, state: NodeViewState) {
 				/>
 			<h1>No files in your thread. Create or open a note from the left sidebar.</h1>
 			<div class="buttons">
+				<!-- svelte-ignore a11y_consider_explicit_label -->
 				<button use:command={{
 					command: createNewFile,
 					labelShortcut: true
 				}} class="subtle"></button>
+				<!-- svelte-ignore a11y_consider_explicit_label -->
 				<button use:command={{
 					command: goTo,
 					labelShortcut: true
 				}} class="subtle"></button>
+				<!-- svelte-ignore a11y_consider_explicit_label -->
 				<button use:command={{
 					command: setMapFocusLevel,
 					labelShortcut: true

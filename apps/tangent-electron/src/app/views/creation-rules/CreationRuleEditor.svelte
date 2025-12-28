@@ -1,6 +1,6 @@
 <script lang="ts">
 import { getContext, tick } from 'svelte'
-import { PathValidationMessages, validatePath } from 'common/trees'
+import { type PathValidationMessages, validatePath } from 'common/trees'
 import type CreationRule from 'common/settings/CreationRule'
 import { nameFromRule, willPromptForName } from 'common/settings/CreationRule'
 import { Workspace } from 'app/model'
@@ -139,7 +139,7 @@ function onValidateShortcut(shortcut: string) {
 	<details>
 		<summary>Name Template Tokens</summary>
 		<p>You can use the following tokens to automate some aspects of note naming.</p>
-		<table>
+		<table><tbody>
 			<tr>
 				<th><CreationRuleTemplateButton templateText="%name%" insertTemplateText={insertTextIntoTemplate}/></th>
 				<td>
@@ -147,11 +147,11 @@ function onValidateShortcut(shortcut: string) {
 					A blank template is equivalent to a template with just this value.
 				</td>
 			</tr>
-		</table>
+		</tbody></table>
 		<h4>Date & Time</h4>
 		<p>These tokens are replaced with the appropriate values based on when the note is created.</p>
 		<figure>
-			<table>
+			<table><tbody>
 				<tr><th><CreationRuleTemplateButton templateText="%YYYY%" insertTemplateText={insertTextIntoTemplate}/></th><td>The full year.</td></tr>
 				<tr><th><CreationRuleTemplateButton templateText="%YY%" insertTemplateText={insertTextIntoTemplate}/></th><td>The last two digits of the year.</td></tr>
 				<tr><th><CreationRuleTemplateButton templateText="%MM%" insertTemplateText={insertTextIntoTemplate}/></th><td>The two digit month. e.g. "05" for May.</td></tr>
@@ -168,12 +168,12 @@ function onValidateShortcut(shortcut: string) {
 				<tr><th><CreationRuleTemplateButton templateText="%Mth%" insertTemplateText={insertTextIntoTemplate}/></th><td>The shortened name of the month.<sup>2</sup></td></tr>
 				<tr><th><CreationRuleTemplateButton templateText="%WeekDay%" insertTemplateText={insertTextIntoTemplate}/></th><td>The full name of the week day.<sup>2</sup></td></tr>
 				<tr><th><CreationRuleTemplateButton templateText="%WDay%" insertTemplateText={insertTextIntoTemplate}/></th><td>The short name of the week day.<sup>2</sup></td></tr>
-			</table>
+			</tbody></table>
 			<figcaption>
-				<table>
+				<table><tbody>
 					<tr><th>1</th><td>Append "o" to use ordinal numbers, e.g. "1st", "2nd", "3rd".</td></tr>
 					<tr><th>2</th><td>Can be made all-caps or all lowercase by making the token all caps or all lowercase.</td></tr>
-				</table>
+				</tbody></table>
 			</figcaption>
 		</figure>
 	</details>

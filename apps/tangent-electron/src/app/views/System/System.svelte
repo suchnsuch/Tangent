@@ -25,13 +25,13 @@ let section = workspace.viewState.system.section
 
 // Update Data
 let updateState = workspace.updateState
-let supressUpdates = false
+let suppressUpdates = false
 $: mode = updateState.mode
 $: downloadProgress = updateState.downloadProgress
 
 $: onModeChanged($mode)
 function onModeChanged(_m?) {
-	if ($mode === 'ready' && !supressUpdates && !detailsOpen && workspace.viewState.modal.stack.length == 0) {
+	if ($mode === 'ready' && !suppressUpdates && !detailsOpen && workspace.viewState.modal.stack.length == 0) {
 		detailsOpen = true
 		section.set('Updates')
 	}
@@ -107,7 +107,7 @@ $: currentMenu = menus.find(m => m.name === $section) ?? menus[0]
 	}}
 >
 	<svelte:fragment slot="button">
-		<div class={'buttonContent ' + $mode} class:supressed={supressUpdates}>
+		<div class={'buttonContent ' + $mode} class:supressed={suppressUpdates}>
 			<div><svg style={`width: 24px; height: 24px;`}>
 				{#if $mode === 'ready'}
 					<use href="update.svg#arrow" />

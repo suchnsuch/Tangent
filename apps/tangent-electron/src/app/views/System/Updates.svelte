@@ -61,80 +61,81 @@ function laterButtonClick() {
 <main>
 	<p>
 		<SettingView setting={channel} showReset={false} />
-		{#if $channel === 'beta'}
-			<div class="message">
-				The beta channel may contain bugs.
-				If you encounter a bug, please
-				<a target="_blank" rel="noreferrer" href="https://mastodon.social/@taylorhadden">tell me on Mastodon</a>.
-			</div>
-		{:else if $channel === 'alpha'}
-			<div class="message warning">
-				This channel <em>will</em> contain bugs.
-				Only select this channel if you are comfortable with risking stability.
-				If you encounter a bug, please
-				<a target="_blank" rel="noreferrer" href="https://mastodon.social/@taylorhadden">tell me on Mastodon</a>.
-			</div>
-		{/if}
 	</p>
+	{#if $channel === 'beta'}
+		<p class="message">
+			The beta channel may contain bugs.
+			If you encounter a bug, please
+			<a target="_blank" rel="noreferrer" href="https://mastodon.social/@taylorhadden">tell me on Mastodon</a>.
+		</p>
+	{:else if $channel === 'alpha'}
+		<p class="message warning">
+			This channel <em>will</em> contain bugs.
+			Only select this channel if you are comfortable with risking stability.
+			If you encounter a bug, please
+			<a target="_blank" rel="noreferrer" href="https://mastodon.social/@taylorhadden">tell me on Mastodon</a>.
+		</p>
+	{/if}
+
 	<article>
-	<p><button
-		class="updateButton"
-		on:click={buttonClicked}
-		disabled={$mode === 'checking' || $mode === 'downloading'}
-	>
-		<div>{buttonText}</div>
-		{#if downloadPercent}
-			<div class="progressBar show" transition:slide={{ duration: 300 }}>
-				<div class="progress" style={`width: ${downloadPercent}%;`}></div>
+		<button
+			class="updateButton"
+			on:click={buttonClicked}
+			disabled={$mode === 'checking' || $mode === 'downloading'}
+		>
+			<div>{buttonText}</div>
+			{#if downloadPercent}
+				<div class="progressBar show" transition:slide={{ duration: 300 }}>
+					<div class="progress" style={`width: ${downloadPercent}%;`}></div>
+				</div>
+			{/if}
+		</button>
+
+		{#if $mode === 'up-to-date'}
+			<p class="info up-to-date" transition:slide={{ duration: 300 }}>
+				You are up to date!
+			</p>
+		{/if}
+
+		{#if $mode === 'ready'}
+			<p class="info ready" transition:slide={{ duration: 300 }}>
+				The update to {$nextUpdate.version} is ready!
+				The update will be applied automatically on exit, or you can update now.
+			</p>
+			{#if supressUpdates}
+				<p class="info">
+					Update notifications are supressed until next exit.
+				</p>
+			{:else}
+				<p class="laterButton">
+					<button on:click={laterButtonClick}>Update Later</button>
+				</p>
+			{/if}
+		{/if}
+		{#if $mode === 'error'}
+			<div class="info" transition:slide={{ duration: 300 }}>
+				<p>
+					The update {#if $nextUpdate}to {$nextUpdate.version}{/if} failed!
+				</p>
+				<p class="error">
+					Error: "{$errorMessage}"
+				</p>
+				<p>
+					You can try to check for updates again, or
+					<a href="http://tangentnotes.com/Download" target="_blank" rel="noreferrer">download the latest installer.</a>
+				</p>
 			</div>
+			
 		{/if}
-	</button></p>
 
-	{#if $mode === 'up-to-date'}
-		<p class="info up-to-date" transition:slide={{ duration: 300 }}>
-			You are up to date!
+		<p class="lastChecked" class:show={$lastChecked != null}>
+			Currently on v{workspace.version}.
+			{#if $lastChecked != null}
+				Last checked: {dates.shortestDayDate($lastChecked)}, {dates.clockTime($lastChecked)}
+			{/if}
 		</p>
-	{/if}
-
-	{#if $mode === 'ready'}
-		<p class="info ready" transition:slide={{ duration: 300 }}>
-			The update to {$nextUpdate.version} is ready!
-			The update will be applied automatically on exit, or you can update now.
-		</p>
-		{#if supressUpdates}
-			<p class="info">
-				Update notifications are supressed until next exit.
-			</p>
-		{:else}
-			<p class="laterButton">
-				<button on:click={laterButtonClick}>Update Later</button>
-			</p>
-		{/if}
-	{/if}
-	{#if $mode === 'error'}
-		<div class="info" transition:slide={{ duration: 300 }}>
-			<p>
-				The update {#if $nextUpdate}to {$nextUpdate.version}{/if} failed!
-			</p>
-			<p class="error">
-				Error: "{$errorMessage}"
-			</p>
-			<p>
-				You can try to check for updates again, or
-				<a href="http://tangentnotes.com/Download" target="_blank" rel="noreferrer">download the latest installer.</a>
-			</p>
-		</div>
-		
-	{/if}
-
-	<p class="lastChecked" class:show={$lastChecked != null}>
-		Currently on v{workspace.version}.
-		{#if $lastChecked != null}
-			Last checked: {dates.shortestDayDate($lastChecked)}, {dates.clockTime($lastChecked)}
-		{/if}
-	</p>
-	<p></p>
-</article>
+		<p></p>
+	</article>
 </main>
 
 <style lang="scss">

@@ -54,6 +54,7 @@ function determineWillCreateNewFiles(rules: (CreationRule | CreationRuleDefiniti
 >
 	<span class="label">Create</span>
 	{#each shortList as rule}
+		<!-- svelte-ignore node_invalid_placement_ssr -->
 		<button
 			class="no-callout"
 			use:CommandAction={isSingle ? null : {

@@ -1,7 +1,7 @@
 <script lang="ts">
 import { createEventDispatcher, getContext } from 'svelte'
-import { getNode, isReference, isSubReference, TreeNodeOrReference } from 'common/nodeReferences'
-import { NavigationData } from 'app/events'
+import { getNode, isReference, isSubReference, type TreeNodeOrReference } from 'common/nodeReferences'
+import type { NavigationData } from 'app/events'
 import { Workspace } from 'app/model'
 import WorkspaceTreeNode from 'app/model/WorkspaceTreeNode'
 import WorkspaceFileHeader from 'app/utils/WorkspaceFileHeader.svelte'

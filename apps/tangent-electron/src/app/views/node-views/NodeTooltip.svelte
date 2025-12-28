@@ -1,6 +1,6 @@
 <script lang="ts">
 import { wait } from '@such-n-such/core'
-import { TreeNode } from 'common/trees'
+import type { TreeNode } from 'common/trees'
 import NodePreview from '../summaries/NodePreview.svelte'
 import NodeLine from '../summaries/NodeLine.svelte'
 

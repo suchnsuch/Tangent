@@ -1,5 +1,5 @@
 <script lang="ts">
-import { ChildList, childrenToHTML } from 'common/annotations/nodeAnnotations';
+import { type ChildList, childrenToHTML } from 'common/annotations/nodeAnnotations';
 import { annotateMatchText } from 'common/search';
 import type { TagOption } from './TagAutocompleter'
 

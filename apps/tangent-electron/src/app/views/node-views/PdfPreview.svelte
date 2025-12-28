@@ -83,7 +83,7 @@ function renderPage() {
 </script>
 
 <div bind:this={container} use:resizeObserver={onResize}>
-	<canvas bind:this={canvas} />
+	<canvas bind:this={canvas}></canvas>
 </div>
 
 <style lang="scss">

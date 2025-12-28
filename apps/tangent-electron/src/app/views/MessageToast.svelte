@@ -65,6 +65,7 @@ function cancelTimeout(message: Message) {
 			on:mouseleave={ e => startTimeout(message, 2000)}
 		>
 			<button
+				aria-label="Remove Message"
 				on:click={e => removeMessage(message)}
 			><svg style={`width: 24px; height: 24px;`}>
 					<use href="close.svg#close"/>

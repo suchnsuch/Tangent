@@ -4,9 +4,9 @@ import { EmbedType, getEmbedType } from 'common/embedding'
 import type { HrefFormedLink } from 'common/indexing/indexTypes'
 import type { Workspace } from 'app/model'
 import type EmbedFile from 'app/model/EmbedFile'
-import { HandleResult, isNode } from 'app/model/NodeHandle'
+import { type HandleResult, isNode } from 'app/model/NodeHandle'
 import type { UrlDataError, WebsiteData } from 'common/urlData'
-    import PdfPreview from 'app/views/node-views/PdfPreview.svelte';
+import PdfPreview from 'app/views/node-views/PdfPreview.svelte'
 
 type Form = {
 	mode: 'error'
@@ -243,7 +243,7 @@ function websiteImageStyle(form: WebsiteData) {
 	<!-- svelte-ignore a11y-click-events-have-key-events -->
 	<!-- svelte-ignore a11y-no-static-element-interactions -->
 	<media-controller style={audioStyle()} audio class="audio" on:click|preventDefault>
-		<audio slot="media" src={form.src} />
+		<audio slot="media" src={form.src} ></audio>
 		<media-settings-menu hidden anchor="auto">
 			<media-settings-menu-item>
 				Speed
@@ -254,21 +254,21 @@ function websiteImageStyle(form: WebsiteData) {
 		</media-settings-menu>
 		<media-control-bar>
 			<div class="simple-menu">
-				<media-play-button class="first" notooltip/>
+				<media-play-button class="first" notooltip></media-play-button>
 				<div class="floating">
-					<media-seek-backward-button style="min-width: 3em"/>
-					<media-seek-forward-button style="min-width: 3em"/>
+					<media-seek-backward-button style="min-width: 3em"></media-seek-backward-button>
+					<media-seek-forward-button style="min-width: 3em"></media-seek-forward-button>
 				</div>
 			</div>
 			<div class="simple-menu">
-				<media-mute-button notooltip/>
+				<media-mute-button notooltip></media-mute-button>
 				<div class="floating">
-					<media-volume-range/>
+					<media-volume-range></media-volume-range>
 				</div>
 			</div>
-			<media-time-display showduration notoggle/>
+			<media-time-display showduration notoggle></media-time-display>
 			<media-time-range></media-time-range>
-			<media-settings-menu-button/>
+			<media-settings-menu-button></media-settings-menu-button>
 		</media-control-bar>
 	</media-controller>
 {:else if form.mode === 'video'}
@@ -276,7 +276,7 @@ function websiteImageStyle(form: WebsiteData) {
 	<!-- svelte-ignore a11y-no-static-element-interactions -->
 	<media-controller style={getBaseStyle()} on:click|preventDefault>
 		<!-- svelte-ignore a11y-media-has-caption -->
-		<video slot="media" src={form.src} />
+		<video slot="media" src={form.src} ></video>
 		<media-settings-menu hidden anchor="auto">
 			<media-settings-menu-item>
 				Speed
@@ -287,22 +287,22 @@ function websiteImageStyle(form: WebsiteData) {
 		</media-settings-menu>
 		<media-control-bar>
 			<div class="simple-menu">
-				<media-play-button class="first" notooltip/>
+				<media-play-button class="first" notooltip></media-play-button>
 				<div class="floating">
-					<media-seek-backward-button style="min-width: 3em"/>
-					<media-seek-forward-button style="min-width: 3em"/>
+					<media-seek-backward-button style="min-width: 3em"></media-seek-backward-button>
+					<media-seek-forward-button style="min-width: 3em"></media-seek-forward-button>
 				</div>
 			</div>
 			<div class="simple-menu">
-				<media-mute-button notooltip/>
+				<media-mute-button notooltip></media-mute-button>
 				<div class="floating">
-					<media-volume-range/>
+					<media-volume-range></media-volume-range>
 				</div>
 			</div>
-			<media-time-display showduration notoggle/>
+			<media-time-display showduration notoggle></media-time-display>
 			<media-time-range></media-time-range>
-			<media-settings-menu-button/>
-			<media-fullscreen-button/>
+			<media-settings-menu-button></media-settings-menu-button>
+			<media-fullscreen-button></media-fullscreen-button>
 		</media-control-bar>
 	</media-controller>
 {:else if form.mode === 'pdf'}

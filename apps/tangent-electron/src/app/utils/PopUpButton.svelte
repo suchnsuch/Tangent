@@ -9,14 +9,14 @@ function getPopUpId() {
 import { createPopper } from '@popperjs/core'
 import type { Placement } from '@popperjs/core'
 import type { Command } from 'app/model/commands'
-import type { AnyCommandContext, CommandContext } from 'app/model/commands/Command'
+import type { AnyCommandContext } from 'app/model/commands/Command'
 import commandAction from 'app/model/commands/CommandAction'
 import type { CommandActionOptions } from 'app/model/commands/CommandAction'
 import { focusLayer } from './focus'
 import { onMount, tick } from 'svelte';
 import type { ContextMenuConstructorOptions } from 'app/model/menus';
 import Menu from './Menu.svelte'
-import { tooltip as tooltipHelper, TooltipDefOrConfig, dropTooltip } from './tooltips';
+import { tooltip as tooltipHelper, type TooltipDefOrConfig, dropTooltip } from './tooltips';
 	
 export let name = ''
 export let placement: Placement = 'bottom'

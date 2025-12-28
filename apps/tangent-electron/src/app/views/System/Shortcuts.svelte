@@ -4,7 +4,7 @@ import { deepEqual } from 'fast-equals'
 import { isMac } from 'common/platform'
 import { buildFuzzySegementMatcher } from 'common/search'
 import { Workspace } from 'app/model'
-import { WorkspaceCommands, WorkspaceCommand } from 'app/model/commands'
+import type { WorkspaceCommands, WorkspaceCommand } from 'app/model/commands'
 import { shortcutDisplayString } from 'app/utils/shortcuts'
 import { tooltip } from 'app/utils/tooltips'
 import ShortcutsEditorCommandTooltip from './ShortcutsEditorCommandTooltip.svelte'
@@ -157,7 +157,7 @@ function resetToDefault(key: string) {
 
 <main>
 	<nav><input type="search" bind:value={filter} placeholder="Search" /></nav>
-	<table>
+	<table><tbody>
 		{#each list as group (group.title)}
 			<tr>
 				<th>{group.title} Commands</th>
@@ -239,7 +239,7 @@ function resetToDefault(key: string) {
 				</tr>
 			{/each}
 		{/each}
-	</table>
+	</tbody></table>
 </main>
 
 <style lang="scss">

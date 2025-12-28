@@ -25,13 +25,15 @@ export let visible = true
 	<!--Explicitly avoiding reactive syntax to push home the need to restart the titlebar var to change-->
 	{#if !isMac && titlebar?.value === 'condensed'}
 		<div class="windowButtons buttonGroup">
-			<button class="minimize subtle" on:click={e => api.window.minimize()}><svg>
+			<button class="minimize subtle" on:click={e => api.window.minimize()} aria-label="Minimize Window"><svg>
 				<use href="window.svg#minimize" />
 			</svg></button>
-			<button class="toggleMaximize subtle" on:click={e => api.window.toggleMaximize()}><svg>
+			<!-- svelte-ignore a11y_consider_explicit_label -->
+			<button class="toggleMaximize subtle" on:click={e => api.window.toggleMaximize()} aria-label="Maximize Window"><svg>
 				<use href="window.svg#toggleMaximize" />
 			</svg></button>
-			<button class="close subtle" on:click={e => api.window.close()}><svg>
+			<!-- svelte-ignore a11y_consider_explicit_label -->
+			<button class="close subtle" on:click={e => api.window.close()} aria-label="Close Window"><svg>
 				<use href="window.svg#close" />
 			</svg></button>
 		</div>

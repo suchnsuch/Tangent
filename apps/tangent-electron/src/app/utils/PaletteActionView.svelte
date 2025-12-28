@@ -1,6 +1,6 @@
 <script lang="ts">
-import { PaletteAction } from 'app/model/commands/WorkspaceCommand'
-import { SearchMatchResult } from 'common/search'
+import type { PaletteAction } from 'app/model/commands/WorkspaceCommand';
+import type { SearchMatchResult } from 'common/search';
 import { shortcutsHtmlString } from './shortcuts'
 import SearchSegmentHighlight from 'app/utils/SearchSegmentHighlight.svelte'
 

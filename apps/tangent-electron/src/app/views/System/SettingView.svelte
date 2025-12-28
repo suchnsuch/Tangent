@@ -1,6 +1,7 @@
 <script lang="ts">
 import { getContext } from 'svelte'
-import Setting, { getValue, getDescription, getDisplayName, SettingType, SettingValue, SettingArrayType, SettingForm } from 'common/settings/Setting'
+import Setting, { getValue, getDescription, getDisplayName } from 'common/settings/Setting'
+import type { SettingType, SettingValue, SettingArrayType, SettingForm } from 'common/settings/Setting'
 import type Workspace from 'app/model/Workspace'
 import SvgIcon from '../smart-icons/SVGIcon.svelte'
 import PopUpButton from 'app/utils/PopUpButton.svelte'
@@ -231,7 +232,8 @@ function toggleItem(item) {
 						class="grow"
 						spellcheck="true"
 						rows="3"
-						placeholder={setting.placeholder}/>
+						placeholder={setting.placeholder}>
+					</textarea>
 				{:else if form === 'shortcut'}
 					<div style="display: flex; align-items: center;">
 						<ShortcutInput

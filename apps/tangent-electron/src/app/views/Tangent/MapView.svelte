@@ -14,7 +14,7 @@ import MapConnectionView from './MapConnectionView.svelte'
 
 import { CommandAction as command } from 'app/model/commands'
 import type { TreeNode } from 'common/trees'
-import { appendContextTemplate, ContextMenuConstructorOptions } from 'app/model/menus';
+import { appendContextTemplate, type ContextMenuConstructorOptions } from 'app/model/menus';
 import { scrollTo } from 'app/utils'
 import { clockTime, shortestDayDate } from 'common/dates'
 import { startDrag, stopDrag } from 'app/utils/dragging'
@@ -23,7 +23,7 @@ import { readable } from 'svelte/store'
 import { markEventAsShortcutable, shortcutFromEvent } from 'app/utils/shortcuts'
 import SvgIcon from '../smart-icons/SVGIcon.svelte'
 import type { RemoveFromMapCommandContext } from 'app/model/commands/RemoveFromMap'
-import { ThreadHistoryItem, UpdateThreadOptions } from 'common/dataTypes/Session'
+import type { ThreadHistoryItem, UpdateThreadOptions } from 'common/dataTypes/Session';
 import { isMac } from 'common/platform'
 import { createCommandHandler } from 'app/model/commands/Command'
 
@@ -867,14 +867,17 @@ function cleanupConnectionHover() {
 					styleString="--iconStroke: var(--embossedBackgroundColor);"
 					/>
 				<div class="buttons">
+					<!-- svelte-ignore a11y_consider_explicit_label -->
 					<button use:command={{
 						command: workspace.commands.createNewFile,
 						labelShortcut: true
 					}} class="subtle"></button>
+					<!-- svelte-ignore a11y_consider_explicit_label -->
 					<button use:command={{
 						command: workspace.commands.goTo,
 						labelShortcut: true
 					}} class="subtle"></button>
+					<!-- svelte-ignore a11y_consider_explicit_label -->
 					<button use:command={{
 						command: workspace.commands.setMapFocusLevel,
 						labelShortcut: true

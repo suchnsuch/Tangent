@@ -1,26 +1,17 @@
 <script lang="ts">
-import type { NavigationData } from 'app/events';
-import type { Workspace } from 'app/model';
-import EmbedFile from 'app/model/EmbedFile';
-import Folder from 'app/model/Folder';
+import type { NavigationData } from 'app/events'
+import type { Workspace } from 'app/model'
 
-import type CardsViewState from 'app/model/nodeViewStates/CardsViewState';
-import { NoteDetailMode } from 'app/model/nodeViewStates/NoteViewState';
-import NoteFile from 'app/model/NoteFile';
-import LazyScrolledList from 'app/utils/LazyScrolledList.svelte';
-import WorkspaceFileHeader from 'app/utils/WorkspaceFileHeader.svelte';
-import { EmbedType } from 'common/embedding';
-import { WritableStore, ForwardingStore } from 'common/stores'
-import { getNode, getNodeOrReferenceId, isReference, isSubReference, TreeNodeOrReference } from 'common/nodeReferences';
-import { pluralize } from 'common/plurals';
-import { createEventDispatcher } from 'svelte';
-import { getContext } from 'svelte';
-import { onMount, tick } from 'svelte';
-import NoteEditor from '../editors/NoteEditor/NoteEditor.svelte';
-import SetCreationRules from './SetCreationRules.svelte';
-import WorkspaceTreeNode from 'app/model/WorkspaceTreeNode';
-import NodeIcon from '../smart-icons/NodeIcon.svelte';
-    import NodePreview from '../summaries/NodePreview.svelte';
+import type CardsViewState from 'app/model/nodeViewStates/CardsViewState'
+import { NoteDetailMode } from 'app/model/nodeViewStates/NoteViewState'
+import LazyScrolledList from 'app/utils/LazyScrolledList.svelte'
+import { ForwardingStore } from 'common/stores'
+import { getNodeOrReferenceId, type TreeNodeOrReference } from 'common/nodeReferences'
+import { createEventDispatcher } from 'svelte'
+import { getContext } from 'svelte'
+import { onMount, tick } from 'svelte'
+import SetCreationRules from './SetCreationRules.svelte'
+import NodePreview from '../summaries/NodePreview.svelte'
 
 const dispatch = createEventDispatcher<{
 	navigate: NavigationData

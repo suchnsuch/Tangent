@@ -1,5 +1,5 @@
 <script lang="ts">
-import LensViewState from 'app/model/nodeViewStates/LensViewState'
+import type LensViewState from 'app/model/nodeViewStates/LensViewState'
 export let state: LensViewState
 </script>
 

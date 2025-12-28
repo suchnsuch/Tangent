@@ -1,7 +1,7 @@
 <script lang="ts">
 import SettingView from 'app/views/System/SettingView.svelte';
 import type SetInfo from 'common/dataTypes/SetInfo'
-import { SetLensMode } from 'common/dataTypes/SetInfo'
+import type { SetLensMode } from 'common/dataTypes/SetInfo'
 import { ForwardingStore } from 'common/stores'
 
 export let info: SetInfo

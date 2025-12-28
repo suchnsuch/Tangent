@@ -1,5 +1,5 @@
 <script lang="ts">
-import { dndzone, DndEvent } from 'svelte-dnd-action'
+import { dndzone, type DndEvent } from 'svelte-dnd-action'
 import type { Workspace } from 'app/model'
 
 import CreationRule from 'common/settings/CreationRule'

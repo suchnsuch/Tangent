@@ -1,6 +1,6 @@
 <script lang="ts">
 import { getContext } from 'svelte'
-import { getNode, isReference, isSubReference, TreeNodeOrReference } from 'common/nodeReferences'
+import { getNode, isReference, isSubReference, type TreeNodeOrReference } from 'common/nodeReferences'
 import { WritableStore } from 'common/stores'
 import { pluralize } from 'common/plurals'
 import { EmbedType } from 'common/embedding'
@@ -72,15 +72,15 @@ export let noteDetailMode: NoteDetailMode = NoteDetailMode.None
 					<div class="image" style={`background-image: url("${node.cacheBustPath}"); ${layout === 'auto' ? 'height: 250px;' : ''}`}></div>
 				{:else if embedType === EmbedType.Audio}
 					<media-controller class="audio stretch" autohide="-1" gesturesdisabled>
-						<audio slot="media" src={node.cacheBustPath} />
+						<audio slot="media" src={node.cacheBustPath}></audio>
 						<!-- svelte-ignore a11y-click-events-have-key-events -->
 						<!-- svelte-ignore a11y-no-static-element-interactions -->
-						<media-play-button slot="centered-chrome" on:click|preventDefault/>
+						<media-play-button slot="centered-chrome" on:click|preventDefault></media-play-button>
 						<!-- svelte-ignore a11y-click-events-have-key-events -->
 						<!-- svelte-ignore a11y-no-static-element-interactions -->
 						<media-control-bar on:click|preventDefault>
-							<media-time-display showduration notoggle/>
-							<media-time-range/>
+							<media-time-display showduration notoggle></media-time-display>
+							<media-time-range></media-time-range>
 						</media-control-bar>
 					</media-controller>
 				{:else if embedType === EmbedType.Video}
@@ -89,13 +89,13 @@ export let noteDetailMode: NoteDetailMode = NoteDetailMode.None
 					<div class="video stretch" on:click|preventDefault>
 						<media-controller class="roundedBottom" gesturesdisabled>
 							<!-- svelte-ignore a11y-media-has-caption -->
-							<video slot="media" src={node.cacheBustPath}/>
+							<video slot="media" src={node.cacheBustPath}></video>
 							<media-control-bar>
-								<media-play-button/>
-								<media-mute-button/>
-								<media-time-display showduration notoggle/>
-								<media-time-range/>
-								<media-fullscreen-button/>
+								<media-play-button></media-play-button>
+								<media-mute-button></media-mute-button>
+								<media-time-display showduration notoggle></media-time-display>
+								<media-time-range></media-time-range>
+								<media-fullscreen-button></media-fullscreen-button>
 							</media-control-bar>
 						</media-controller>
 					</div>

@@ -56,7 +56,7 @@ function setPlayback(this: HTMLAudioElement | HTMLVideoElement, event: Event) {
 					on:loadedmetadata={setPlayback}
 					on:seeked={updatePlayback}
 					on:pause={updatePlayback}
-				/>
+				></audio>
 			{:else if embedType === EmbedType.Video}
 				<!-- svelte-ignore a11y-media-has-caption -->
 				<video
@@ -67,7 +67,7 @@ function setPlayback(this: HTMLAudioElement | HTMLVideoElement, event: Event) {
 					on:loadedmetadata={setPlayback}
 					on:seeked={updatePlayback}
 					on:pause={updatePlayback}
-				/>
+				></video>
 			{/if}
 			<media-settings-menu hidden anchor="auto">
 				<media-settings-menu-item>
@@ -79,23 +79,23 @@ function setPlayback(this: HTMLAudioElement | HTMLVideoElement, event: Event) {
 			</media-settings-menu>
 			<media-control-bar>
 				<div class="simple-menu">
-					<media-play-button class="first" notooltip/>
+					<media-play-button class="first" notooltip></media-play-button>
 					<div class="floating">
-						<media-seek-backward-button style="min-width: 3em"/>
-						<media-seek-forward-button style="min-width: 3em"/>
+						<media-seek-backward-button style="min-width: 3em"></media-seek-backward-button>
+						<media-seek-forward-button style="min-width: 3em"></media-seek-forward-button>
 					</div>
 				</div>
 				<div class="simple-menu">
-					<media-mute-button notooltip/>
+					<media-mute-button notooltip></media-mute-button>
 					<div class="floating">
-						<media-volume-range/>
+						<media-volume-range></media-volume-range>
 					</div>
 				</div>
-				<media-time-display showduration notoggle/>
+				<media-time-display showduration notoggle></media-time-display>
 				<media-time-range></media-time-range>
-				<media-settings-menu-button/>
+				<media-settings-menu-button></media-settings-menu-button>
 				{#if embedType === EmbedType.Video}
-					<media-fullscreen-button/>
+					<media-fullscreen-button></media-fullscreen-button>
 				{/if}
 			</media-control-bar>
 		</media-controller>

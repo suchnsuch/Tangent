@@ -1,5 +1,5 @@
 <script lang="ts">
-import { get, Readable, readable, writable } from 'svelte/store'
+import { get, type Readable, readable, writable } from 'svelte/store'
 import { createPopper } from '@popperjs/core';
 
 import { Editor, type EditorRange } from "typewriter-editor"

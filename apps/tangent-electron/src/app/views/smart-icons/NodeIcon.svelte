@@ -1,5 +1,5 @@
 <script lang="ts">
-import { TreeNode } from 'common/trees'
+import type { TreeNode } from 'common/trees'
 import { sizeToStyle } from './smartIcons'
 import { iconForNode } from 'common/icons'
 

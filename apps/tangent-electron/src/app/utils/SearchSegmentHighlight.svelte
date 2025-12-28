@@ -1,6 +1,6 @@
 <script lang="ts">
-import { ChildList, childrenToHTML } from 'common/annotations/nodeAnnotations';
-import { annotateMatchText, SearchMatchResult } from 'common/search';
+import { type ChildList, childrenToHTML } from 'common/annotations/nodeAnnotations';
+import { annotateMatchText, type SearchMatchResult } from 'common/search';
 import '../style/highlights.scss'
 
 export let value: string | SearchMatchResult

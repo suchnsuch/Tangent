@@ -3,8 +3,7 @@ import { fly } from 'svelte/transition'
 import type { ImageViewState } from 'app/model/nodeViewStates'
 import WorkspaceFileHeader from 'app/utils/WorkspaceFileHeader.svelte'
 import { clamp } from 'common/utils'
-import { appendContextTemplate, ContextMenuConstructorOptions } from 'app/model/menus'
-import { getEmbedDisplayname } from 'common/embedding'
+import { appendContextTemplate, type ContextMenuConstructorOptions } from 'app/model/menus'
 
 export let state: ImageViewState
 export let editable: boolean = true

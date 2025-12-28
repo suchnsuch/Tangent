@@ -1,7 +1,7 @@
 <script lang="ts">
 import { getContext } from 'svelte'
-import { HrefFormedLink } from 'common/indexing/indexTypes'
-import { TreeNode } from 'common/trees'
+import type { HrefFormedLink } from 'common/indexing/indexTypes'
+import type { TreeNode } from 'common/trees'
 import { isMac } from 'common/platform'
 import { Workspace } from 'app/model'
 import { dropTooltip } from 'app/utils/tooltips'

@@ -23,6 +23,9 @@ function closeModal() {
 
 {#if $modalComponent}
 <div class="modal">
+	<!-- svelte-ignore a11y_click_events_have_key_events -->
+	<!-- svelte-ignore a11y_click_events_have_key_events -->
+	<!-- svelte-ignore a11y_no_static_element_interactions -->
 	<div class="modalBack"
 		transition:fade|global={{ duration: 100 }}
 		on:click={closeModal}></div>

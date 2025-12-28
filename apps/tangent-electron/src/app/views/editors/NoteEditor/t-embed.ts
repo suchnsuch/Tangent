@@ -2,7 +2,7 @@ import type { Workspace } from 'app/model'
 import { StructureType } from 'common/indexing/indexTypes'
 
 import EmbedRoot from './EmbedRoot.svelte'
-import TangentLink, { type LinkState } from './t-link'
+import { TangentLink, type LinkState } from './t-link'
 import { markAsSelectionRequest } from 'app/events'
 import { deepEqual } from 'fast-equals'
 import type { HandleResult } from 'app/model/NodeHandle'

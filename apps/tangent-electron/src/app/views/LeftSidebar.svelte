@@ -6,7 +6,7 @@ import { SidebarMode } from 'common/SidebarState'
 import type { Workspace } from 'app/model'
 import command from 'app/model/commands/CommandAction'
 import { getSortModeDisplayName } from 'app/model/directoryView'
-import { appendContextTemplate, ExtendedContextEvent } from 'app/model/menus'
+import { appendContextTemplate, type ExtendedContextEvent } from 'app/model/menus'
 import { startDrag } from 'app/utils'
 import PopUpButton from 'app/utils/PopUpButton.svelte'
 
@@ -161,6 +161,7 @@ function onWorkspaceNameContextMenu(event: MouseEvent) {
 
 				<span class="spacer"></span>
 
+				<!-- svelte-ignore a11y_consider_explicit_label -->
 				<button
 					use:command={{
 						command: workspace.commands.createNewFolder

@@ -1,7 +1,7 @@
 import { isModKey } from 'app/utils/events';
 import type { HrefFormedLink } from 'common/indexing/indexTypes';
 import { type Editor, type ShortcutEvent } from 'typewriter-editor';
-import TangentLink from './NoteEditor/t-link';
+import { TangentLink } from './NoteEditor/t-link';
 import { ReadableStore } from 'common/stores';
 
 interface NavigationEventData {

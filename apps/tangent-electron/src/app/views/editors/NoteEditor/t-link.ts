@@ -13,7 +13,7 @@ export function setTLinkTooltipComponent(component: SvelteConstructor) {
 	tooltipComponent = component
 }
 
-class TangentLink extends HTMLElement {
+export class TangentLink extends HTMLElement {
 
 	protected linkState: LinkState
 	handleUnsub: () => void
@@ -186,4 +186,3 @@ class TangentLink extends HTMLElement {
 }
 
 customElements.define('t-link', TangentLink)
-export default TangentLink

@@ -1,14 +1,14 @@
 <script lang="ts">
 import { shortestDayDate, simpleTimestamp } from 'common/dates';
 import type { TreeNode } from 'common/trees';
-import { annotateMatchText, SearchMatchResult } from 'common/search';
+import { annotateMatchText, type SearchMatchResult } from 'common/search';
 
 import { getContext } from 'svelte';
 
 import type { Workspace } from '../../model/index'
 import NodeIcon from '../smart-icons/NodeIcon.svelte';
-import paths, { dirname, normalizeSeperators } from 'common/paths';
-import { applyAnnotation, ChildList, childrenToHTML } from 'common/annotations/nodeAnnotations';
+import paths, { normalizeSeperators } from 'common/paths';
+import { applyAnnotation, type ChildList, childrenToHTML } from 'common/annotations/nodeAnnotations';
 import { isTagTreeNode } from 'common/indexing/TagNode';
 import { tooltip } from 'app/utils/tooltips'
 

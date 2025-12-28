@@ -1,7 +1,8 @@
 <script lang="ts">
 import { getContext } from 'svelte'
 import { iterateOverChildren, type TreeNode } from 'common/trees'
-import { PathMatch, SearchMatchResult, SegmentSearchNodePair, buildMatcher, orderTreeNodesForSearch } from 'common/search'
+import { buildMatcher, orderTreeNodesForSearch } from 'common/search'
+import type { PathMatch, SearchMatchResult, SegmentSearchNodePair } from 'common/search'
 import { implicitExtensionsMatch } from 'common/fileExtensions'
 import type Workspace from '../model/Workspace'
 import type { PaletteAction } from 'app/model/commands/WorkspaceCommand'

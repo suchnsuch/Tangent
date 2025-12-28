@@ -74,7 +74,7 @@ function nodeOptionEvent(option: any, event: Event) {
 			onItemEvent={nodeOptionEvent}>
 			<svelte:fragment slot="item" let:item={option}>
 				<span class="headerLevel">H{option.header.level}</span>
-				<span class="headerText"><SearchSegmentHighlight value={option.match ?? option.header.text} />
+				<span class="headerText"><SearchSegmentHighlight value={option.match ?? option.header.text} /></span>
 			</svelte:fragment>
 			<svelte:fragment slot="empty">
 				{#if $contentText}

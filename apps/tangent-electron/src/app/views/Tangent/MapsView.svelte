@@ -4,13 +4,13 @@ import { Point } from 'common/geometry'
 import type { Tangent, Workspace } from 'app/model'
 import { scrollTo, startDrag } from 'app/utils'
 import MapView from './MapView.svelte'
-import { fillDateFormat, friendlyWeekDay, shortestDayDate } from 'common/dates'
+import { fillDateFormat, friendlyWeekDay } from 'common/dates'
 import command from 'app/model/commands/CommandAction'
 import classStore from 'app/utils/ClassStoreAction'
 import { fade } from 'svelte/transition'
 import { cubicInOut } from 'svelte/easing'
-import Session, { UpdateThreadOptions } from 'common/dataTypes/Session'
-    import { addShortcutsToEvent } from 'typewriter-editor';
+import Session, { type UpdateThreadOptions } from 'common/dataTypes/Session'
+import { addShortcutsToEvent } from 'typewriter-editor'
 
 const workspace = getContext('workspace') as Workspace
 const {
@@ -329,6 +329,7 @@ $: if ($openSessions) {
 					{#if isActive}
 						<span class="mergeUpWrapper">
 							<!-- svelte-ignore a11y-mouse-events-have-key-events -->
+							<!-- svelte-ignore a11y_consider_explicit_label -->
 							<button class="subtle"
 								use:command={mergeWithPreviousSession}
 								on:mouseover={e => onMergeMouseOver(e, index)}
@@ -343,12 +344,14 @@ $: if ($openSessions) {
 					{/if}
 
 					<!-- svelte-ignore a11y-mouse-events-have-key-events -->
+					<!-- svelte-ignore a11y_consider_explicit_label -->
 					<button class="subtle"
 						use:command={{ command: archivePreviousSessions, context: { session }}}
 						on:mouseover={e => onArchiveMouseOver(e, index)}
 						on:mouseout={onArchiveMouseOut}
 					></button>
 				{:else if session.previousSession.value}
+					<!-- svelte-ignore a11y_consider_explicit_label -->
 					<button class="subtle" use:command={{ command: showPreviousSession, context: { session } }}>
 					</button>
 				{/if}
@@ -374,6 +377,7 @@ $: if ($openSessions) {
 		<div class="extraSpace" style:grid-row={2 + $openSessions.length * 2}>
 			<div class="end-menu buttonBar">
 				{#if !$activeSession.isEmpty}
+					<!-- svelte-ignore a11y_consider_explicit_label -->
 					<button class="subtle" use:command={createNewSession}>
 					</button>
 				{/if}

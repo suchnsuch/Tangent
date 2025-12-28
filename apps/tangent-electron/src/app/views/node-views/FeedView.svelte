@@ -6,14 +6,12 @@ import { NoteViewState } from 'app/model/nodeViewStates'
 import type FeedViewState from 'app/model/nodeViewStates/FeedViewState'
 
 import { FocusLevel } from 'common/dataTypes/TangentInfo'
-import { MapStrength } from 'common/tangentMap/MapNode'
 import { scrollTo } from 'app/utils'
 import { cachedScroll } from 'app/utils/scrollCaching'
 import type { ScrollToOptions } from 'app/utils/scrollto'
 
-import type { TreeNode } from 'common/trees'
 import { ForwardingStore } from 'common/stores'
-import { areNodesOrReferencesEquivalent, getNode, TreeNodeOrReference } from 'common/nodeReferences'
+import { areNodesOrReferencesEquivalent, getNode, type TreeNodeOrReference } from 'common/nodeReferences'
 
 import { createEventDispatcher, getContext, onMount, tick } from 'svelte'
 import { fly } from 'svelte/transition'

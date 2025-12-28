@@ -1,7 +1,7 @@
 <script lang="ts">
 import { getContext } from 'svelte'
 import { Workspace } from 'app/model'
-import { TreeNode } from 'common/trees'
+import type { TreeNode } from 'common/trees'
 import NodeLine from '../summaries/NodeLine.svelte'
 import SvgIcon from '../smart-icons/SVGIcon.svelte'
 import { tooltip } from 'app/utils/tooltips'
