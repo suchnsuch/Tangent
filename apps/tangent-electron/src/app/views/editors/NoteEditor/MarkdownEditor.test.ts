@@ -1,6 +1,7 @@
 import { describe, test, expect, beforeEach, it } from 'vitest'
 import { page, userEvent } from '@vitest/browser/context'
 
+import TangentEmbed from './t-embed' // Fixes an order-of-import issue where TangentEmbed couldn't access TangentLink early enough. This only shows up in vitest.
 import { wait } from '@such-n-such/core'
 import { markdownToTextDocument } from 'common/markdownModel'
 import MarkdownEditor from './MarkdownEditor'
