@@ -29,7 +29,7 @@
     "build-and-release:all": "npm run clean-build && npm run test:no-build && npm run publish:all",
     "test": "vitest run && npm run build:dev && npm run test:end-to-end",
     "test:no-build": "vitest run && npm run test:end-to-end",
-    "test:unit": "vitest run --project unit-core --project unit-web",
+    "test:unit": "vitest run --project tangent-electron-unit-core --project tangent-electron-unit-web",
     "test:integration": "vitest --project integration",
     "test:end-to-end": "playwright test --project Tests",
     "svelte-dev": "webpack watch",
