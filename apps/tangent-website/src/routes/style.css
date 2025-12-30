@@ -1,0 +1,12 @@
+img.screenshot {
+	border: 1px solid #cacaca;
+	border-radius: 10px;
+
+	box-shadow: rgba(0, 0, 0, 0.1) 0px 10px 50px;
+}
+
+@media (prefers-color-scheme: dark) {
+	img.screenshot {
+		border-color: #454545;
+	}
+}

@@ -15,6 +15,7 @@
 		"packages/tangent-query-parser",
 		"packages/tangent-html-to-markdown",
 		"apps/tangent-electron",
+		"apps/tangent-website",
 		"apps/tangent-test-workspace-generator"
 	],
 	"devDependencies": {

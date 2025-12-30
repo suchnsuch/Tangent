@@ -1,0 +1,225 @@
+/* Variables */
+:root {
+	--fontFamily: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+	--spaceWidth: .25em;
+	--indentSize: 8;
+	--indentWidth: calc(var(--indentSize) * var(--spaceWidth));
+	tab-size: var(--indentWidth);
+
+	--backgroundColor: #f6f6f6;
+	--textColor: #252525;
+	--deemphasizedTextColor: #575757;
+
+	--linkColor: rgb(0,100,200);
+	--visitedLinkColor: rgb(0,80,160);
+
+	--scrollbarColor: rgba(0, 0, 0, .1);
+
+	--buttonBackgroundColor: #e9e9e9;
+	--noteBackgroundColor: white;
+
+	--borderColor: #e5e5e5;
+
+	--iconStroke: #414141;
+
+	--accentHue: 141;
+	--accentSaturation: 67%;
+
+	--accentTextColor: hsl(var(--accentHue), var(--accentSaturation), 35%);
+	--deemphasizedAccentTextColor: hsl(var(--accentHue), var(--accentSaturation), 25%);
+
+	--accentBackgroundColor: hsl(
+		var(--accentHue),
+		var(--accentSaturation),
+		52%);
+	--accentHoverBackgroundColor: hsl(
+		var(--accentHue),
+		var(--accentSaturation),
+		56%);
+	--accentActiveBackgroundColor: hsl(
+		var(--accentHue),
+		var(--accentSaturation),
+		48%);
+
+	--externalLinkColor: rgb(0, 100, 200);
+	--emptyLinkTextColor: #9b321f;
+
+	--selectionBackgroundColor: var(--accentBackgroundColor);
+	--selectionPressedBackgroundColor: rgba(0, 0, 0, .2);
+
+	--pageWidth: 30rem;
+}
+
+@media (prefers-color-scheme: dark) {
+	/* Variables for dark mode */
+	:root {
+		--backgroundColor: #323232;
+		--textColor: #ccc;
+		--deemphasizedTextColor: #9a9a9a;
+
+		--scrollbarColor: rgba(255, 255, 255, .1);
+
+		--buttonBackgroundColor: #4c4c4c;
+		--noteBackgroundColor: #1e1e1e;
+
+		--borderColor: #3d3d3d;
+
+		--iconStroke: #cecbcb;
+
+		--accentTextColor: hsl(var(--accentHue), var(--accentSaturation), 60%);
+		--deemphasizedAccentTextColor: hsl(var(--accentHue), calc(var(--accentSaturation) * .8 ), 40%);
+
+		--linkColor: rgb(74, 157, 240);
+		--visitedLinkColor: rgb(60, 134, 209);
+
+		--accentBackgroundColor: hsl(
+			var(--accentHue),
+			var(--accentSaturation),
+			25%);
+		--accentHoverBackgroundColor: hsl(
+			var(--accentHue),
+			var(--accentSaturation),
+			30%);
+		--accentActiveBackgroundColor: hsl(
+			var(--accentHue),
+			var(--accentSaturation),
+			20%);
+
+		--externalLinkColor: rgb(0, 150, 250);
+		--emptyLinkTextColor: #d65a49;
+
+		--selectionBackgroundColor: rgba(255, 255, 255, .16);
+		--selectionPressedBackgroundColor: rgba(255, 255, 255, .13);
+	}	
+}
+
+@media (max-width: 550px) {
+	:root {
+		font-size: 14px;
+	}
+}
+
+html, body {
+	position: relative;
+	background-color: var(--noteBackgroundColor);
+}
+
+body {
+	color: var(--textColor);
+	margin: 0;
+	box-sizing: border-box;
+	font-family: var(--fontFamily);
+}
+
+#svelte {
+	min-height: 100vh;
+	display: flex;
+	flex-direction: column;
+}
+
+/* Scrollbar settings for windows because windows scrollbars are heinous */
+.win *::-webkit-scrollbar {
+	background-color: transparent;
+	width: 4px;
+	height: 6px;
+	cursor: pointer;
+}
+.win *::-webkit-scrollbar-thumb {
+	background-color: var(--scrollbarColor);
+}
+
+a {
+	color: var(--linkColor);
+	text-decoration: none;
+}
+
+a:hover {
+	text-decoration: underline;
+}
+
+a:visited {
+	color: var(--visitedLinkColor);
+}
+
+a.local {
+	color: var(--accentTextColor);
+}
+
+label {
+	display: block;
+}
+
+/* Default Page Layout */
+article {
+	padding: 1em;
+}
+article h1,
+article h2,
+article p,
+article hr,
+article ul,
+article ol {
+	max-width: var(--pageWidth);
+	margin-left: auto;
+	margin-right: auto;
+}
+
+h1 {
+	font-size: 200%;
+	font-weight: 200;
+	margin-top: 1.5em;
+	margin-bottom: .75em;
+}
+h2 {
+	font-size: 150%;
+	font-weight: 200;
+	margin-top: 1.5em;
+	margin-bottom: .75em;
+}
+p {
+	line-height: 1.5;
+	margin-top: 1.5em;
+	margin-bottom: 1.5em;
+}
+
+ul {
+	padding-left: 0;
+}
+
+li {
+	line-height: 1.5;
+	margin-left: 2em;
+}
+
+.accentText {
+	color: var(--accentTextColor);
+}
+
+a.buttonLink {
+	background: var(--accentBackgroundColor);
+	color: var(--textColor);
+
+	padding: .5em 2em;
+	border-radius: .5rem;
+}
+a.buttonLink:hover {
+	background: var(--accentHoverBackgroundColor);
+}
+a.buttonLink:active {
+	background: var(--accentActiveBackgroundColor);
+}
+
+.action {
+	font-size: 120%;
+	text-align: center;
+	margin-top: 3rem;
+}
+.action:last-child {
+	margin-top: 6rem;
+}
+
+@media (min-width: 550px) {
+	p {
+		padding-left: 1em;
+	}
+}
