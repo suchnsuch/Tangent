@@ -11,26 +11,6 @@ const appCompiler = webpack(require('../src/app/webpack.config'))
 const mode = process.env.NODE_ENV || 'production';
 const prod = mode === 'production';
 
-function buildTypescript() {
-	return new Promise((resolve, reject) => {
-		console.log('Compiling Typescript...')
-		// Checkout [the cli docs](https://www.typescriptlang.org/docs/handbook/compiler-options.html) for more
-		exec('npx tsc --project tsconfig.main.json', (err, stdout, stderr) => {
-			if (err) {
-				console.error('Typescript compilation failed')
-				console.error(err.stack || err)
-				console.log(stderr)
-				console.log(stdout)
-				reject(err)
-			}
-			else {
-				resolve()
-				console.log('Typescript compiled')
-			}
-		})
-	})
-}
-
 async function buildPrism() {
 	// I hate how prism wants to be built, so I'm doing it myself
 	const buildPath = path.resolve(path.join(__dirname, '../__build', 'bundle', 'prism'))
@@ -286,28 +266,10 @@ async function buildAll() {
 }
 
 module.exports = {
-	buildTypescript,
 	buildApp,
 	buildAll
 }
 
 if (require.main === module) {
-
-	const yargs = require('yargs')
-	const argv = yargs
-		.option('typescript', {
-			alias: 't',
-			description: 'Build Typescript',
-			type: 'boolean'
-		}).argv
-
-	let willBuildAll = true
-	if (argv.typescript) {
-		willBuildAll = false
-		buildTypescript().catch(console.log)
-	}
-
-	if (willBuildAll) {
-		buildAll()
-	}
+	buildAll()
 }
