@@ -1,5 +1,5 @@
-import type { FormatType, LineType, TypesetTypes } from 'typewriter-editor/dist/typesetting'
-import { h } from 'typewriter-editor/dist/rendering/vdom'
+import type { FormatType, LineType, TypesetTypes } from 'typewriter-editor/typesetting'
+import { h } from 'typewriter-editor/rendering/vdom'
 import katex from 'katex'
 import type { IndentDefinition } from './line'
 import { isEqual, type AttributeMap } from '@typewriter/document'

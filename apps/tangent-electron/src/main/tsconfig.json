@@ -4,7 +4,7 @@
 		"sourceMap": true,
 		"baseUrl": "../src",
 		"lib": ["ESNext", "DOM"],
-		"moduleResolution": "Node",
+		"moduleResolution": "bundler",
 		"allowJs": true,
 		"esModuleInterop": true,
 		"target": "ESNext",

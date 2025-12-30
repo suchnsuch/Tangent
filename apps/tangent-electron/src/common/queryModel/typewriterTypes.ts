@@ -1,5 +1,5 @@
-import type { TypesetTypes } from 'typewriter-editor/dist/typesetting'
-import { h, type Props } from 'typewriter-editor/dist/rendering/vdom'
+import type { TypesetTypes } from 'typewriter-editor/typesetting'
+import { h, type Props } from 'typewriter-editor/rendering/vdom'
 
 export interface TokenAttributes {
 	className: string

@@ -10,7 +10,7 @@
 		"target": "ES2022",
 		"lib": ["ESNext", "DOM"],
 		"types": ["svelte"],
-		"moduleResolution": "Node",
+		"moduleResolution": "bundler",
 		"allowJs": true,
 		"esModuleInterop": true,
 		"strict": false,

@@ -1,6 +1,6 @@
 <script lang="ts">
 import { createEventDispatcher, getContext } from 'svelte'
-import { asRoot } from 'typewriter-editor/dist/asRoot'
+import { asRoot } from 'typewriter-editor'
 
 import type { ConnectionInfo } from 'common/indexing/indexTypes'
 import paths from 'common/paths'

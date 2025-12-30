@@ -3,8 +3,7 @@ import { get, type Readable, readable, writable } from 'svelte/store'
 import { createPopper } from '@popperjs/core';
 
 import { Editor, type EditorRange } from "typewriter-editor"
-import { editorStores } from 'typewriter-editor/dist/stores'
-import { OFFSCREEN_RECT } from 'typewriter-editor/dist/popper'
+import { editorStores } from 'typewriter-editor'
 
 import type { AutocompleteHandler, AutocompleteModule } from './autocompleteModule'
 
@@ -38,6 +37,8 @@ export function proxy<T>(defaultValueOrStore: T | Readable<T>) {
 
 let menu: HTMLElement
 let popper;
+
+const OFFSCREEN_RECT = new DOMRect(-1000000, -100000, 0, 0)
 
 const { active, doc, selection, focus, root, updateEditor } = editorStores(editor);
 $: updateEditor(editor);
