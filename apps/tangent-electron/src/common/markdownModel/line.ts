@@ -91,6 +91,36 @@ export function getLineFormattingPrefix(line: Line, forNextLine = false): string
 	return ''
 }
 
+function getActiveSentenceStart(lineStart: number, lineEnd: number, from: number, matchList: RegExpExecArray[]) {
+	let startMatch: RegExpMatchArray = null
+	for (let i = 0; i < matchList.length; i++) {
+		const match = matchList[i]
+		const offset = match[1].length
+		if (match.index + offset < from) {
+			startMatch = match
+		}
+		else break // thereby grabbing the closest one
+	}
+
+	if (startMatch) {
+		const last = lineStart + startMatch.index + startMatch[0].length
+		if (last === lineEnd) {
+			if (matchList.length > 1) {
+				// Include the previous sentence when we're within trailing whitespace on a line.
+				startMatch = matchList.at(-2)
+			}
+			else {
+				// This is the first sentence.
+				return lineStart
+			}
+		}
+
+		return lineStart + startMatch.index + startMatch[1].length // Start just after the period
+	}
+
+	return lineStart
+}
+
 export function getActiveSentenceRange(doc: TextDocument, line: Line, selection: EditorRange): EditorRange {
 	const lineRange = doc.getLineRange(line)
 	const text = doc.getText(lineRange)
@@ -105,36 +135,20 @@ export function getActiveSentenceRange(doc: TextDocument, line: Line, selection:
 	if (matches) {
 		const matchList = [...matches]
 
-		let startMatch: RegExpMatchArray = null
-		let startLengthOffset = 0
-		for (let i = 0; i < matchList.length; i++) {
-			const match = matchList[i]
-			const offset = match[1].length
-			if (match.index + offset < from) {
-				startMatch = match
-				startLengthOffset = offset
-			}
-			else break // thereby grabbing the closest one
-		}
-
-		if (startMatch) {
-			start = lineStart + startMatch.index + startLengthOffset // Start just after the period
-		}
-
+		start = getActiveSentenceStart(lineStart, lineEnd, from, matchList)
+		
 		let endMatch: RegExpMatchArray = null
-		let endLengthOffset = 0
 		for (let i = matchList.length - 1; i >= 0; i--) {
 			const match = matchList[i]
 			const offset = match[1].length
 			if (match.index + offset >= to) {
 				endMatch = match
-				endLengthOffset = offset
 			}
 			else break // thereby grabbing the closest one
 		}
 
 		if (endMatch) {
-			end = lineStart + endMatch.index + endLengthOffset // Include just the period
+			end = lineStart + endMatch.index + endMatch[1].length // Include just the period
 		}
 	}
 
