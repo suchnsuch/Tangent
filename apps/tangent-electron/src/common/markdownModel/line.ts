@@ -191,12 +191,14 @@ export function parseBlockquote(char: string, parser: NoteParser): boolean {
 		if (next === ' ' && feed.peek(2) === '>') {
 			feed.next()
 		}
+		else if (next != '>') break // This is gross, but it's functioning
+
 		feed.next()
 	}
 
-	if (feed.currentChar === ' ') feed.next()
+	if (feed.peek() === ' ') feed.next()
 
 	parser.lineData.blockquote = blockDepth
-	parser.commitSpan({ line_format: true, hidden: true }, 0)
+	parser.commitSpan({ line_format: true, hidden: true })
 	return true
 }

@@ -16,3 +16,7 @@ And
 >> Double depth quotes
 > In
 > > Both formats
+
+And
+>*style* things immediately
+> *before* and after a space
