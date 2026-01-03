@@ -1,5 +1,5 @@
 <script lang="ts">
-import { createEventDispatcher, getContext, onDestroy } from 'svelte';
+import { getContext, onDestroy } from 'svelte';
 import type WorkspaceTreeNode from 'app/model/WorkspaceTreeNode';
 import OneLineEditor from 'app/views/editors/OneLineEditor/OneLineEditor';
 import { Source, asRoot } from 'typewriter-editor';
@@ -8,11 +8,6 @@ import NodeIcon from 'app/views/smart-icons/NodeIcon.svelte';
 import AutoCompleteMenu from 'app/views/editors/autocomplete/AutoCompleteMenu.svelte';
 import UnicodeAutocompleter from 'app/views/editors/autocomplete/UnicodeAutocompleter';
 import UnicodeAutocompleteMenu from 'app/views/editors/autocomplete/UnicodeAutocompleteMenu.svelte';
-
-const dispatch = createEventDispatcher<{
-	'rename': string,
-	'enter-exit': void
-}>()
 
 // Using an editor here to have full control over paste behavior.
 const editor = new OneLineEditor(getContext('workspace'));
@@ -31,6 +26,9 @@ export let focusing = false
 export let preventMouseUpDefault = false
 export let showIcon = true
 export let showExtension = true
+
+export let onRename: (newName: string) => boolean|undefined = null
+export let onEnterExit: () => void = null
 
 export let node: WorkspaceTreeNode
 $: updateText(node ? $node.name : '')
@@ -69,7 +67,7 @@ function renameFile() {
 	// Trim to remove any trailing newline from the editor
 	let newName = editor.getText().trim()
 	if (node.name !== newName) {
-		if (!dispatch('rename', newName, { cancelable: true }) || !node.rename(newName)) {
+		if (onRename && onRename(newName) === false || !node.rename(newName)) {
 			wait().then(() => {
 				editor.setText(node ? $node.name : '', undefined, Source.api)
 			})
@@ -84,7 +82,7 @@ function onHeaderKeydown(event: KeyboardEvent) {
 		event.preventDefault()
 		headerEditElement.blur()
 
-		dispatch('enter-exit')
+		if (onEnterExit) onEnterExit()
 	}
 	else if (event.key === 'Escape') {
 		event.preventDefault()

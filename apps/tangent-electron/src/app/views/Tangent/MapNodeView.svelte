@@ -1,5 +1,5 @@
 <script lang="ts">
-import { createEventDispatcher, getContext } from 'svelte'
+import { getContext } from 'svelte'
 import { fade } from 'svelte/transition'
 
 import type { TreeNode } from 'common/trees'
@@ -16,7 +16,6 @@ import ScrollingItemList from 'app/utils/ScrollingItemList.svelte'
 import NodeLine from '../summaries/NodeLine.svelte'
 import NodeIcon from '../smart-icons/NodeIcon.svelte'
 
-const dispatch = createEventDispatcher()
 const tangent = getContext('tangent') as Tangent
 
 export let mapNode: MapNode
@@ -25,6 +24,8 @@ export let threaded: boolean = false
 export let showIcon: boolean = true
 
 export let onPointerEnter: (event: PointerEvent) => void = null
+export let onNodeSizeUpdated: () => void = null
+export let onAddLink: (node: TreeNode, direction: 'in'|'out') => void = null
 
 let inMenuOpen = false
 let outMenuOpen = false
@@ -53,7 +54,7 @@ function updateSize(container: HTMLElement) {
 	const rect = mapNode.requestDimensions()
 	if (!rect) return
 	mapNode.setDimensions(rect.width, rect.height)
-	dispatch('nodeSizeUpdated')
+	if (onNodeSizeUpdated) onNodeSizeUpdated()
 }
 
 function inLinkItemEvent(node: TreeNode, event: Event) {
@@ -68,10 +69,8 @@ function onLinkItemEvent(node: TreeNode, event: Event, direction: 'in' | 'out') 
 	if (event.type === 'click'
 		|| event.type === 'keydown' && (event as KeyboardEvent).key === 'Enter') {
 		
-		dispatch('add-link', {
-			node,
-			direction
-		})
+		if (onAddLink) onAddLink(node, direction)
+		
 		inMenuOpen = false
 		outMenuOpen = false
 	}

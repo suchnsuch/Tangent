@@ -12,6 +12,9 @@ export interface NavigationData {
 	direction?: 'in' | 'out' | 'replace'
 }
 
+export type NavigationCallback = (data: NavigationData) => void
+export type ViewReadyCallback = () => void
+
 interface PasteTextEventData {
 	text: string
 }

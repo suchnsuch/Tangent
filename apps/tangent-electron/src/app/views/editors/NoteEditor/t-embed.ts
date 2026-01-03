@@ -1,6 +1,6 @@
 import type { Workspace } from 'app/model'
 import { StructureType } from 'common/indexing/indexTypes'
-import { mount } from 'svelte'
+import { mount, unmount } from 'svelte'
 import EmbedRoot from './EmbedRoot.svelte'
 import { TangentLink, type LinkState } from './t-link'
 import { markAsSelectionRequest } from 'app/events'
@@ -19,7 +19,7 @@ function createStyleElement(href: string) {
 class TangentEmbed extends TangentLink {
 
 	private content: HTMLElement
-	private component: EmbedRoot
+	private component: any
 	private errorMessage: string
 
 	private willUpdateState = false
@@ -46,7 +46,8 @@ class TangentEmbed extends TangentLink {
 
 	disconnectedCallback() {
 		if (this.component) {
-			this.component.$destroy()
+			unmount(this.component)
+			this.component = null
 		}
 	}
 

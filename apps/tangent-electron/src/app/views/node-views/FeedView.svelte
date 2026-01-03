@@ -1,6 +1,6 @@
 <script lang="ts">
 import { indexOfEquivalent, last } from '@such-n-such/core'
-import type { NavigationData } from 'app/events'
+import type { NavigationCallback, NavigationData, ViewReadyCallback } from 'app/events'
 import type { Workspace } from 'app/model'
 import { NoteViewState } from 'app/model/nodeViewStates'
 import type FeedViewState from 'app/model/nodeViewStates/FeedViewState'
@@ -13,12 +13,10 @@ import type { ScrollToOptions } from 'app/utils/scrollto'
 import { ForwardingStore } from 'common/stores'
 import { areNodesOrReferencesEquivalent, getNode, type TreeNodeOrReference } from 'common/nodeReferences'
 
-import { createEventDispatcher, getContext, onMount, tick } from 'svelte'
+import { getContext, onMount, tick } from 'svelte'
 import { fly } from 'svelte/transition'
 import NodeViewSelector from './NodeViewSelector.svelte'
 import SetCreationRules from './SetCreationRules.svelte'
-
-const dispatch = createEventDispatcher<{ navigate: NavigationData }>()
 
 const workspace = getContext('workspace') as Workspace
 
@@ -29,6 +27,8 @@ export let state: FeedViewState
 export let extraTop: number = 0
 export let isCurrent: boolean
 export let focusLevel: FocusLevel
+
+export let onNavigate: NavigationCallback = null
 
 const items = new ForwardingStore<TreeNodeOrReference[]>([])
 const firstItem = new ForwardingStore<TreeNodeOrReference>(null)
@@ -200,7 +200,7 @@ function reactToCurrent(currentNode) {
 	}
 }
 
-function onViewReady(item: TreeNodeOrReference) {
+function handleViewReady(item: TreeNodeOrReference) {
 	if (!feedContainer) {
 		return
 	}
@@ -287,38 +287,37 @@ function updateShowCreateFromHover(event: MouseEvent) {
 	showCreateFromHover = event.y > height - 115
 }
 
-function forwardNavigation(event: CustomEvent<NavigationData>, item: TreeNodeOrReference) {
-	if (event.detail.direction === 'out') {
+function forwardNavigation(data: NavigationData, item: TreeNodeOrReference) {
+	if (data.direction === 'out') {
 		// Inject a navigation event from the feed to the feed child
 		const node = getNode(item, workspace.directoryStore)
-		dispatch('navigate', {
+		if (onNavigate) onNavigate({
 			target: node,
 			direction: 'out',
 			origin: state.parent.node
 		})
 
 		// Pass on the event from the feed child to the target
-		dispatch('navigate', {
-			...event.detail
+		if (onNavigate) onNavigate({
+			...data
 		})
 	}
-	else if (event.detail.direction === 'in') {
+	else if (data.direction === 'in') {
 		// Replace origin with self so that feed lens is maintained
-		dispatch('navigate', {
-			...event.detail,
+		if (onNavigate) onNavigate({
+			...data,
 			origin: state.parent.node
 		})
 	}
-	else if (event.detail.direction === 'replace') {
+	else if (data.direction === 'replace') {
 		// Pass on the normal event
-		dispatch('navigate', {
-			...event.detail
+		if (onNavigate) onNavigate({
+			...data
 		})
 	}
 }
 
-function onScrollRequest(event: CustomEvent<ScrollToOptions>, item: TreeNodeOrReference) {
-	let options = event.detail
+function handleScrollRequest(options: ScrollToOptions, item: TreeNodeOrReference) {
 	options.container = feedContainer
 	scrollTo(options)
 }
@@ -369,9 +368,9 @@ function extraBottomClick(event: MouseEvent) {
 				background="none"
 				layout="auto"
 				focusLevel={overrideRealFocus ? FocusLevel.Thread : focusLevel}
-				on:navigate={e => forwardNavigation(e, item)}
-				on:view-ready={e => onViewReady(item)}
-				on:scroll-request={e => onScrollRequest(e, item)}
+				onNavigate={data => forwardNavigation(data, item)}
+				onViewReady={() => handleViewReady(item)}
+				onScrollRequest={options => handleScrollRequest(options, item)}
 			/>
 		</div>
 	{/each}

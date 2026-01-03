@@ -29,6 +29,8 @@ export interface ScrollToOptions {
 	onDone?: () => void
 }
 
+export type ScrollToCallback = (options: ScrollToOptions) => void
+
 const noOp = () => {}
 
 // This is a port over of `svelte/internal/loop.js` as it is no longer accessible by the build system

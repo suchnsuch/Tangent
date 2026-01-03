@@ -73,8 +73,8 @@ function versionClicked(event: MouseEvent, version: string) {
 	}
 }
 
-function onNavigate(event: CustomEvent<NavigationData>) {
-	const { link } = event.detail
+function onNavigate(data: NavigationData) {
+	const { link } = data
 	if (link.form == 'wiki') {
 		workspace.api.documentation.open(link.href)
 	}
@@ -111,7 +111,7 @@ function onNavigate(event: CustomEvent<NavigationData>) {
 				<h1>Update Notes</h1>
 				{#each versionDetailsList as versionDetails, i}
 					<h2>{versionDetails.title}</h2>
-					<MarkdownView content={versionDetails.content} on:navigate={onNavigate}></MarkdownView>
+					<MarkdownView content={versionDetails.content} {onNavigate}></MarkdownView>
 				{/each}
 			{/await}
 		{/if}

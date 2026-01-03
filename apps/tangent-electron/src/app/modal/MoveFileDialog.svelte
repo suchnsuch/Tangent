@@ -76,12 +76,12 @@ function updateOptions(text: string) {
 	}
 }
 
-function autocomplete(event: CustomEvent<Option>) {
-	text = workspace.directoryStore.getPathToItem(event.detail.node)
+function onAutocomplete(option: Option) {
+	text = workspace.directoryStore.getPathToItem(option.node)
 }
 
-function selectOption(event: CustomEvent<{option: Option, event}>) {
-	const { node, action } = event.detail.option
+function selectOption(option: Option, event) {
+	const { node, action } = option
 	if (node) {
 		workspace.commands.moveFile.execute({
 			subject,
@@ -125,8 +125,8 @@ function selectOption(event: CustomEvent<{option: Option, event}>) {
 		placeholder="Type to filter folders..."
 		bind:selectedIndex
 		bind:text
-		on:autocomplete={autocomplete}
-		on:select={selectOption}>
+		{onAutocomplete}
+		onSelect={selectOption}>
 		<svelte:fragment slot="option" let:option>
 			{#if option.node === workspace.directoryStore.files}
 				Workspace Root

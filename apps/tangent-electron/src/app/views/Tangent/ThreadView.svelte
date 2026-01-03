@@ -11,7 +11,7 @@ import { resizeObserver } from 'app/utils/resizeObserver'
 
 import { FocusLevel } from 'common/dataTypes/TangentInfo'
 import { derived } from 'svelte/store'
-import type { NavigationData } from 'app/events'
+import type { NavigationCallback, NavigationData } from 'app/events'
 import NodeViewSelector from '../node-views/NodeViewSelector.svelte'
 import ThreadViewVerticalTitleBar from './ThreadViewVerticalTitleBar.svelte'
 import type { NodeViewState } from 'app/model/nodeViewStates'
@@ -34,9 +34,9 @@ const {
 	dirtyIndicatorVisibility
 } = workspace.settings
 
-const dispatch = createEventDispatcher<{ navigate: NavigationData }>()
-
 export let tangent: Tangent
+
+export let onNavigate: NavigationCallback = null
 
 $: focusLevel = tangent.focusLevel
 $: currentNode = tangent.currentNode
@@ -163,12 +163,12 @@ function getNodeContainerStyle(index: number, min: number) {
 	return result
 }
 
-function onNavigate(event: CustomEvent<NavigationData>) {
-	const origin = event.detail.origin
+function handleNavigate(data: NavigationData) {
+	const origin = data.origin
 	if (origin !== 'current') {
 		tangent.updateThread({ currentNode: origin, thread: 'retain' })
 	}
-	dispatch('navigate', event.detail)
+	if (onNavigate) onNavigate(data)
 }
 
 function onNodeContainerClicked(event: MouseEvent, state: NodeViewState) {
@@ -217,7 +217,7 @@ function onWheel(event: WheelEvent, state: NodeViewState) {
 					{isCurrent}
 					extraTop={36}
 					focusLevel={Math.max($focusLevel, FocusLevel.Thread)}
-					on:navigate={onNavigate}
+					onNavigate={handleNavigate}
 				/>
 			</div>
 			<ThreadViewVerticalTitleBar

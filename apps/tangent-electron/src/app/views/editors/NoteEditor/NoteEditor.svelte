@@ -1,5 +1,5 @@
 <script lang="ts">
-import { createEventDispatcher, getContext, onDestroy, onMount, tick } from 'svelte'
+import { getContext, onDestroy, tick } from 'svelte'
 import {
 	addShortcutsToEvent,
 	DecorateEvent,
@@ -36,12 +36,12 @@ import { type HrefFormedLink, StructureType } from 'common/indexing/indexTypes'
 import type { ConnectionInfo } from 'common/indexing/indexTypes'
 import { areLineArraysOpTextEquivalent, type EditInfo, getEditInfo, getRangeWhile, rangesAreEquivalent, stripLineAttributes } from 'common/typewriterUtils'
 import { scrollTo } from 'app/utils';
-import { type NavigationData } from 'app/events'
+import { type NavigationCallback, type NavigationData, type ViewReadyCallback } from 'app/events'
 import WorkspaceFileHeader from 'app/utils/WorkspaceFileHeader.svelte';
 import { TangentLink } from './t-link';
 import { appendContextTemplate, type ContextMenuConstructorOptions } from 'app/model/menus';
 import { getInitialSelection } from 'common/markdownModel';
-import { marginToAxis, type ScrollToOptions } from 'app/utils/scrollto';
+import { marginToAxis, type ScrollToCallback, type ScrollToOptions } from 'app/utils/scrollto';
 import { timedLatch } from 'app/utils/svelte';
 import LazyScrolledList from 'app/utils/LazyScrolledList.svelte';
 import { resolveLink } from 'common/markdownModel/links';
@@ -73,12 +73,6 @@ import YamlTooltip from './YamlTooltip.svelte';
 if (!TangentEmbed) {
 	console.error('I don\'t have Embeds!')
 }
-
-const dispatch = createEventDispatcher<{
-	'navigate': NavigationData
-	'view-ready': undefined
-	'scroll-request': ScrollToOptions
-}>()
 
 const workspace = getContext('workspace') as Workspace
 const {
@@ -115,6 +109,10 @@ export let extraBottom: number = 0
 
 export let fixedTitle: boolean = null
 export let showHeaderIcon = false
+
+export let onNavigate: NavigationCallback = null
+export let onViewReady: ViewReadyCallback = null
+export let onScrollRequest: ScrollToCallback = null
 
 let container: HTMLElement
 
@@ -357,15 +355,16 @@ function onFileChanged(note: NoteFile) {
 						// loaded, and thus ready to go as soon as this component
 						// was mounted. In this case, we need to delay before dispatching,
 						// otherwise the event is lost.
+						// TODO: Check if this is necessary in Svelte 5
 						tick().then(() => {
 							// Delaying ensures that the event can be consumed
 							// even when the component is first created
-							dispatch('view-ready')
+							if (onViewReady) onViewReady()
 						})
 					}
 					else {
 						// Otherwise, we're good to go
-						dispatch('view-ready')
+						if (onViewReady) onViewReady()
 					}
 				}
 				
@@ -489,8 +488,8 @@ function setScrollTo(options: ScrollToOptions) {
 	if (layout === 'fill') {
 		scrollTo(options)
 	}
-	else {
-		dispatch('scroll-request', options)
+	else if (onScrollRequest) {
+		onScrollRequest(options)
 	}
 }
 
@@ -866,7 +865,7 @@ function navigationForward(event: NavigationEvent) {
 		}
 
 		console.log('Navigation forward')
-		dispatch('navigate', {
+		if (onNavigate) onNavigate({
 			link,
 			origin: note,
 			direction
@@ -874,16 +873,15 @@ function navigationForward(event: NavigationEvent) {
 	}
 }
 
-function navigateTo(event: Event, inLink: ConnectionInfo, direction: 'in' | 'out') {
-	event.stopPropagation()
+function navigateTo(inLink: ConnectionInfo, direction: 'in' | 'out') {
 	let link: HrefFormedLink = {
 		...inLink,
 		href: inLink.from,
-		form: 'raw', // Requireed as the from is a full path
+		form: 'raw', // Required as the from is a full path
 		from: note.path
 	}
 
-	dispatch('navigate', {
+	if (onNavigate) onNavigate({
 		link,
 		origin: note,
 		direction
@@ -1075,7 +1073,7 @@ function onContextMenu(event: MouseEvent) {
 					accelerator: 'CommandOrControl+Enter',
 					toolTip: 'Opens the linked item in the default app',
 					click: () => {
-						dispatch('navigate', {
+						if (onNavigate) onNavigate({
 							link: linkInfo,
 							origin: note
 						})
@@ -1103,7 +1101,7 @@ function onContextMenu(event: MouseEvent) {
 						accelerator: 'CommandOrControl+Enter',
 						toolTip: toolTipBase + 'in a new pane to the right of this pane.',
 						click: () => {
-							dispatch('navigate', {
+							if (onNavigate) onNavigate({
 								link: linkInfo,
 								origin: note
 							})
@@ -1114,7 +1112,7 @@ function onContextMenu(event: MouseEvent) {
 						accelerator: 'CommandOrControl+Alt+Enter',
 						toolTip: toolTipBase + 'in a new pane to the right of this pane.',
 						click: () => {
-							dispatch('navigate', {
+							if (onNavigate) onNavigate({
 								link: linkInfo,
 								origin: note,
 								direction: 'in'
@@ -1126,7 +1124,7 @@ function onContextMenu(event: MouseEvent) {
 						accelerator: 'CommandOrControl+Shift+Enter',
 						toolTip: toolTipBase + 'in the current pane.',
 						click: () => {
-							dispatch('navigate', {
+							if (onNavigate) onNavigate({
 								link: linkInfo,
 								origin: note,
 								direction: 'replace'
@@ -1152,7 +1150,7 @@ function onContextMenu(event: MouseEvent) {
 					label: 'Open File',
 					toolTip: `Opens "${filename}" in its default application.`,
 					click: () => {
-						dispatch('navigate', {
+						if (onNavigate) onNavigate({
 							link: linkInfo
 						})
 					}
@@ -1174,7 +1172,7 @@ function onContextMenu(event: MouseEvent) {
 				label: 'Show in Browser',
 				toolTip: 'Opens the link in your default browser.',
 				click: () => {
-					dispatch('navigate', {
+					if (onNavigate) onNavigate({
 						link: linkInfo,
 						origin: note
 					})
@@ -1551,7 +1549,7 @@ function onDetailsContexMenu(event: MouseEvent) {
 								{link}
 								target="from"
 								className="button focusable"
-								on:select={e => navigateTo(e, link, e.detail.direction)}
+								onSelect={direction => navigateTo(link, direction)}
 							/>
 						</LazyScrolledList>
 					</div>

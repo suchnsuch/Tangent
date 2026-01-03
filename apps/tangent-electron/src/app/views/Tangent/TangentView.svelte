@@ -117,8 +117,8 @@ function onFocusLevel(f: FocusLevel) {
 	}
 }
 
-function onNavigate(event: CustomEvent<NavigationData>) {
-	workspace.navigateTo(event.detail)
+function onNavigate(data: NavigationData) {
+	workspace.navigateTo(data)
 }
 </script>
 
@@ -129,8 +129,7 @@ function onNavigate(event: CustomEvent<NavigationData>) {
 
 <main class="TangentView" on:wheel={onWheel}>
 {#if $focusLevel >= FocusLevel.Thread}
-	<ThreadView {tangent}
-		on:navigate={onNavigate}/>
+	<ThreadView {tangent} {onNavigate} />
 {:else}
 	<MapsView {tangent} />
 {/if}

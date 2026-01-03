@@ -7,16 +7,10 @@ import { NoteDetailMode } from 'app/model/nodeViewStates/NoteViewState'
 import LazyScrolledList from 'app/utils/LazyScrolledList.svelte'
 import { ForwardingStore } from 'common/stores'
 import { getNodeOrReferenceId, type TreeNodeOrReference } from 'common/nodeReferences'
-import { createEventDispatcher } from 'svelte'
 import { getContext } from 'svelte'
 import { onMount, tick } from 'svelte'
 import SetCreationRules from './SetCreationRules.svelte'
 import NodePreview from '../summaries/NodePreview.svelte'
-
-const dispatch = createEventDispatcher<{
-	navigate: NavigationData
-	'view-ready': undefined
-}>()
 
 const workspace = getContext('workspace') as Workspace
 
@@ -24,6 +18,9 @@ const needsAltToScroll = workspace.settings.cardViewCardsHoldAltToScroll
 
 export let state: CardsViewState
 export let extraTop: number = 0
+
+export let onNavigate: (data: NavigationData) => void
+export let onViewReady: () => void
 
 export let layout: 'fill' | 'auto' = 'fill'
 
@@ -44,20 +41,24 @@ $: items.forwardFrom(state.items)
 onMount(() => {
 	tick().then(() => {
 		// This view is always ready to go essentially immediately
-		dispatch('view-ready')
+		sendViewReady()
 	})
 })
 
 function nodeClick(event: MouseEvent, ref: TreeNodeOrReference) {
 	if (event.defaultPrevented) return
 	
-	dispatch('navigate', {
+	onNavigate({
 		origin: state.parent.node,
 		target: ref
 	})
 	
 	event.preventDefault()
 	event.stopPropagation()
+}
+
+function sendViewReady() {
+	if (onViewReady) onViewReady()
 }
 </script>
 
@@ -72,7 +73,7 @@ function nodeClick(event: MouseEvent, ref: TreeNodeOrReference) {
 		itemID={getNodeOrReferenceId}
 		mode="append"
 		groupStep={10}
-		on:range-updated={e => dispatch('view-ready')}
+		onRangeUpdated={sendViewReady}
 	>
 		<svelte:fragment slot="item" let:item>
 			<div class="card" on:click={e => nodeClick(e, item)}>

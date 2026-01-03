@@ -1,21 +1,16 @@
 <script lang="ts">
-import { createEventDispatcher, getContext, onDestroy } from 'svelte'
+import { getContext } from 'svelte'
 import { fly, fade } from 'svelte/transition'
 import { FocusLevel } from 'common/dataTypes/TangentInfo'
 import paths from 'common/paths'
 import type { TreeNode } from 'common/trees'
-import type { NavigationData } from 'app/events'
+import type { NavigationCallback, ViewReadyCallback } from 'app/events'
 import type { NodeViewState } from 'app/model/nodeViewStates'
-import type { ScrollToOptions } from 'app/utils/scrollto'
+import type { ScrollToCallback } from 'app/utils/scrollto'
 import { resizeObserver } from 'app/utils/resizeObserver'
 import Workspace from 'app/model/Workspace'
 import SvgIcon from '../smart-icons/SVGIcon.svelte'
 import './lensSettings.scss'
-
-const typedDispatch = createEventDispatcher<{
-	'navigate': NavigationData,
-	'scroll-request': ScrollToOptions
-}>()
 
 const workspace = getContext('workspace') as Workspace
 
@@ -31,6 +26,10 @@ export let background: 'auto' | 'none' = 'auto'
 
 /** The number of extra pixels to pad the top by */
 export var extraTop: number = 0
+
+export let onNavigate: NavigationCallback
+export let onScrollRequest: ScrollToCallback = null
+export let onViewReady: ViewReadyCallback = null
 
 $: lensState = state.currentLens
 $: viewComponent = $lensState?.viewComponent
@@ -148,9 +147,9 @@ function getClassNamesForNode(node: TreeNode) {
 			{layout}
 			{background}
 			extraTop={willPinSettings ? settingsHeight ?? extraTop : extraTop}
-			on:navigate={e => typedDispatch('navigate', e.detail)}
-			on:view-ready
-			on:scroll-request={e => typedDispatch('scroll-request', e.detail)}
+			{onNavigate}
+			{onViewReady}
+			{onScrollRequest}
 		/>
 	{:else}
 		<div class="missing">

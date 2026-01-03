@@ -1,5 +1,5 @@
 <script lang="ts">
-import { createEventDispatcher, getContext } from 'svelte'
+import { getContext } from 'svelte'
 import { asRoot } from 'typewriter-editor'
 
 import type { ConnectionInfo } from 'common/indexing/indexTypes'
@@ -13,11 +13,11 @@ import { appendContextTemplate } from 'app/model/menus'
 
 let workspace: Workspace = getContext('workspace')
 
-const dispatch = createEventDispatcher()
-
 export let link: ConnectionInfo
 export let target: 'to' | 'from'
 export let className = ''
+
+export let onSelect: (direction: 'in'|'out') => void = null
 
 $: targetPath = target === 'to' ? link.to : link.from
 $: targetNode = workspace.directoryStore.get(targetPath)
@@ -42,9 +42,7 @@ function onClick(event: MouseEvent) {
 }
 
 function sendSelection(sendIn: boolean) {
-	dispatch('select', {
-		direction: sendIn ? 'in' : 'out'
-	})
+	if (onSelect) onSelect(sendIn ? 'in' : 'out')
 }
 
 function onContextMenu(event: MouseEvent) {

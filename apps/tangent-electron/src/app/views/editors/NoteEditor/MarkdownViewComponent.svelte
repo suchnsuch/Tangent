@@ -1,17 +1,14 @@
 <script lang="ts">
-import { createEventDispatcher, onDestroy } from 'svelte'
+import { onDestroy } from 'svelte'
 import { asRoot } from 'typewriter-editor'
 import { markdownToTextDocument } from 'common/markdownModel'
 
-import type { NavigationData } from 'app/events'
+import type { NavigationCallback } from 'app/events'
 import MarkdownView from './MarkdownView'
 import type { NavigationEvent } from '../t-linkModule';
 
-const dispatch = createEventDispatcher<{
-	'navigate': NavigationData
-}>()
-
 export let content: string
+export let onNavigate: NavigationCallback = null
 const editor = new MarkdownView({ doc: markdownToTextDocument(content ?? '')} )
 
 editor.on('navigate', navigationForward)
@@ -31,8 +28,8 @@ function navigationForward(event: NavigationEvent) {
 		// Internal link
 		//$linkHighlight = link
 	}
-	else {
-		dispatch('navigate', {
+	else if (onNavigate) {
+		onNavigate({
 			link
 		})
 	}

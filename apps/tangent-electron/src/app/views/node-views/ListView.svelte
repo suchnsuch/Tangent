@@ -1,7 +1,7 @@
 <script lang="ts">
-import { createEventDispatcher, getContext } from 'svelte'
+import { getContext } from 'svelte'
 import { getNode, isReference, isSubReference, type TreeNodeOrReference } from 'common/nodeReferences'
-import type { NavigationData } from 'app/events'
+import type { NavigationCallback, ViewReadyCallback } from 'app/events'
 import { Workspace } from 'app/model'
 import WorkspaceTreeNode from 'app/model/WorkspaceTreeNode'
 import WorkspaceFileHeader from 'app/utils/WorkspaceFileHeader.svelte'
@@ -9,20 +9,18 @@ import ListViewState from 'app/model/nodeViewStates/ListViewState'
 import { BaseSetViewState } from 'app/model/nodeViewStates/SetViewState'
 import NodeIcon from '../smart-icons/NodeIcon.svelte'
 
-const dispatch = createEventDispatcher<{
-	navigate: NavigationData
-	'view-ready': undefined
-}>()
-
 const workspace = getContext('workspace') as Workspace
 
 export let state: ListViewState
 export let layout: 'fill' | 'auto' = 'fill'
 export let extraTop: number = 0
+
+export let onNavigate: NavigationCallback = null
+
 $: items = state.items
 
 function nodeClick(event, ref: TreeNodeOrReference) {
-	dispatch('navigate', {
+	if (onNavigate) onNavigate({
 		origin: state.parent.node,
 		target: ref
 	})

@@ -213,15 +213,15 @@ async function setState(state: WorkspaceInitState) {
 	}
 }
 
-async function onWorkspaceSelected(event) {
-	console.log('Switching workspace to', event.detail)
+async function onWorkspaceSelected(workspacePath: string) {
+	console.log('Switching workspace to', workspacePath)
 	applicationState = 'initializing'
 	showLoading = false
 	showLoadingTimeout = window.setTimeout(() => {
 		showLoading = true
 	}, 500)
 	try {
-		let workspaceState = await api.getWorkspace(event.detail)
+		const workspaceState = await api.getWorkspace(workspacePath)
 		setState(workspaceState)
 	}
 	catch (e) {
@@ -329,7 +329,7 @@ Below is a stack trace of the error. Please provide any additional details above
 {:else if applicationState === 'usingWorkspace'}
 	<WorkspaceView {workspace} />
 {:else if applicationState === 'choosingWorkspace'}
-	<WorkspaceSelector {api} on:workspaceSelected={onWorkspaceSelected} />
+	<WorkspaceSelector {api} {onWorkspaceSelected} />
 {:else if applicationState === 'error'}
 	<div class="loading error">
 		<SvgIcon

@@ -2,7 +2,6 @@
 import { focusLayer } from 'app/utils'
 import ScrollingItemList from 'app/utils/ScrollingItemList.svelte'
 import { wrappedIndex } from 'common/collections'
-import { createEventDispatcher } from 'svelte'
 
 type T = $$Generic
 interface $$Slots {
@@ -13,14 +12,6 @@ interface $$Slots {
 	placeholder: {}
 }
 
-const dispatch = createEventDispatcher<{
-	autocomplete: T,
-	select: {
-		option: T,
-		event: MouseEvent | KeyboardEvent
-	}
-}>()
-
 export let text: string
 export let placeholderMode: 'always' | 'hideWithText' = 'hideWithText'
 export let placeholder: string = 'Type to select...'
@@ -29,6 +20,9 @@ export let options: T[] = []
 export let selectedIndex = 0
 export let itemID: (item: any) => any = null
 export let getItemTooltip: (item: any, index?: number) => string = null
+
+export let onAutocomplete: (value: T) => void
+export let onSelect: (option: T, event: MouseEvent | KeyboardEvent) => void
 
 let inputElement: HTMLInputElement
 
@@ -48,22 +42,16 @@ function onInputKey(event: KeyboardEvent) {
 			break
 		case 'Tab':
 			event.preventDefault()
-			dispatch('autocomplete', options[selectedIndex])
+			onAutocomplete(options[selectedIndex])
 			break
 		case 'Enter':
 			event.preventDefault()
 			const option = options[selectedIndex]
 			if (option) {
-				selectOption(option, event)
+				onSelect(option, event)
 			}
 			break
 	}
-}
-
-function selectOption(option, event) {
-	dispatch('select', {
-		option, event
-	})
 }
 </script>
 
@@ -83,7 +71,7 @@ function selectOption(option, event) {
 		items={options}
 		{selectedIndex}
 		containerClass="itemsContainer"
-		onItemEvent={selectOption}
+		onItemEvent={onSelect}
 		{itemID}
 		{getItemTooltip}>
 		<svelte:fragment slot="item" let:item={option}>

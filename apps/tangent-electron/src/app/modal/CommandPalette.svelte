@@ -210,8 +210,7 @@ function updateOptions(text: string) {
 	}
 }
 
-function autocomplete(event: CustomEvent) {
-	let option = event.detail as Option
+function onAutocomplete(option: Option) {
 	const tabOption = options[selectedIndex]
 	if (tabOption) {
 		if (tabOption.node) {
@@ -225,8 +224,7 @@ function autocomplete(event: CustomEvent) {
 	}
 }
 
-function selectOption(selectEvent: CustomEvent<{option: Option, event: KeyboardEvent | MouseEvent}>) {
-	let { option, event } = selectEvent.detail
+function selectOption(option: Option, event: KeyboardEvent | MouseEvent) {
 	if (option.node) {
 
 		const nav: NavigationData = {
@@ -311,8 +309,8 @@ function shouldShowShortcut(action: PaletteAction) {
 		placeholderMode={'always'}
 		bind:selectedIndex
 		bind:text
-		on:autocomplete={autocomplete}
-		on:select={selectOption}
+		{onAutocomplete}
+		onSelect={selectOption}
 		itemID={optionID}
 		getItemTooltip={optionTooltip}>
 		<svelte:fragment slot="option" let:option>

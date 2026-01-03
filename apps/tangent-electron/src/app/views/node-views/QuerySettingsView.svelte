@@ -31,20 +31,21 @@ $: hasErrors = $queryResult && (
 	('errors' in $queryResult.query && $queryResult.query.errors?.length)
 )
 
-function onRename(event: CustomEvent<string>) {
+function onRename(newName: string) {
 	const parent = workspace.directoryStore.getParent(state.node)
 	const grandparent = workspace.directoryStore.getParent(parent)
 	if (parent && grandparent) {
 		if (parent.name === 'Temp' && grandparent.name === '.tangent') {
-			event.preventDefault()
 			// If I want to do this again, I should make a move() function on the WorkspaceTreeNode directly
 			// perhaps by overloading `MoveFileCommand` to include rename support.
-			const validatedName = validateFileSegment(event.detail)
-			if (!validatedName) return
-			const newPath = paths.join(workspace.directoryStore.files.path, event.detail) + state.node.fileType
+			const validatedName = validateFileSegment(newName)
+			if (!validatedName) return false
+
+			const newPath = paths.join(workspace.directoryStore.files.path, newName) + state.node.fileType
 			// Set the name now. This prevents a double-rename bug.
 			state.node.name = validatedName
 			workspace.api.file.move(state.node.path, newPath)
+			return true
 		}
 	}
 }
@@ -56,7 +57,7 @@ function onRename(event: CustomEvent<string>) {
 		<WorkspaceFileHeader
 			slot="label"
 			node={state.node} showExtension={false}
-			on:rename={onRename}
+			{onRename}
 		/>
 	</QueryTextEditor>
 	<DocumentationLink pageName="Queries" />

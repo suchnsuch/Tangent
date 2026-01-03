@@ -1,5 +1,4 @@
 <script lang="ts">
-import { createEventDispatcher } from 'svelte'
 import { EmbedType, getEmbedType } from 'common/embedding'
 import type { HrefFormedLink } from 'common/indexing/indexTypes'
 import type { Workspace } from 'app/model'

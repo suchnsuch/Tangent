@@ -1,17 +1,15 @@
 <script lang="ts">
 
-import { afterUpdate, createEventDispatcher, onMount, tick } from 'svelte';
+import { afterUpdate, onMount, tick } from 'svelte';
 import { findParentScrollContainer } from './scrolling';
-
-const dispatch = createEventDispatcher<{
-	'range-updated': undefined
-}>()
 
 export let items: any[]
 export let mode: 'buffer' | 'append' = 'buffer'
 export let groupStep = 50
 export let itemID: (item: any) => any = null
 export let scrollContainer: HTMLElement = null
+
+export let onRangeUpdated: () => void = null
 
 let itemsContainer: HTMLElement
 
@@ -70,7 +68,7 @@ function evaluateVisibility(direction=0) {
 			itemRange = [itemRange[0] - groupStep, itemRange[1] - groupStep]
 			
 			tick().then(() => {
-				dispatch('range-updated')
+				if (onRangeUpdated) onRangeUpdated()
 				evaluateVisibility(-1)
 			})
 		}
@@ -102,7 +100,7 @@ function evaluateVisibility(direction=0) {
 				itemRange = [itemRange[0] + groupStep, itemRange[1] + groupStep]
 
 				tick().then(() => {
-					dispatch('range-updated')
+					if (onRangeUpdated) onRangeUpdated()
 					evaluateVisibility(1)
 				})
 			}
@@ -110,7 +108,7 @@ function evaluateVisibility(direction=0) {
 			 	if (scrollRect.bottom >= itemsRect.bottom - .9) {
 					itemRange = [itemRange[0], itemRange[1] + groupStep]
 					tick().then(() => {
-						dispatch('range-updated')
+						if (onRangeUpdated) onRangeUpdated()
 					})
 				}
 			}

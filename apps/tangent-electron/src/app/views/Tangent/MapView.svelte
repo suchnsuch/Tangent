@@ -472,12 +472,7 @@ function onMapNodeContextMenu(event: MouseEvent, node: MapNode) {
 	appendContextTemplate(event, options)
 }
 
-function onMapNodeAddLink(event: CustomEvent, mapNode: MapNode) {
-	const { node, direction }: {
-		node: TreeNode,
-		direction: 'in' | 'out'
-	} = event.detail
-
+function onMapNodeAddLink(node: TreeNode, direction: 'in'|'out', mapNode: MapNode) {
 	const originNode = mapNode.node.value
 	const originThreadIndex = $current.thread.indexOf(originNode)
 
@@ -854,10 +849,10 @@ function cleanupConnectionHover() {
 				on:click={e => onMapNodeClick(e, mapNode)}
 				on:dblclick={e => onMapNodeDoubleClick(e, mapNode)}
 				on:contextmenu={e => onMapNodeContextMenu(e, mapNode)}
-				on:nodeSizeUpdated={triggerRePlace}
 				on:pointerdown={e => onMapNodeMouseDown(e, mapNode)}
 				onPointerEnter={e => onMapNodeMouseEnter(e, mapNode)}
-				on:add-link={e => onMapNodeAddLink(e, mapNode)}
+				onNodeSizeUpdated={triggerRePlace}
+				onAddLink={(node, direction) => onMapNodeAddLink(node, direction, mapNode)}
 			/>
 		{:else}
 			<div class="empty">

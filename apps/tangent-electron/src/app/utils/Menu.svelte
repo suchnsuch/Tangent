@@ -1,14 +1,17 @@
 <script lang="ts">
-import { createEventDispatcher, onMount } from "svelte"
+import { onMount } from "svelte"
 import { type Placement, createPopper } from "@popperjs/core"
 
 import type { ContextMenuConstructorOptions } from "app/model/menus"
 import MenuItem from "./MenuItem.svelte"
-import type { CancelMenuDetails, CancelMenuEvent, RequestMenuDetails, RequestMenuEvent } from './MenuItem.svelte'
+import type { CancelMenuCallback, ExecuteMenuCallback, RequestMenuCallback } from './MenuItem.svelte'
 
 export let template: ContextMenuConstructorOptions[]
 export let placementElement: HTMLElement = null
 export let placement: Placement = 'bottom'
+
+export let onExecuted: ExecuteMenuCallback
+export let onRequestMenu: RequestMenuCallback = null
 
 $: hasAnyCheckboxes = determineHasCheckboxes(template)
 function determineHasCheckboxes(template: ContextMenuConstructorOptions[]) {
@@ -48,22 +51,17 @@ const menuDelay = 200
 // Delay used when transitioning from one menu to another
 const interMenuDelay = 50
 
-type SubmenuData = RequestMenuDetails & {
+type SubmenuData = {
+	element: HTMLElement
+	template: ContextMenuConstructorOptions[]
 	timeout?: any
 }
-
-let dispatch = createEventDispatcher<{
-	executed: {},
-	requestMenu: RequestMenuDetails
-	cancelMenu: CancelMenuDetails
-}>()
 
 let incomingMenu: SubmenuData = null
 let shownMenu: SubmenuData = null
 let outgoingMenu: SubmenuData = null
 
-function onRequestMenu(event: RequestMenuEvent) {
-	const { element, template: subTemplate } = event.detail
+function handleRequestMenu(element: HTMLElement, subTemplate: ContextMenuConstructorOptions[]) {
 	if (incomingMenu && incomingMenu.element !== element && incomingMenu.timeout) {
 		// Shown menu has not yet landed, and should be discarded
 		clearTimeout(incomingMenu.timeout)
@@ -96,11 +94,8 @@ function onRequestMenu(event: RequestMenuEvent) {
 		}, outgoingMenu ? interMenuDelay : menuDelay)
 	}
 
-	// Propegate menu request up the chain
-	dispatch('requestMenu', {
-		element: placementElement,
-		template
-	})
+	// Propagate menu request up the chain
+	if (onRequestMenu) onRequestMenu(placementElement, template)
 }
 
 function cancelShownMenu(delay, force = false) {
@@ -121,8 +116,7 @@ function cancelShownMenu(delay, force = false) {
 	}
 }
 
-function onCancelMenu(event: CancelMenuEvent) {
-	const { element } = event.detail
+function handleCancelMenu(element: HTMLElement) {
 	if (incomingMenu?.element === element) {
 		clearTimeout(incomingMenu.timeout)
 		incomingMenu = null
@@ -134,19 +128,8 @@ function onCancelMenu(event: CancelMenuEvent) {
 }
 
 function onMouseEnter() {
-	if (placementElement) {
-		dispatch('requestMenu', {
-			element: placementElement,
-			template
-		})
-	}
-}
-
-function onMouseLeave() {
-	if (placementElement) {
-		// dispatch('cancelMenu', {
-		// 	element: placementElement
-		// })
+	if (placementElement && onRequestMenu) {
+		onRequestMenu(placementElement, template)
 	}
 }
 
@@ -154,7 +137,7 @@ function onMouseLeave() {
 
 <nav bind:this={menu}
 	on:mouseenter={onMouseEnter}
-	on:mouseleave={onMouseLeave}>
+>
 	{#each template as item}
 		{#if item.type === 'separator'}
 			<div class="separator"></div>
@@ -162,9 +145,9 @@ function onMouseLeave() {
 			<MenuItem
 				template={item}
 				forceCheckboxSpace={hasAnyCheckboxes}
-				on:executed
-				on:requestMenu={onRequestMenu}
-				on:cancelMenu={onCancelMenu}
+				{onExecuted}
+				onRequestMenu={handleRequestMenu}
+				onCancelMenu={handleCancelMenu}
 			/>
 		{/if}
 	{/each}
@@ -175,9 +158,9 @@ function onMouseLeave() {
 		template={shownMenu.template}
 		placementElement={shownMenu.element}
 		placement="right-start"
-		on:executed
-		on:requestMenu={onRequestMenu}
-		on:cancelMenu={onCancelMenu}/>
+		{onExecuted}
+		onRequestMenu={handleRequestMenu}
+	/>
 {/if}
 
 <style lang="scss">

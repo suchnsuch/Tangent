@@ -1,52 +1,39 @@
 <script lang="ts" context="module">
-export interface RequestMenuDetails {
-	element: HTMLElement,
-	template: ContextMenuConstructorOptions[]
-}
-export type RequestMenuEvent = CustomEvent<RequestMenuDetails>
-
-export interface CancelMenuDetails {
-	element: HTMLElement
-}
-export type CancelMenuEvent = CustomEvent<CancelMenuDetails>
+export type ExecuteMenuCallback = () => void
+export type RequestMenuCallback = (element: HTMLElement, template: ContextMenuConstructorOptions[]) => void
+export type CancelMenuCallback = (element: HTMLElement) => void
 </script>
 
 <script lang="ts">
 import type { Workspace } from 'app/model'
 import type { ContextMenuConstructorOptions } from "app/model/menus"
 import SvgIcon from "app/views/smart-icons/SVGIcon.svelte";
-import { createEventDispatcher, getContext } from "svelte";
+import { getContext } from "svelte";
 import { shortcutsHtmlString } from "./shortcuts";
 import commandAction from '../model/commands/CommandAction'
-
-let dispatch = createEventDispatcher<{
-	executed: {},
-	requestMenu: RequestMenuDetails
-	cancelMenu: CancelMenuDetails
-}>()
 
 const workspace = getContext('workspace') as Workspace
 
 export let template: ContextMenuConstructorOptions
 export let forceCheckboxSpace = false
+
+export let onExecuted: ExecuteMenuCallback
+export let onRequestMenu: RequestMenuCallback
+export let onCancelMenu: CancelMenuCallback
+
 let button: HTMLElement
 
 $: shortcut = template.accelerator ?? template.command?.shortcuts
 
 function onMouseEnter(event: MouseEvent) {
-	if (template.submenu) {
-		dispatch('requestMenu', {
-			element: button,
-			template: template.submenu as ContextMenuConstructorOptions[]
-		})
+	if (template.submenu && onRequestMenu) {
+		onRequestMenu(button, template.submenu)
 	}
 }
 
 function onMouseLeave(event: MouseEvent) {
-	if (template.submenu) {
-		dispatch('cancelMenu', {
-			element: button
-		})
+	if (template.submenu && onCancelMenu) {
+		onCancelMenu(button)
 	}
 }
 
@@ -57,7 +44,7 @@ function onClick(event: Event) {
 			initiatingEvent: event,
 			...commandContext
 		})
-		dispatch('executed')	
+		if (onExecuted) onExecuted()
 	}
 	if (click) {
 		click()

@@ -1,5 +1,4 @@
 <script lang="ts">
-import { createEventDispatcher } from 'svelte'
 import type WindowAPI from 'common/WindowApi'
 import paths from 'common/paths'
 
@@ -8,10 +7,16 @@ import PopUpButton from './utils/PopUpButton.svelte'
 import SvgIcon from './views/smart-icons/SVGIcon.svelte'
 import { tooltip } from './utils/tooltips'
 
-export let api: WindowAPI
+const {
+	api,
+	...props
+} : {
+	api: WindowAPI,
+	onWorkspaceSelected: (workspacePath: string) => void
+} = $props()
 
-let dispatch = createEventDispatcher()
-
+// svelte-ignore non_reactive_update
+// svelte-ignore state_referenced_locally
 let workspacesPromise: Promise<string[]> = api.getKnownWorkspaces()
 
 function refreshWorkspaceList() {
@@ -26,7 +31,7 @@ async function openNewWorkspace() {
 
 function openWorkspace(workspacePath: string) {
 	if (workspacePath) {
-		dispatch('workspaceSelected', workspacePath)
+		props.onWorkspaceSelected(workspacePath)
 	}
 }
 
@@ -61,7 +66,7 @@ function openDocumentation() {
 			<ul>
 				{#each workspaces as workspace}
 					<li class="buttonGroup">
-						<button on:click={() => openWorkspace(workspace)}>
+						<button onclick={() => openWorkspace(workspace)}>
 							<h3>{paths.basename(workspace)}</h3>
 							<p>{workspace}</p>
 						</button>
@@ -69,11 +74,11 @@ function openDocumentation() {
 							<div class="workspaceMenu buttonGroup vertical">
 								<button
 									use:tooltip={"Reveal this workspace in the file browser."}
-									on:click={() => api.file.showInFileBrowser(workspace)}
+									onclick={() => api.file.showInFileBrowser(workspace)}
 									>Show Workspace</button>
 								<button
 									use:tooltip={"Remove this workspace from this list"}
-									on:click={() => forgetWorkspace(workspace)}
+									onclick={() => forgetWorkspace(workspace)}
 								>Forget Workspace</button>
 							</div>
 						</PopUpButton>
@@ -90,19 +95,19 @@ function openDocumentation() {
 			<p>
 				You can have few or many workspaces, but you need at least one!
 				For more information, check out
-				<!-- svelte-ignore a11y-invalid-attribute -->
-				<a href="#" on:click={openDocumentation} class="local">the documentation</a>.
+				<!-- svelte-ignore a11y_invalid_attribute -->
+				<a href="#" onclick={openDocumentation} class="local">the documentation</a>.
 			</p>
 		{/if}
 
 		<div class="newButton">
-			<button on:click={openNewWorkspace}>Open New Workspace</button>
+			<button onclick={openNewWorkspace}>Open New Workspace</button>
 		</div>
 	
 		{#if workspaces.length}
 			<p class="documentation">	
-				<!-- svelte-ignore a11y-invalid-attribute -->
-				<a href="#" on:click={openDocumentation} class="local">Open Documentation</a>
+				<!-- svelte-ignore a11y_invalid_attribute -->
+				<a href="#" onclick={openDocumentation} class="local">Open Documentation</a>
 			</p>
 		{/if}
 	{/await}

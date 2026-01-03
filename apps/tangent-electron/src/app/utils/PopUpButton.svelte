@@ -216,7 +216,7 @@ function windowKey(event: KeyboardEvent) {
 		{#if template}
 			<Menu
 				template={Array.isArray(template) ? template : template()}
-				on:executed={() => showMenu = false}
+				onExecuted={() => showMenu = false}
 			/>
 		{:else}
 			Add content to this menu to fill it in
