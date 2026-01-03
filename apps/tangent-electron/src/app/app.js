@@ -1,3 +1,4 @@
+import { mount } from 'svelte'
 import App from './App.svelte'
 
 import './style/input.scss'
@@ -10,7 +11,7 @@ pdfjs.GlobalWorkerOptions.workerSrc = pdfWorker
 
 import 'pdfjs-dist/web/pdf_viewer.css'
 
-const app = new App({
+const app = mount(App, {
 	target: document.body,
 })
 

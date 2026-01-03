@@ -239,7 +239,9 @@ function logWebpackErrors(err, stats) {
 	if (stats.hasWarnings()) {
 		console.log(info.warnings.length, 'Warnings')
 		for (let warning of info.warnings) {
-			console.log(warning.moduleName, warning.loc)
+			if (warning.moduleName) {
+				console.log(warning.moduleName, warning.loc)
+			}
 			console.log(warning.message)
 			if (warning.stack) {
 				//console.log(warning.stack)

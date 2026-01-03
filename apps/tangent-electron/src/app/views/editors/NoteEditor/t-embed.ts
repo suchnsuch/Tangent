@@ -1,6 +1,6 @@
 import type { Workspace } from 'app/model'
 import { StructureType } from 'common/indexing/indexTypes'
-
+import { mount } from 'svelte'
 import EmbedRoot from './EmbedRoot.svelte'
 import { TangentLink, type LinkState } from './t-link'
 import { markAsSelectionRequest } from 'app/events'
@@ -110,7 +110,7 @@ class TangentEmbed extends TangentLink {
 			}
 		}
 		else {
-			this.component = new EmbedRoot({
+			this.component = mount(EmbedRoot, {
 				target: this.content,
 				props: {
 					link,

@@ -1,7 +1,7 @@
-import type { SvelteComponent } from "svelte"
+import type { Component, SvelteComponent } from "svelte"
 import { writable } from 'svelte/store'
 
-export type SvelteConstructor = new (...args: any[]) => SvelteComponent
+export type SvelteConstructor = (new (...args: any[]) => SvelteComponent) | Component
 
 export function mediaQueryStore(query: string) {
 	const mediaQuery = window.matchMedia(query)
