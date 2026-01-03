@@ -87,6 +87,13 @@
   <update_contact>k8ie_AT_mcld.eu</update_contact>
 
   <releases>
+    <release version="0.11.1" date="2026-01-03">
+      <description>
+        <ul>
+          <li>Fixed an issue where styling markup immediately after the beginning of block quotes were not processed correctly.</li>
+        </ul>
+      </description>
+    </release>
      <release version="0.11.1" date="2025-12-26">
       <description>
         <ul>
