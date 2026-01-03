@@ -110,15 +110,6 @@ class TangentEmbed extends TangentLink {
 			}
 		}
 		else {
-			this.component = mount(EmbedRoot, {
-				target: this.content,
-				props: {
-					link,
-					block,
-					workspace: (document as any).workspace as Workspace
-				}
-			})
-
 			const handleForm = form => {
 				if (!form || form.mode === 'error') {
 					this.setLinkState('error', null)
@@ -138,8 +129,15 @@ class TangentEmbed extends TangentLink {
 				}
 			}
 
-			this.component.$on('form', e => handleForm(e.detail))
-			handleForm(this.component.form)
+			this.component = mount(EmbedRoot, {
+				target: this.content,
+				props: {
+					link,
+					block,
+					workspace: (document as any).workspace as Workspace,
+					onForm: handleForm
+				}
+			})
 		}
 	}
 

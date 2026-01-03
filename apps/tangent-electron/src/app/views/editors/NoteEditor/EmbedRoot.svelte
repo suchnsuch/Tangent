@@ -34,14 +34,12 @@ type Form = {
 	mode: 'website'
 } & WebsiteData
 
-const formDispatcher = createEventDispatcher<{ 'form': Form }>()
-
 export let link: HrefFormedLink
 export let block: boolean
 export let workspace: Workspace
 
-// Normally these wouldn't be exports, but I want accessors for them
-export let form: Form = null
+export let onForm: (form: Form) => void
+let form: Form = null
 
 $: nodeHandle = workspace?.getHandle(link)
 $: onNodeHandleChanged(nodeHandle ? $nodeHandle : null)
@@ -165,7 +163,7 @@ function onNodeHandleChanged(value: HandleResult) {
 			...value as WebsiteData
 		}
 	}
-	formDispatcher('form', form)
+	onForm(form)
 }
 
 function error(message: string) {
