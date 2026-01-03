@@ -1,5 +1,5 @@
 import type { TreeNode } from 'common/trees'
-import type NodeViewState from './NodeViewState'
+import type { NodeViewState } from './NodeViewState'
 import { ReadableStore } from 'common/stores'
 import type LensViewState from './LensViewState'
 import UnhandledView from 'app/views/node-views/UnhandledView.svelte'

@@ -10,7 +10,7 @@ import FeedSettingsView from 'app/views/node-views/FeedSettingsView.svelte'
 import ViewStateContext from './ViewStateContext'
 import { areNodesOrReferencesEquivalent, getNode, indexOfMatch, type TreeNodeOrReference } from 'common/nodeReferences'
 import NoteViewState, { NoteDetailMode } from './NoteViewState'
-import type NodeViewState from './NodeViewState'
+import type { NodeViewState } from './NodeViewState'
 
 class FeedViewStateContext extends ViewStateContext {
 	protected createNodeViewState(item: TreeNodeOrReference, allowUnhandled?: boolean): NodeViewState {

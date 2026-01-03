@@ -1,5 +1,5 @@
-import type NodeViewState from './NodeViewState'
-export type { NodeViewState }
+import type { NodeViewState, DetailsViewState} from './NodeViewState'
+export type { NodeViewState, DetailsViewState }
 
 import FolderViewState from './FolderViewState'
 export { FolderViewState }

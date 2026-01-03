@@ -1,7 +1,7 @@
-import { derived, type Readable } from 'svelte/store'
+import { derived, type Readable, type Writable } from 'svelte/store'
 import type { EditorRange } from "@typewriter/document"
 import { escapeRegExp } from '@such-n-such/core'
-import type NodeViewState from "./NodeViewState"
+import type { NodeViewState, DetailsViewState } from "./NodeViewState"
 import type NoteFile from "../NoteFile"
 import { type PartialLink, StructureType } from "common/indexing/indexTypes"
 import { ForwardingStore, ReadableStore, subscribeUntil, WritableStore } from 'common/stores'
@@ -18,10 +18,11 @@ import { clamp } from 'common/utils'
 import NoteSettingsView from 'app/views/node-views/NoteSettingsView.svelte'
 import DataFile from '../DataFile'
 import NoteViewInfo from 'common/dataTypes/NoteViewInfo'
-import paths from 'common/paths'
 import type MarkdownEditor from 'app/views/editors/NoteEditor/MarkdownEditor'
 import { createContentIdMatcher } from 'common/markdownModel/links'
 import { deepEqual } from 'fast-equals'
+import type { SvelteConstructor } from 'app/utils/svelte'
+import NoteDetailsSummary from 'app/views/summaries/NoteDetailsSummary.svelte'
 
 export enum NoteDetailMode {
 	None = 0,
@@ -63,6 +64,8 @@ export default class NoteViewState implements NodeViewState, LensViewState {
 
 	readonly currentLens: ReadableStore<LensViewState>
 	readonly pinSettings: Readable<boolean>
+
+	readonly details: Writable<DetailsViewState> = new WritableStore<DetailsViewState>(null)
 
 	// Forwarded state values
 	readonly selection: WritableStore<EditorRange>
@@ -320,5 +323,12 @@ export default class NoteViewState implements NodeViewState, LensViewState {
 
 	get settingsComponent() {
 		return NoteSettingsView
+	}
+
+	get detailsSummaryComponent() {
+		if ((this.detailMode & NoteDetailMode.WordsAndChars) != NoteDetailMode.None) {
+			return NoteDetailsSummary
+		}
+		return null
 	}
 }

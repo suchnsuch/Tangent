@@ -1,5 +1,5 @@
 import { ForwardingStore, ReadableStore, WritableStore } from 'common/stores'
-import type { NodeViewState } from '.'
+import type { NodeViewState, DetailsViewState } from '.'
 import EmbedFile from '../EmbedFile'
 import type LensViewState from './LensViewState'
 import AudioVideoView from 'app/views/node-views/AudioVideoView.svelte'
@@ -11,6 +11,7 @@ export default class AudioVideoViewState implements NodeViewState, LensViewState
 	readonly file: EmbedFile
 
 	readonly currentLens: ReadableStore<LensViewState>
+	readonly details = new WritableStore<DetailsViewState>(null)
 
 	readonly viewInfoFile: DataFile
 	readonly viewInfo = new WritableStore<AudioVideoViewInfo>(null)

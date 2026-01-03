@@ -1,16 +1,20 @@
 <script lang="ts">
-import { getContext } from 'svelte'
+import { getContext, tick } from 'svelte'
 import { fly, fade } from 'svelte/transition'
 import { FocusLevel } from 'common/dataTypes/TangentInfo'
 import paths from 'common/paths'
 import type { TreeNode } from 'common/trees'
 import type { NavigationCallback, ViewReadyCallback } from 'app/events'
-import type { NodeViewState } from 'app/model/nodeViewStates'
+import type { DetailsViewState, NodeViewState } from 'app/model/nodeViewStates'
 import type { ScrollToCallback } from 'app/utils/scrollto'
 import { resizeObserver } from 'app/utils/resizeObserver'
 import Workspace from 'app/model/Workspace'
 import SvgIcon from '../smart-icons/SVGIcon.svelte'
 import './lensSettings.scss'
+import { timedLatch } from 'app/utils/svelte'
+import DetailBacklinksView from './DetailBacklinksView.svelte'
+import { pluralize } from 'common/plurals'
+import { WorkspaceTreeNode } from 'app/model'
 
 const workspace = getContext('workspace') as Workspace
 
@@ -46,6 +50,22 @@ $: showSettings = showSettingsFromMouse || showSettingsFromHover || willPinSetti
 let container: HTMLElement
 let settingsContainer: HTMLElement
 let settingsHeight: number = extraTop
+
+$: node = state.node instanceof WorkspaceTreeNode ? state.node : null
+$: detailsState = state.details
+$: canShowDetails = node && detailsState != null
+$: canOpenDetails = canShowDetails && $detailsState?.open !== null
+$: areDetailsOpen = canShowDetails && $detailsState?.open
+const showDetails = timedLatch(false)
+$: showDetails.update(areDetailsOpen)
+$: detailsComponent = getDetailsComponent($detailsState)
+function getDetailsComponent(state: DetailsViewState) {
+	if (!state?.tab || state.tab === 'backlinks') {
+		return DetailBacklinksView
+	}
+	return null
+}
+let detailsContainer: HTMLElement
 
 function onSettingsResize(entries: ResizeObserverEntry[]) {
 	const entry = entries[0]
@@ -127,6 +147,41 @@ function getClassNamesForNode(node: TreeNode) {
 	}
 
 	return classes
+}
+
+function toggleOpenDetails(event: MouseEvent) {
+	if (!canOpenDetails) return
+	if (areDetailsOpen) {
+		detailsState.update(details => {
+			return {
+				...details,
+				open: false
+			}
+		})
+	}
+	else {
+		openDetails()
+	}
+}
+
+function openDetails() {
+	detailsState.update(details => {
+		return {
+			...details,
+			open: true
+		}
+	})
+	showDetails.update(true)
+
+	tick().then(() => {
+		if (!detailsContainer) return
+		let target = detailsContainer.querySelector('.focusable')
+		if (target instanceof HTMLElement) {
+			target.focus({
+				preventScroll: true
+			})
+		}
+	})
 }
 
 </script>
@@ -214,6 +269,45 @@ function getClassNamesForNode(node: TreeNode) {
 			</div>
 		{/if}
 	{/if}
+
+	{#if canShowDetails}
+		<div
+			class="details"
+			class:open={areDetailsOpen}
+			class:openable={canOpenDetails}
+		>
+			<!-- svelte-ignore a11y_click_events_have_key_events -->
+			<!-- svelte-ignore a11y_no_static_element_interactions -->
+			<div class="detailsInfoBar detailsBlock"
+				on:click={toggleOpenDetails}
+			>
+				<span class="links">
+					{pluralize(
+						$node.meta?.inLinks.length ?? 0,
+						'$$ Incoming Links',
+						'$$ Incoming Link',
+						'No Incoming Links')}
+				</span>
+				<span class="separator"></span>
+				{#if state.detailsSummaryComponent}
+					<span class="node"><svelte:component
+						this={state.detailsSummaryComponent}
+						{state}
+					/></span>
+				{/if}
+			</div>
+
+			{#if $showDetails && detailsComponent}
+				<main bind:this={detailsContainer}>
+					<svelte:component
+						this={detailsComponent}
+						{state}
+						{onNavigate}
+					/>
+				</main>
+			{/if}
+		</div>
+	{/if}
 </main>
 
 <style lang="scss">
@@ -265,5 +359,63 @@ main {
 
 .settings {
 	flex-grow: 1;
+}
+
+.details {
+	position: absolute;
+	z-index: 10;
+	left: 0;
+	right: 0;
+	bottom: 0;
+
+	display: flex;
+	flex-direction: column;
+
+	transform: translateY(calc(100% - 24px));
+	background: var(--noteBackgroundColor);
+
+	transition: transform .5s, box-shadow .5s;
+
+	max-height: 80%;
+	overflow: hidden;
+
+	&.open {
+		transform: translateY(0);
+		box-shadow: 0 0 10px rgba(0, 0, 0, .3);
+	}
+
+	main {
+		overflow-y: auto;
+		padding-bottom: 2em;
+	}
+}
+
+.detailsInfoBar {
+	font-size: 70%;
+	box-sizing: border-box;
+	height: 24px;
+	width: 100%;
+	padding: 4px 10px 4px 6px;
+	flex-grow: 0;
+	flex-shrink: 0;
+
+	display: grid;
+	grid-template-columns: max-content 1fr max-content;
+	align-items: center;
+
+	white-space: normal;
+	transition: opacity .3s;
+
+	.focusing:not(:hover) & {
+		opacity: .5;
+	}
+
+	.separator {
+		flex-grow: 1;
+	}
+	
+	.openable & {
+		cursor: pointer;
+	}
 }
 </style>
