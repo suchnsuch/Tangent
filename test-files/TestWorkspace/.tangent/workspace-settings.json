@@ -4,7 +4,6 @@
 		{
 			"name": "📥 Inbox Note",
 			"nameTemplate": "%name%",
-			"shortcut": "Mod+Alt+I",
 			"folder": "Inbox",
 			"description": "Creates a new note for quickly capturing thoughts that are not yet completely formed."
 		},
