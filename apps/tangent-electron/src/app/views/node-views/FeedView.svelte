@@ -440,6 +440,12 @@ function extraBottomClick(event: MouseEvent) {
 
 	background: var(--backgroundColor);
 	color: var(--deemphasizedTextColor);
+
+	transition: opacity .3s;
+
+	:global(.focusing) & {
+		opacity: 0.5;
+	}
 }
 
 .feed .note :global(.fixedTitle) > :global(header::before) {

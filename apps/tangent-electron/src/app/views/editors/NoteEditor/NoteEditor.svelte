@@ -1,7 +1,6 @@
 <script lang="ts">
 import { getContext, onDestroy, tick } from 'svelte'
 import {
-	addShortcutsToEvent,
 	DecorateEvent,
 	type DecorationsModule,
 	EditorChangeEvent,
@@ -14,7 +13,7 @@ import {
 	asRoot
 } from 'typewriter-editor'
 
-import { requestCallbackOnIdle, wait } from '@such-n-such/core'
+import { wait } from '@such-n-such/core'
 
 import type Workspace from "app/model/Workspace";
 import type NoteFile from 'app/model/NoteFile'
@@ -117,8 +116,6 @@ let effectiveExtraBottom = extraBottom
 
 let lastFocusLevel = focusLevel
 
-let stats = ''
-
 let isInitializing = false
 let allowSelectionScroll = true
 let saveTimeout = null
@@ -142,7 +139,12 @@ $: annotations.forwardFrom(state.annotations)
 $: annotationIndex.forwardFrom(state.annotationIndex)
 $: updateAnnotations($annotations, $annotationIndex)
 
-$: focusing = (focusLevel >= FocusLevel.Paragraph) && (layout !== 'fill' || hasSelection && !justScrolled)
+$: focusing = workspace.viewState.focusing
+$: if (isCurrent) {
+	$focusing = (focusLevel >= FocusLevel.Paragraph) && (layout !== 'fill' || hasSelection && !justScrolled)
+	console.log({ focusing: $focusing })
+}
+
 $: virtual = $note.meta?.virtual
 
 $: willFixTitle = (fixedTitle ?? $fixedTitleSetting)
@@ -1317,7 +1319,6 @@ function updateCodeBlockSizing() {
 		bind:headerElement
 		bind:headerEditElement
 		{editable}
-		{focusing}
 		preventMouseUpDefault={true}
 		showIcon={showHeaderIcon}
 		showExtension={false}
@@ -1333,7 +1334,7 @@ function updateCodeBlockSizing() {
 		on:blur={onEditorBlur}
 		on:contextmenu={onContextMenu}
 		class="note"
-		class:focusing
+		class:focusing={$focusing}
 	></article>
 	{#if (!editorIsFocused || !editable) && virtual}
 		<div

@@ -21,7 +21,6 @@ onDestroy(() => {
 export let headerElement: HTMLElement = null
 export let headerEditElement: HTMLElement = null
 export let editable = true
-export let focusing = false
 
 export let preventMouseUpDefault = false
 export let showIcon = true
@@ -94,7 +93,6 @@ function onHeaderKeydown(event: KeyboardEvent) {
 
 <!-- svelte-ignore a11y-no-static-element-interactions -->
 <header
-	class:focusing
 	on:mouseup={headerMouseUp}
 	bind:this={headerElement}
 >{#if showIcon}<span class="icon"><NodeIcon {node} size="1em" /></span>{/if}<span
@@ -129,7 +127,7 @@ header {
 	padding-bottom: calc(1em / 2.5);
 
 	transition: opacity .3s;
-	&.focusing {
+	:global(.focusing) & {
 		opacity: .5;
 	}
 

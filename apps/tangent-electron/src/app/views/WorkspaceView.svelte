@@ -28,6 +28,16 @@ setContext('workspace', workspace)
 
 $: focusLevel = workspace.viewState.tangent.focusLevel
 $: targetFocusModeLevel = workspace.viewState.targetFocusModeLevel
+$: focusing = workspace.viewState.focusing
+$: {
+	// It is dumb I have to do this instead of class:focusing={$focusing}
+	if ($focusing) {
+		document.body.classList.add('focusing')
+	}
+	else {
+		document.body.classList.remove('focusing')
+	}
+}
 $: topCommandHandler = createCommandHandler(Object.values(workspace.commands).filter(c => !c.group))
 
 // Top bar

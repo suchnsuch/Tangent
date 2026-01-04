@@ -11,19 +11,23 @@ import { FocusLevel } from 'common/dataTypes/TangentInfo';
 
 export default class WorkspaceViewState extends ObjectStore {
 	
-	workspace: Workspace
+	readonly workspace: Workspace
 
-	directoryView: DirectoryView
-	tagTreeView: DirectoryView
-	leftSidebar: SidebarState
+	readonly directoryView: DirectoryView
+	readonly tagTreeView: DirectoryView
+	readonly leftSidebar: SidebarState
 
-	tangent: Tangent
+	readonly tangent: Tangent
 
-	targetFocusModeLevel: WritableStore<FocusLevel>
+	// The focus level turned to by default when focus is toggled
+	readonly targetFocusModeLevel: WritableStore<FocusLevel>
 
-	modal: ModalState
+	// Whether the editor is currently focusing
+	readonly focusing: WritableStore<boolean>
 
-	system = new SystemMenu()
+	readonly modal: ModalState
+
+	readonly system = new SystemMenu()
 
 	_initializing: boolean = false
 
@@ -44,6 +48,7 @@ export default class WorkspaceViewState extends ObjectStore {
 		this.tangent = new Tangent(this, workspace.client.clientName)
 
 		this.targetFocusModeLevel = new WritableStore(FocusLevel.Typewriter)
+		this.focusing = new WritableStore(false)
 		
 		this.modal = new ModalState()
 	}

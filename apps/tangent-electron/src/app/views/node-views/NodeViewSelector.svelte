@@ -449,7 +449,7 @@ main {
 	white-space: normal;
 	transition: opacity .3s;
 
-	.focusing:not(:hover) & {
+	:global(.focusing) &:not(:hover) {
 		opacity: .5;
 	}
 
