@@ -28,10 +28,6 @@ import AutoCompleteMenu from '../autocomplete/AutoCompleteMenu.svelte'
 import WikiLinkAutocompleteMenu from '../autocomplete/WikiLinkAutocompleteMenu.svelte'
 import type { FileLoadState } from 'app/model/File'
 import { FocusLevel } from 'common/dataTypes/TangentInfo'
-
-import LinkInfoView from 'app/views/summaries/LinkInfoView.svelte'
-import { pluralize } from 'common/plurals'
-import arrowNavigate from 'app/utils/arrowNavigate'
 import { type HrefFormedLink, StructureType } from 'common/indexing/indexTypes'
 import type { ConnectionInfo } from 'common/indexing/indexTypes'
 import { areLineArraysOpTextEquivalent, type EditInfo, getEditInfo, getRangeWhile, rangesAreEquivalent, stripLineAttributes } from 'common/typewriterUtils'
@@ -42,15 +38,12 @@ import { TangentLink } from './t-link';
 import { appendContextTemplate, type ContextMenuConstructorOptions } from 'app/model/menus';
 import { getInitialSelection } from 'common/markdownModel';
 import { marginToAxis, type ScrollToCallback, type ScrollToOptions } from 'app/utils/scrollto';
-import { timedLatch } from 'app/utils/svelte';
-import LazyScrolledList from 'app/utils/LazyScrolledList.svelte';
 import { resolveLink } from 'common/markdownModel/links';
 import type { Annotation } from 'common/nodeReferences';
 import { ForwardingStore, subscribeUntil } from 'common/stores'
 import type { NoteViewState } from 'app/model/nodeViewStates';
 import { getActiveSentenceRange } from 'common/markdownModel/line';
 import paths from 'common/paths';
-import { NoteDetailMode } from 'app/model/nodeViewStates/NoteViewState';
 import TagAutocompleter from '../autocomplete/TagAutocompleter';
 import TagAutocompleteMenu from '../autocomplete/TagAutocompleteMenu.svelte';
 import { getPixelValue } from 'app/utils/style';
@@ -92,7 +85,6 @@ const editor = new MarkdownEditor(workspace)
 let headerElement: HTMLElement
 let headerEditElement: HTMLElement
 let editorElement: HTMLElement
-let detailsElement: HTMLElement
 
 export let state: Pick<NoteViewState, 'note'> & Partial<NoteViewState>
 
@@ -139,11 +131,6 @@ let isEditorMouseDown = false
 let mouseDownX = 0
 let mouseDownY = 0
 
-let detailsOpened = false
-let inLinks: ConnectionInfo[] = null
-const showBacklinks = timedLatch(detailsOpened)
-$: showBacklinks.update(detailsOpened)
-
 $: note = state.note
 
 let annotationHighlightTimeout: number = null
@@ -178,8 +165,6 @@ function onEditorRoot() {
 	editor.root.addEventListener('mouseover', onEditorMouseOver)
 	editor.root.addEventListener('mouseout', onEditorMouseOut)
 
-	updateDetails()
-	
 	editor.modules.tangent?.setNotePath(note.path)
 
 	if (state?.scrollY && layout === 'fill') {
@@ -337,8 +322,6 @@ function onFileChanged(note: NoteFile) {
 		editor.modules.tangent?.setNotePath(note.path)
 		// No need to check for line equivalency: new note means new init
 		skipLineCheck = true
-
-		updateDetails()
 	}
 	if (skipLineCheck || !areLineArraysOpTextEquivalent(note.lines, editor.doc.lines)) {
 		if (saveTimeout) {
@@ -411,9 +394,6 @@ function initializeSelection(_h?, _e?) {
 		if (note.loadState === 'new') {
 			getSelection().selectAllChildren(headerEditElement)
 			headerEditElement.focus()
-		}
-		else if (virtual && detailsElement) {
-			openDetails()
 		}
 		else if ($annotations?.length) {
 			updateAnnotations($annotations)
@@ -645,10 +625,6 @@ function onEditorChange(changeEvent: EditorChangeEvent) {
 
 		workspace.dispatchEvent(new Event('editing'))
 	}
-	
-	if (state.detailMode) {
-		requestCallbackOnIdle(updateDetails)
-	}
 }
 
 function onEditorDecorate(event: DecorateEvent) {
@@ -796,7 +772,8 @@ function applyAnnotations(event?: DecorateEvent) {
 
 function resumeFocus(arg?) {
 	if (arg instanceof Event && virtual) {
-		openDetails()
+		// TODO: Some way of opening details automatically
+		// openDetails()
 		return
 	}
 
@@ -827,12 +804,7 @@ function onNoteKeydown(event: KeyboardEventWithShortcut) {
 		return
 	}
 
-	if (event.modShortcut === 'Mod+Alt+ArrowDown') {
-		event.preventDefault()
-		openDetails()
-		return
-	}
-
+	// TODO: Make into a proper command
 	if (event.modShortcut === 'Mod+F') {
 		event.preventDefault()
 		const selection = editor.doc.selection
@@ -1318,120 +1290,6 @@ function updateCodeBlockSizing() {
 	}
 }
 
-// Details
-function updateDetails() {
-	const detailMode = state.detailMode
-	if ((detailMode & (NoteDetailMode.Words | NoteDetailMode.Characters)) === NoteDetailMode.None) {
-		return	
-	}
-
-	const doc = editor?.doc
-	if (doc) {
-		let result = ''
-
-		const text = doc.getText()
-
-		if (NoteDetailMode.Words === (detailMode & NoteDetailMode.Words)) {
-			result += pluralize(
-				text.match(/\w+/g)?.length ?? 0,
-				'$$ Words',
-				'$$ Word',
-				'No Words')
-		}
-
-		if (NoteDetailMode.Characters === (detailMode & NoteDetailMode.Characters)) {
-			if (result.length > 0) result += ', '
-			result += pluralize(
-				text.length,
-				'$$ Characters',
-				'$$ Character',
-				'No Characters, Yet')
-		}
-
-		stats = result
-	}
-}
-
-function inLinkID(info: ConnectionInfo) {
-	return `${info.from}_${info.start}-${info.end}`
-}
-
-$: updateInLinks(state, $note)
-function updateInLinks(state, note) {
-	if (NoteDetailMode.Details === (state.detailMode & NoteDetailMode.Details)) {
-		const newLinks = note.meta?.inLinks
-		if (newLinks !== inLinks) {
-			inLinks = newLinks?.sort((a, b) => {
-				if (a.from > b.from) {
-					return 1
-				}
-				if (a.from < b.from) {
-					return -1
-				}
-				return 0
-			})
-		}
-	}
-}
-
-function toggleOpenDetails(event: MouseEvent) {
-	if (NoteDetailMode.Details !== (state.detailMode & NoteDetailMode.Details)) {
-		return
-	}
-	if (!detailsOpened) {
-		openDetails()
-	}
-	else {
-		detailsOpened = false
-	}
-}
-
-function openDetails() {
-	detailsOpened = true
-	showBacklinks.update(detailsOpened)
-
-	// Details need to be rendered in
-	tick().then(() => {
-		if (!detailsElement) return
-		let target = detailsElement.querySelector('.inLinks .lazy-list-items :first-child')
-		if (target instanceof HTMLElement) {
-			target.focus({
-				preventScroll: true
-			})
-		}
-		else {
-			let target = detailsElement.querySelector('.inLinks')
-			if (target instanceof HTMLElement) {
-				target.focus({ preventScroll: true })
-			}
-		}
-	})
-}
-
-function onDetailKeydown(event: KeyboardEventWithShortcut) {
-	if (event.defaultPrevented) return
-
-	addShortcutsToEvent(event)
-
-	if (event.key === 'Escape' || event.modShortcut === 'Mod+Alt+ArrowDown' || event.modShortcut === 'Mod+Alt+ArrowUp') {
-		event.preventDefault()
-
-		detailsOpened = false
-		resumeFocus()
-	}
-}
-
-function onDetailsContexMenu(event: MouseEvent) {
-	appendContextTemplate(event, [
-		{
-			label: 'Open Backlink Documentation',
-			click: () => {
-				workspace.api.documentation.open('Backlinks')
-			}
-		}
-	], 'bottom')
-}
-
 </script>
 
 <!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
@@ -1443,7 +1301,6 @@ function onDetailsContexMenu(event: MouseEvent) {
 	on:mouseleave={onMouseLeave}
 	on:wheel={onWheel}
 	on:keydown={onNoteKeydown}
-	on:focusin={e => detailsOpened = false}
 	bind:this={container}
 	class={`noteEditor layout-${layout} background-${background} margins-${$margins}`}
 	class:editable={editable}
@@ -1504,66 +1361,6 @@ function onDetailsContexMenu(event: MouseEvent) {
 	<LineGutterLeft {editor} target={leftHoverdLineTarget} />
 	<LineGutterRight {editor} target={rightHoveredLineTarget} />
 </main>
-
-{#if state.detailMode}
-{@const detailMode = state.detailMode}
-{@const canOpenDetails = NoteDetailMode.Details === (detailMode & NoteDetailMode.Details)}
-<!-- svelte-ignore a11y-no-static-element-interactions -->
-<div
-	class="details"
-	class:focusing
-	class:open={detailsOpened}
-	class:openable={canOpenDetails}
-	bind:this={detailsElement}
-	on:keydown={onDetailKeydown}
->
-	<!-- svelte-ignore a11y-click-events-have-key-events -->
-	<div class="detailsInfoBar detailsBlock"
-		on:click={ toggleOpenDetails }>
-
-		<span class="links">
-			{#if NoteDetailMode.LinkSummary === (detailMode & NoteDetailMode.LinkSummary)}
-				{pluralize(
-					inLinks?.length ?? 0,
-					'$$ Incoming Links',
-					'$$ Incoming Link',
-					'No Incoming Links')}
-			{/if}
-		</span>
-		
-		<span class="seperator"></span>
-		<span class="stats">{stats}</span>
-	</div>
-	{#if canOpenDetails}
-		<main on:contextmenu={onDetailsContexMenu}>
-			{#if $showBacklinks}
-				{#if inLinks?.length}
-					<div class="inLinks detailsBlock"
-						use:arrowNavigate={{
-							containerSelector: '.lazy-list-items',
-							scrollTime: 100
-						}}
-						tabindex="-1"
-					>
-						<LazyScrolledList items={inLinks} itemID={inLinkID}>
-							<LinkInfoView
-								slot="item"
-								let:item={link}
-								{link}
-								target="from"
-								className="button focusable"
-								onSelect={direction => navigateTo(link, direction)}
-							/>
-						</LazyScrolledList>
-					</div>
-				{:else}
-					<div class="inLinks inLinks-empty detailsBlock" tabindex="-1">No Incoming Links</div>
-				{/if}
-			{/if}
-		</main>
-	{/if}
-</div>
-{/if}
 
 {#if fallbackErrors?.length}
 <div class="fallbackWarning" style={`top: ${extraTop + 10}px;`}
@@ -1642,7 +1439,7 @@ main {
 	}
 }
 
-article, .detailsBlock {
+article {
 	&:focus {
 		outline: none;
 	}
@@ -1668,93 +1465,6 @@ article, .detailsBlock {
 		right: 0;
 		top: var(--noContentOffset);
 	}
-}
-
-.details {
-	position: absolute;
-	z-index: 10;
-	left: 0;
-	right: 0;
-	bottom: 0;
-
-	display: flex;
-	flex-direction: column;
-
-	transform: translateY(calc(100% - 24px));
-	background: var(--noteBackgroundColor);
-
-	transition: transform .5s, box-shadow .5s;
-
-	max-height: 80%;
-	overflow: hidden;
-
-	&.open {
-		transform: translateY(0);
-		box-shadow: 0 0 10px rgba(0, 0, 0, .3);
-	}
-
-	main {
-		overflow-y: auto;
-		padding-bottom: 2em;
-	}
-}
-
-.detailsInfoBar {
-	font-size: 70%;
-	box-sizing: border-box;
-	height: 24px;
-	width: 100%;
-	padding: 4px 10px 4px 6px;
-	flex-grow: 0;
-	flex-shrink: 0;
-
-	display: grid;
-	grid-template-columns: max-content 1fr max-content;
-	align-items: center;
-
-	white-space: normal;
-	transition: opacity .3s;
-
-	.focusing:not(:hover) & {
-		opacity: .5;
-	}
-
-	.seperator {
-		flex-grow: 1;
-	}
-	
-	.openable & {
-		cursor: pointer;
-	}
-}
-
-.inLinks :global(.lazy-list-items) {
-	display: grid;
-	grid-template-columns: .5fr .5fr;
-	grid-auto-rows: auto;
-	grid-auto-flow: dense;
-
-	column-gap: 8px;
-	row-gap: 8px;
-	padding: 8px;
-
-	> :global(*) {
-		max-height: 12em;
-
-		:global(.link-cursor-directional) & {
-			cursor: e-resize;
-		}
-		:global(.link-cursor-directional.alt-pressed) & {
-			cursor: w-resize;
-		}
-	}
-}
-
-.inLinks-empty {
-	text-align: center;
-	color: var(--deemphasizedTextColor);
-	margin: 1em;
-	font-style: italic;
 }
 
 .fallbackWarning {
