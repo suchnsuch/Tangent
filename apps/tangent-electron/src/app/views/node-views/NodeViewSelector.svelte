@@ -29,6 +29,8 @@ export var focusLevel: FocusLevel = FocusLevel.Thread
 export let layout: 'fill' | 'auto' = 'fill'
 export let background: 'auto' | 'none' = 'auto'
 
+export let showDetails = true
+
 /** The number of extra pixels to pad the top by */
 export let extraTop = 0
 export let extraBottom = 0
@@ -55,13 +57,13 @@ let settingsHeight: number = extraTop
 
 $: node = state.node instanceof WorkspaceTreeNode ? state.node : null
 $: detailsState = state.details
-$: canShowDetails = node && detailsState != null
+$: canShowDetails = showDetails && node && detailsState != null
 $: canOpenDetails = canShowDetails && $detailsState?.open !== null
 $: areDetailsOpen = canShowDetails && $detailsState?.open
 
-const showDetails = timedLatch(false)
-$: showDetails.update(areDetailsOpen)
-$: if ($showDetails && detailsContainer) {
+const effectiveShowDetails = timedLatch(false)
+$: effectiveShowDetails.update(areDetailsOpen)
+$: if ($effectiveShowDetails && detailsContainer) {
 	let target = detailsContainer.querySelector('.focusable')
 	if (target instanceof HTMLElement) {
 		target.focus({
@@ -192,7 +194,7 @@ function openDetails() {
 			open: true
 		}
 	})
-	showDetails.update(true)
+	effectiveShowDetails.update(true)
 
 	tick().then(() => {
 		if (!detailsContainer) return
@@ -330,7 +332,7 @@ function onDetailKeydown(event: KeyboardEvent) {
 				{/if}
 			</div>
 
-			{#if $showDetails && detailsComponent}
+			{#if $effectiveShowDetails && detailsComponent}
 				<main bind:this={detailsContainer}>
 					<svelte:component
 						this={detailsComponent}

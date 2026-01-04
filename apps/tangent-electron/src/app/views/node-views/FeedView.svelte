@@ -369,6 +369,7 @@ function extraBottomClick(event: MouseEvent) {
 				isCurrent={isCurrent && item === $currentItem}
 				background="none"
 				layout="auto"
+				showDetails={false}
 				focusLevel={overrideRealFocus ? FocusLevel.Thread : focusLevel}
 				onNavigate={data => forwardNavigation(data, item)}
 				onViewReady={() => handleViewReady(item)}
