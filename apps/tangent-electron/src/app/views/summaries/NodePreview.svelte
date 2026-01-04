@@ -10,6 +10,7 @@ import NoteEditor from '../editors/NoteEditor/NoteEditor.svelte'
 import NodeIcon from '../smart-icons/NodeIcon.svelte'
 import { NoteDetailMode } from 'app/model/nodeViewStates/NoteViewState'
 import PdfPreview from '../node-views/PdfPreview.svelte'
+import NoteDetailsSummary from './NoteDetailsSummary.svelte'
 
 const workspace: Workspace = getContext('workspace')
 
@@ -29,13 +30,14 @@ export let noteDetailMode: NoteDetailMode = NoteDetailMode.None
 	{@const ref = isReference(item) ? item : null}
 	
 	{#if node instanceof NoteFile}
+		{@const noteState = {
+			// A bit messy, but faster than an entire view state
+			note: node,
+			annotations: ref?.annotations ? new WritableStore(ref.annotations) : undefined,
+			detailMode: noteDetailMode
+		}}
 		<NoteEditor
-			state={{
-				note: node,
-				// A bit messy, but faster than an entire viewstate
-				annotations: ref?.annotations ? new WritableStore(ref.annotations) : undefined,
-				detailMode: noteDetailMode
-			}}
+			state={noteState}
 			{background}
 			{layout}
 			allowOverscroll={false}
@@ -44,6 +46,13 @@ export let noteDetailMode: NoteDetailMode = NoteDetailMode.None
 			extraBottom={20}
 			showHeaderIcon={noteShowHeaderIcon}
 		/>
+		{#if noteDetailMode != NoteDetailMode.None}
+			<div class="detailsInfoBar">
+				<span></span>
+				<span class="separator"></span>
+				<NoteDetailsSummary state={noteState} mode={noteDetailMode} />
+			</div>
+		{/if}
 	{:else if node instanceof Folder}
 		{@const children = node.children?.length ? [...node.visibleChildren()] : []}
 		<div class={"folderCard " + layout}>
@@ -244,6 +253,27 @@ export let noteDetailMode: NoteDetailMode = NoteDetailMode.None
 			min-width: 200px;
 		}
 	}
+}
+
+.detailsInfoBar {
+	position: absolute;
+	z-index: 10;
+	left: 0;
+	right: 0;
+	bottom: 0;
+
+	background: var(--noteBackgroundColor);
+
+	font-size: 70%;
+	box-sizing: border-box;
+	height: 24px;
+	padding: 4px 10px 4px 6px;
+	flex-grow: 0;
+	flex-shrink: 0;
+
+	display: grid;
+	grid-template-columns: max-content 1fr max-content;
+	align-items: center;
 }
 
 </style>

@@ -5,10 +5,14 @@ import type { NoteViewState } from 'app/model/nodeViewStates'
 import { NoteDetailMode } from 'app/model/nodeViewStates/NoteViewState'
 
 interface Props {
-	state: NoteViewState
+	state: Pick<NoteViewState, 'note'> & Partial<NoteViewState>
+	mode?: NoteDetailMode
 }
 
-let { state: noteViewState }: Props = $props()
+let {
+	state: noteViewState,
+	...props
+}: Props = $props()
 
 let note = $derived(noteViewState.note)
 let stats = $state('')
@@ -28,7 +32,7 @@ $effect(() => {
 })
 
 function updateDetails() {
-	const detailMode = noteViewState.detailMode
+	const detailMode = props.mode ?? noteViewState.detailMode
 	if ((detailMode & (NoteDetailMode.Words | NoteDetailMode.Characters)) === NoteDetailMode.None) {
 		return	
 	}

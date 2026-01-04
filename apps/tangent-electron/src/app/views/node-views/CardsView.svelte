@@ -139,7 +139,7 @@ function sendViewReady() {
 				border-top-right-radius: var(--borderRadius);
 			}
 
-			:global(.details) {
+			:global(.detailsInfoBar) {
 				// Fix details overlap since the details have background color
 				border-bottom-left-radius: var(--borderRadius);
 				border-bottom-right-radius: var(--borderRadius);
