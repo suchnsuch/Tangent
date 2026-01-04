@@ -18,6 +18,7 @@ export let editable: boolean = true
 
 export let layout: 'fill' | 'auto' = 'fill'
 export let extraTop: number = 0
+export let extraBottom: number = 0
 
 let container: HTMLDivElement
 let viewerElement: HTMLDivElement
@@ -71,6 +72,7 @@ function onClick(event: MouseEvent) {
 	class:layout-fill={layout === 'fill'}
 	style:--noteWidthMax={$maxWidth + 'px'}
 	style:padding-top={extraTop + 'px'}
+	style:padding-bottom={extraBottom + 'px'}
 >
 	<WorkspaceFileHeader
 		node={state.file}

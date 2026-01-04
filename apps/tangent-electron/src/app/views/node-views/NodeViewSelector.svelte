@@ -15,6 +15,7 @@ import { timedLatch } from 'app/utils/svelte'
 import DetailBacklinksView from './DetailBacklinksView.svelte'
 import { pluralize } from 'common/plurals'
 import { WorkspaceTreeNode } from 'app/model'
+import { shortcutFromEvent } from 'app/utils/shortcuts'
 
 const workspace = getContext('workspace') as Workspace
 
@@ -29,7 +30,8 @@ export let layout: 'fill' | 'auto' = 'fill'
 export let background: 'auto' | 'none' = 'auto'
 
 /** The number of extra pixels to pad the top by */
-export var extraTop: number = 0
+export let extraTop = 0
+export let extraBottom = 0
 
 export let onNavigate: NavigationCallback
 export let onScrollRequest: ScrollToCallback = null
@@ -104,6 +106,10 @@ function onMouseMoveContainer(event: MouseEvent) {
 	}
 }
 
+function onFocusInContainer(event: FocusEvent) {
+	// TODO: Close details if not within details
+}
+
 let hoverTimeout = null
 function onSettingsEnter() {
 	if (hoverTimeout) clearTimeout(hoverTimeout)
@@ -149,7 +155,7 @@ function getClassNamesForNode(node: TreeNode) {
 	return classes
 }
 
-function toggleOpenDetails(event: MouseEvent) {
+function toggleOpenDetails() {
 	if (!canOpenDetails) return
 	if (areDetailsOpen) {
 		detailsState.update(details => {
@@ -184,6 +190,19 @@ function openDetails() {
 	})
 }
 
+function onDetailKeydown(event: KeyboardEvent) {
+	if (event.defaultPrevented) return
+
+	const shortcut = shortcutFromEvent(event)
+	// TODO: Make into proper commands
+	if (event.key === 'Escape' || shortcut === 'Mod+Alt+ArrowDown' || shortcut === 'Mod+Alt+ArrowUp') {
+		event.preventDefault()
+		toggleOpenDetails()
+
+		if (state.focus) state.focus(container)
+	}
+}
+
 </script>
 
 <main
@@ -192,6 +211,7 @@ function openDetails() {
 	on:mouseenter={onMouseEnterContainer}
 	on:mouseleave={onMouseLeaveContainer}
 	on:mousemove={onMouseMoveContainer}
+	on:focusin={onFocusInContainer}
 >
 	{#if lensState && viewComponent}
 		<svelte:component
@@ -202,6 +222,7 @@ function openDetails() {
 			{layout}
 			{background}
 			extraTop={willPinSettings ? settingsHeight ?? extraTop : extraTop}
+			extraBottom={extraBottom + (canShowDetails ? 24 : 0)}
 			{onNavigate}
 			{onViewReady}
 			{onScrollRequest}
@@ -271,10 +292,12 @@ function openDetails() {
 	{/if}
 
 	{#if canShowDetails}
+		<!-- svelte-ignore a11y_no_static_element_interactions -->
 		<div
 			class="details"
 			class:open={areDetailsOpen}
 			class:openable={canOpenDetails}
+			on:keydown={onDetailKeydown}
 		>
 			<!-- svelte-ignore a11y_click_events_have_key_events -->
 			<!-- svelte-ignore a11y_no_static_element_interactions -->
@@ -388,6 +411,14 @@ main {
 		overflow-y: auto;
 		padding-bottom: 2em;
 	}
+}
+
+.detailsBlock {
+	white-space: pre-wrap;
+
+	max-width: var(--noteWidthMax);
+	box-sizing: border-box;
+	margin: 0 auto;
 }
 
 .detailsInfoBar {

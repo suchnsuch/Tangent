@@ -25,6 +25,7 @@ const maxWidth = workspace.settings.noteWidthMax
 // TODO: This should eventually be some interface
 export let state: FeedViewState
 export let extraTop: number = 0
+export let extraBottom: number = 0
 export let isCurrent: boolean
 export let focusLevel: FocusLevel
 
@@ -48,7 +49,8 @@ $: startAt = state.settings.startAt
 
 let feedContainer: HTMLElement
 let _initialized = false
-let extraBottom = 0
+let computedExtraBottom = 0
+$: effectiveExtraBottom = extraBottom + computedExtraBottom
 
 /**
  * We don't want to restore cached scroll until all displayed items are ready to go.
@@ -167,7 +169,7 @@ $: if (feedNodes) loadNextIfAppropriate()
 $: updateFeedContainer(feedContainer, feedNodes, _initialized)
 function updateFeedContainer(container: HTMLElement, items: TreeNodeOrReference[], initialized) {
 	if (!initialized && container && items.length) {
-		extraBottom = container.getBoundingClientRect().height * .8
+		computedExtraBottom = container.getBoundingClientRect().height * .8
 		_initialized = true
 		if ($scrollY < 0) {
 			tick().then(() => {
@@ -263,7 +265,7 @@ function loadNextIfAppropriate() {
 	if (!feedContainer || waitingOn) return
 	
 	const rect = feedContainer.getBoundingClientRect()
-	if (feedContainer.scrollHeight - feedContainer.scrollTop - rect.height < extraBottom) {
+	if (feedContainer.scrollHeight - feedContainer.scrollTop - rect.height < effectiveExtraBottom) {
 		let visibleIndex = feedNodes.indexOf($lastItem)
 		if (visibleIndex === feedNodes.length - 1) {
 			let [start, end] = feedRange
@@ -375,7 +377,7 @@ function extraBottomClick(event: MouseEvent) {
 		</div>
 	{/each}
 	<!-- svelte-ignore a11y-click-events-have-key-events -->
-	<div class="extraBottom" style:height={`${extraBottom}px`} on:click={extraBottomClick}></div>
+	<div class="extraBottom" style:height={`${effectiveExtraBottom}px`} on:click={extraBottomClick}></div>
 	
 </div>
 

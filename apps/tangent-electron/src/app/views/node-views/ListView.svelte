@@ -14,6 +14,7 @@ const workspace = getContext('workspace') as Workspace
 export let state: ListViewState
 export let layout: 'fill' | 'auto' = 'fill'
 export let extraTop: number = 0
+export let extraBottom: number = 0
 
 export let onNavigate: NavigationCallback = null
 
@@ -33,7 +34,8 @@ function nodeClick(event, ref: TreeNodeOrReference) {
 
 <main
 	class={`layout-${layout}`}
-	style:padding-top={`${extraTop}px`}
+	style:padding-top={extraTop + 'px'}
+	style:padding-bottom={extraBottom + 'px'}
 >
 	{#if (state.parent instanceof BaseSetViewState && state.parent.isLensOverridden) && state.parent.node instanceof WorkspaceTreeNode}
 		<WorkspaceFileHeader node={state.parent.node} showExtension={false} editable={false} />

@@ -1,15 +1,19 @@
 <script lang="ts">
+	import { getContext } from 'svelte'
 import type { TreeNode } from 'common/trees'
 import type { NodeViewState } from 'app/model/nodeViewStates'
+import { appendContextTemplate } from 'app/model/menus'
 import type { ConnectionInfo, HrefFormedLink } from 'common/indexing/indexTypes'
 import type { NavigationCallback } from 'app/events'
-import { WorkspaceTreeNode } from 'app/model'
+import { Workspace, WorkspaceTreeNode } from 'app/model'
 import arrowNavigate from 'app/utils/arrowNavigate'
 import LazyScrolledList from 'app/utils/LazyScrolledList.svelte'
 import LinkInfoView from '../summaries/LinkInfoView.svelte'
 
 export let state: NodeViewState
 export let onNavigate: NavigationCallback
+
+let workspace = getContext('workspace') as Workspace
 
 $: node = state.node instanceof WorkspaceTreeNode ? state.node : null
 let inLinks: ConnectionInfo[] = null
@@ -50,16 +54,29 @@ function navigateTo(event: Event, inLink: ConnectionInfo, direction: 'in' | 'out
 	})
 }
 
+function onDetailsContextMenu(event: MouseEvent) {
+	appendContextTemplate(event, [
+		{
+			label: 'Open Backlink Documentation',
+			click: () => {
+				workspace.api.documentation.open('Backlinks')
+			}
+		}
+	], 'bottom')
+}
+
 </script>
 
 <main>
 {#if inLinks?.length}
+	<!-- svelte-ignore a11y_no_static_element_interactions -->
 	<div class="inLinks detailsBlock"
 		use:arrowNavigate={{
 			containerSelector: '.lazy-list-items',
 			scrollTime: 100
 		}}
 		tabindex="-1"
+		oncontextmenu={onDetailsContextMenu}
 	>
 		<LazyScrolledList items={inLinks} itemID={inLinkID}>
 			<LinkInfoView

@@ -18,6 +18,7 @@ const needsAltToScroll = workspace.settings.cardViewCardsHoldAltToScroll
 
 export let state: CardsViewState
 export let extraTop: number = 0
+export let extraBottom: number = 0
 
 export let onNavigate: (data: NavigationData) => void
 export let onViewReady: () => void
@@ -63,7 +64,8 @@ function sendViewReady() {
 </script>
 
 <div class="cards" class:layout-fill={layout === 'fill'} class:needs-alt={$needsAltToScroll}
-	style:padding-top={`${extraTop}px`}
+	style:padding-top={extraTop + 'px'}
+	style:padding-bottom={extraBottom + 'px'}
 	style:--noteBackgroundColor="var(--backgroundColor)"
 >
 	<!-- svelte-ignore a11y-click-events-have-key-events -->
