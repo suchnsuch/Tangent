@@ -304,7 +304,7 @@ export function buildMainMenu(workspace: Workspace): MenuItemConstructorOptions[
 					label: '    Sentence',
 					command: cmds.setSentenceFocusLevel
 				},
-				{ command: cmds.showIncomingLinks },
+				{ command: cmds.openDetails },
 				{ type: 'separator' },
 				{ command: cmds.collapseCurrentSection },
 				{ command: cmds.collapseAllSections },

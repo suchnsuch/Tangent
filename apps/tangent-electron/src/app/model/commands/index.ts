@@ -38,6 +38,7 @@ import { NativeCommand } from './NativeCommand'
 import { OpenDocumentationCommand } from './OpenDocumentation'
 import { DeleteSidebarItem, RenameSidebarItem } from './SidebarCommands'
 import { CopyFileToClipboardCommand } from './CopyFileToClipboard'
+import { OpenDetailsCommand } from './DetailCommands'
 export { Command, CommandAction, type WorkspaceCommand }
 
 type LiteralCommands = ReturnType<typeof createAllCommands>
@@ -326,12 +327,15 @@ function createAllCommands(workspace: Workspace) {
 			shortcut: 'Mod+Alt+.'
 		}),
 
-		showIncomingLinks: new NoteKeyboardProxyCommand(workspace, {
+		openDetails: new OpenDetailsCommand(workspace, {
 			shortcut: 'Mod+Alt+Down',
-			label: 'Show Incoming Links',
-			focus: true,
-			tooltip: 'Opens the information panel of the current note, revealing any links to that note from other notes.'
+			mode: 'toggle' // When possible, having the same command close a panel it just opened is preferable
 		}),
+		closeDetails: new OpenDetailsCommand(workspace, {
+			shortcuts: ['Escape', 'Mod+Alt+Up'],
+			mode: false,
+			group: 'Details'
+		})
 	}
 }
 

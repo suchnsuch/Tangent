@@ -15,7 +15,7 @@ import { timedLatch } from 'app/utils/svelte'
 import DetailBacklinksView from './DetailBacklinksView.svelte'
 import { pluralize } from 'common/plurals'
 import { WorkspaceTreeNode } from 'app/model'
-import { shortcutFromEvent } from 'app/utils/shortcuts'
+import { createCommandHandler } from 'app/model/commands/Command'
 
 const workspace = getContext('workspace') as Workspace
 
@@ -58,8 +58,18 @@ $: detailsState = state.details
 $: canShowDetails = node && detailsState != null
 $: canOpenDetails = canShowDetails && $detailsState?.open !== null
 $: areDetailsOpen = canShowDetails && $detailsState?.open
+
 const showDetails = timedLatch(false)
 $: showDetails.update(areDetailsOpen)
+$: if ($showDetails && detailsContainer) {
+	let target = detailsContainer.querySelector('.focusable')
+	if (target instanceof HTMLElement) {
+		target.focus({
+			preventScroll: true
+		})
+	}
+}
+
 $: detailsComponent = getDetailsComponent($detailsState)
 function getDetailsComponent(state: DetailsViewState) {
 	if (!state?.tab || state.tab === 'backlinks') {
@@ -67,7 +77,12 @@ function getDetailsComponent(state: DetailsViewState) {
 	}
 	return null
 }
+
 let detailsContainer: HTMLElement
+let closeDetailsCommands = createCommandHandler([
+	workspace.commands.openDetails,
+	workspace.commands.closeDetails
+])
 
 function onSettingsResize(entries: ResizeObserverEntry[]) {
 	const entry = entries[0]
@@ -193,13 +208,8 @@ function openDetails() {
 function onDetailKeydown(event: KeyboardEvent) {
 	if (event.defaultPrevented) return
 
-	const shortcut = shortcutFromEvent(event)
-	// TODO: Make into proper commands
-	if (event.key === 'Escape' || shortcut === 'Mod+Alt+ArrowDown' || shortcut === 'Mod+Alt+ArrowUp') {
-		event.preventDefault()
-		toggleOpenDetails()
-
-		if (state.focus) state.focus(container)
+	if (closeDetailsCommands(event) && state.focus) {
+		state.focus(container)
 	}
 }
 

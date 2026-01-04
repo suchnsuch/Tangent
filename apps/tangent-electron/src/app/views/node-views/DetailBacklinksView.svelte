@@ -90,7 +90,7 @@ function onDetailsContextMenu(event: MouseEvent) {
 		</LazyScrolledList>
 	</div>
 {:else}
-	<div class="inLinks inLinks-empty detailsBlock" tabindex="-1">No Incoming Links</div>
+	<div class="inLinks inLinks-empty detailsBlock focusable" tabindex="-1">No Incoming Links</div>
 {/if}
 </main>
 
