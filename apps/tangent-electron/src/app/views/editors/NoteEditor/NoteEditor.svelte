@@ -142,7 +142,6 @@ $: updateAnnotations($annotations, $annotationIndex)
 $: focusing = workspace.viewState.focusing
 $: if (isCurrent) {
 	$focusing = (focusLevel >= FocusLevel.Paragraph) && (layout !== 'fill' || hasSelection && !justScrolled)
-	console.log({ focusing: $focusing })
 }
 
 $: virtual = $note.meta?.virtual

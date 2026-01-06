@@ -23,6 +23,7 @@ import { createContentIdMatcher } from 'common/markdownModel/links'
 import { deepEqual } from 'fast-equals'
 import type { SvelteConstructor } from 'app/utils/svelte'
 import NoteDetailsSummary from 'app/views/summaries/NoteDetailsSummary.svelte'
+import { selectDetailsPane } from 'app/utils/selection'
 
 export enum NoteDetailMode {
 	None = 0,
@@ -65,7 +66,7 @@ export default class NoteViewState implements NodeViewState, LensViewState {
 	readonly currentLens: ReadableStore<LensViewState>
 	readonly pinSettings: Readable<boolean>
 
-	readonly details: Writable<DetailsViewState> = new WritableStore<DetailsViewState>(null)
+	readonly details = new WritableStore<DetailsViewState>(null)
 
 	// Forwarded state values
 	readonly selection: WritableStore<EditorRange>
@@ -196,6 +197,9 @@ export default class NoteViewState implements NodeViewState, LensViewState {
 	}
 
 	focus(element: HTMLElement) {
+		if (!element) return false
+		if (this.details?.value?.open && selectDetailsPane(element)) return true
+		
 		const list = element?.querySelectorAll('.noteEditor')
 		if (list) {
 			let targetEditorElement: HTMLElement = null

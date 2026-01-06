@@ -16,6 +16,7 @@ import DetailBacklinksView from './DetailBacklinksView.svelte'
 import { pluralize } from 'common/plurals'
 import { WorkspaceTreeNode } from 'app/model'
 import { createCommandHandler } from 'app/model/commands/Command'
+import { selectDetailsPane } from 'app/utils/selection'
 
 const workspace = getContext('workspace') as Workspace
 
@@ -63,13 +64,10 @@ $: areDetailsOpen = canShowDetails && $detailsState?.open
 
 const effectiveShowDetails = timedLatch(false)
 $: effectiveShowDetails.update(areDetailsOpen)
-$: if ($effectiveShowDetails && detailsContainer) {
-	let target = detailsContainer.querySelector('.focusable')
-	if (target instanceof HTMLElement) {
-		target.focus({
-			preventScroll: true
-		})
-	}
+$: if ($effectiveShowDetails && container) {
+	tick().then(() => {
+		selectDetailsPane(container)
+	})
 }
 
 $: detailsComponent = getDetailsComponent($detailsState)
@@ -80,7 +78,6 @@ function getDetailsComponent(state: DetailsViewState) {
 	return null
 }
 
-let detailsContainer: HTMLElement
 let closeDetailsCommands = createCommandHandler([
 	workspace.commands.openDetails,
 	workspace.commands.closeDetails
@@ -183,28 +180,13 @@ function toggleOpenDetails() {
 		})
 	}
 	else {
-		openDetails()
+		detailsState.update(details => {
+			return {
+				...details,
+				open: true
+			}
+		})
 	}
-}
-
-function openDetails() {
-	detailsState.update(details => {
-		return {
-			...details,
-			open: true
-		}
-	})
-	effectiveShowDetails.update(true)
-
-	tick().then(() => {
-		if (!detailsContainer) return
-		let target = detailsContainer.querySelector('.focusable')
-		if (target instanceof HTMLElement) {
-			target.focus({
-				preventScroll: true
-			})
-		}
-	})
 }
 
 function onDetailKeydown(event: KeyboardEvent) {
@@ -333,7 +315,7 @@ function onDetailKeydown(event: KeyboardEvent) {
 			</div>
 
 			{#if $effectiveShowDetails && detailsComponent}
-				<main bind:this={detailsContainer}>
+				<main>
 					<svelte:component
 						this={detailsComponent}
 						{state}
