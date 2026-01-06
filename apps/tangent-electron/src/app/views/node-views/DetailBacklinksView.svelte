@@ -38,8 +38,7 @@ function inLinkID(info: ConnectionInfo) {
 	return `${info.from}_${info.start}-${info.end}`
 }
 
-function navigateTo(event: Event, inLink: ConnectionInfo, direction: 'in' | 'out') {
-	event.stopPropagation()
+function navigateTo(inLink: ConnectionInfo, direction: 'in' | 'out') {
 	let link: HrefFormedLink = {
 		...inLink,
 		href: inLink.from,
@@ -85,7 +84,7 @@ function onDetailsContextMenu(event: MouseEvent) {
 				{link}
 				target="from"
 				className="button focusable"
-				on:select={e => navigateTo(e, link, e.detail.direction)}
+				onSelect={direction => navigateTo(link, direction)}
 			/>
 		</LazyScrolledList>
 	</div>
