@@ -1,6 +1,7 @@
 import { EditorRange, Line, normalizeRange, TextChange, TextDocument } from '@typewriter/document'
 import { lineToText } from 'common/typewriterUtils'
 import { lineIsMultiLineFormat } from './line'
+import { deepEqual } from 'fast-equals'
 
 /**
  * 
@@ -59,7 +60,7 @@ export function compareSectionDepth(lineA: Line, lineB: Line): number | true {
 	const codeB = attrB?.code
 	if (codeA && codeB) {
 		// If its the same, they're the same
-		if (codeA === codeB) return true
+		if (deepEqual(codeA, codeB)) return true
 		// Otherwise just equivalent
 		return 0
 	}
