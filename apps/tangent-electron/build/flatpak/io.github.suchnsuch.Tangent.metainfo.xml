@@ -87,6 +87,13 @@
   <update_contact>k8ie_AT_mcld.eu</update_contact>
 
   <releases>
+    <release version="0.11.4" date="2026-01-08">
+      <description>
+        <ul>
+          <li>Fixed an issue where you could not collapse second tier list items.</li>
+        </ul>
+      </description>
+    </release>
     <release version="0.11.3" date="2026-01-08">
       <description>
         <ul>
