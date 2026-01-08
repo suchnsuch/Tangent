@@ -90,9 +90,15 @@ function shouldHideSource(context: CodeParsingContext) {
 
 export function parseCodeBlock(char: string, parser: NoteParser): boolean {
 	if (char !== '`' || !parser.isStartOfContent) return false
+	// At least three sequential backticks are required
 	if (!parser.feed.checkFor('```')) return false
 
 	const { feed, builder } = parser
+	
+	const start = feed.index - 2
+	const startCount = 2 + feed.consumeSequentialCharacters('`')
+	// The `+` allows closing lines to be longer, which follows CommonMark: https://spec.commonmark.org/0.31.2/#example-124
+	const formatMatcher = new RegExp('^' + feed.substring(start, start + startCount) + '+$')
 
 	const indent = parser.getCurrentIndent()
 
@@ -134,7 +140,7 @@ export function parseCodeBlock(char: string, parser: NoteParser): boolean {
 		code: '',
 		isAtEnd: (char, parser, context) => {
 			const line = parser.feed.getLineText()
-			if (line.trimEnd() === '```') {
+			if (line.trimEnd().match(formatMatcher)) {
 				parser.feed.nextByLength(line.length)
 				
 				return true
