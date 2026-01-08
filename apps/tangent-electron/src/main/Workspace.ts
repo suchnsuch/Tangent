@@ -410,7 +410,7 @@ export default class Workspace {
 				}
 
 				try {
-					log.info(`Creating a virtual node from "${chalk.green(link.href)}" at "${chalk.grey(newPath)}".`)
+					log.debug(`Creating a virtual node from "${chalk.green(link.href)}" at "${chalk.grey(newPath)}".`)
 					const newNode = this.createFile(null, newPath, IndexData.blankVirtual())
 
 					return newNode
