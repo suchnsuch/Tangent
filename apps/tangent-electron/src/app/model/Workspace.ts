@@ -406,6 +406,7 @@ export default class Workspace extends EventDispatcher {
 					if (result !== DirectoryStoreAddResult.Success) {
 						console.error('Did not move', item, DirectoryStoreAddResult.describe(result), change)
 					}
+					changed = true
 				}
 				else {
 					changed = this.directoryStore.integrate(
