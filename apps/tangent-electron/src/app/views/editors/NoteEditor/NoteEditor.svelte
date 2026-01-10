@@ -1014,8 +1014,11 @@ function onMouseMove(event: MouseEvent) {
 		const lineElement = lines.item(i) as HTMLElement
 		const lineBounds = lineElement.getBoundingClientRect()
 
+		const leftBound = Math.min(bounds.left, lineBounds.left)
+		const rightBound = Math.max(bounds.right, lineBounds.right)
+
 		if (event.clientY > lineBounds.top && event.clientY <= lineBounds.bottom) {
-			if (event.clientX > lineBounds.left - 50 && event.clientX < lineBounds.left + 150) {
+			if (event.clientX > leftBound - 50 && event.clientX < lineBounds.left + 150) {
 				if (leftHoverdLineTarget?.element !== lineElement) {
 					leftHoverdLineTarget = {
 						element: lineElement,
@@ -1025,7 +1028,7 @@ function onMouseMove(event: MouseEvent) {
 				clearLeft = false
 			}
 
-			if (event.clientX > lineBounds.right - 150 && event.clientX < lineBounds.right + 50) {
+			if (event.clientX > lineBounds.right - 150 && event.clientX < rightBound + 50) {
 				if (rightHoveredLineTarget?.element !== lineElement) {
 					rightHoveredLineTarget = {
 						element: lineElement,

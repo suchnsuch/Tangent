@@ -87,7 +87,29 @@
   <update_contact>k8ie_AT_mcld.eu</update_contact>
 
   <releases>
-    <release version="0.11.1" date="2026-01-03">
+    <release version="0.11.5" date="2026-01-10">
+      <description>
+        <ul>
+          <li>Fixed an issue where moving a file out of a folder didn't immediately update the folder view.</li>
+        </ul>
+      </description>
+    </release>
+    <release version="0.11.4" date="2026-01-08">
+      <description>
+        <ul>
+          <li>Fixed an issue where you could not collapse second tier list items.</li>
+        </ul>
+      </description>
+    </release>
+    <release version="0.11.3" date="2026-01-08">
+      <description>
+        <ul>
+          <li>Added support for code blocks defined by more than three backticks.</li>
+          <li>Fixed an issue where editing code blocks could break the ability to collapse code blocks.</li>
+        </ul>
+      </description>
+    </release>
+    <release version="0.11.2" date="2026-01-03">
       <description>
         <ul>
           <li>Fixed an issue where styling markup immediately after the beginning of block quotes were not processed correctly.</li>
