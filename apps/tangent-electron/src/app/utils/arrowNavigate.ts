@@ -61,8 +61,6 @@ export default function arrowNavigate(node: HTMLElement, options?: Partial<Arrow
 			return
 		}
 
-		console.log(event)
-
 		const direction = directionFromKey(event)
 		if (!direction) return
 

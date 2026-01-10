@@ -4,7 +4,7 @@ import type Tangent from "../Tangent"
 import type Workspace from "../Workspace"
 import type { CommandContext, CommandOptions } from "./Command"
 import WorkspaceCommand from "./WorkspaceCommand"
-import { focusLeftSidebar, getLeftSidebarElement } from './ToggleSidebar'
+import { focusLeftSidebar, getCurrentMapNode, getLeftSidebarElement } from 'app/utils/selection'
 
 type ChangeFileMode = 'left' | 'right'
 
@@ -38,7 +38,7 @@ export default class ChangeCurrentFileCommand extends WorkspaceCommand {
 		mode = mode || this.mode
 
 		const sidebar = getLeftSidebarElement()
-		if (sidebar.contains(document.activeElement)) {
+		if (sidebar?.contains(document.activeElement)) {
 			return mode === 'right'
 		}
 
@@ -61,11 +61,15 @@ export default class ChangeCurrentFileCommand extends WorkspaceCommand {
 		let nextIndex = -1
 
 		const sidebar = getLeftSidebarElement()
+		const map = getCurrentMapNode()
 		let isInSidebar = false
-		if (sidebar.contains(document.activeElement)) {
+		if (sidebar?.contains(document.activeElement)) {
 			isInSidebar = true
 			if (mode === 'right') nextIndex = 0
 			else return
+		}
+		else if (map === document.activeElement) {
+			if (mode !== 'left') return
 		}
 		else if (mode === 'left') {
 			nextIndex = index - 1
@@ -77,6 +81,11 @@ export default class ChangeCurrentFileCommand extends WorkspaceCommand {
 		if (nextIndex === -1) {
 			// Switch to the left sidebar
 			focusLeftSidebar()
+			return
+		}
+
+		if (map) {
+			map.focus({ preventScroll: true })
 			return
 		}
 

@@ -2,23 +2,7 @@ import { SidebarMode } from 'common/SidebarState'
 import type Workspace from '../Workspace'
 import WorkspaceCommand from './WorkspaceCommand'
 import { wait } from '@such-n-such/core'
-
-export function getLeftSidebarElement() {
-	const target = document.querySelector('.sidebar.left')
-	if (target instanceof HTMLElement) return target
-	return null
-}
-
-export function focusLeftSidebar() {
-	let target = document.querySelector('.sidebar.left .FileTreeItem.isSelected')
-	if (!target) target = document.querySelector('.sidebar.left .FileTreeItem.isParent')
-	if (!target) target = document.querySelector('.sidebar.left .FileTreeItem:first-child')
-	if (target instanceof HTMLElement) {
-		target.focus()
-		return true
-	}
-	return false
-}
+import { focusLeftSidebar } from 'app/utils/selection'
 
 // TODO: Extend for right/left sidebar
 export default class ToggleSidebarCommand extends WorkspaceCommand {

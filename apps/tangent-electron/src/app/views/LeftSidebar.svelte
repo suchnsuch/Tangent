@@ -15,6 +15,8 @@ import SortingOptions from './FileTree/SortingOptions.svelte'
 import SortModeIcon from './smart-icons/SortModeIcon.svelte'
 import SvgIcon from './smart-icons/SVGIcon.svelte'
 import { tooltip } from 'app/utils/tooltips'
+import { wait } from '@such-n-such/core'
+import { focusLeftSidebar } from 'app/utils/selection'
 
 const workspace = getContext('workspace') as Workspace
 
@@ -110,6 +112,33 @@ function onWorkspaceNameContextMenu(event: MouseEvent) {
 		}
 	])
 }
+
+function onKeydown(event: KeyboardEvent) {
+	if (event.defaultPrevented) return
+	if (event.key === 'Escape') {
+		// "Escape" back to the main content
+		event.preventDefault()
+		workspace.commands.moveToRightFile.execute()
+		return
+	}
+	if (event.key === 'Tab') {
+		event.preventDefault()
+		// TODO: An actual tab model!
+		if ($currentTab === 'files') {
+			$currentTab = 'tags'
+		}
+		else if ($currentTab === 'tags') {
+			$currentTab = 'files'
+		}
+
+		// A delay of > 1 is necessary 😬
+		wait(10).then(() => {
+			// Don't _love_ that this is in a command
+			focusLeftSidebar()
+		})
+		return
+	}
+}
 </script>
 
 <svelte:window bind:innerWidth={windowWidth} />
@@ -126,6 +155,7 @@ function onWorkspaceNameContextMenu(event: MouseEvent) {
 	on:focusin={() => updateHasFocus(true)}
 	on:focusout={() => updateHasFocus(false)}
 	on:contextmenu={onSidebarContextMenu}
+	on:keydown={onKeydown}
 	style={ `width: ${width}px; transform: translateX(${visible ? 0 : -width - 10}px);` }
 >
 	<header>

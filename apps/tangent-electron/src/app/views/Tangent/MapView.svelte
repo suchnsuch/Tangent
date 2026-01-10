@@ -38,7 +38,9 @@ const commandHandler = createCommandHandler([
 	workspace.commands.removeNodeFromMap,
 	workspace.commands.removeNodeAndChildrenFromMap,
 	workspace.commands.removeEverythingButNodeFromMap,
-	workspace.commands.removeEverythingButThreadFromMap
+	workspace.commands.removeEverythingButThreadFromMap,
+
+	workspace.commands.moveToLeftFile // For jumping to the sidebar
 ])
 
 export let session: Session
@@ -667,6 +669,9 @@ function openMenus(type: 'in' | 'out') {
 
 function interpretKeyboardEvent(event: KeyboardEvent) {
 	if (!isActive) return
+
+	if (commandHandler(event)) return
+
 	switch (event.key) {
 		case 'ArrowLeft':
 			if (event.ctrlKey || event.metaKey) {
@@ -693,7 +698,6 @@ function interpretKeyboardEvent(event: KeyboardEvent) {
 		default:
 			// TODO: Some kind of command override/derive system
 			const shortcut = shortcutFromEvent(event)
-			console.log(shortcut, event)
 			if (workspace.commands.undo.shortcuts.includes(shortcut)) {
 				session.undoStack.undo()
 				return true
