@@ -17,7 +17,7 @@ export let link: ConnectionInfo
 export let target: 'to' | 'from'
 export let className = ''
 
-export let onSelect: (direction: 'in'|'out') => void = null
+export let onSelect: (event: KeyboardEvent|MouseEvent) => void
 
 $: targetPath = target === 'to' ? link.to : link.from
 $: targetNode = workspace.directoryStore.get(targetPath)
@@ -29,20 +29,8 @@ $: contextStore.set(link?.context || '')
 $: editor.set(markdownToTextDocument($contextStore))
 
 function onKeydown(event: KeyboardEvent) {
-	if (event.defaultPrevented) return
-	if (event.key === 'Enter') {
-		event.preventDefault()
-		sendSelection(event.altKey)
-	}
-}
-
-function onClick(event: MouseEvent) {
-	event.preventDefault()
-	sendSelection(event.altKey)
-}
-
-function sendSelection(sendIn: boolean) {
-	if (onSelect) onSelect(sendIn ? 'in' : 'out')
+	if (event.defaultPrevented || event.key !== 'Enter') return
+	onSelect(event)
 }
 
 function onContextMenu(event: MouseEvent) {
@@ -51,14 +39,16 @@ function onContextMenu(event: MouseEvent) {
 			label: 'Open to right',
 			accelerator: 'Enter',
 			click: () => {
-				sendSelection(false)
+				onSelect(new MouseEvent('click'))
 			}
 		},
 		{
 			label: 'Open to left',
 			accelerator: 'Alt+Enter',
 			click: () => {
-				sendSelection(true)
+				onSelect(new MouseEvent('click', {
+					altKey: true
+				}))
 			}
 		}
 	])
@@ -71,7 +61,7 @@ function onContextMenu(event: MouseEvent) {
 <main
 	class={className}
 	tabindex="0"
-	on:click={onClick}
+	on:click={onSelect}
 	on:keydown={onKeydown}
 	on:contextmenu={onContextMenu}
 >

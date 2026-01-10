@@ -1,5 +1,5 @@
 <script lang="ts">
-import type { NavigationData } from 'app/events'
+import { getLinkDirectionFromEvent, type NavigationData } from 'app/events'
 import type { Workspace } from 'app/model'
 
 import type CardsViewState from 'app/model/nodeViewStates/CardsViewState'
@@ -11,6 +11,7 @@ import { getContext } from 'svelte'
 import { onMount, tick } from 'svelte'
 import SetCreationRules from './SetCreationRules.svelte'
 import NodePreview from '../summaries/NodePreview.svelte'
+import arrowNavigate from 'app/utils/arrowNavigate'
 
 const workspace = getContext('workspace') as Workspace
 
@@ -51,25 +52,52 @@ function nodeClick(event: MouseEvent, ref: TreeNodeOrReference) {
 	
 	onNavigate({
 		origin: state.parent.node,
-		target: ref
+		target: ref,
+		direction: getLinkDirectionFromEvent(event, workspace)
 	})
 	
 	event.preventDefault()
 	event.stopPropagation()
 }
 
+function nodeKeydown(event: KeyboardEvent, ref: TreeNodeOrReference) {
+	if (event.defaultPrevented) return
+	if (event.key != 'Enter') return
+
+	onNavigate({
+		origin: state.parent.node,
+		target: ref,
+		direction: getLinkDirectionFromEvent(event, workspace)
+	})
+
+	event.preventDefault()
+}
+
 function sendViewReady() {
 	if (onViewReady) onViewReady()
 }
+
 </script>
 
-<div class="cards" class:layout-fill={layout === 'fill'} class:needs-alt={$needsAltToScroll}
+<div class="CardsView" class:layout-fill={layout === 'fill'} class:needs-alt={$needsAltToScroll}
 	style:padding-top={extraTop + 'px'}
 	style:padding-bottom={extraBottom + 'px'}
 	style:--noteBackgroundColor="var(--backgroundColor)"
+
+	tabindex="-1"
+	use:arrowNavigate={{
+		containerSelector: '.lazy-list-items',
+		scrollTime: 100,
+		focusClass: 'focused',
+		scrollMarginY: {
+			start: extraTop + 16,
+			end: extraBottom + 8
+		}
+	}}
 >
 	<!-- svelte-ignore a11y-click-events-have-key-events -->
 	<!-- svelte-ignore a11y-no-static-element-interactions -->
+	<!-- svelte-ignore a11y_no_noninteractive_tabindex -->
 	<LazyScrolledList
 		items={$items}
 		itemID={getNodeOrReferenceId}
@@ -78,7 +106,10 @@ function sendViewReady() {
 		onRangeUpdated={sendViewReady}
 	>
 		<svelte:fragment slot="item" let:item>
-			<div class="card" on:click={e => nodeClick(e, item)}>
+			<div class="card" tabindex="0"
+				on:click={e => nodeClick(e, item)}
+				on:keydown={e => nodeKeydown(e, item)}
+			>
 				<NodePreview {item}
 					noteFixedTitle={true}
 					noteShowHeaderIcon={false}
@@ -91,7 +122,7 @@ function sendViewReady() {
 </div>
 
 <style lang="scss">
-.cards {
+.CardsView {
 	text-align: left;
 	padding-top: 3rem;
 
@@ -103,68 +134,78 @@ function sendViewReady() {
 		overflow-y: auto;
 	}
 
-	> :global(.lazy-list-items) {
-		display: grid;
-		padding: 1rem;
-		gap: 1rem;
+	:global {
+		> .lazy-list-items {
+			display: grid;
+			padding: 1rem;
+			gap: 1rem;
 
-		grid-template-columns: repeat(auto-fit, minmax(min(calc(50% - 2rem), calc(26rem)), 1fr));
-		grid-auto-rows: min-content;
-		grid-auto-flow: row;
+			grid-template-columns: repeat(auto-fit, minmax(min(calc(50% - 2rem), calc(26rem)), 1fr));
+			grid-auto-rows: min-content;
+			grid-auto-flow: row;
 
-		> :global(.card) {
-			position: relative;
-			height: 20rem;
+			> .card {
+				position: relative;
+				height: 20rem;
 
-			box-sizing: border-box;
+				box-sizing: border-box;
 
-			border: 1px solid var(--borderColor);
-			background-color: var(--backgroundColor);
+				border: 1px solid var(--borderColor);
+				background-color: var(--backgroundColor);
 
-			border-radius: var(--borderRadius);
+				border-radius: var(--borderRadius);
 
-			padding: .5rem;
+				padding: .5rem;
 
-			--fontSize: calc(1rem * .8);
-			--headerFontSizeFactor: 2;
+				--fontSize: calc(1rem * .8);
+				--headerFontSizeFactor: 2;
 
-			:global(*) {
-				-webkit-user-select: auto;
-				user-select: auto;
+				&.focused {
+					outline: 2px solid #666;
+					&:focus {
+						outline-color: var(--accentBackgroundColor);
+					}
+				}
+
+				* {
+					-webkit-user-select: auto;
+					user-select: auto;
+				}
+
+				.noteEditor header {
+					// Fix the header overlap since the headers have background color
+					border-top-left-radius: var(--borderRadius);
+					border-top-right-radius: var(--borderRadius);
+				}
+
+				.detailsInfoBar {
+					// Fix details overlap since the details have background color
+					border-bottom-left-radius: var(--borderRadius);
+					border-bottom-right-radius: var(--borderRadius);
+
+					background: linear-gradient(transparent, var(--noteBackgroundColor) 25%);
+				}
 			}
 
-			:global(.noteEditor header) {
-				// Fix the header overlap since the headers have background color
-				border-top-left-radius: var(--borderRadius);
-				border-top-right-radius: var(--borderRadius);
-			}
+			.create {
+				font-size: 120%;
 
-			:global(.detailsInfoBar) {
-				// Fix details overlap since the details have background color
-				border-bottom-left-radius: var(--borderRadius);
-				border-bottom-right-radius: var(--borderRadius);
+				color: var(--deemphasizedTextColor);
+				background-color: unset;
+				--inputBorderRadius: var(--borderRadius);
 
-				background: linear-gradient(transparent, var(--noteBackgroundColor) 25%);
+				padding: unset;
 			}
 		}
-		> :global(.create) {
-			font-size: 120%;
-
-			color: var(--deemphasizedTextColor);
-			background-color: unset;
-			--inputBorderRadius: var(--borderRadius);
-
-			padding: unset;
-		}
-	}	
+	}
 }
 
 // Block scrolling of note cards...
-.cards.needs-alt :global(.card) :global(.noteEditor) {
+.CardsView.needs-alt :global(.card) :global(.noteEditor) {
 	overflow-y: hidden;
 }
 // ...unless alt is pressed
-:global(.alt-pressed) .cards.needs-alt :global(.card) :global(.noteEditor) {
+:global(.alt-pressed) .CardsView.needs-alt :global(.card) :global(.noteEditor) {
 	overflow-y: auto;
 }
 </style>

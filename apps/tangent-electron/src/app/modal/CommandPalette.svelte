@@ -10,7 +10,7 @@ import { isModKey } from 'app/utils/events'
 import { stringSort } from 'common/sorting'
 import { buildFuzzySegementMatcher, buildMatcher, compareNodeSearch, orderTreeNodesForSearch, type PathMatch, type SearchMatchResult, type SegmentSearchNodePair } from 'common/search'
 import PaletteActionView from 'app/utils/PaletteActionView.svelte'
-import type { NavigationData } from 'app/events'
+import { getLinkDirectionFromEvent, type NavigationData } from 'app/events'
 import { visibleFileTypeMatch, implicitExtensionsMatch } from 'common/fileExtensions'
 
 let workspace = getContext('workspace') as Workspace
@@ -245,13 +245,7 @@ function selectOption(option: Option, event: KeyboardEvent | MouseEvent) {
 
 		if (isModKey(event) || event.shiftKey || event.altKey) {
 			nav.origin = 'current'
-			nav.direction = 'out'
-			if (event.shiftKey !== (workspace.settings.linkClickPaneBehavior.value === 'replace')) {
-				nav.direction = 'replace'
-			}
-			if (event.altKey) {
-				nav.direction = 'in'
-			}
+			nav.direction = getLinkDirectionFromEvent(event, workspace)
 		}
 
 		workspace.navigateTo(nav)

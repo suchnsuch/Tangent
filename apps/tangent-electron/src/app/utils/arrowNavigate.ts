@@ -1,5 +1,5 @@
 import { Point } from "common/geometry"
-import scrollTo from './scrollto'
+import scrollTo, { type ScrollMargin } from './scrollto'
 
 function elementCenter(node: HTMLElement): Point {
 	return Point.make(
@@ -26,33 +26,68 @@ export interface ArrowNavigateOptions {
 	containerSelector: string
 	scrollTime: number
 	focusClass: string
+
+	scrollMarginX: ScrollMargin
+	scrollMarginY: ScrollMargin
 }
 
 export default function arrowNavigate(node: HTMLElement, options?: Partial<ArrowNavigateOptions>) {
 
+	let container = node
+
 	if (options?.containerSelector) {
-		node = node.querySelector(options.containerSelector)
+		container = node.querySelector(options.containerSelector)
+	}
+
+	function clearFocused() {
+		if (!options?.focusClass) return
+		for (let i = 0; i < container.children.length; i++) {
+			container.children[i].classList.remove(options.focusClass)
+		}
 	}
 
 	function keydown(event: KeyboardEvent) {
 		if (event.defaultPrevented) return
-		if (document.activeElement?.parentElement !== node) return
+		if (node !== document.activeElement && !node.contains(document.activeElement)) return
 		if (!(document.activeElement instanceof HTMLElement)) return
 		if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return
+
+		if (event.key === 'Escape') {
+			if (document.activeElement != node) {
+				clearFocused()
+				node.focus()
+				event.preventDefault()
+			}
+			return
+		}
+
+		console.log(event)
 
 		const direction = directionFromKey(event)
 		if (!direction) return
 
 		let closest: HTMLElement = null
+		let fallback: HTMLElement = null
 		let closestDistance = Number.MAX_VALUE
-		const current = document.activeElement
+		let current = document.activeElement
 
-		const currentPoint = elementCenter(current)
-		let child = node.firstElementChild
+		if (current.parentElement != container && options?.focusClass) {
+			// Attempt to recover the selection
+			const found = container.querySelector('.' + options.focusClass)
+			if (found instanceof HTMLElement) {
+				current = found
+			}
+		}
+
+		const currentPoint = current === node ? Point.make(
+			current.offsetLeft, current.offsetTop
+		) : elementCenter(current)
+		let child = container.firstElementChild
 
 		for (; child != null; child = child.nextElementSibling) {
 			if (child === current) continue
 			if (!(child instanceof HTMLElement)) continue
+			if (!fallback) fallback = child
 
 			const itemPoint = elementCenter(child)
 			const dirToItem = Point.normalize(Point.subtract(itemPoint, currentPoint))
@@ -70,18 +105,23 @@ export default function arrowNavigate(node: HTMLElement, options?: Partial<Arrow
 			}
 		}
 
-		if (!closest) return
+		if (!closest) {
+			if (current != node && fallback) closest = fallback
+			else return
+		}
 		event.preventDefault()
 
 		if (options?.focusClass) {
-			current.classList.remove(options.focusClass)
+			clearFocused()
 			closest.classList.add(options.focusClass)
 		}
 
 		closest.focus({ preventScroll: true })
 		scrollTo({
 			target: closest,
-			duration: options?.scrollTime ?? 0
+			duration: options?.scrollTime ?? 0,
+			marginX: options?.scrollMarginX,
+			marginY: options?.scrollMarginY
 		})
 	}
 
@@ -91,16 +131,13 @@ export default function arrowNavigate(node: HTMLElement, options?: Partial<Arrow
 		// Wind up to our immediate child
 		let target = event.target
 		while (target) {
-			if (target.parentElement === node) break
+			if (target.parentElement === container) break
 			target = target.parentElement
 		}
 		if (!target) return
 
 		if (options?.focusClass) {
-			for (let i = 0; i < node.children.length; i++) {
-				node.children[i].classList.remove(options.focusClass)
-			}
-			
+			clearFocused()
 			target.classList.add(options.focusClass)
 		}
 	}

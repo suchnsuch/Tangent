@@ -31,7 +31,7 @@ import { type HrefFormedLink, StructureType } from 'common/indexing/indexTypes'
 import type { ConnectionInfo } from 'common/indexing/indexTypes'
 import { areLineArraysOpTextEquivalent, type EditInfo, getEditInfo, getRangeWhile, rangesAreEquivalent, stripLineAttributes } from 'common/typewriterUtils'
 import { scrollTo } from 'app/utils';
-import { type NavigationCallback, type NavigationData, type ViewReadyCallback } from 'app/events'
+import { getLinkDirectionFromEvent, type NavigationCallback, type NavigationData, type ViewReadyCallback } from 'app/events'
 import WorkspaceFileHeader from 'app/utils/WorkspaceFileHeader.svelte';
 import { TangentLink } from './t-link';
 import { appendContextTemplate, type ContextMenuConstructorOptions } from 'app/model/menus';
@@ -75,8 +75,7 @@ const {
 	crossOutFinishedTodos,
 	smartParagraphBreaks,
 	fixedTitle: fixedTitleSetting,
-	letCodeExpand,
-	linkClickPaneBehavior
+	letCodeExpand
 } = workspace.settings
 
 const editor = new MarkdownEditor(workspace)
@@ -825,40 +824,13 @@ function navigationForward(event: NavigationEvent) {
 		if (state.highlightLink) state.highlightLink(link)
 	}
 	else {
-		const { shiftKey, altKey } = event.incitingEvent
-
-		let direction: NavigationData['direction'] = 'out'
-		if (altKey) {
-			direction = 'in'
-		}
-		else {
-			if (shiftKey !== (linkClickPaneBehavior.value === 'replace')) {
-				direction = 'replace'
-			}
-		}
-
 		console.log('Navigation forward')
 		if (onNavigate) onNavigate({
 			link,
 			origin: note,
-			direction
+			direction: getLinkDirectionFromEvent(event.incitingEvent, workspace)
 		})
 	}
-}
-
-function navigateTo(inLink: ConnectionInfo, direction: 'in' | 'out') {
-	let link: HrefFormedLink = {
-		...inLink,
-		href: inLink.from,
-		form: 'raw', // Required as the from is a full path
-		from: note.path
-	}
-
-	if (onNavigate) onNavigate({
-		link,
-		origin: note,
-		direction
-	})
 }
 
 function onWheel(event: WheelEvent) {

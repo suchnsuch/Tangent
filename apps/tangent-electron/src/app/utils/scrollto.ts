@@ -7,7 +7,7 @@ interface AxisDimensions {
 }
 
 type ScrollMode = 'show' | 'center'
-type ScrollMargin = number | AxisDimensions
+export type ScrollMargin = number | AxisDimensions
 
 export interface ScrollToOptions {
 	container?: HTMLElement

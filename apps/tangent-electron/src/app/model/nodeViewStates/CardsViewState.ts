@@ -7,6 +7,7 @@ import type { TreeNodeOrReference } from 'common/nodeReferences';
 import type CardsLensSettings from 'common/settings/CardsLensSettings';
 import { sortNodes } from 'common/settings/Sorting';
 import CardsSettingsView from 'app/views/node-views/CardsSettingsView.svelte';
+import { selectDetailsPane } from 'app/utils/selection';
 
 export default class CardsViewState implements SetLensViewState {
 	readonly parent: SetViewState
@@ -27,4 +28,22 @@ export default class CardsViewState implements SetLensViewState {
 
 	get viewComponent() { return CardsView }
 	get settingsComponent() { return CardsSettingsView }
+
+	focus(element: HTMLElement): boolean {
+		if (!element) return false
+		if (this.parent.details?.value?.open && selectDetailsPane(element)) return true
+
+		const card = element.querySelector('.CardsView .card.focused')
+		if (card instanceof HTMLElement) {
+			card.focus()
+			return true
+		}
+
+		const container = element.querySelector('.CardsView')
+		if (container instanceof HTMLElement) {
+			container.focus()
+			return true
+		}
+		return false
+	}
 }

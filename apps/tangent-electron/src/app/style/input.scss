@@ -61,7 +61,7 @@ textarea {
 button, .button, select {
 	color: inherit; // This allows context colors to easily apply.
 	background-color: var(--buttonBackgroundColor);
-	transition: background-color .2s, border-color .2s, color .2s;
+	transition: background-color .2s, border-color .2s, outline-color .2s, color .2s;
 	outline: none;
 	border: none;
 
@@ -132,17 +132,17 @@ button, .button {
 	}
 
 	&.focusable {
-		border: 2px solid transparent;
+		outline: 2px solid transparent;
 
 		&.focused:not(:focus):not(:hover) {
-			border-color: #666;
+			outline-color: #666;
 		}
 
 		&:hover, &:focus {
-			border-color: var(--bgColor_Selected);
+			outline-color: var(--bgColor_Selected);
 		}
 		&:active {
-			border-color: var(--bgColor_Active);
+			outline-color: var(--bgColor_Active);
 		}
 	}
 }

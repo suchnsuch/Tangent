@@ -1,10 +1,10 @@
 <script lang="ts">
-	import { getContext } from 'svelte'
+import { getContext } from 'svelte'
 import type { TreeNode } from 'common/trees'
 import type { NodeViewState } from 'app/model/nodeViewStates'
 import { appendContextTemplate } from 'app/model/menus'
 import type { ConnectionInfo, HrefFormedLink } from 'common/indexing/indexTypes'
-import type { NavigationCallback } from 'app/events'
+import { getLinkDirectionFromEvent, type NavigationCallback } from 'app/events'
 import { Workspace, WorkspaceTreeNode } from 'app/model'
 import arrowNavigate from 'app/utils/arrowNavigate'
 import LazyScrolledList from 'app/utils/LazyScrolledList.svelte'
@@ -38,7 +38,9 @@ function inLinkID(info: ConnectionInfo) {
 	return `${info.from}_${info.start}-${info.end}`
 }
 
-function navigateTo(inLink: ConnectionInfo, direction: 'in' | 'out') {
+function onSelectLink(event: KeyboardEvent | MouseEvent, inLink: ConnectionInfo) {
+	if (event.defaultPrevented) return
+
 	let link: HrefFormedLink = {
 		...inLink,
 		href: inLink.from,
@@ -46,10 +48,12 @@ function navigateTo(inLink: ConnectionInfo, direction: 'in' | 'out') {
 		from: node.path
 	}
 
+	event.preventDefault()
+
 	onNavigate({
 		link,
 		origin: node,
-		direction
+		direction: getLinkDirectionFromEvent(event, workspace)
 	})
 }
 
@@ -85,7 +89,7 @@ function onDetailsContextMenu(event: MouseEvent) {
 				{link}
 				target="from"
 				className="button focusable"
-				onSelect={direction => navigateTo(link, direction)}
+				onSelect={e => onSelectLink(e, link)}
 			/>
 		</LazyScrolledList>
 	</div>

@@ -12,7 +12,7 @@ import { isModKey } from 'app/utils/events'
 import { appendContextTemplate, type ContextMenuConstructorOptions } from 'app/model/menus'
 import LazyScrolledList from 'app/utils/LazyScrolledList.svelte'
 import { tooltip } from 'app/utils/tooltips'
-import type { NavigationData } from 'app/events'
+import { getLinkDirectionFromEvent, type NavigationData } from 'app/events'
 import { getTreeNodeTransfer, hasTreeNodeTransfer, setTreeNodeTransfer } from 'app/utils/dragDrop'
 import { queryFileType } from 'common/dataTypes/QueryInfo'
 import NodeIcon from '../smart-icons/NodeIcon.svelte'
@@ -91,11 +91,9 @@ function itemClicked(event: MouseEvent | KeyboardEvent, item:TreeNode) {
 		target: item
 	}
 
-	if (isModKey(event)) {
+	if (isModKey(event) || event.shiftKey || event.altKey) {
 		nav.origin = 'current'
-		if (event.shiftKey) {
-			nav.direction = 'replace'
-		}
+		nav.direction = getLinkDirectionFromEvent(event, workspace)
 	}
 	
 	workspace.navigateTo(nav)

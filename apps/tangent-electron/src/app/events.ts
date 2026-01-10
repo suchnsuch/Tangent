@@ -1,7 +1,7 @@
 import type { HrefFormedLink } from 'common/indexing/indexTypes'
 import type { TreeNode } from 'common/trees'
 import type { TreeNodeOrReference } from 'common/nodeReferences'
-import type { Tangent } from './model'
+import type { Tangent, Workspace } from './model'
 import type { AttributePredicate } from 'common/typewriterUtils'
 
 export interface NavigationData {
@@ -43,3 +43,17 @@ export function eventHasSelectionRequest(event: MouseEvent) {
 		return event.editorSelectionRequest as SelectionRequestArgs
 	}
 }
+
+export function getLinkDirectionFromEvent(event: KeyboardEvent | MouseEvent, workspace: Workspace): NavigationData['direction'] {
+	const { shiftKey, altKey } = event
+
+	if (altKey) {
+		return 'in'
+	}
+	else if (shiftKey !== (workspace.settings.linkClickPaneBehavior.value === 'replace')) {
+		return 'replace'
+	}
+
+	return 'out'
+}
+
