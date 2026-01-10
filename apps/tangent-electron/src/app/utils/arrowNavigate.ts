@@ -25,6 +25,7 @@ function directionFromKey(event: KeyboardEvent) {
 export interface ArrowNavigateOptions {
 	containerSelector: string
 	scrollTime: number
+	focusClass: string
 }
 
 export default function arrowNavigate(node: HTMLElement, options?: Partial<ArrowNavigateOptions>) {
@@ -71,6 +72,12 @@ export default function arrowNavigate(node: HTMLElement, options?: Partial<Arrow
 
 		if (!closest) return
 		event.preventDefault()
+
+		if (options?.focusClass) {
+			current.classList.remove(options.focusClass)
+			closest.classList.add(options.focusClass)
+		}
+
 		closest.focus({ preventScroll: true })
 		scrollTo({
 			target: closest,
@@ -78,11 +85,33 @@ export default function arrowNavigate(node: HTMLElement, options?: Partial<Arrow
 		})
 	}
 
+	function onClick(event: MouseEvent) {
+		if (!(event.target instanceof HTMLElement)) return
+
+		// Wind up to our immediate child
+		let target = event.target
+		while (target) {
+			if (target.parentElement === node) break
+			target = target.parentElement
+		}
+		if (!target) return
+
+		if (options?.focusClass) {
+			for (let i = 0; i < node.children.length; i++) {
+				node.children[i].classList.remove(options.focusClass)
+			}
+			
+			target.classList.add(options.focusClass)
+		}
+	}
+
 	node.addEventListener('keydown', keydown)
+	node.addEventListener('click', onClick)
 
 	return {
 		destroy() {
 			node.removeEventListener('keydown', keydown)
+			node.removeEventListener('click', onClick)
 		}
 	}
 }

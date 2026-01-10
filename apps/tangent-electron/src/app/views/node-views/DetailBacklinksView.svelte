@@ -72,7 +72,8 @@ function onDetailsContextMenu(event: MouseEvent) {
 	<div class="inLinks detailsBlock"
 		use:arrowNavigate={{
 			containerSelector: '.lazy-list-items',
-			scrollTime: 100
+			scrollTime: 100,
+			focusClass: 'focused'
 		}}
 		tabindex="-1"
 		oncontextmenu={onDetailsContextMenu}

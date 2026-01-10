@@ -134,6 +134,10 @@ button, .button {
 	&.focusable {
 		border: 2px solid transparent;
 
+		&.focused:not(:focus):not(:hover) {
+			border-color: #666;
+		}
+
 		&:hover, &:focus {
 			border-color: var(--bgColor_Selected);
 		}
