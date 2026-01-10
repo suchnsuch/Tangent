@@ -176,8 +176,10 @@ function onNodeContainerClicked(event: MouseEvent, state: NodeViewState) {
 	
 	// Use state instead of node to account for states representing other nodes
 	if ($currentState !== state) {
-		console.log('clicked changing current')
-		tangent.updateThread({ currentNode: state.node, thread: 'retain' })
+		if ($states.includes(state)) {
+			console.log('clicked changing current')
+			tangent.updateThread({ currentNode: state.node, thread: 'retain' })
+		}
 	}
 	else {
 		// We always want to scroll to the thing we've clicked on
