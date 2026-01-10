@@ -198,6 +198,16 @@ export default class NoteViewState implements NodeViewState, LensViewState {
 
 	focus(element: HTMLElement) {
 		if (!element) return false
+
+		if (this.note?.meta.virtual && this.details) {
+			this.details.update(value => {
+				return {
+					open: true,
+					...value
+				}
+			})
+		}
+
 		if (this.details?.value?.open && selectDetailsPane(element)) return true
 		
 		const list = element?.querySelectorAll('.noteEditor')
