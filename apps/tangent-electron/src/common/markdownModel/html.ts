@@ -180,7 +180,7 @@ function badTokenParser(char: string, parser: NoteParser): boolean {
 }
 
 function consumeWhitespace(char: string, parser: NoteParser): boolean {
-	if (char.match(WHITESPACE_MATCH)) {
+	if (char !== '\n' && char.match(WHITESPACE_MATCH)) {
 		const { feed } = parser
 		feed.index = feed.findWhile(WHITESPACE_MATCH, feed.index + 1)
 		parser.commitSpan(WHITESPACE_ATTRIBUTES)

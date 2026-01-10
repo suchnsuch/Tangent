@@ -87,6 +87,13 @@
   <update_contact>k8ie_AT_mcld.eu</update_contact>
 
   <releases>
+    <release version="0.11.6" date="2026-01-10">
+      <description>
+        <ul>
+          <li>Fixed an issue with HTML parsing where sequential newlines were not handled correctly.</li>
+        </ul>
+      </description>
+    </release>
     <release version="0.11.5" date="2026-01-10">
       <description>
         <ul>
