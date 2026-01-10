@@ -107,6 +107,7 @@ function onContextMenu(event: MouseEvent) {
 
 <!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
 <main bind:this={container}
+	class="ImageView"
 	class:layout-fill={layout === 'fill'}
 	style:padding-top={extraTop + 'px'}
 	style:padding-bottom={extraBottom + 'px'}

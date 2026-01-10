@@ -6,6 +6,7 @@ import type LensViewState from './LensViewState'
 import ImageView from 'app/views/node-views/ImageView.svelte'
 import type { SettingDefinition } from 'common/settings/Setting'
 import ZoomSetting from 'common/settings/ZoomSetting'
+import { selectDetailsPane } from 'app/utils/selection'
 
 const imageZoomDefinition: SettingDefinition<number> = {
 	defaultValue: 1,
@@ -36,4 +37,15 @@ export default class ImageViewState implements NodeViewState, LensViewState {
 	// Lens interface
 	get parent() { return this }
 	get viewComponent() { return ImageView }
+
+	focus(element: HTMLElement): boolean {
+		if (!element) return false
+		if (this.details?.value?.open && selectDetailsPane(element)) return true
+		const container = element.querySelector('.ImageView')
+		if (container instanceof HTMLElement) {
+			container.focus()
+			return true
+		}
+		return false
+	}
 }

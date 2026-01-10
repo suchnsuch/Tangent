@@ -18,12 +18,12 @@ export class OpenDetailsCommand extends WorkspaceCommand {
 	}
 
 	canExecute(context?: CommandContext): boolean {
-		const view = this.workspace.viewState.tangent.getCurrentViewState()
+		const view = this.workspace.viewState.tangent.currentThreadState.value?.currentLens.value.parent
 		return view?.details != null
 	}
 
 	execute(context?: CommandContext): void {
-		const view = this.workspace.viewState.tangent.getCurrentViewState()
+		const view = this.workspace.viewState.tangent.currentThreadState.value?.currentLens.value.parent
 		if (!view?.details) return
 		view.details.update(details => {
 			return {
