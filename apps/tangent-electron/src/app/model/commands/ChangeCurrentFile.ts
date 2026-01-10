@@ -1,9 +1,10 @@
-import type { TreeNode } from "common/trees";
-import { derived } from 'svelte/store';
-import type Tangent from "../Tangent";
-import type Workspace from "../Workspace";
-import type { CommandContext, CommandOptions } from "./Command";
-import WorkspaceCommand from "./WorkspaceCommand";
+import type { TreeNode } from "common/trees"
+import { derived } from 'svelte/store'
+import type Tangent from "../Tangent"
+import type Workspace from "../Workspace"
+import type { CommandContext, CommandOptions } from "./Command"
+import WorkspaceCommand from "./WorkspaceCommand"
+import { focusLeftSidebar, getLeftSidebarElement } from './ToggleSidebar'
 
 type ChangeFileMode = 'left' | 'right'
 
@@ -36,9 +37,14 @@ export default class ChangeCurrentFileCommand extends WorkspaceCommand {
 		node = node || tangent?.currentNode.value
 		mode = mode || this.mode
 
+		const sidebar = getLeftSidebarElement()
+		if (sidebar.contains(document.activeElement)) {
+			return mode === 'right'
+		}
+
 		const index = tangent.threadLenses.value.findIndex(l => l.parent.node === node)
 		if (mode === 'left') {
-			return index > 0
+			return true // Since we can go to the sidebar!
 		}
 		if (mode === 'right') {
 			return index >= 0 && index < tangent.threadLenses.value.length - 1
@@ -53,18 +59,44 @@ export default class ChangeCurrentFileCommand extends WorkspaceCommand {
 		const threadLenses = tangent.threadLenses.value
 		const index = threadLenses.findIndex(l => l.parent.node === node)
 		let nextIndex = -1
-		if (mode === 'left') {
+
+		const sidebar = getLeftSidebarElement()
+		let isInSidebar = false
+		if (sidebar.contains(document.activeElement)) {
+			isInSidebar = true
+			if (mode === 'right') nextIndex = 0
+			else return
+		}
+		else if (mode === 'left') {
 			nextIndex = index - 1
 		}
 		else if (mode === 'right') {
 			nextIndex = index + 1
 		}
 
+		if (nextIndex === -1) {
+			// Switch to the left sidebar
+			focusLeftSidebar()
+			return
+		}
+
 		if (nextIndex >= 0 && nextIndex < threadLenses.length) {
-			tangent.updateThread({
-				currentNode: threadLenses[nextIndex].parent.node,
-				thread: 'retain'
-			})
+			const nextNode = threadLenses[nextIndex].parent.node
+			if (nextNode === tangent.currentNode.value) {
+				// Already there, reselect
+				if (threadLenses[nextIndex].focus) {
+					const container = document.querySelector('.nodeContainer.current')
+					if (container instanceof HTMLElement) {
+						threadLenses[nextIndex].focus(container)
+					}
+				}
+			}
+			else {
+				tangent.updateThread({
+					currentNode: threadLenses[nextIndex].parent.node,
+					thread: 'retain'
+				})
+			}
 		}
 	}
 

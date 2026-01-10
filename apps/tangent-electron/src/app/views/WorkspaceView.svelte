@@ -74,9 +74,11 @@ let leftSidebarSize = 100
 
 let leftSidebarVisible = $leftSidebarMode === SidebarMode.pinned
 let lastLeftSidebarShouldBeVisible = leftSidebarVisible
+let shouldDelayClosingSidebar = false
 
 let hoveringForLeftSidebar = false
 let hoveringOverLeftSidebar = false
+let leftSidebarHasFocus = false
 
 let resizingLeftSidebar = false
 let sortMenuIsOpen = false
@@ -99,6 +101,7 @@ $: {
 		let shouldBeVisible = ($leftSidebarMode === SidebarMode.pinned
 			|| hoveringForLeftSidebar
 			|| hoveringOverLeftSidebar
+			|| leftSidebarHasFocus
 			|| resizingLeftSidebar
 			|| sortMenuIsOpen)
 
@@ -109,11 +112,15 @@ $: {
 
 			if (shouldBeVisible) {
 				leftSidebarVisible = true
+				shouldDelayClosingSidebar = hoveringForLeftSidebar
+					|| hoveringOverLeftSidebar
+					|| resizingLeftSidebar
+					|| sortMenuIsOpen
 			}
 			else {
 				leftSidebarVisibilityTimeout = setTimeout(() => {
 					leftSidebarVisible = false
-				}, 350)
+				}, shouldDelayClosingSidebar ? 350 : 0)
 			}
 
 			lastLeftSidebarShouldBeVisible = shouldBeVisible
@@ -121,18 +128,6 @@ $: {
 	}
 
 	topBarShouldBeVisible = topBarShouldBeVisible || $focusLevel <= FocusLevel.Thread || hoveringForTopBar || leftSidebarVisible || focusMenuIsOpen
-}
-
-function setLeftSidebarPinned(newPinned: boolean) {
-	if ($leftSidebarMode === SidebarMode.pinned && !newPinned) {
-		$leftSidebarMode = SidebarMode.closed
-	}
-	else if ($leftSidebarMode === SidebarMode.hoverable && newPinned) {
-		$leftSidebarMode = SidebarMode.pinned
-	}
-	else {
-		$leftSidebarMode = newPinned ? SidebarMode.pinned : SidebarMode.hoverable
-	}
 }
 
 function onMainMouseMove(event: MouseEvent) {
@@ -421,6 +416,7 @@ function onViewContextMenu(event: MouseEvent) {
 	visible={leftSidebarVisible}
 	bind:width={leftSidebarSize}
 	bind:hoveringOver={hoveringOverLeftSidebar}
+	bind:hasFocus={leftSidebarHasFocus}
 	bind:resizing={resizingLeftSidebar} />
 
 <ModalStateView modalState={workspace.viewState.modal} />

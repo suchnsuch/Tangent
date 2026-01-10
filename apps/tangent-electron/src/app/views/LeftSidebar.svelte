@@ -37,6 +37,7 @@ const tabs = [
 
 export let visible: boolean
 export let hoveringOver: boolean
+export let hasFocus: boolean
 export let resizing: boolean = false
 export let width = 100
 
@@ -50,6 +51,10 @@ let tagTreeViewSort = workspace.viewState.tagTreeView.sortMode
 
 function updateHoveringLeftSidebar(hovering: boolean) {
 	hoveringOver = hovering
+}
+
+function updateHasFocus(focus: boolean) {
+	hasFocus = focus
 }
 
 function startLeftDrag(event: MouseEvent) {
@@ -118,6 +123,8 @@ function onWorkspaceNameContextMenu(event: MouseEvent) {
 	class:resizing={resizing}
 	on:mouseover={() => updateHoveringLeftSidebar(true)}
 	on:mouseleave={() => updateHoveringLeftSidebar(false)}
+	on:focusin={() => updateHasFocus(true)}
+	on:focusout={() => updateHasFocus(false)}
 	on:contextmenu={onSidebarContextMenu}
 	style={ `width: ${width}px; transform: translateX(${visible ? 0 : -width - 10}px);` }
 >
@@ -282,5 +289,6 @@ function onWorkspaceNameContextMenu(event: MouseEvent) {
 
 .scroller {
 	overflow-y: auto;
+	flex-grow: 1;
 }
 </style>

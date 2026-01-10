@@ -287,7 +287,10 @@ function drop(event: DragEvent, item: TreeNode) {
 }
 
 const commandHandler = createCommandHandler(
-	Object.values(workspace.commands).filter(c => c.group === 'Sidebar'),
+	[
+		workspace.commands.moveToRightFile, // Used to jump back to the thread
+		...Object.values(workspace.commands).filter(c => c.group === 'Sidebar')
+	],
 	{
 		restrictForInput: false,
 		buildContext(context: SidebarCommandContext) {
@@ -307,10 +310,11 @@ function onKeydown(event: KeyboardEvent, item: TreeNode) {
 	const index = visibleItems.indexOf(item)
 	if (index < 0) return
 
+	const target = event.target as HTMLElement
 	const isOpen = directoryView.isItemOpen(item)
 
 	if (index > 0 && (event.key === 'ArrowUp' || event.key === 'ArrowLeft' && !isOpen)) {
-		const previous = (event.target as HTMLElement).previousElementSibling
+		const previous = isModKey(event) ? target.parentElement.firstElementChild : target.previousElementSibling
 		if (previous instanceof HTMLElement) {
 			previous.focus()
 			event.preventDefault()
@@ -318,7 +322,7 @@ function onKeydown(event: KeyboardEvent, item: TreeNode) {
 		}
 	}
 	if (index < visibleItems.length - 1 && (event.key === 'ArrowDown' || event.key === 'ArrowRight' && isOpen)) {
-		const next = (event.target as HTMLElement).nextElementSibling
+		const next = isModKey(event) ? target.parentElement.lastElementChild : target.nextElementSibling
 		if (next instanceof HTMLElement) {
 			next.focus()
 			event.preventDefault()
@@ -441,10 +445,6 @@ function onKeydown(event: KeyboardEvent, item: TreeNode) {
 		}
 	}
 
-	&:focus {
-		background-color: var(--keySelectionBackgroundColor);
-	}
-
 	&:hover, &.isSelected {
 		background-color: var(--selectionBackgroundColor)
 	}
@@ -455,6 +455,14 @@ function onKeydown(event: KeyboardEvent, item: TreeNode) {
 
 	&:active {
 		background-color: var(--selectionPressedBackgroundColor);
+	}
+
+	&:focus {
+		background-color: var(--accentBackgroundColor);
+
+		&:active {
+			background-color: var(--accentActiveBackgroundColor);
+		}
 	}
 }
 :global {
