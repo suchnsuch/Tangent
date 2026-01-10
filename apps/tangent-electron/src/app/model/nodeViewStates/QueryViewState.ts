@@ -9,6 +9,7 @@ import type { QueryResult } from 'common/indexing/queryResults'
 import { SelectEvent } from 'app/views/editors/selectionEvents'
 import { allChangedPaths, type TreeChange } from 'common/trees'
 import { getInitialQuerySelection } from 'common/queryModel'
+import QueryDetailsSummary from 'app/views/summaries/QueryDetailsSummary.svelte'
 
 export default class QueryViewState extends BaseSetViewState {
 	readonly queryFile: DataFile
@@ -108,5 +109,9 @@ export default class QueryViewState extends BaseSetViewState {
 	dispose() {
 		super.dispose()
 		this.queryFile.unloadFile()
+	}
+
+	get detailsSummaryComponent() {
+		return QueryDetailsSummary
 	}
 }

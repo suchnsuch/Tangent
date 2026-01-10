@@ -10,6 +10,7 @@ import type Folder from "../Folder"
 import { BaseSetViewState } from './SetViewState'
 import type ViewStateContext from './ViewStateContext'
 import FolderSettingsView from 'app/views/node-views/FolderSettingsView.svelte'
+import FolderDetailsSummary from 'app/views/summaries/FolderDetailsSummary.svelte'
 
 export default class FolderViewState extends BaseSetViewState {
 	readonly folder: Folder
@@ -79,4 +80,5 @@ export default class FolderViewState extends BaseSetViewState {
 	}
 
 	get settingsComponent() { return FolderSettingsView }
+	get detailsSummaryComponent() { return FolderDetailsSummary }
 }

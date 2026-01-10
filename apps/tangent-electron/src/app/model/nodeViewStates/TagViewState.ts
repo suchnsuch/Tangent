@@ -7,6 +7,7 @@ import type DataFile from '../DataFile'
 import type Tag from '../Tag'
 import { BaseSetViewState } from './SetViewState'
 import type ViewStateContext from './ViewStateContext'
+import TagDetailsSummary from 'app/views/summaries/TagDetailsSummary.svelte'
 
 export default class TagViewState extends BaseSetViewState {
 	readonly tag: Tag
@@ -68,4 +69,5 @@ export default class TagViewState extends BaseSetViewState {
 	}
 
 	get settingsComponent() { return TagSettingsView }
+	get detailsSummaryComponent() { return TagDetailsSummary }
 }

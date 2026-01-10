@@ -1,5 +1,5 @@
 import { WritableStore, ReadableStore } from 'common/stores'
-import type { NodeViewState } from '.'
+import type { DetailsViewState, NodeViewState } from '.'
 import type EmbedFile from '../EmbedFile'
 import type LensViewState from './LensViewState'
 
@@ -22,6 +22,8 @@ export default class ImageViewState implements NodeViewState, LensViewState {
 	readonly panY = new WritableStore<number>(0)
 
 	readonly currentLens: ReadableStore<LensViewState>;
+
+	readonly details = new WritableStore<DetailsViewState>(null)
 
 	constructor(file: EmbedFile) {
 		this.file = file

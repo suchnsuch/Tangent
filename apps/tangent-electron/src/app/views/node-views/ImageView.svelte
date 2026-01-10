@@ -9,6 +9,8 @@ export let state: ImageViewState
 export let editable: boolean = true
 
 export let layout: 'fill' | 'auto' = 'fill'
+export let extraTop = 0
+export let extraBottom = 0
 
 let container: HTMLElement
 
@@ -106,6 +108,8 @@ function onContextMenu(event: MouseEvent) {
 <!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
 <main bind:this={container}
 	class:layout-fill={layout === 'fill'}
+	style:padding-top={extraTop + 'px'}
+	style:padding-bottom={extraBottom + 'px'}
 	on:wheel={onWheel}
 	on:keydown={onKeydown}
 	on:mousemove={onMouseMove}
@@ -120,7 +124,9 @@ function onContextMenu(event: MouseEvent) {
 		style={`transform: scale(${$zoom}) translate(${$panX}px, ${$panY}px);`}
 		on:mousedown={mouseDown}/>
 	{#if isTransformed || isHoveringControls}
-		<div class="controls" transition:fly={{ y: 100 }}>
+		<div class="controls" transition:fly={{ y: 100 }}
+			style:bottom={`calc(1em + ${extraBottom}px)`}
+		>
 			<button class="zoomText" on:click={resetTransform}>{Math.round($zoom * 100)}%</button>
 			<input class="zoomSlider" type="range" min="{zoom.range.min}" max={zoom.range.max} step="0.1" bind:value={$zoom}/>
 		</div>
@@ -132,7 +138,6 @@ main {
 	background: var(--noteBackgroundColor);
 
 	&.layout-fill {
-		padding-top: var(--topBarHeight);
 		position: absolute;
 		inset: 0;
 	}

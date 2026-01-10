@@ -21,7 +21,6 @@ import NoteViewInfo from 'common/dataTypes/NoteViewInfo'
 import type MarkdownEditor from 'app/views/editors/NoteEditor/MarkdownEditor'
 import { createContentIdMatcher } from 'common/markdownModel/links'
 import { deepEqual } from 'fast-equals'
-import type { SvelteConstructor } from 'app/utils/svelte'
 import NoteDetailsSummary from 'app/views/summaries/NoteDetailsSummary.svelte'
 import { selectDetailsPane } from 'app/utils/selection'
 
