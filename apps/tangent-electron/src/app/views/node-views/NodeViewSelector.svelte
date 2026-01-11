@@ -300,7 +300,7 @@ function onDetailKeydown(event: KeyboardEvent) {
 			>
 				<span class="links">
 					{pluralize(
-						$node.meta?.inLinks.length ?? 0,
+						$node.meta?.inLinks?.length ?? 0,
 						'$$ Incoming Links',
 						'$$ Incoming Link',
 						'No Incoming Links')}
