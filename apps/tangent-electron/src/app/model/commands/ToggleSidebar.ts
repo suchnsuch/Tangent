@@ -2,7 +2,7 @@ import { SidebarMode } from 'common/SidebarState'
 import type Workspace from '../Workspace'
 import WorkspaceCommand from './WorkspaceCommand'
 import { wait } from '@such-n-such/core'
-import { focusLeftSidebar } from 'app/utils/selection'
+import { focusLeftSidebar, getLeftSidebarElement } from 'app/utils/selection'
 
 // TODO: Extend for right/left sidebar
 export default class ToggleSidebarCommand extends WorkspaceCommand {
@@ -11,12 +11,17 @@ export default class ToggleSidebarCommand extends WorkspaceCommand {
 	}
 
 	execute(_context) {
-		this.workspace.viewState.leftSidebar.mode.update(m => m === SidebarMode.pinned ? SidebarMode.closed : SidebarMode.pinned)
-		if (this.workspace.viewState.leftSidebar.mode.value === SidebarMode.pinned) {
+		const mode = this.workspace.viewState.leftSidebar.mode
+		mode.update(m => m === SidebarMode.pinned ? SidebarMode.closed : SidebarMode.pinned)
+		if (mode.value === SidebarMode.pinned) {
+			// Shift focus into the sidebar
 			wait().then(() => {
-				console.log('looking for sidebar targets')
 				focusLeftSidebar()
 			})
+		}
+		else if (getLeftSidebarElement()?.contains(document.activeElement)) {
+			// Shift focus back to content
+			this.workspace.commands.moveToRightFile.execute()
 		}
 	}
 
