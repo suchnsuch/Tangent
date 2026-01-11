@@ -62,7 +62,7 @@ export default class FolderViewState extends BaseSetViewState {
 							name: `Note in "${this.folder?.name}"`,
 							nameTemplate: '%name%',
 							folder: this.folder?.relativePath,
-							mode: 'createOrOpen'
+							mode: 'create'
 						} as CreationRuleDefinition)
 					}
 	
