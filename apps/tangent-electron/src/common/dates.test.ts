@@ -30,9 +30,19 @@ describe('Date Format', () => {
 
 	it('Should allow for short "th"ed dates', () => {
 		expect(dates.fillDateFormat('%MM%-%Do%', new Date(2000, 1, 1, 5, 30))).toEqual('02-1st')
+		expect(dates.fillDateFormat('%MM%-%Do%', new Date(2000, 1, 2, 5, 30))).toEqual('02-2nd')
+		expect(dates.fillDateFormat('%MM%-%Do%', new Date(2000, 1, 3, 5, 30))).toEqual('02-3rd')
+		expect(dates.fillDateFormat('%MM%-%Do%', new Date(2000, 1, 4, 5, 30))).toEqual('02-4th')
 	})
 
 	it('Should allow for long "th"ed dates', () => {
 		expect(dates.fillDateFormat('%MM%-%DDo%', new Date(2000, 1, 5, 5, 30))).toEqual('02-05th')
+		expect(dates.fillDateFormat('%MM%-%DDo%', new Date(2000, 1, 23, 5, 30))).toEqual('02-23rd')
+	})
+
+	it('Should handle "th"ing the silly teens', () => {
+		expect(dates.fillDateFormat('%DDo%', new Date(2000, 1, 11, 1, 1))).toEqual('11th')
+		expect(dates.fillDateFormat('%DDo%', new Date(2000, 1, 12, 1, 1))).toEqual('12th')
+		expect(dates.fillDateFormat('%DDo%', new Date(2000, 1, 13, 1, 1))).toEqual('13th')
 	})
 })

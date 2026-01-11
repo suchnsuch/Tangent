@@ -48,18 +48,15 @@ const shortWeekdays = [
 	'Sat'
 ] as const
 
-const numberThs = {
-	'0': 'th',
-	'1': 'st',
-	'2': 'nd',
-	'3': 'rd',
-	'4': 'th',
-	'5': 'th',
-	'6': 'th',
-	'7': 'th',
-	'8': 'th',
-	'9': 'th'
-} as const
+const thers = [
+	{
+		match: /(1[123]|[4567890])$/,
+		text: 'th'
+	},
+	{ match: /1$/, text: 'st' },
+	{ match: /2$/, text: 'nd' },
+	{ match: /3$/, text: 'rd' }
+]
 
 // From https://stackoverflow.com/questions/8619879/javascript-calculate-the-day-of-the-year-1-366
 export function daysIntoYear(date: Date){
@@ -170,7 +167,12 @@ export function fillDateFormat(format: string, date: Date) {
 		const day = date.getDate()
 		let result = str[2] === 'D' ? forceTwoDigitNumber(day) : day.toString()
 		if (str.at(-2) === 'o') {
-			result += numberThs[result.at(-1)]
+			for (const ther of thers) {
+				if (result.match(ther.match)) {
+					result += ther.text
+					break
+				}
+			}
 		}
 		return result
 	})
