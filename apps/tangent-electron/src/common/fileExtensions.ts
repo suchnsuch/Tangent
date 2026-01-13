@@ -43,7 +43,8 @@ export const imageFileExtensions = [
 	'.jpg',
 	'.gif',
 	'.bmp',
-	'.svg'
+	'.svg',
+	'.webp'
 ]
 export const imageExtensionMatch = getExtensionRegex(imageFileExtensions)
 
