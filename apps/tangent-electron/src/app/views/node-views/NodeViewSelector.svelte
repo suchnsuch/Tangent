@@ -57,19 +57,23 @@ $: showSettings = showSettingsFromMouse || showSettingsFromHover || willShowSett
 let container: HTMLElement
 let settingsContainer: HTMLElement
 let settingsHeight: number = extraTop
+const settingsFocusSelector = '.arrowNavigate, .WorkspaceFileHeader .title'
 
 let closeSettingsCommands = createCommandHandler([
 	workspace.commands.openPaneSettings,
 	workspace.commands.closePaneSettings
 ])
 $: if (settingsContainer && willShowSettings && !settingsContainer.contains(document.activeElement)) {
-	settingsContainer.focus()
+	const target = settingsContainer.querySelector(settingsFocusSelector)
+	if (target instanceof HTMLElement) target.focus()
+	else settingsContainer.focus()
 }
 
 $: detailsState = state.details
 $: canShowDetails = showDetails && node && detailsState != null
 $: canOpenDetails = canShowDetails && $detailsState?.open !== null
 $: areDetailsOpen = canShowDetails && $detailsState?.open
+let detailsContainer: HTMLElement = null
 
 const effectiveShowDetails = timedLatch(false)
 $: effectiveShowDetails.update(areDetailsOpen)
@@ -130,7 +134,14 @@ function onMouseMoveContainer(event: MouseEvent) {
 }
 
 function onFocusInContainer(event: FocusEvent) {
-	// TODO: Close details if not within details
+	if (detailsState && !detailsContainer.contains(document.activeElement)) {
+		detailsState.update(details => {
+			return {
+				...details,
+				open: false
+			}
+		})
+	}
 }
 
 let settingsHoverTimeout = null
@@ -302,7 +313,7 @@ function onDetailKeydown(event: KeyboardEvent) {
 				bind:this={settingsContainer}
 				use:resizeObserver={onSettingsResize}
 				use:arrowNavigate={{
-					targetSelector: '.arrowNavigate, .WorkspaceFileHeader .title',
+					targetSelector: settingsFocusSelector,
 					focusClass: 'focusable'
 				}}
 				tabindex="-1"
@@ -344,6 +355,7 @@ function onDetailKeydown(event: KeyboardEvent) {
 	{#if canShowDetails}
 		<!-- svelte-ignore a11y_no_static_element_interactions -->
 		<div
+			bind:this={detailsContainer}
 			class="details"
 			class:open={areDetailsOpen}
 			class:openable={canOpenDetails}
