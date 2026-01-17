@@ -95,6 +95,7 @@ function onHeaderKeydown(event: KeyboardEvent) {
 <header
 	on:mouseup={headerMouseUp}
 	bind:this={headerElement}
+	class="WorkspaceFileHeader"
 >{#if showIcon}<span class="icon"><NodeIcon {node} size="1em" /></span>{/if}<span
 	class="title"
 	bind:this={headerEditElement}

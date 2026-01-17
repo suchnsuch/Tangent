@@ -17,6 +17,7 @@ $: displayMode.forwardFrom(info?.displayMode)
 		name="Display As"
 		display="inline"
 		form="select"
+		inputClass="arrowNavigate"
 		showReset={false}
 	/>
 {/if}

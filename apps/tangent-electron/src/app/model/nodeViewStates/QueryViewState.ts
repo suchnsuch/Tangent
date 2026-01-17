@@ -3,7 +3,7 @@ import type ViewStateContext from './ViewStateContext'
 import type DataFile from '../DataFile'
 import { derived, readable, type Readable } from 'svelte/store'
 import type QueryInfo from 'common/dataTypes/QueryInfo'
-import { ReadableStore, WritableStore } from 'common/stores'
+import { WritableStore } from 'common/stores'
 import QuerySettingsView from 'app/views/node-views/QuerySettingsView.svelte'
 import type { QueryResult } from 'common/indexing/queryResults'
 import { SelectEvent } from 'app/views/editors/selectionEvents'
@@ -15,7 +15,6 @@ export default class QueryViewState extends BaseSetViewState {
 	readonly queryFile: DataFile
 
 	readonly queryInfo = new WritableStore<QueryInfo>(null)
-	readonly pinSettings = new ReadableStore(true)
 
 	readonly queryResult: Readable<QueryResult>
 	readonly lastRequestID = new WritableStore<number>(0)
@@ -62,6 +61,8 @@ export default class QueryViewState extends BaseSetViewState {
 		this._nodes = derived(this.queryResult, queryResult => queryResult?.items ?? [])
 
 		this._creationRules = readable([])
+
+		this.showSettings.setPinOverride(true)
 	}
 
 	get node() { return this.queryFile }

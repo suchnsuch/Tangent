@@ -14,8 +14,6 @@ export default class TagViewState extends BaseSetViewState {
 	readonly tagInfoFile: DataFile
 	readonly tagInfo = new WritableStore<TagInfo>(null)
 
-	readonly pinSettings = new ReadableStore(true)
-
 	constructor(context: ViewStateContext, tag: Tag) {
 		super(context)
 		this.tag = tag
@@ -58,6 +56,8 @@ export default class TagViewState extends BaseSetViewState {
 
 		// TODO: Something that handles this
 		this._creationRules = new ReadableStore([])
+
+		this.showSettings.setPinOverride(true)
 	}
 
 	get node() { return this.tag }

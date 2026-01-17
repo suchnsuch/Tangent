@@ -1,8 +1,9 @@
-import type { Readable } from 'svelte/store'
 import type { SvelteConstructor } from 'app/utils/svelte'
 import type { TreeChange, TreeNode } from 'common/trees'
-import type { ReadableStore, WritableStore } from 'common/stores'
+import { WritableStore, type ReadableStore } from 'common/stores'
 import type LensViewState from './LensViewState'
+
+export type NodeViewSettingsVisibility = boolean | 'pin'
 
 export interface DetailsViewState {
 	open: boolean
@@ -16,7 +17,7 @@ export interface NodeViewState {
 	readonly currentLens: ReadableStore<LensViewState>
 
 	settingsComponent?: SvelteConstructor
-	readonly pinSettings?: Readable<boolean>
+	readonly showSettings?: WritableStore<NodeViewSettingsVisibility>
 
 	detailsSummaryComponent?: SvelteConstructor
 	readonly details?: WritableStore<DetailsViewState>
@@ -24,4 +25,25 @@ export interface NodeViewState {
 	dispose?()
 	focus?(element: HTMLElement): boolean
 	onTreeChange?(change: TreeChange)
+}
+
+export class NodeViewSettingsVisibilityStore extends WritableStore<NodeViewSettingsVisibility> {
+	private pinOverride: boolean
+
+	constructor(value: NodeViewSettingsVisibility, pinOverride?: boolean) {
+		super(value)
+		this.pinOverride = pinOverride ?? false
+	}
+
+	get() {
+		if (this.pinOverride) return 'pin'
+		return super.value
+	}
+
+	setPinOverride(override: boolean) {
+		if (this.pinOverride != override) {
+			this.pinOverride = override
+			this.notifyObservers()
+		}
+	}
 }

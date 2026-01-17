@@ -16,6 +16,7 @@ export let name: string = null
 export let showReset = true
 export let form: SettingForm = setting.form
 export let display: 'block' | 'inline' = 'block'
+export let inputClass: string = ''
 
 type SettingList = SettingValue<SettingType>[]
 export let getValues: () => Promise<SettingList> = null
@@ -190,6 +191,7 @@ function toggleItem(item) {
 					<select
 						bind:value={$setting}
 						use:tooltip={setting.description}
+						class={inputClass}
 					>
 						{#each effectiveValueList as item}
 							<option value={getValue(item)}>{getDisplayName(item) || 'Default'}</option>
@@ -200,7 +202,7 @@ function toggleItem(item) {
 						{#each effectiveValueList as validValue}
 							<button class:active={getValue(validValue) === $setting}
 								use:tooltip={getDescription(validValue)}
-								class="grow"
+								class={"grow " + inputClass}
 								on:click={() => applyValue(getValue(validValue))}>
 								{getDisplayName(validValue)}
 							</button>
@@ -214,11 +216,12 @@ function toggleItem(item) {
 					bind:value={softValue}
 					min={setting.range.min}
 					max={setting.range.max}
+					class={inputClass}
 					on:blur={applySoftValue}
 					on:keydown={applySoftValue}/>
 				<input 
 					type="range"
-					class="grow"
+					class={"grow " + inputClass}
 					min={displayMin($setting)}
 					max={displayMax($setting)}
 					step={setting.range.step ?? .01}
@@ -229,7 +232,7 @@ function toggleItem(item) {
 				{#if form === 'textarea'}
 					<textarea
 						bind:value={$setting}
-						class="grow"
+						class={"grow " + inputClass}
 						spellcheck="true"
 						rows="3"
 						placeholder={setting.placeholder}></textarea>
@@ -238,16 +241,17 @@ function toggleItem(item) {
 						<ShortcutInput
 							bind:value={$setting}
 							validate={onValidateShortcut}
+							class={inputClass}
 						/>
 					</div>
 				{:else}
 					<input type="text"
-						class="grow"
+						class={"grow " + inputClass}
 						bind:value={$setting}
 						placeholder={setting.placeholder ?? (setting.form === 'folder' ? 'Workspace Root' : '')}
 					/>
 					{#if setting.form === 'folder' || setting.form === 'path'}
-						<button on:click={selectPath} class="iconButton">
+						<button on:click={selectPath} class={"inputButton " + inputClass}>
 							<SvgIcon ref={'folder.svg#folder'} size={16} />
 						</button>
 					{/if}
@@ -258,6 +262,7 @@ function toggleItem(item) {
 				type="checkbox"
 				use:tooltip={setting.description}
 				bind:checked={$setting}
+				class={inputClass}
 				on:click|stopPropagation
 			/>
 			<span class="spacer"></span>
@@ -265,7 +270,7 @@ function toggleItem(item) {
 		{#if showReset}
 			<button
 				use:tooltip={"Reset \"" + setting.name + "\" to its default value."}
-				class="reset subtle"
+				class={"reset subtle " + inputClass}
 				on:click={() => $setting = setting.defaultValue}
 				disabled={$setting === setting.defaultValue}
 			><SvgIcon size={20} ref="reset.svg#arc"/></button>

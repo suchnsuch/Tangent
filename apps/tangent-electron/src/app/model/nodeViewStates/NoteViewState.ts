@@ -1,10 +1,10 @@
 import { derived, type Readable, type Writable } from 'svelte/store'
 import type { EditorRange } from "@typewriter/document"
 import { escapeRegExp } from '@such-n-such/core'
-import type { NodeViewState, DetailsViewState } from "./NodeViewState"
+import { type NodeViewState, type DetailsViewState, type NodeViewSettingsVisibility, NodeViewSettingsVisibilityStore } from "./NodeViewState"
 import type NoteFile from "../NoteFile"
 import { type PartialLink, StructureType } from "common/indexing/indexTypes"
-import { ForwardingStore, ReadableStore, subscribeUntil, WritableStore } from 'common/stores'
+import { CachingStore, ForwardingStore, ReadableStore, subscribeUntil, WritableStore } from 'common/stores'
 import type { StructureDelta } from 'common/indexing/structureUtils'
 import type LensViewState from './LensViewState'
 
@@ -63,7 +63,7 @@ export default class NoteViewState implements NodeViewState, LensViewState {
 	readonly noteViewInfo = new WritableStore<NoteViewInfo>(null)
 
 	readonly currentLens: ReadableStore<LensViewState>
-	readonly pinSettings: Readable<boolean>
+	readonly showSettings = new NodeViewSettingsVisibilityStore(false)
 
 	readonly details = new WritableStore<DetailsViewState>(null)
 
@@ -123,16 +123,16 @@ export default class NoteViewState implements NodeViewState, LensViewState {
 		this.detailMode = showDetails
 
 		this.currentLens = new ReadableStore(this)
-		this.pinSettings = derived([this.search, this.annotations], ([search, annotations]) => {
-			return search?.enabled || annotations.length > 1
-		})
-
+		
 		this.unsubs = [
 			this.note.observeStructureChanges(delta => {
 				this.onStructureChange(delta)
 			}),
 			this.search.subscribe(search => this.onSearchChanged(search)),
 			this.note.subscribe(note => this.onSearchChanged(this.search.value)),
+			derived([this.search, this.annotations], ([search, annotations]) => {
+				return search?.enabled || annotations.length > 1
+			}).subscribe(pin => this.showSettings.setPinOverride(pin))
 		]
 	}
 

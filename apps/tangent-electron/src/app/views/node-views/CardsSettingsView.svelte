@@ -11,6 +11,7 @@ $: settings = state.settings
 	name="Sort By"
 	display="inline"
 	form="select"
+	inputClass="arrowNavigate"
 	showReset={false}
 />
 <SettingView
@@ -18,10 +19,12 @@ $: settings = state.settings
 	name="Order"
 	display="inline"
 	form="select"
+	inputClass="arrowNavigate"
 	showReset={false}
 />
 <SettingView
 	display="inline"
 	setting={settings.showWordCount}
+	inputClass="arrowNavigate"
 	showReset={false}
 />

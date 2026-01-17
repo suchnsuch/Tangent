@@ -39,6 +39,7 @@ import { OpenDocumentationCommand } from './OpenDocumentation'
 import { DeleteSidebarItem, RenameSidebarItem } from './SidebarCommands'
 import { CopyFileToClipboardCommand } from './CopyFileToClipboard'
 import { OpenDetailsCommand } from './DetailCommands'
+import { OpenPaneSettingsCommand } from './PaneSettingsCommands'
 export { Command, CommandAction, type WorkspaceCommand }
 
 type LiteralCommands = ReturnType<typeof createAllCommands>
@@ -327,14 +328,26 @@ function createAllCommands(workspace: Workspace) {
 			shortcut: 'Mod+Alt+.'
 		}),
 
+		openPaneSettings: new OpenPaneSettingsCommand(workspace, {
+			group: 'Pane',
+			shortcut: 'Mod+Alt+Up',
+			mode: 'toggle'
+		}),
+		closePaneSettings: new OpenPaneSettingsCommand(workspace, {
+			group: 'Pane Settings',
+			shortcut: 'Mod+Alt+Down',
+			mode: false
+		}),
+
 		openDetails: new OpenDetailsCommand(workspace, {
+			group: 'Pane',
 			shortcut: 'Mod+Alt+Down',
 			mode: 'toggle' // When possible, having the same command close a panel it just opened is preferable
 		}),
 		closeDetails: new OpenDetailsCommand(workspace, {
+			group: 'Details',
 			shortcuts: ['Escape', 'Mod+Alt+Up'],
-			mode: false,
-			group: 'Details'
+			mode: false
 		})
 	}
 }

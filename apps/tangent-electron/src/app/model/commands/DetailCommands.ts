@@ -18,12 +18,12 @@ export class OpenDetailsCommand extends WorkspaceCommand {
 	}
 
 	canExecute(context?: CommandContext): boolean {
-		const view = this.workspace.viewState.tangent.currentThreadState.value?.currentLens.value.parent
+		const view = this.workspace.viewState.tangent.currentThreadState.value
 		return view?.details != null
 	}
 
 	execute(context?: CommandContext): void {
-		const view = this.workspace.viewState.tangent.currentThreadState.value?.currentLens.value.parent
+		const view = this.workspace.viewState.tangent.currentThreadState.value
 		if (!view?.details) return
 		view.details.update(details => {
 			return {
@@ -44,7 +44,7 @@ export class OpenDetailsCommand extends WorkspaceCommand {
 	}
 
 	getTooltip(context?: CommandContext) {
-		if (this.mode === false) return 'Closes the details of the current panel.'
-		return 'Opens the details of the current panel.'
+		if (this.mode === false) return 'Closes the details of the current pane.'
+		return 'Opens the details of the current pane.'
 	}
 }

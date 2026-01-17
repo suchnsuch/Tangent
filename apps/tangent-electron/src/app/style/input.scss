@@ -63,6 +63,7 @@ button, .button, select {
 	background-color: var(--buttonBackgroundColor);
 	transition: background-color .2s, border-color .2s, outline-color .2s, color .2s;
 	outline: none;
+	outline-color: transparent; // Prevents wonky transitions
 	border: none;
 
 	&:focus {
@@ -130,7 +131,9 @@ button, .button {
 	&:focus {
 		border-color: #666;
 	}
+}
 
+input, button, select, textarea, .button {
 	&.focusable {
 		outline: 2px solid transparent;
 
@@ -138,11 +141,12 @@ button, .button {
 			outline-color: #666;
 		}
 
-		&:hover, &:focus {
-			outline-color: var(--bgColor_Selected);
+		&:focus {
+			z-index: 1;
+			outline-color: var(--bgColor_Selected, var(--accentBackgroundColor));
 		}
 		&:active {
-			outline-color: var(--bgColor_Active);
+			outline-color: var(--bgColor_Active, var(--accentActiveBackgroundColor));
 		}
 	}
 }

@@ -2,9 +2,10 @@ import { Point } from "common/geometry"
 import scrollTo, { type ScrollMargin } from './scrollto'
 
 function elementCenter(node: HTMLElement): Point {
+	const rect = node.getBoundingClientRect()
 	return Point.make(
-		node.offsetLeft + node.offsetWidth * .5,
-		node.offsetTop + node.offsetWidth * .5
+		rect.left + rect.width * .5,
+		rect.top + rect.height * .5
 	)
 }
 
@@ -22,16 +23,33 @@ function directionFromKey(event: KeyboardEvent) {
 	return null
 }
 
-export interface ArrowNavigateOptions {
-	containerSelector: string
-	scrollTime: number
-	focusClass: string
-
-	scrollMarginX: ScrollMargin
-	scrollMarginY: ScrollMargin
+export function isArrowNavigateEvent(event: Event) {
+	return (event as any)._isArrowNavigateEvent
 }
 
-export default function arrowNavigate(node: HTMLElement, options?: Partial<ArrowNavigateOptions>) {
+export function preventArrowNavigate(event: Event) {
+	(event as any)._preventArrowNavigate = true
+}
+
+function allowArrowNavigate(event: Event) {
+	return !event.defaultPrevented && !(event as any)._preventArrowNavigate
+}
+
+export interface ArrowNavigateOptions {
+	// Selects a container of children to move between
+	containerSelector?: string
+	// Selects a set of elements to move between. If containerSelector is set, this target will be relative to that selector
+	targetSelector?: string
+
+	// When set, focused elements will have this class automatically added and removed
+	focusClass?: string
+	
+	scrollTime?: number
+	scrollMarginX?: ScrollMargin
+	scrollMarginY?: ScrollMargin
+}
+
+export default function arrowNavigate(node: HTMLElement, options?: ArrowNavigateOptions) {
 
 	let container = node
 
@@ -39,24 +57,52 @@ export default function arrowNavigate(node: HTMLElement, options?: Partial<Arrow
 		container = node.querySelector(options.containerSelector)
 	}
 
+	function getTargets() {
+		return Array.from(options?.targetSelector
+			? container.querySelectorAll(options.targetSelector)
+			: container.children)
+	}
+
 	function clearFocused() {
 		if (!options?.focusClass) return
-		for (let i = 0; i < container.children.length; i++) {
-			container.children[i].classList.remove(options.focusClass)
+		for (const target of getTargets()) {
+			target.classList.remove(options.focusClass)
 		}
 	}
 
+	function claimEvent(event: KeyboardEvent) {
+		event.preventDefault()
+		;(event as any)._isArrowNavigateEvent = true
+	}
+
 	function keydown(event: KeyboardEvent) {
-		if (event.defaultPrevented) return
+		if (!allowArrowNavigate(event)) return
 		if (node !== document.activeElement && !node.contains(document.activeElement)) return
 		if (!(document.activeElement instanceof HTMLElement)) return
 		if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return
+
+		if (event.key === 'Enter') {
+			const target = event.target
+			// Chromium doesn't like "Enter" for interacting with inputs, frustratingly
+			if (target instanceof HTMLSelectElement) {
+				claimEvent(event)
+				target.showPicker()
+				return
+			}
+			if (target instanceof HTMLInputElement) {
+				if (target.type === 'checkbox') {
+					claimEvent(event)
+					target.checked = !target.checked
+					return
+				}
+			}
+		}
 
 		if (event.key === 'Escape') {
 			if (document.activeElement != node) {
 				clearFocused()
 				node.focus()
-				event.preventDefault()
+				claimEvent(event)
 			}
 			return
 		}
@@ -64,14 +110,17 @@ export default function arrowNavigate(node: HTMLElement, options?: Partial<Arrow
 		const direction = directionFromKey(event)
 		if (!direction) return
 
-		let closest: HTMLElement = null
+		let best: HTMLElement = null
 		let fallback: HTMLElement = null
-		let closestDistance = Number.MAX_VALUE
+		let bestDot = 0
+		let bestDistance = Number.MAX_VALUE
 		let current = document.activeElement
 
-		if (current.parentElement != container && options?.focusClass) {
+		const targets = getTargets()
+
+		if (!targets.includes(current) && options?.focusClass) {
 			// Attempt to recover the selection
-			const found = container.querySelector('.' + options.focusClass)
+			const found = container.querySelector(`${options?.targetSelector ?? ''}.${options.focusClass}`)
 			if (found instanceof HTMLElement) {
 				current = found
 			}
@@ -80,43 +129,49 @@ export default function arrowNavigate(node: HTMLElement, options?: Partial<Arrow
 		const currentPoint = current === node ? Point.make(
 			current.offsetLeft, current.offsetTop
 		) : elementCenter(current)
-		let child = container.firstElementChild
 
-		for (; child != null; child = child.nextElementSibling) {
-			if (child === current) continue
-			if (!(child instanceof HTMLElement)) continue
-			if (!fallback) fallback = child
+		function isBetter(distance: number, dot: number) {
+			if (!best) return true
+			if (bestDot === dot) return distance < bestDistance
+			if (bestDot < dot && distance < bestDistance) return true
+			if (bestDot < 1 && Math.abs(dot - bestDot) < .1) return distance < bestDistance
+			return false
+		}
 
-			const itemPoint = elementCenter(child)
+		for (const target of targets) {
+			if (target === current) continue
+			if (!(target instanceof HTMLElement)) continue
+			if (!fallback) fallback = target
+
+			const itemPoint = elementCenter(target)
 			const dirToItem = Point.normalize(Point.subtract(itemPoint, currentPoint))
 			const dot = Point.dot(direction, dirToItem)
 			
-			if (dot < .5) continue
+			if (dot <= 0) continue
 
-			const distance = Point.squareDistance(
-				currentPoint,
-				itemPoint)
-			
-			if (!closest || distance < closestDistance) {
-				closest = child
-				closestDistance = distance
+			const distance = Point.squareDistance(currentPoint, itemPoint) / dot
+
+			if (isBetter(distance, dot)) {
+				best = target
+				bestDistance = distance
+				bestDot = dot
 			}
 		}
 
-		if (!closest) {
-			if (current != node && fallback) closest = fallback
+		if (!best) {
+			if (current != node && fallback) best = fallback
 			else return
 		}
-		event.preventDefault()
+		claimEvent(event)
 
 		if (options?.focusClass) {
 			clearFocused()
-			closest.classList.add(options.focusClass)
+			best.classList.add(options.focusClass)
 		}
 
-		closest.focus({ preventScroll: true })
+		best.focus({ preventScroll: true })
 		scrollTo({
-			target: closest,
+			target: best,
 			duration: options?.scrollTime ?? 0,
 			marginX: options?.scrollMarginX,
 			marginY: options?.scrollMarginY

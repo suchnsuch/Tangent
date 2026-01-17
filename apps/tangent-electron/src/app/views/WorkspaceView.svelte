@@ -38,7 +38,7 @@ $: {
 		document.body.classList.remove('focusing')
 	}
 }
-$: topCommandHandler = createCommandHandler(Object.values(workspace.commands).filter(c => !c.group))
+$: topCommandHandler = createCommandHandler(Object.values(workspace.commands).filter(c => !c.group || c.group === 'Pane'))
 
 // Top bar
 let hoveringForTopBar = false

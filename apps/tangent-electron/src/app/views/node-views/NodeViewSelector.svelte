@@ -17,6 +17,7 @@ import { pluralize } from 'common/plurals'
 import { WorkspaceTreeNode } from 'app/model'
 import { createCommandHandler } from 'app/model/commands/Command'
 import { selectDetailsPane } from 'app/utils/selection'
+import arrowNavigate, { isArrowNavigateEvent } from 'app/utils/arrowNavigate'
 
 const workspace = getContext('workspace') as Workspace
 
@@ -40,6 +41,7 @@ export let onNavigate: NavigationCallback
 export let onScrollRequest: ScrollToCallback = null
 export let onViewReady: ViewReadyCallback = null
 
+$: node = state.node instanceof WorkspaceTreeNode ? state.node : null
 $: lensState = state.currentLens
 $: viewComponent = $lensState?.viewComponent
 $: canShowSettings = state.settingsComponent != null ||
@@ -48,15 +50,22 @@ $: canShowSettings = state.settingsComponent != null ||
 let hintSettings = false
 let showSettingsFromMouse = false
 let showSettingsFromHover = false
-$: pinSettings = state.pinSettings
-$: willPinSettings = (pinSettings && $pinSettings)
-$: showSettings = showSettingsFromMouse || showSettingsFromHover || willPinSettings
+$: showSettingsState = state.showSettings
+$: willShowSettings = (showSettingsState && $showSettingsState !== false)
+$: showSettings = showSettingsFromMouse || showSettingsFromHover || willShowSettings
 
 let container: HTMLElement
 let settingsContainer: HTMLElement
 let settingsHeight: number = extraTop
 
-$: node = state.node instanceof WorkspaceTreeNode ? state.node : null
+let closeSettingsCommands = createCommandHandler([
+	workspace.commands.openPaneSettings,
+	workspace.commands.closePaneSettings
+])
+$: if (settingsContainer && willShowSettings && !settingsContainer.contains(document.activeElement)) {
+	settingsContainer.focus()
+}
+
 $: detailsState = state.details
 $: canShowDetails = showDetails && node && detailsState != null
 $: canOpenDetails = canShowDetails && $detailsState?.open !== null
@@ -124,15 +133,43 @@ function onFocusInContainer(event: FocusEvent) {
 	// TODO: Close details if not within details
 }
 
-let hoverTimeout = null
+let settingsHoverTimeout = null
 function onSettingsEnter() {
-	if (hoverTimeout) clearTimeout(hoverTimeout)
+	if (settingsHoverTimeout) clearTimeout(settingsHoverTimeout)
 	showSettingsFromHover =  true
 }
 function onSettingsLeave() {
-	hoverTimeout = setTimeout(() => {
+	settingsHoverTimeout = setTimeout(() => {
 		showSettingsFromHover = false
 	}, 500)
+}
+
+let settingsFocusTimeout = null
+function onSettingsKeydown(event: KeyboardEvent) {
+	if (event.defaultPrevented) {
+		if (isArrowNavigateEvent(event)) {
+			if (settingsFocusTimeout) clearTimeout(settingsFocusTimeout)
+			showSettingsState?.set(true)
+		}
+		return
+	}
+
+	if (closeSettingsCommands(event) && state.focus) {
+		state.focus(container)
+		return
+	}
+
+	if (event.key === 'Escape') {
+		event.preventDefault()
+		workspace.commands.closePaneSettings.execute()
+		state.focus(container)
+		return
+	}
+}
+function onSettingsFocusOut(event: FocusEvent) {
+	settingsFocusTimeout = setTimeout(() => {
+		showSettingsState?.set(false)
+	}, 50)
 }
 
 // This provides directory-scoped class names for custom css styling
@@ -215,7 +252,7 @@ function onDetailKeydown(event: KeyboardEvent) {
 			{focusLevel}
 			{layout}
 			{background}
-			extraTop={willPinSettings ? settingsHeight ?? extraTop : extraTop}
+			extraTop={(showSettingsState && $showSettingsState === 'pin') ? settingsHeight ?? extraTop : extraTop}
 			extraBottom={extraBottom + (canShowDetails ? 24 : 0)}
 			{onNavigate}
 			{onViewReady}
@@ -247,17 +284,25 @@ function onDetailKeydown(event: KeyboardEvent) {
 				{/if}
 			</div>
 		{/if}
-		{#if showSettings}
+		{#if showSettings || true}
 			<!-- svelte-ignore a11y-click-events-have-key-events -->
 			<!-- svelte-ignore a11y-no-static-element-interactions -->
+			<!-- svelte-ignore a11y_no_noninteractive_tabindex -->
 			<div
 				bind:this={settingsContainer}
 				use:resizeObserver={onSettingsResize}
+				use:arrowNavigate={{
+					targetSelector: '.arrowNavigate, .WorkspaceFileHeader .title',
+					focusClass: 'focusable'
+				}}
+				tabindex="-1"
 				class="settings-container"
 				style:padding-top={extraTop + 4 + 'px'}
 				on:mouseenter={onSettingsEnter}
 				on:mouseleave={onSettingsLeave}
 				on:click|preventDefault
+				on:keydown={onSettingsKeydown}
+				on:focusout={onSettingsFocusOut}
 				in:fly={{ duration: 200, y: -100 }}
 				out:fly={{ duration: 700, y: -100 }}
 			>

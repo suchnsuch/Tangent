@@ -79,7 +79,7 @@ function onSearchChange(event) {
 				<button disabled>
 					<SvgIcon size={16} ref="query.svg#query" />
 				</button>
-				<input bind:this={searchField} class="search" type="text"
+				<input bind:this={searchField} class="search arrowNavigate" type="text"
 					value={$search.text}
 					on:input={onSearchChange}
 					on:keydown={onSearchKeydown}
@@ -87,7 +87,7 @@ function onSearchChange(event) {
 				/>
 			</span>
 		{:else}
-			<button class="subtle" on:click={openSearch}>
+			<button class="subtle arrowNavigate" on:click={openSearch}>
 				<SvgIcon size={16} ref="query.svg#query" />
 			</button>
 		{/if}
@@ -95,10 +95,10 @@ function onSearchChange(event) {
 		{#if $annotations.length > 0}
 			<span class="annotation-count">{$annotationIndex + 1}/{$annotations.length}</span>
 			<span class="buttonGroup">
-				<button class="previous" on:click={() => $annotationIndex = $annotationIndex == 0 ? $annotations.length - 1 : $annotationIndex - 1}>
+				<button class="previous arrowNavigate" on:click={() => $annotationIndex = $annotationIndex == 0 ? $annotations.length - 1 : $annotationIndex - 1}>
 					<SvgIcon size={16} ref="arrows.svg#back" />
 				</button>
-				<button class="next" on:click={() => $annotationIndex = $annotationIndex == $annotations.length - 1 ? 0 : $annotationIndex + 1}>
+				<button class="next arrowNavigate" on:click={() => $annotationIndex = $annotationIndex == $annotations.length - 1 ? 0 : $annotationIndex + 1}>
 					<SvgIcon size={16} ref="arrows.svg#forward" />
 				</button>
 			</span>
@@ -106,7 +106,7 @@ function onSearchChange(event) {
 			<span class="annotation-count none">No Matches</span>
 		{/if}
 		{#if $search?.enabled || $annotations.length > 0}
-			<button class="subtle" on:click={closeSearch}>
+			<button class="subtle arrowNavigate" on:click={closeSearch}>
 				<SvgIcon size={16} ref="close.svg#close" />
 			</button>
 		{/if}

@@ -2,17 +2,33 @@
 import { eventIsModifier, shortcutDisplayString, shortcutFromEvent } from './shortcuts'
 import { tooltip } from './tooltips'
 
-export let validate: (shortcut: string) => string = null
-export let onCancel: () => void = null
-export let onAccept: (shortcut: string) => void = null
+interface Props {
+	validate?: (shortcut: string) => string
+	onCancel?: () => void
+	onAccept?: (shortcut: string) => void
 
-export let value: string = null
+	value?: string
+	class?: string
+}
 
-let editText: string = value ?? ''
-let errorText: string = ''
-let editElement: HTMLInputElement = null
-let placeholder = 'Add Shortcut'
-$: if (value === null) editElement?.focus(); else if (document.activeElement !== editElement) editText = value
+let {
+	validate,
+	onCancel,
+	onAccept,
+	value = $bindable(null),
+	...props
+}: Props = $props()
+
+let editText: string = $state(value ?? '')
+let errorText: string = $state('')
+let editElement: HTMLInputElement = $state(null)
+let placeholder = $state('Add Shortcut')
+
+$effect(() => {
+	console.log('value', value)
+	if (value === null) editElement?.focus()
+	else if (document.activeElement !== editElement) editText = value
+})
 
 function onFocus() {
 	editText = ''
@@ -53,10 +69,11 @@ function onEditKeyUp(event: KeyboardEvent) {
 <input
 	bind:this={editElement}
 	bind:value={editText}
-	on:keydown={onEditKeyDown}
-	on:keyup={onEditKeyUp}
-	on:focus={onFocus}
-	on:blur={onBlur}
+	onkeydown={onEditKeyDown}
+	onkeyup={onEditKeyUp}
+	onfocus={onFocus}
+	onblur={onBlur}
+	class={props.class}
 	{placeholder}
 />
 {#if errorText}
