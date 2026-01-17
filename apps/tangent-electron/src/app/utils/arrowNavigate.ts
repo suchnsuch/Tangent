@@ -1,5 +1,6 @@
 import { Point } from "common/geometry"
 import scrollTo, { type ScrollMargin } from './scrollto'
+import { wait } from "@such-n-such/core"
 
 function elementCenter(node: HTMLElement): Point {
 	const rect = node.getBoundingClientRect()
@@ -96,6 +97,13 @@ export default function arrowNavigate(node: HTMLElement, options?: ArrowNavigate
 					return
 				}
 			}
+			if (target instanceof HTMLButtonElement && options?.focusClass) {
+				// Hack to ensure the 
+				wait().then(() => {
+					target.classList.add(options?.focusClass)
+				})
+				return
+			}
 		}
 
 		if (event.key === 'Escape') {
@@ -105,6 +113,13 @@ export default function arrowNavigate(node: HTMLElement, options?: ArrowNavigate
 				claimEvent(event)
 			}
 			return
+		}
+
+		if (event.target instanceof HTMLInputElement && event.target.type === 'text') {
+			const input = event.target
+			if (input.selectionStart != input.selectionEnd) return
+			if (event.key === 'ArrowLeft' && input.selectionStart > 0) return
+			if (event.key === 'ArrowRight' && input.selectionEnd < input.value.length) return
 		}
 
 		const direction = directionFromKey(event)

@@ -166,9 +166,19 @@ function onSettingsKeydown(event: KeyboardEvent) {
 		return
 	}
 }
+function onSettingsFocusIn(event: FocusEvent) {
+	if (settingsFocusTimeout) {
+		clearTimeout(settingsFocusTimeout)
+		if (event.target instanceof HTMLElement && event.target.matches('.arrowNavigate')) {
+			event.target.classList.add('focusable')
+		}
+	}
+}
 function onSettingsFocusOut(event: FocusEvent) {
+	if (!willShowSettings) return
 	settingsFocusTimeout = setTimeout(() => {
 		showSettingsState?.set(false)
+		settingsFocusTimeout = null
 	}, 50)
 }
 
@@ -284,7 +294,7 @@ function onDetailKeydown(event: KeyboardEvent) {
 				{/if}
 			</div>
 		{/if}
-		{#if showSettings || true}
+		{#if showSettings}
 			<!-- svelte-ignore a11y-click-events-have-key-events -->
 			<!-- svelte-ignore a11y-no-static-element-interactions -->
 			<!-- svelte-ignore a11y_no_noninteractive_tabindex -->
@@ -302,6 +312,7 @@ function onDetailKeydown(event: KeyboardEvent) {
 				on:mouseleave={onSettingsLeave}
 				on:click|preventDefault
 				on:keydown={onSettingsKeydown}
+				on:focusin={onSettingsFocusIn}
 				on:focusout={onSettingsFocusOut}
 				in:fly={{ duration: 200, y: -100 }}
 				out:fly={{ duration: 700, y: -100 }}

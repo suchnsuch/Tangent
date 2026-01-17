@@ -19,6 +19,7 @@ $: if (search && $search?.enabled) {
 	})
 }
 
+let openButton: HTMLButtonElement
 let searchField: HTMLInputElement
 
 function openSearch() {
@@ -32,14 +33,21 @@ function closeSearch() {
 			enabled: false
 		}
 	})
+	tick().then(() => {
+		if (openButton) openButton.focus()
+	})
 }
 
 function onSearchKeydown(event: KeyboardEvent) {
+	if (event.defaultPrevented || !state.search.value?.enabled) return
 	if (event.key === 'Escape') {
 		event.preventDefault()
 		closeSearch()
 		return
 	}
+}
+
+function onSearchInputKeydown(event: KeyboardEvent) {
 	if (event.key === 'Enter' || event.key == 'Tab') {
 		event.preventDefault()
 		event.stopPropagation()
@@ -73,7 +81,8 @@ function onSearchChange(event) {
 <div class="lens-settings-row">
 	<WorkspaceFileHeader node={state.node} showExtension={true} />
 	<span class="spacer"></span>
-	<span class="search buttonBar">
+	<!-- svelte-ignore a11y_no_static_element_interactions -->
+	<span class="search buttonBar" on:keydown={onSearchKeydown}>
 		{#if $search?.enabled}
 			<span class="buttonGroup">
 				<button disabled>
@@ -81,13 +90,13 @@ function onSearchChange(event) {
 				</button>
 				<input bind:this={searchField} class="search arrowNavigate" type="text"
 					value={$search.text}
+					on:keydown={onSearchInputKeydown}
 					on:input={onSearchChange}
-					on:keydown={onSearchKeydown}
 					use:focusLayer={'FileSearch'}
 				/>
 			</span>
 		{:else}
-			<button class="subtle arrowNavigate" on:click={openSearch}>
+			<button bind:this={openButton} class="subtle arrowNavigate" on:click={openSearch}>
 				<SvgIcon size={16} ref="query.svg#query" />
 			</button>
 		{/if}
