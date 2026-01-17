@@ -43,7 +43,7 @@ export interface ArrowNavigateOptions {
 	targetSelector?: string
 
 	// When set, focused elements will have this class automatically added and removed
-	focusClass?: string
+	focusClass?: string|string[]
 	
 	scrollTime?: number
 	scrollMarginX?: ScrollMargin
@@ -53,6 +53,13 @@ export interface ArrowNavigateOptions {
 export default function arrowNavigate(node: HTMLElement, options?: ArrowNavigateOptions) {
 
 	let container = node
+	let focusClasses = (() => {
+		if (!options.focusClass) return null
+		if (Array.isArray(options.focusClass)) {
+			return options.focusClass
+		}
+		return [options.focusClass]
+	})()
 
 	if (options?.containerSelector) {
 		container = node.querySelector(options.containerSelector)
@@ -64,10 +71,19 @@ export default function arrowNavigate(node: HTMLElement, options?: ArrowNavigate
 			: container.children)
 	}
 
-	function clearFocused() {
-		if (!options?.focusClass) return
+	function addFocusClasses(target: HTMLElement) {
+		if (!focusClasses) return
+		for (const focusClass of focusClasses) {
+				target.classList.add(focusClass)
+			}
+	}
+
+	function clearFocusedClasses() {
+		if (!focusClasses) return
 		for (const target of getTargets()) {
-			target.classList.remove(options.focusClass)
+			for (const focusClass of focusClasses) {
+				target.classList.remove(focusClass)
+			}
 		}
 	}
 
@@ -97,10 +113,10 @@ export default function arrowNavigate(node: HTMLElement, options?: ArrowNavigate
 					return
 				}
 			}
-			if (target instanceof HTMLButtonElement && options?.focusClass) {
+			if (target instanceof HTMLButtonElement && focusClasses) {
 				// Hack to ensure the 
 				wait().then(() => {
-					target.classList.add(options?.focusClass)
+					addFocusClasses(target)
 				})
 				return
 			}
@@ -108,7 +124,7 @@ export default function arrowNavigate(node: HTMLElement, options?: ArrowNavigate
 
 		if (event.key === 'Escape') {
 			if (document.activeElement != node) {
-				clearFocused()
+				clearFocusedClasses()
 				node.focus()
 				claimEvent(event)
 			}
@@ -179,9 +195,9 @@ export default function arrowNavigate(node: HTMLElement, options?: ArrowNavigate
 		}
 		claimEvent(event)
 
-		if (options?.focusClass) {
-			clearFocused()
-			best.classList.add(options.focusClass)
+		if (focusClasses) {
+			clearFocusedClasses()
+			addFocusClasses(best)
 		}
 
 		best.focus({ preventScroll: true })
@@ -204,9 +220,9 @@ export default function arrowNavigate(node: HTMLElement, options?: ArrowNavigate
 		}
 		if (!target) return
 
-		if (options?.focusClass) {
-			clearFocused()
-			target.classList.add(options.focusClass)
+		if (focusClasses) {
+			clearFocusedClasses()
+			addFocusClasses(target)
 		}
 	}
 

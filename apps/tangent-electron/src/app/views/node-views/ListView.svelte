@@ -1,13 +1,14 @@
 <script lang="ts">
 import { getContext } from 'svelte'
 import { getNode, isReference, isSubReference, type TreeNodeOrReference } from 'common/nodeReferences'
-import type { NavigationCallback, ViewReadyCallback } from 'app/events'
+import { getLinkDirectionFromEvent, type NavigationCallback } from 'app/events'
 import { Workspace } from 'app/model'
 import WorkspaceTreeNode from 'app/model/WorkspaceTreeNode'
 import WorkspaceFileHeader from 'app/utils/WorkspaceFileHeader.svelte'
-import ListViewState from 'app/model/nodeViewStates/ListViewState'
+import ListViewState, { arrowNavigateTargetSelector } from 'app/model/nodeViewStates/ListViewState'
 import { BaseSetViewState } from 'app/model/nodeViewStates/SetViewState'
 import NodeIcon from '../smart-icons/NodeIcon.svelte'
+import arrowNavigate from 'app/utils/arrowNavigate'
 
 const workspace = getContext('workspace') as Workspace
 
@@ -23,19 +24,31 @@ $: items = state.items
 function nodeClick(event, ref: TreeNodeOrReference) {
 	if (onNavigate) onNavigate({
 		origin: state.parent.node,
-		target: ref
+		target: ref,
+		direction: getLinkDirectionFromEvent(event, workspace)
 	})
 	
 	event.preventDefault()
 	event.stopPropagation()
 }
 
+function nodeKeydown(event: KeyboardEvent, ref: TreeNodeOrReference) {
+	if (event.key === 'Enter') {
+		nodeClick(event, ref)
+	}
+}
+
 </script>
 
 <main
-	class={`layout-${layout}`}
+	class={`ListView layout-${layout}`}
 	style:padding-top={extraTop + 'px'}
 	style:padding-bottom={extraBottom + 'px'}
+	use:arrowNavigate={{
+		targetSelector: arrowNavigateTargetSelector,
+		focusClass: ['focusable', 'focused']
+	}}
+	tabindex="-1"
 >
 	{#if (state.parent instanceof BaseSetViewState && state.parent.isLensOverridden) && state.parent.node instanceof WorkspaceTreeNode}
 		<WorkspaceFileHeader node={state.parent.node} showExtension={false} editable={false} />
@@ -48,7 +61,12 @@ function nodeClick(event, ref: TreeNodeOrReference) {
 				{@const node = getNode(item, workspace.directoryStore)}
 				<!-- svelte-ignore a11y-no-static-element-interactions -->
 				<!-- svelte-ignore a11y-click-events-have-key-events -->
-				<div class="button subtle" on:click={e => nodeClick(e, item)}>
+				<!-- svelte-ignore a11y_no_noninteractive_tabindex -->
+				<div class="button no-callout arrowNavigate"
+					tabindex="0"
+					on:click={e => nodeClick(e, item)}
+					on:keydown={e => nodeKeydown(e, item)}
+				>
 					<NodeIcon {node} />
 					{node.name}
 				</div>
