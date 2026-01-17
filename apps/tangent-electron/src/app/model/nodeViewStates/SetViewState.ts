@@ -13,7 +13,7 @@ import FeedViewState from './FeedViewState';
 import type LensViewState from './LensViewState';
 import type ViewStateContext from './ViewStateContext';
 import LoadingViewState from './LoadingViewState';
-import { NodeViewSettingsVisibilityStore } from './NodeViewState';
+import { DetailsViewStateStore, NodeViewSettingsVisibilityStore } from './NodeViewState';
 
 export interface SetViewState extends NodeViewState, NodeSet {
 	context: ViewStateContext
@@ -30,7 +30,7 @@ export abstract class BaseSetViewState extends SelfStore implements SetViewState
 
 	protected _lensOverride: SetLensMode
 
-	readonly details = new WritableStore<DetailsViewState>(null)
+	readonly details = new DetailsViewStateStore<DetailsViewState>(null)
 	readonly showSettings = new NodeViewSettingsVisibilityStore(false)
 
 	constructor(context) {

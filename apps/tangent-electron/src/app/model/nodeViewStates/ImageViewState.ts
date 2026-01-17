@@ -7,6 +7,7 @@ import ImageView from 'app/views/node-views/ImageView.svelte'
 import type { SettingDefinition } from 'common/settings/Setting'
 import ZoomSetting from 'common/settings/ZoomSetting'
 import { selectDetailsPane } from 'app/utils/selection'
+import { DetailsViewStateStore } from './NodeViewState'
 
 const imageZoomDefinition: SettingDefinition<number> = {
 	defaultValue: 1,
@@ -24,7 +25,7 @@ export default class ImageViewState implements NodeViewState, LensViewState {
 
 	readonly currentLens: ReadableStore<LensViewState>;
 
-	readonly details = new WritableStore<DetailsViewState>(null)
+	readonly details = new DetailsViewStateStore<DetailsViewState>(null)
 
 	constructor(file: EmbedFile) {
 		this.file = file

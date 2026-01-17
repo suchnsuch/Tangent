@@ -20,7 +20,7 @@ export interface NodeViewState {
 	readonly showSettings?: WritableStore<NodeViewSettingsVisibility>
 
 	detailsSummaryComponent?: SvelteConstructor
-	readonly details?: WritableStore<DetailsViewState>
+	readonly details?: DetailsViewStateStore<DetailsViewState>
 
 	dispose?()
 	focus?(element: HTMLElement): boolean
@@ -45,5 +45,25 @@ export class NodeViewSettingsVisibilityStore extends WritableStore<NodeViewSetti
 			this.pinOverride = override
 			this.notifyObservers()
 		}
+	}
+}
+
+export class DetailsViewStateStore<T extends DetailsViewState> extends WritableStore<T> {
+	open(isOpen=true) {
+		this.update(details => {
+			return {
+				...details,
+				open: isOpen
+			}
+		})
+	}
+
+	close() {
+		this.update(details => {
+			return {
+				...details,
+				open: false
+			}
+		})
 	}
 }

@@ -3,12 +3,13 @@ import type { DetailsViewState, NodeViewState } from '.'
 import EmbedFile from '../EmbedFile'
 import type LensViewState from './LensViewState'
 import PdfView from 'app/views/node-views/PdfView.svelte'
+import { DetailsViewStateStore } from './NodeViewState'
 
 export default class PdfViewState implements NodeViewState, LensViewState {
 	readonly file: EmbedFile
 
 	readonly currentLens: ReadableStore<LensViewState>
-	readonly details = new WritableStore<DetailsViewState>(null)
+	readonly details = new DetailsViewStateStore<DetailsViewState>(null)
 
 	constructor(file: EmbedFile) {
 		this.file = file

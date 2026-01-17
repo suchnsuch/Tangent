@@ -18,6 +18,7 @@ import { WorkspaceTreeNode } from 'app/model'
 import { createCommandHandler } from 'app/model/commands/Command'
 import { selectDetailsPane } from 'app/utils/selection'
 import arrowNavigate, { isArrowNavigateEvent } from 'app/utils/arrowNavigate'
+import type { NodeViewSettingsVisibility } from 'app/model/nodeViewStates/NodeViewState'
 
 const workspace = getContext('workspace') as Workspace
 
@@ -72,10 +73,11 @@ $: if (settingsContainer && willShowSettings && !settingsContainer.contains(docu
 $: detailsState = state.details
 $: canShowDetails = showDetails && node && detailsState != null
 $: canOpenDetails = canShowDetails && $detailsState?.open !== null
-$: areDetailsOpen = canShowDetails && $detailsState?.open
+$: areDetailsOpen = canShowDetails ? $detailsState?.open : false
 let detailsContainer: HTMLElement = null
+let detailsHeight = 0
 
-const effectiveShowDetails = timedLatch(false)
+const effectiveShowDetails = timedLatch<NodeViewSettingsVisibility>(false)
 $: effectiveShowDetails.update(areDetailsOpen)
 $: if ($effectiveShowDetails && container) {
 	tick().then(() => {
@@ -135,12 +137,7 @@ function onMouseMoveContainer(event: MouseEvent) {
 
 function onFocusInContainer(event: FocusEvent) {
 	if (detailsState && !detailsContainer.contains(document.activeElement)) {
-		detailsState.update(details => {
-			return {
-				...details,
-				open: false
-			}
-		})
+		detailsState.close()
 	}
 }
 
@@ -229,22 +226,7 @@ function getClassNamesForNode(node: TreeNode) {
 
 function toggleOpenDetails() {
 	if (!canOpenDetails) return
-	if (areDetailsOpen) {
-		detailsState.update(details => {
-			return {
-				...details,
-				open: false
-			}
-		})
-	}
-	else {
-		detailsState.update(details => {
-			return {
-				...details,
-				open: true
-			}
-		})
-	}
+	detailsState.open(!areDetailsOpen)
 }
 
 function onDetailKeydown(event: KeyboardEvent) {
@@ -252,6 +234,13 @@ function onDetailKeydown(event: KeyboardEvent) {
 
 	if (closeDetailsCommands(event) && state.focus) {
 		state.focus(container)
+	}
+}
+
+function onDetailsResized(entries: ResizeObserverEntry[]) {
+	const entry = entries[0]
+	if (entry) {
+		detailsHeight = entry.contentBoxSize[0].blockSize
 	}
 }
 
@@ -274,7 +263,7 @@ function onDetailKeydown(event: KeyboardEvent) {
 			{layout}
 			{background}
 			extraTop={(showSettingsState && $showSettingsState === 'pin') ? settingsHeight ?? extraTop : extraTop}
-			extraBottom={extraBottom + (canShowDetails ? 24 : 0)}
+			extraBottom={extraBottom + detailsHeight}
 			{onNavigate}
 			{onViewReady}
 			{onScrollRequest}
@@ -360,6 +349,7 @@ function onDetailKeydown(event: KeyboardEvent) {
 			class:open={areDetailsOpen}
 			class:openable={canOpenDetails}
 			on:keydown={onDetailKeydown}
+			use:resizeObserver={onDetailsResized}
 		>
 			<!-- svelte-ignore a11y_click_events_have_key_events -->
 			<!-- svelte-ignore a11y_no_static_element_interactions -->

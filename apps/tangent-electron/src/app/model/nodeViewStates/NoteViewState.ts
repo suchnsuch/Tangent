@@ -1,10 +1,10 @@
-import { derived, type Readable, type Writable } from 'svelte/store'
+import { derived } from 'svelte/store'
 import type { EditorRange } from "@typewriter/document"
 import { escapeRegExp } from '@such-n-such/core'
-import { type NodeViewState, type DetailsViewState, type NodeViewSettingsVisibility, NodeViewSettingsVisibilityStore } from "./NodeViewState"
+import { type NodeViewState, type DetailsViewState, NodeViewSettingsVisibilityStore, DetailsViewStateStore } from "./NodeViewState"
 import type NoteFile from "../NoteFile"
 import { type PartialLink, StructureType } from "common/indexing/indexTypes"
-import { CachingStore, ForwardingStore, ReadableStore, subscribeUntil, WritableStore } from 'common/stores'
+import { ForwardingStore, ReadableStore, subscribeUntil, WritableStore } from 'common/stores'
 import type { StructureDelta } from 'common/indexing/structureUtils'
 import type LensViewState from './LensViewState'
 
@@ -65,7 +65,7 @@ export default class NoteViewState implements NodeViewState, LensViewState {
 	readonly currentLens: ReadableStore<LensViewState>
 	readonly showSettings = new NodeViewSettingsVisibilityStore(false)
 
-	readonly details = new WritableStore<DetailsViewState>(null)
+	readonly details = new DetailsViewStateStore<DetailsViewState>(null)
 
 	// Forwarded state values
 	readonly selection: WritableStore<EditorRange>
@@ -199,12 +199,7 @@ export default class NoteViewState implements NodeViewState, LensViewState {
 		if (!element) return false
 
 		if (this.note?.meta.virtual && this.details) {
-			this.details.update(value => {
-				return {
-					open: true,
-					...value
-				}
-			})
+			this.details.open()
 		}
 
 		if (this.details?.value?.open && selectDetailsPane(element)) return true

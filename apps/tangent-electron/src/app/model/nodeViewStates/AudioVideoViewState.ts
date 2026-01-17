@@ -6,12 +6,13 @@ import AudioVideoView from 'app/views/node-views/AudioVideoView.svelte'
 import DataFile from '../DataFile'
 import AudioVideoViewInfo from 'common/dataTypes/AudioVideoViewInfo'
 import ViewStateContext from './ViewStateContext'
+import { DetailsViewStateStore } from './NodeViewState'
 
 export default class AudioVideoViewState implements NodeViewState, LensViewState {
 	readonly file: EmbedFile
 
 	readonly currentLens: ReadableStore<LensViewState>
-	readonly details = new WritableStore<DetailsViewState>(null)
+	readonly details = new DetailsViewStateStore<DetailsViewState>(null)
 
 	readonly viewInfoFile: DataFile
 	readonly viewInfo = new WritableStore<AudioVideoViewInfo>(null)
