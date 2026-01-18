@@ -803,19 +803,6 @@ function onNoteKeydown(event: KeyboardEventWithShortcut) {
 		state.setAnnotations([])
 		return
 	}
-
-	// TODO: Make into a proper command
-	if (event.modShortcut === 'Mod+F') {
-		event.preventDefault()
-		const selection = editor.doc.selection
-		if (selection && selection[0] != selection[1]) {
-			state.setSearch(editor.doc.getText(selection))
-		}
-		else {
-			state.setSearch()
-		}
-		return
-	}
 }
 
 function navigationForward(event: NavigationEvent) {

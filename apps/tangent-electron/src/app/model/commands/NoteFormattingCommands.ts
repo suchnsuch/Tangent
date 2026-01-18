@@ -24,6 +24,7 @@ interface InlineFormatCommandOptions extends CommandOptions {
 }
 
 interface NoteEditorCommandContext extends CommandContext {
+	view?: NoteViewState
 	editor?: MarkdownEditor
 	selection?: EditorRange
 }
@@ -49,18 +50,21 @@ class NoteEditorCommand extends WorkspaceCommand {
 	getTargets(context?: NoteEditorCommandContext) {
 		let editor = context?.editor
 		let selection = context?.selection
+		let view = context?.view
+		
+		if (!view) {
+			view = getNoteView(this.workspace.viewState.tangent)
+			if (!view || !(view.editor instanceof MarkdownEditor)) return null
+		}
 
 		if (!editor || !selection) {
-			const view = getNoteView(this.workspace.viewState.tangent)
-			if (!view || !(view.editor instanceof MarkdownEditor)) return null
-			
 			editor = editor || view.editor
 			selection = selection || editor.doc.selection || view.selection.value
 		}
 
-		if (!editor || !selection) return null
+		if (!view || !editor || !selection) return null
 
-		return { editor, selection }
+		return { view, editor, selection }
 	}
 }
 
@@ -327,5 +331,37 @@ export class ShiftNoteGroupCommand extends NoteEditorCommand {
 
 	getDefaultPaletteName() {
 		return this.getName()
+	}
+}
+
+export class SearchNoteCommand extends NoteEditorCommand {
+
+	constructor(workspace: Workspace, options: CommandOptions) {
+		super(workspace, { group: 'Notes', ...options })
+	}
+
+	canExecute(context?: NoteEditorCommandContext): boolean {
+		return this.getTargets(context) != null
+	}
+
+	execute(context?: NoteEditorCommandContext): void {
+		const targets = this.getTargets(context)
+		if (!targets) return
+		const { view, editor, selection } = targets
+
+		if (selection[0] != selection[1]) {
+			view.setSearch(editor.doc.getText(selection))
+		}
+		else {
+			view.setSearch()
+		}
+	}
+
+	getLabel(context?: CommandContext) {
+		return 'Search Note'
+	}
+
+	getTooltip(context?: CommandContext) {
+		return 'Searches for content within the current note.'
 	}
 }

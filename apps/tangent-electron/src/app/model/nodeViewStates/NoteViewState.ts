@@ -279,6 +279,7 @@ export default class NoteViewState implements NodeViewState, LensViewState {
 	}
 
 	setSearch(text?: string) {
+		this.showSettings.set(true)
 		this.search.update(search => {
 			text = text ?? search?.text ?? ''
 			const mode = search?.mode ?? 'text'

@@ -32,7 +32,7 @@ import ShowAllChildMapNodesCommand from './ShowAllChildMapNodes'
 import ShowPreviousSessionCommand from './ShowPreviousSession'
 import DuplicateNodeCommand from './DuplicateNode'
 import { CollapseAllSectionsCommand, CollapseCurrentSectionCommand } from './CollapseSectionCommands'
-import { InlineFormatCommand, NoteLinePrefixCommand, ShiftNoteGroupCommand, ToggleMDLinkCommand as ToggleMarkdownLinkCommand, ToggleWikiLinkCommand } from './NoteFormattingCommands'
+import { InlineFormatCommand, NoteLinePrefixCommand, SearchNoteCommand, ShiftNoteGroupCommand, ToggleMDLinkCommand as ToggleMarkdownLinkCommand, ToggleWikiLinkCommand } from './NoteFormattingCommands'
 import { isMac } from 'common/platform'
 import { NativeCommand } from './NativeCommand'
 import { OpenDocumentationCommand } from './OpenDocumentation'
@@ -198,7 +198,34 @@ function createAllCommands(workspace: Workspace) {
 		showPreviousSession: new ShowPreviousSessionCommand(workspace),
 
 
+		// Panes & Details
+		openPaneSettings: new OpenPaneSettingsCommand(workspace, {
+			group: 'Pane',
+			shortcut: 'Mod+Alt+Up',
+			mode: 'toggle'
+		}),
+		closePaneSettings: new OpenPaneSettingsCommand(workspace, {
+			group: 'Pane Settings',
+			shortcut: 'Mod+Alt+Down',
+			mode: false
+		}),
+
+		openDetails: new OpenDetailsCommand(workspace, {
+			group: 'Pane',
+			shortcut: 'Mod+Alt+Down',
+			mode: 'toggle' // When possible, having the same command close a panel it just opened is preferable
+		}),
+		closeDetails: new OpenDetailsCommand(workspace, {
+			group: 'Details',
+			shortcuts: ['Escape', 'Mod+Alt+Up'],
+			mode: false
+		}),
+
+
 		// Notes
+		SearchNoteCommand: new SearchNoteCommand(workspace, {
+			shortcut: 'Mod+F'
+		}),
 		toggleBold: new InlineFormatCommand(workspace, {
 			label: 'Bold',
 			tooltip: 'Toggles whether the selected text is bold.',
@@ -327,28 +354,6 @@ function createAllCommands(workspace: Workspace) {
 			mode: 'expand',
 			shortcut: 'Mod+Alt+.'
 		}),
-
-		openPaneSettings: new OpenPaneSettingsCommand(workspace, {
-			group: 'Pane',
-			shortcut: 'Mod+Alt+Up',
-			mode: 'toggle'
-		}),
-		closePaneSettings: new OpenPaneSettingsCommand(workspace, {
-			group: 'Pane Settings',
-			shortcut: 'Mod+Alt+Down',
-			mode: false
-		}),
-
-		openDetails: new OpenDetailsCommand(workspace, {
-			group: 'Pane',
-			shortcut: 'Mod+Alt+Down',
-			mode: 'toggle' // When possible, having the same command close a panel it just opened is preferable
-		}),
-		closeDetails: new OpenDetailsCommand(workspace, {
-			group: 'Details',
-			shortcuts: ['Escape', 'Mod+Alt+Up'],
-			mode: false
-		})
 	}
 }
 
