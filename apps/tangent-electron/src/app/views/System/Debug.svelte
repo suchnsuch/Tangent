@@ -20,6 +20,7 @@ let settings = workspace.settings
 		<SettingView setting={settings.debug_sendItemsToTrash} />
 		<SettingView setting={settings.debug_ioQueue_enable} />
 		<SettingView setting={settings.debug_ioQueue_maxActive} />
+		<SettingView setting={settings.debug_maxDisplayedAnnotations} />
 	</div>
 </main>
 

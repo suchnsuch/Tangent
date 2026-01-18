@@ -599,6 +599,17 @@ export default class Settings extends ObjectStore {
 		}
 	})
 
+	debug_maxDisplayedAnnotations = new Setting<number>({
+		name: 'Max displayed annotations',
+		description: 'Sets the maximum number of note annotations (e.g. search results) that will be displayed at once.',
+		defaultValue: 100,
+		range: {
+			min: 1,
+			max: 10000,
+			step: 1
+		}
+	})
+
 	constructor() {
 		super()
 		this.setupObservables()

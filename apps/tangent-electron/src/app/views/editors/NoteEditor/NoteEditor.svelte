@@ -756,10 +756,21 @@ function applyAnnotations(event?: DecorateEvent) {
 			}
 		}
 
-		for (let i = 0; i < $annotations.length; i++) {
-			if (i !== $annotationIndex) {
-				applyAnnotation($annotations[i], false)
-			}
+		// Clip the number of rendered annotations.
+		// Building & tearing large numbers have serious performance problems.
+		// A clear cause is typing in the search field.
+		// `t` can easily generate thousands of hits, just to be immediately removed by subsequent typing.
+		// Clipping is relatively consistent with how Firefox does its in-page search.
+		// Highlighting thousands of simple hits is also not likely to be useful.
+
+		const maxAnnotations = workspace.settings.debug_maxDisplayedAnnotations.value
+		const startIndex = Math.max(0, $annotationIndex - Math.round(maxAnnotations * .5))
+		const endIndex = Math.min($annotationIndex + (maxAnnotations - ($annotationIndex - startIndex)), $annotations.length)
+		for (let i = startIndex; i < $annotationIndex; i++) {
+			applyAnnotation($annotations[i], false)
+		}
+		for (let i = $annotationIndex + 1; i < endIndex; i++) {
+			applyAnnotation($annotations[i], false)
 		}
 
 		// Apply the current annotation last so that it's on top
