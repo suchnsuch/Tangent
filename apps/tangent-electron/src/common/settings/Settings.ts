@@ -532,6 +532,12 @@ export default class Settings extends ObjectStore {
 		description: 'Whether Tangent should use spell check or not.',
 		defaultValue: true
 	})
+
+	autoSetChildListGlyphs = new Setting<boolean>({
+		name: 'Automatic Child List Glyphs',
+		description: 'Automatically set the glyphs of list items when indenting.',
+		defaultValue: true
+	})
 	
 	spellCheckLanguages = new Setting<string, string[]>({
 		name: 'Additional Spell Check\nLanguages',

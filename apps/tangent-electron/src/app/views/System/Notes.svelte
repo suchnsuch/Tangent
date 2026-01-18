@@ -64,6 +64,7 @@ async function getSpellCheckLanguages() {
 		<SettingView setting={settings.boldCharacters} />
 		<SettingView setting={settings.allowInterTextUnderscoreFormatting} />
 		<SettingView setting={settings.smartParagraphBreaks} />
+		<SettingView setting={settings.autoSetChildListGlyphs} />
 		<SettingView setting={settings.enableSpellCheck} />
 		{#if !isMac}
 			<SettingView setting={settings.spellCheckLanguages}

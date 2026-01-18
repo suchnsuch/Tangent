@@ -246,7 +246,7 @@ describe('List Handling', () => {
 
 		expect(editor.getText()).toEqual(`
 * A simple
-	* unordered
+	- unordered
 * list`)
 	})
 
@@ -262,7 +262,7 @@ describe('List Handling', () => {
 
 		expect(editor.getText()).toEqual(`
 1. A simple
-	1. ordered
+	a. ordered
 2. list`)
 	})
 

@@ -25,7 +25,7 @@ import TangentCheckbox from './t-checkbox'
 import TangentCodePreview from './t-code-preview' // No deletey
 import TangentMath from './t-math' // No deletey
 import { indentMatcher } from 'common/markdownModel/matches'
-import { getGlyphForNumber, ListDefinition, ListForm, listMatcher } from 'common/markdownModel/list'
+import { getAutoChild, getGlyphForNumber, ListDefinition, ListForm, listMatcher } from 'common/markdownModel/list'
 import type { Workspace } from 'app/model'
 import { getEditInfo, getLineRangeWhile, getRangeWhile, getRangesIntersecting, getSelectedLines, intersectRanges, lineToText } from 'common/typewriterUtils'
 import { isLeftClick, startDrag } from 'app/utils'
@@ -371,6 +371,15 @@ export default function editorModule(editor: Editor, options: {
 					break
 				}
 				else if (indent.length < intendedIndent.length) {
+					if (lineIndex === targetLineIndex - 1 && (workspace?.settings.autoSetChildListGlyphs.value ?? true)) {
+						const listData = prevLine.attributes.list as ListDefinition
+						if (listData) {
+							const { form, glyph, basis } = getAutoChild(listData)
+							targetForm = form
+							targetGlyph = glyph
+							basisNumber = basis
+						}
+					}
 					break
 				}
 			}

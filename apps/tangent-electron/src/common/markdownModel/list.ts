@@ -206,3 +206,16 @@ export function parseListItem(char: string, parser: NoteParser): boolean {
 
 	return true
 }
+
+export function getAutoChild(listData: ListDefinition) {
+	switch (listData.form) {
+		case ListForm.Unordered:
+		case ListForm.UnorderedLarge:
+		case ListForm.AlphaLower:
+			return { form: ListForm.Unordered, glyph: '-' }
+		case ListForm.AlphaUpper:
+			return { form: ListForm.Digit, glyph: '1.', basis: 1 }
+		case ListForm.Digit:
+			return { form: ListForm.AlphaLower, glyph: 'a.', basis: 1 }
+	}
+}
