@@ -45,4 +45,9 @@ describe('Date Format', () => {
 		expect(dates.fillDateFormat('%DDo%', new Date(2000, 1, 12, 1, 1))).toEqual('12th')
 		expect(dates.fillDateFormat('%DDo%', new Date(2000, 1, 13, 1, 1))).toEqual('13th')
 	})
+
+	it('Should handle weeks', () => {
+		expect(dates.fillDateFormat('%W%', new Date(2000, 0, 14, 1, 1))).toEqual('2')
+		expect(dates.fillDateFormat('%WW%', new Date(2000, 0, 14, 1, 1))).toEqual('02')
+	})
 })

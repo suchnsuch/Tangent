@@ -1,3 +1,5 @@
+import { getWeek } from 'date-fns'
+
 const months = [
 	'January',
 	'February',
@@ -201,6 +203,14 @@ export function fillDateFormat(format: string, date: Date) {
 	result = result.replace(/%WDay%/g, shortWeekdays[date.getDay()])
 	result = result.replace(/%WDAY%/g, shortWeekdays[date.getDay()].toUpperCase())
 	result = result.replace(/%wday%/g, shortWeekdays[date.getDay()].toLowerCase())
+
+	// Week count
+	const weekNumber = getWeek(date, {
+		weekStartsOn: 1,
+		firstWeekContainsDate: 4
+	})
+	result = result.replace(/%W%/g, weekNumber.toString())
+	result = result.replace(/%WW%/g, forceTwoDigitNumber(weekNumber))
 
 	return result
 }

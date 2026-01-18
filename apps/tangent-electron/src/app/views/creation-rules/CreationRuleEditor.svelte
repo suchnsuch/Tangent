@@ -168,6 +168,9 @@ function onValidateShortcut(shortcut: string) {
 				<tr><th><CreationRuleTemplateButton templateText="%Mth%" insertTemplateText={insertTextIntoTemplate}/></th><td>The shortened name of the month.<sup>2</sup></td></tr>
 				<tr><th><CreationRuleTemplateButton templateText="%WeekDay%" insertTemplateText={insertTextIntoTemplate}/></th><td>The full name of the week day.<sup>2</sup></td></tr>
 				<tr><th><CreationRuleTemplateButton templateText="%WDay%" insertTemplateText={insertTextIntoTemplate}/></th><td>The short name of the week day.<sup>2</sup></td></tr>
+				<tr></tr>
+				<tr><th><CreationRuleTemplateButton templateText="%WW%" insertTemplateText={insertTextIntoTemplate} /></th><td>The double digit ISO week of the year.</td></tr>
+				<tr><th><CreationRuleTemplateButton templateText="%W%" insertTemplateText={insertTextIntoTemplate} /></th><td>The single digit ISO week of the year.</td></tr>
 			</tbody></table>
 			<figcaption>
 				<table><tbody>
