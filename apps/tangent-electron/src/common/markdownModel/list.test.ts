@@ -35,7 +35,7 @@ describe('Match List', () => {
 	it('Can find bullet', () => {
 		expect(matchList('* Hello')).toEqual<ListDefinition>({
 			indent: '',
-			form: ListForm.Unordered,
+			form: ListForm.UnorderedLarge,
 			glyph: '*'
 		})
 		expect(matchList('  - Hello')).toEqual<ListDefinition>({

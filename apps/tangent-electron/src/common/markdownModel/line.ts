@@ -23,10 +23,7 @@ export function getLineFormatData(line: Line) {
 }
 
 export function lineHasMultiLineContext(line: Line) {
-	if (line.attributes.list) {
-		return line.attributes.list.form !== ListForm.Unordered ? 'list' : undefined
-	}
-	return undefined
+	return line.attributes.list
 }
 
 export function lineIsMultiLineFormat(line: Line) {

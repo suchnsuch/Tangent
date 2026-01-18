@@ -149,6 +149,50 @@ describe('List Handling', () => {
 3. List`)
 	})
 
+	test('Converting - to * should update the entire list', async () => {
+		editor.doc = markdownToTextDocument(`
+- A simple
+- unordered
+- List`)
+		editor.select(2)
+		editor.delete(-1)
+		await wait(waitTime)
+		expect(editor.getText()).toEqual(`
+ A simple
+- unordered
+- List`)
+		
+		editor.insert('*')
+		await wait(waitTime)
+
+		expect(editor.getText()).toEqual(`
+* A simple
+* unordered
+* List`)
+	})
+
+	test('Converting * to - should update the entire list', async () => {
+		editor.doc = markdownToTextDocument(`
+* A simple
+* unordered
+* List`)
+		editor.select(2)
+		editor.delete(-1)
+		await wait(waitTime)
+		expect(editor.getText()).toEqual(`
+ A simple
+* unordered
+* List`)
+		
+		editor.insert('-')
+		await wait(waitTime)
+
+		expect(editor.getText()).toEqual(`
+- A simple
+- unordered
+- List`)
+	})
+
 	test('Untabbing from one level to the other should retain cursor position relative to prefix', async () => {
 		editor.doc = markdownToTextDocument(`
 1. A simple

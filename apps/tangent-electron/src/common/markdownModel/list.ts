@@ -25,7 +25,8 @@ export const numericGlyphMatcher = /(\d+)|([a-z])|([A-Z])/
 export const checkboxMatcher = /\[([x\- ]?)\]/
 
 export enum ListForm {
-	Unordered,
+	Unordered, // -,+
+	UnorderedLarge, // *
 	Digit,
 	AlphaUpper,
 	AlphaLower
@@ -95,7 +96,7 @@ export function matchList(line: string): ListDefinition {
 
 		if (match[3]) {
 			// Unordered list
-			definition.form = ListForm.Unordered
+			definition.form = match[3] === '*' ? ListForm.UnorderedLarge : ListForm.Unordered
 		}
 		else {
 			const { form, index } = extractNumericValueFromMatch(match, 4)
@@ -154,6 +155,7 @@ export function getFormOfGlyph(glyph: string): Partial<ListDefinition> {
 export function getGlyphForNumber(form: ListForm, index: number = 1) {
 	switch (form) {
 		case ListForm.Unordered:
+		case ListForm.UnorderedLarge:
 			return undefined
 		case ListForm.AlphaUpper:
 			if (index > 0 && index < Z_index - A_index) {
