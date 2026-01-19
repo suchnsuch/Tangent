@@ -443,19 +443,19 @@ article.note {
 				border: 1px solid var(--accentBackgroundColor);
 				
 				&:not(.last) {
-					padding-right: 0;
-					border-right: none;
+					padding-inline-end: 0;
+					border-inline-end: none;
 				}
 
 				&.last {
-					border-top-right-radius: .4em;
-					border-bottom-right-radius: .4em;
+					border-start-end-radius: .4em;
+					border-end-end-radius: .4em;
 				}
 
 				&.tagSectionDepth-1 {
-					padding-left: 1.25em;
-					border-top-left-radius: .7em;
-					border-bottom-left-radius: .7em;
+					padding-inline-start: 1.25em;
+					border-start-start-radius: .7em;
+					border-end-start-radius: .7em;
 
 					&::before {
 						content: "";
@@ -463,8 +463,8 @@ article.note {
 						width: .5em;
 						height: .5em;
 
-						left: 0.45em;
-						top: 50%;
+						inset-inline-start: 0.45em;
+						inset-block-start: 50%;
 						transform: translateY(-50%);
 						
 						background: var(--noteBackgroundColor);
@@ -472,8 +472,8 @@ article.note {
 					}
 				}
 				&:not(.tagSectionDepth-1) {
-					padding-left: 0;
-					border-left: none;
+					padding-inline-start: 0;
+					border-inline-start: none;
 				}
 
 				// Default colors for different depths
@@ -489,12 +489,18 @@ article.note {
 				border-left: none;
 				border-right: none;
 
+				--linearGradientAngle: 100deg;
+
+				&:dir(rtl) {
+					--linearGradientAngle: -100deg;
+				}
+
 				// Default colors for different depths
 				&.tagSeperatorDepth-1, &.tagSeperatorDepth-3, &.tagSeperatorDepth-5 {
-					background: linear-gradient(100deg, var(--accentBackgroundColor) 48%, var(--accentDeemphasizedBackgroundColor) 52%);
+					background: linear-gradient(var(--linearGradientAngle), var(--accentBackgroundColor) 48%, var(--accentDeemphasizedBackgroundColor) 52%);
 				}
 				&.tagSeperatorDepth-2, &.tagSeperatorDepth-4, &.tagSeperatorDepth-6 {
-					background: linear-gradient(100deg, var(--accentDeemphasizedBackgroundColor) 48%, var(--accentBackgroundColor) 52%);
+					background: linear-gradient(var(--linearGradientAngle), var(--accentDeemphasizedBackgroundColor) 48%, var(--accentBackgroundColor) 52%);
 				}
 
 				&:not(.revealed) {
