@@ -24,7 +24,7 @@ class TangentCheckbox extends HTMLElement {
 		checkbox.style.display = 'block'
 		checkbox.style.position = 'relative'
 		checkbox.style.top = '.25em'
-		checkbox.style.right = '.15em'
+		checkbox.style.insetInlineEnd = '.15em'
 		checkbox.style.width = '1em'
 		checkbox.style.height = '1em'
 

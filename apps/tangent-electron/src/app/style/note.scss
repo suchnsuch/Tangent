@@ -56,7 +56,7 @@ article.note {
 
 		--lineIndent: 0; // Modified by the target
 
-		margin-left: calc(var(--spaceWidth) * var(--lineIndent));
+		margin-inline-start: calc(var(--spaceWidth) * var(--lineIndent));
 		&.revealed {
 			text-indent: calc(-1 * var(--spaceWidth) * var(--lineIndent));
 		}
@@ -112,32 +112,32 @@ article.note {
 	blockquote {
 		margin: 0;
 
-		margin-left: 2em;
-		border-left: 4px solid var(--deemphasizedTextColor);
+		margin-inline-start: 2em;
+		border-inline-start: 4px solid var(--deemphasizedTextColor);
 
 		// TODO: Block quotes would idealy be nested
 		&.depth-1 {
-			border-left-width: 4px;
+			border-inline-start-width: 4px;
 		}
 		&.depth-2 {
-			border-left-width: 8px;
+			border-inline-start-width: 8px;
 		}
 		&.depth-3 {
-			border-left-width: 12px;
+			border-inline-start-width: 12px;
 		}
 		&.depth-4 {
-			border-left-width: 16px;
+			border-inline-start-width: 16px;
 		}
 
 		--lineIndent: 0;
 
-		margin-left: calc(var(--spaceWidth) * (var(--lineIndent) + 8));
+		margin-inline-start: calc(var(--spaceWidth) * (var(--lineIndent) + 8));
 		&.revealed {
-			margin-left: calc(var(--spaceWidth) * 8);
+			margin-inline-start: calc(var(--spaceWidth) * 8);
 			text-indent: 0;
 
 			.line {
-				margin-left: calc(var(--spaceWidth) * var(--innerLineIndent));
+				margin-inline-start: calc(var(--spaceWidth) * var(--innerLineIndent));
 				text-indent: calc(-1 * var(--spaceWidth) * var(--innerLineIndent));
 			}
 
@@ -162,12 +162,12 @@ article.note {
 		position: relative;
 
 		&:not(.revealed) {
-			margin-left: calc((var(--spaceWidth) * var(--lineIndent)) + var(--indentWidth));
+			margin-inline-start: calc((var(--spaceWidth) * var(--lineIndent)) + var(--indentWidth));
 			text-indent: calc(-1 * var(--spaceWidth));
 		}
 
 		&.revealed {
-			margin-left: calc(var(--spaceWidth) * var(--lineIndent));
+			margin-inline-start: calc(var(--spaceWidth) * var(--lineIndent));
 			text-indent: calc(-1 * var(--spaceWidth) * var(--lineIndent));
 		}
 
@@ -183,7 +183,7 @@ article.note {
 					font-size: 100%;
 					position: absolute;
 					top: 0;
-					left: calc(-1 * var(--indentWidth));
+					inset-inline-start: calc(-1 * var(--indentWidth));
 
 					content: attr(listGlyph);
 					width: var(--indentWidth);
@@ -202,7 +202,7 @@ article.note {
 					// This is super hacky, but it gets the right result
 					// accross different line heights and font sizes
 					position: absolute;
-					left: calc(-.42 * var(--indentWidth));
+					inset-inline-start: calc(-.42 * var(--indentWidth));
 					top: calc(rhythmUnit(1) * .5);
 					transform: translateY(-75%);
 				}
