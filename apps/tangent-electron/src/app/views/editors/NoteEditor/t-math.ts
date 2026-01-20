@@ -27,6 +27,7 @@ class TangentMath extends HTMLElement {
 		shadow.appendChild(localStyles)
 
 		const content = document.createElement('span')
+		content.setAttribute('dir', 'ltr')
 		shadow.appendChild(content)
 		
 		this.content = content
