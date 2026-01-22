@@ -136,7 +136,7 @@ function onMouseMoveContainer(event: MouseEvent) {
 }
 
 function onFocusInContainer(event: FocusEvent) {
-	if (detailsState && !detailsContainer.contains(document.activeElement)) {
+	if (detailsState && !detailsContainer?.contains(document.activeElement)) {
 		detailsState.close()
 	}
 }
