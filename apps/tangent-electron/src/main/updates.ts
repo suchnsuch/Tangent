@@ -4,7 +4,7 @@ import { autoUpdater, type ProgressInfo, type UpdateInfo } from 'electron-update
 import { mode } from './environment'
 
 import { contentsMap, saveAndCloseWorkspaces } from './workspaces'
-import { getSettings } from './settings'
+import { subscribeToSettings } from './settings'
 import Logger from 'js-logger'
 
 const log = Logger.get('updates')
@@ -82,6 +82,7 @@ export function checkForUpdates() {
 		autoUpdater.checkForUpdates()
 	}
 	else if (!process.env.INTEGRATION_TEST) {
+		console.trace('Checking for Updates!')
 		// Fake the update loop for testing
 		async function fakeUpdate() {
 			alertCheckingForUpdate()
@@ -150,10 +151,12 @@ ipcMain.on('update', async (event, message) => {
 	}
 })
 
-getSettings().updateChannel.subscribe(updateChannel => {
+subscribeToSettings(settings => {
+	const updateChannel = settings.updateChannel.value
 	if (updateChannel !== autoUpdater.channel) {
-		log.debug('Setting update channel to', updateChannel)
 		autoUpdater.channel = updateChannel
-		checkForUpdates()
+		if (settings.automaticallyCheckForUpdates.value) {
+			checkForUpdates()
+		}
 	}
 })
