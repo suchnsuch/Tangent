@@ -10,7 +10,7 @@ import SettingView from './SettingView.svelte'
 let workspace = getContext('workspace') as Workspace
 let state = workspace.updateState
 
-let supressUpdates = false
+let suppressUpdates = false
 
 $: channel = workspace.settings.updateChannel
 
@@ -53,7 +53,7 @@ function buttonClicked() {
 }
 
 function laterButtonClick() {
-	supressUpdates = true
+	suppressUpdates = true
 }
 
 </script>
@@ -102,9 +102,9 @@ function laterButtonClick() {
 				The update to {$nextUpdate.version} is ready!
 				The update will be applied automatically on exit, or you can update now.
 			</p>
-			{#if supressUpdates}
+			{#if suppressUpdates}
 				<p class="info">
-					Update notifications are supressed until next exit.
+					Update notifications are suppressed until next exit.
 				</p>
 			{:else}
 				<p class="laterButton">
@@ -134,7 +134,8 @@ function laterButtonClick() {
 				Last checked: {dates.shortestDayDate($lastChecked)}, {dates.clockTime($lastChecked)}
 			{/if}
 		</p>
-		<p></p>
+		<p class="space"></p>
+		<SettingView setting={workspace.settings.automaticallyCheckForUpdates}/>
 	</article>
 </main>
 
@@ -206,6 +207,10 @@ p {
 
 .error {
 	color: red;
+}
+
+.space {
+	margin-bottom: 3em;
 }
 </style>
 

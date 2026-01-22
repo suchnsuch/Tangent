@@ -56,7 +56,9 @@ export function createWindow(assignedWorkspace?: string) {
 		disableRendererActions()
 		newWindow.webContents.send('getAllMenus')
 
-		checkForUpdatesThrottled()
+		if (getSettings().automaticallyCheckForUpdates.value) {
+			checkForUpdatesThrottled()
+		}
 	})
 
 	newWindow.webContents.session.webRequest.onBeforeSendHeaders((details, callback) => {

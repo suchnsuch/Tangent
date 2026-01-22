@@ -76,6 +76,12 @@ export default class Settings extends ObjectStore {
 		]
 	})
 
+	automaticallyCheckForUpdates = new Setting<boolean>({
+		name: 'Automatically Check for Updates',
+		description: 'When enabled, Tangent will automatically check for updates.',
+		defaultValue: true
+	})
+
 	showChangelogOnUpdate = new Setting<boolean>({
 		name: 'Show Changelog when Tangent Updates',
 		defaultValue: true
