@@ -1,6 +1,6 @@
 <script lang="ts">
 import { indexOfEquivalent, last } from '@such-n-such/core'
-import type { NavigationCallback, NavigationData, ViewReadyCallback } from 'app/events'
+import type { NavigationCallback, NavigationData } from 'app/events'
 import type { Workspace } from 'app/model'
 import { NoteViewState } from 'app/model/nodeViewStates'
 import type FeedViewState from 'app/model/nodeViewStates/FeedViewState'
@@ -14,13 +14,10 @@ import { ForwardingStore } from 'common/stores'
 import { areNodesOrReferencesEquivalent, getNode, type TreeNodeOrReference } from 'common/nodeReferences'
 
 import { getContext, onMount, tick } from 'svelte'
-import { fly } from 'svelte/transition'
 import NodeViewSelector from './NodeViewSelector.svelte'
-import SetCreationRules from './SetCreationRules.svelte'
+import FloatingSetCreationRules, { shouldShowCreationRulesFromHover } from './FloatingSetCreationRules.svelte'
 
 const workspace = getContext('workspace') as Workspace
-
-const maxWidth = workspace.settings.noteWidthMax
 
 // TODO: This should eventually be some interface
 export let state: FeedViewState
@@ -284,9 +281,7 @@ function updateShowCreateFromScroll() {
 }
 
 function updateShowCreateFromHover(event: MouseEvent) {
-	if (!feedContainer) return
-	const height = feedContainer.getBoundingClientRect().height
-	showCreateFromHover = event.y > height - 115
+	showCreateFromHover = shouldShowCreationRulesFromHover(event, feedContainer)
 }
 
 function forwardNavigation(data: NavigationData, item: TreeNodeOrReference) {
@@ -348,6 +343,7 @@ function extraBottomClick(event: MouseEvent) {
 </script>
 
 <!-- svelte-ignore a11y-no-static-element-interactions -->
+<!-- svelte-ignore a11y_mouse_events_have_key_events -->
 <div class="feed"
 	bind:this={feedContainer}
 	on:scroll={onFeedScroll}
@@ -382,13 +378,7 @@ function extraBottomClick(event: MouseEvent) {
 	
 </div>
 
-{#if showCreateFromScroll || showCreateFromHover}
-	<div class="createContainer" transition:fly={{ y: 200 }} class:hidden={!willCreateNewFiles}>
-		<div class="create" style:max-width={`${$maxWidth}px`}>
-			<SetCreationRules state={state.parent} max={3} direction="row" bind:willCreateNewFiles />
-		</div>
-	</div>
-{/if}
+<FloatingSetCreationRules canShow={showCreateFromScroll || showCreateFromHover} state={state.parent} />
 
 <style lang="scss">
 .feed {
@@ -415,36 +405,6 @@ function extraBottomClick(event: MouseEvent) {
 	}
 	&:last-child {
 		padding-bottom: 4rem;
-	}
-}
-
-.createContainer {
-	position: absolute;
-	bottom: 4em;
-	left: 0;
-	right: 0;
-
-	z-index: 2;
-
-	&.hidden {
-		bottom: -200px;
-	}
-}
-
-.create {
-	display: flex;
-	justify-content: stretch;
-	margin: 0 auto;
-
-	border-radius: var(--inputBorderRadius);
-
-	background: var(--backgroundColor);
-	color: var(--deemphasizedTextColor);
-
-	transition: opacity .3s;
-
-	:global(.focusing) & {
-		opacity: 0.5;
 	}
 }
 

@@ -12,6 +12,7 @@ import { onMount, tick } from 'svelte'
 import SetCreationRules from './SetCreationRules.svelte'
 import NodePreview from '../summaries/NodePreview.svelte'
 import arrowNavigate from 'app/utils/arrowNavigate'
+import FloatingSetCreationRules, { shouldShowCreationRulesFromHover } from './FloatingSetCreationRules.svelte'
 
 const workspace = getContext('workspace') as Workspace
 
@@ -77,12 +78,32 @@ function sendViewReady() {
 	if (onViewReady) onViewReady()
 }
 
+let showCreateFromHover = false
+let showCreateFromScroll = false
+let container: HTMLElement = null
+
+function onScroll() {
+	if (!container) return
+
+	// Hide the creation rule button when we're scrolled to the bottom as there is
+	// a card-based button right there.
+	const height = container.getBoundingClientRect().height
+	showCreateFromScroll = container.scrollHeight - container.scrollTop - height > 50
+}
+
+function updateShowCreateFromHover(event: MouseEvent) {
+	showCreateFromHover = shouldShowCreationRulesFromHover(event, container)
+}
+
 </script>
 
+<!-- svelte-ignore a11y_no_static_element_interactions -->
+<!-- svelte-ignore a11y_mouse_events_have_key_events -->
 <div class="CardsView" class:layout-fill={layout === 'fill'} class:needs-alt={$needsAltToScroll}
 	style:padding-top={extraTop + 'px'}
 	style:padding-bottom={extraBottom + 'px'}
 	style:--noteBackgroundColor="var(--backgroundColor)"
+	bind:this={container}
 
 	tabindex="-1"
 	use:arrowNavigate={{
@@ -94,6 +115,8 @@ function sendViewReady() {
 			end: extraBottom + 8
 		}
 	}}
+	on:scroll={onScroll}
+	on:mousemove={updateShowCreateFromHover}
 >
 	<!-- svelte-ignore a11y-click-events-have-key-events -->
 	<!-- svelte-ignore a11y-no-static-element-interactions -->
@@ -119,7 +142,10 @@ function sendViewReady() {
 		</svelte:fragment>
 		<SetCreationRules slot="after" state={state.parent} _class="card create"/>
 	</LazyScrolledList>
+
 </div>
+
+<FloatingSetCreationRules state={state.parent} canShow={showCreateFromHover && showCreateFromScroll} />
 
 <style lang="scss">
 .CardsView {

@@ -9,6 +9,7 @@ import ListViewState, { arrowNavigateTargetSelector } from 'app/model/nodeViewSt
 import { BaseSetViewState } from 'app/model/nodeViewStates/SetViewState'
 import NodeIcon from '../smart-icons/NodeIcon.svelte'
 import arrowNavigate from 'app/utils/arrowNavigate'
+import FloatingSetCreationRules, { shouldShowCreationRulesFromHover } from './FloatingSetCreationRules.svelte'
 
 const workspace = getContext('workspace') as Workspace
 
@@ -38,17 +39,27 @@ function nodeKeydown(event: KeyboardEvent, ref: TreeNodeOrReference) {
 	}
 }
 
+let showCreateFromHover = false
+let container: HTMLElement = null
+
+function updateShowCreateFromHover(event: MouseEvent) {
+	showCreateFromHover = shouldShowCreationRulesFromHover(event, container)
+}
+
+
 </script>
 
 <main
 	class={`ListView layout-${layout}`}
 	style:padding-top={extraTop + 'px'}
 	style:padding-bottom={extraBottom + 'px'}
+	bind:this={container}
 	use:arrowNavigate={{
 		targetSelector: arrowNavigateTargetSelector,
 		focusClass: ['focusable', 'focused']
 	}}
 	tabindex="-1"
+	on:mousemove={updateShowCreateFromHover}
 >
 	{#if (state.parent instanceof BaseSetViewState && state.parent.isLensOverridden) && state.parent.node instanceof WorkspaceTreeNode}
 		<WorkspaceFileHeader node={state.parent.node} showExtension={false} editable={false} />
@@ -76,6 +87,8 @@ function nodeKeydown(event: KeyboardEvent, ref: TreeNodeOrReference) {
 		{/each}
 	</article>
 </main>
+
+<FloatingSetCreationRules state={state.parent} canShow={showCreateFromHover} />
 
 <style lang="scss">
 main {
