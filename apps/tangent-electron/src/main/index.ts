@@ -71,7 +71,7 @@ Tangent ${app.getVersion()} Launched With Arguments:`, process.argv)
 		if (typeof targetPath !== 'string') return
 		targetPath = path.resolve(targetPath)
 		if (!appReady) {
-			Logger.info('Defering opening until setup is complete', targetPath)
+			Logger.info('Deferring opening until setup is complete', targetPath)
 			openOverride = targetPath
 			return
 		}
@@ -152,7 +152,7 @@ Tangent ${app.getVersion()} Launched With Arguments:`, process.argv)
 			])
 		}
 		catch (err) {
-			log.error('CRITIAL INITIALIZATION ERROR. A major subcomponent of Tangent failed to initialize.')
+			log.error('CRITICAL INITIALIZATION ERROR. A major subcomponent of Tangent failed to initialize.')
 			log.error(err)
 		}
 		
