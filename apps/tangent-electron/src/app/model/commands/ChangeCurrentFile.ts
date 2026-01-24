@@ -5,6 +5,7 @@ import type Workspace from "../Workspace"
 import type { CommandContext, CommandOptions } from "./Command"
 import WorkspaceCommand from "./WorkspaceCommand"
 import { focusLeftSidebar, getCurrentMapNode, getLeftSidebarElement } from 'app/utils/selection'
+import { areNodesOrReferencesEquivalent } from "common/nodeReferences"
 
 type ChangeFileMode = 'left' | 'right'
 
@@ -57,7 +58,11 @@ export default class ChangeCurrentFileCommand extends WorkspaceCommand {
 		mode = mode || this.mode
 
 		const threadLenses = tangent.threadLenses.value
-		const index = threadLenses.findIndex(l => l.parent.node === node)
+		const index = threadLenses.findIndex(l => {
+			if (areNodesOrReferencesEquivalent(l.parent.node, node)) return true
+			if (l.currentlyRepresenting && areNodesOrReferencesEquivalent(l.currentlyRepresenting, node)) return true
+			return false
+		})
 		let nextIndex = -1
 
 		const sidebar = getLeftSidebarElement()
