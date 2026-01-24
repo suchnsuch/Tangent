@@ -1291,7 +1291,7 @@ function updateCodeBlockSizing() {
 		preventMouseUpDefault={true}
 		showIcon={showHeaderIcon}
 		showExtension={false}
-		on:enter-exit={e => editorElement.dispatchEvent(new Event('resumeFocus'))}
+		onEnterExit={() => editorElement.dispatchEvent(new Event('resumeFocus'))}
 		/>
 	<!-- svelte-ignore a11y-click-events-have-key-events -->
 	<article
