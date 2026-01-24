@@ -45,7 +45,7 @@ let willCreateNewFiles = $state(false)
 	left: 0;
 	right: 0;
 
-	z-index: 100;
+	z-index: 50;
 
 	&.hidden {
 		bottom: -200px;

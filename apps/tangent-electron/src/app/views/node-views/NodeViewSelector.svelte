@@ -438,7 +438,7 @@ main {
 
 .details {
 	position: absolute;
-	z-index: 10;
+	z-index: 100;
 	left: 0;
 	right: 0;
 	bottom: 0;

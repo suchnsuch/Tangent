@@ -540,7 +540,7 @@ export default class Settings extends ObjectStore {
 	})
 
 	autoSetChildListGlyphs = new Setting<boolean>({
-		name: 'Automatic Child List Glyphs',
+		name: 'Change List Glyphs on Indent',
 		description: 'Automatically set the glyphs of list items when indenting.',
 		defaultValue: true
 	})

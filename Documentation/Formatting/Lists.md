@@ -17,3 +17,5 @@ List items starting with a `*` are differentiated from the others. `*` list item
 	- Here, we have some sub-items.
 	- They are directly underneath their parent `*` list item. The spacing implies they are a single unit.
 * These different list items provide a slight semantic difference on what you're trying to express.
+
+By default, list glyphs will automatically change when you indent them. Children of `*` list items become `-` items. Ordered lists progress from `A. -> 1. -> a. -> -`. This can be disabled in the [[Notes#Editing Options]].

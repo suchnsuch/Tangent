@@ -198,7 +198,7 @@ export default class NoteViewState implements NodeViewState, LensViewState {
 	focus(element: HTMLElement) {
 		if (!element) return false
 
-		if (this.note?.meta.virtual && this.details) {
+		if (this.note?.meta?.virtual && this.details) {
 			this.details.open()
 		}
 
