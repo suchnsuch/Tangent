@@ -335,8 +335,15 @@ export default class Session extends ObjectStore {
 		return this._isEmpty
 	}
 
-	private publishCurrentThreadItem() {
-		this._currentThreadItem.set(this.threadHistory.get(this.threadIndex.value))
+	private publishCurrentThreadItem(force=false) {
+		const old = this._currentThreadItem.value
+		const next = this.threadHistory.get(this.threadIndex.value)
+
+		this._currentThreadItem.set(next)
+		if (old == next && force) {
+			this._currentThreadItem.notifyObservers()
+		}
+
 		this._isEmpty.set(this.map.nodes.size == 0)
 	}
 
@@ -474,8 +481,7 @@ export default class Session extends ObjectStore {
 
 			if (mustClearUndoStack) {
 				this.undoStack.clear()
-				this._currentThreadItem.value = null
-				this.publishCurrentThreadItem()
+				this.publishCurrentThreadItem(true)
 			}
 		}
 

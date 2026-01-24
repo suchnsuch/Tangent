@@ -62,7 +62,7 @@ export default class ViewStateContext {
 		if (createIfNone && !state) {
 			state = this.createNodeViewState(item, allowUnhandled)
 			if (state) {
-				this.states.set(pathID, state,)
+				this.states.set(pathID, state)
 			}
 		}
 		return state
@@ -75,6 +75,22 @@ export default class ViewStateContext {
 			state.dispose()
 		}
 		this.states.delete(key)
+	}
+
+	/** Remove all states not in this list */
+	condenseToNodes(nodes: TreeNodeOrReference[]) {
+		const keys = new Set(this.states.keys())
+		for (const node of nodes) {
+			keys.delete(node.path)
+		}
+
+		for (const key of keys) {
+			const state = this.states.get(key)
+			if (state.details) {
+				state.dispose()
+			}
+			this.states.delete(key)
+		}
 	}
 
 	getRelativePersistentStateDirectory(): string | null {

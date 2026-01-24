@@ -76,7 +76,7 @@ export default class FeedViewState implements SetLensViewState {
 			}),
 			this.parent.nodes.subscribe(n => {
 				// Reset node states
-				this.context.clearStates()
+				this.context.condenseToNodes(n)
 			}),
 			this.currentItem.subscribe(n => this.applyCurrentItemToThread(n))
 		)
