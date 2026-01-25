@@ -14,6 +14,7 @@ export interface NavigationData {
 
 export type NavigationCallback = (data: NavigationData) => void
 export type ViewReadyCallback = () => void
+export type KeyboardExitCallback = (event: KeyboardEvent) => void
 
 interface PasteTextEventData {
 	text: string

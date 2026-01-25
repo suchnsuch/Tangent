@@ -31,7 +31,7 @@ import { type HrefFormedLink, StructureType } from 'common/indexing/indexTypes'
 import type { ConnectionInfo } from 'common/indexing/indexTypes'
 import { areLineArraysOpTextEquivalent, type EditInfo, getEditInfo, getRangeWhile, rangesAreEquivalent, stripLineAttributes } from 'common/typewriterUtils'
 import { scrollTo } from 'app/utils';
-import { getLinkDirectionFromEvent, type NavigationCallback, type NavigationData, type ViewReadyCallback } from 'app/events'
+import { getLinkDirectionFromEvent, type KeyboardExitCallback, type NavigationCallback, type NavigationData, type ViewReadyCallback } from 'app/events'
 import WorkspaceFileHeader from 'app/utils/WorkspaceFileHeader.svelte';
 import { TangentLink } from './t-link';
 import { appendContextTemplate, type ContextMenuConstructorOptions } from 'app/model/menus';
@@ -103,6 +103,7 @@ export let showHeaderIcon = false
 export let onNavigate: NavigationCallback = null
 export let onViewReady: ViewReadyCallback = null
 export let onScrollRequest: ScrollToCallback = null
+export let onKeyboardExit: KeyboardExitCallback = null
 
 let container: HTMLElement
 
@@ -793,7 +794,7 @@ function resumeFocus(arg?) {
 	}
 
 	if (headerEditElement !== document.activeElement && editorElement !== document.activeElement) {
-		console.log('Resuming focus to ', note.name, state.selection)
+		console.log('Resuming focus to ', note.name, state.selection.value)
 		
 		allowAnnotationReactions = false
 		editorElement?.focus({
@@ -812,6 +813,48 @@ function onNoteKeydown(event: KeyboardEventWithShortcut) {
 	if (event.modShortcut === 'Escape' && $annotations.length) {
 		event.preventDefault()
 		state.setAnnotations([])
+		return
+	}
+
+	if (event.modShortcut === 'ArrowUp') {
+		const selection = editor.doc.selection
+		if (selection && selection[0] === 0 && selection[1] === 0) {
+			if (headerEditElement) {
+				document.getSelection().selectAllChildren(headerEditElement)
+				setScrollTo({
+					container,
+					target: headerEditElement,
+					// Extra bit to scroll to the top of a normal editor, but not in a feed
+					marginY: { start: effectiveExtraTop + 50, end: 0 }
+				})
+			}
+			event.preventDefault()
+			return
+		}
+	}
+	if (event.modShortcut === 'ArrowDown') {
+		const selection = editor.doc.selection
+		const end = editor.doc.length - 1
+		if (selection && selection[0] === end && selection[1] === end) {
+			if (onKeyboardExit) onKeyboardExit(event)
+			return
+		}
+	}
+}
+
+function onHeaderKeyExit(event: KeyboardEvent) {
+	if (event.key === 'Enter' || event.key === 'Escape') {
+		event.preventDefault()
+		editorElement.dispatchEvent(new Event('resumeFocus'))
+		return
+	}
+	if (event.key === 'ArrowDown') {
+		event.preventDefault()
+		editor.select(0)
+		return
+	}
+	if (event.key === 'ArrowUp') {
+		if (onKeyboardExit) onKeyboardExit(event)
 		return
 	}
 }
@@ -1291,7 +1334,7 @@ function updateCodeBlockSizing() {
 		preventMouseUpDefault={true}
 		showIcon={showHeaderIcon}
 		showExtension={false}
-		onEnterExit={() => editorElement.dispatchEvent(new Event('resumeFocus'))}
+		onKeyboardExit={onHeaderKeyExit}
 		/>
 	<!-- svelte-ignore a11y-click-events-have-key-events -->
 	<article

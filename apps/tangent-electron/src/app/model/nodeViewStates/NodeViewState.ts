@@ -10,6 +10,8 @@ export interface DetailsViewState {
 	tab: string
 }
 
+export type NodeFocusMode = 'auto' | 'start' | 'end'
+
 export interface NodeViewState {
 	// Can be implemented as a property backed by the real object
 	readonly node: TreeNode
@@ -23,7 +25,7 @@ export interface NodeViewState {
 	readonly details?: DetailsViewStateStore<DetailsViewState>
 
 	dispose?()
-	focus?(element: HTMLElement): boolean
+	focus?(element: HTMLElement, mode?: NodeFocusMode): boolean
 	onTreeChange?(change: TreeChange)
 }
 

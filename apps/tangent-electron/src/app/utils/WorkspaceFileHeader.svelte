@@ -27,7 +27,7 @@ export let showIcon = true
 export let showExtension = true
 
 export let onRename: (newName: string) => boolean|undefined = null
-export let onEnterExit: () => void = null
+export let onKeyboardExit: (event: KeyboardEvent) => void = null
 
 export let node: WorkspaceTreeNode
 $: updateText(node ? $node.name : '')
@@ -81,12 +81,35 @@ function onHeaderKeydown(event: KeyboardEvent) {
 		event.preventDefault()
 		headerEditElement.blur()
 
-		if (onEnterExit) onEnterExit()
+		if (onKeyboardExit) onKeyboardExit(event)
+		return
 	}
 	else if (event.key === 'Escape') {
 		event.preventDefault()
 		const name = node ? $node.name : ''
 		editor.setText(name, [0, name.length], Source.api)
+
+		if (onKeyboardExit) onKeyboardExit(event)
+		return
+	}
+
+	if (event.ctrlKey || event.shiftKey || event.altKey || event.metaKey) return
+
+	if (event.key === 'ArrowUp' || event.key === 'ArrowLeft') {
+		const selection = editor.doc.selection
+		if (selection && selection[0] === 0 && selection[1] === 0) {
+			if (onKeyboardExit) onKeyboardExit(event)
+			return
+		}
+	}
+
+	if (event.key === 'ArrowDown' || event.key === 'ArrowRight') {
+		const selection = editor.doc.selection
+		const end = editor.doc.length - 1
+		if (selection && selection[0] === end && selection[1] === end) {
+			if (onKeyboardExit) onKeyboardExit(event)
+			return
+		}
 	}
 }
 </script>

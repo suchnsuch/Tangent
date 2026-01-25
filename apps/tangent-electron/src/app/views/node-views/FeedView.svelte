@@ -319,13 +319,42 @@ function handleScrollRequest(options: ScrollToOptions, item: TreeNodeOrReference
 	scrollTo(options)
 }
 
-function nodeClick(event: MouseEvent, item: TreeNodeOrReference) {
+function onNodeFocusIn(event: FocusEvent, item: TreeNodeOrReference) {
 	if (event.defaultPrevented) return
 
 	overrideRealFocus = false
 
 	preventScrollToCurrentNode()
 	$currentItem = item
+}
+
+function nodeKeyboardExit(event: KeyboardEvent, item: TreeNodeOrReference) {
+	const allIndex = $items.indexOf(item)
+	const feedIndex = feedNodes.indexOf(item)
+	if (allIndex < 0) return
+
+	const direction = event.key === 'ArrowUp' ? -1 : (event.key === 'ArrowDown' ? 1 : undefined)
+	if (direction === undefined) return
+
+	const nextFeedIndex = feedIndex + direction
+	if (nextFeedIndex < 0 || nextFeedIndex === feedNodes.length) {
+		const nextRealIndex = allIndex + direction
+		if (nextRealIndex < 0 || nextRealIndex >= $items.length) return
+		// Summon the next item
+		event.preventDefault()
+		$currentItem = $items[allIndex + direction]
+		return
+	}
+
+	// Perform selection directly
+	const noteContainer = feedContainer.childNodes.item(nextFeedIndex)
+	if (noteContainer instanceof HTMLElement) {
+		event.preventDefault()
+		const nextItem = feedNodes[nextFeedIndex]
+		const viewState = state.context.getState(nextItem)
+		if (viewState.focus) viewState.focus(noteContainer, direction === 1 ? 'start' : 'end')
+		return
+	}
 }
 
 function extraBottomClick(event: MouseEvent) {
@@ -358,7 +387,7 @@ function extraBottomClick(event: MouseEvent) {
 		<!-- svelte-ignore a11y-click-events-have-key-events -->
 		<div class="note"
 			class:current={item === $currentItem} 
-			on:click={e => nodeClick(e, item)}
+			on:focusin={e => onNodeFocusIn(e, item)}
 		>
 			<NodeViewSelector
 				state={state.context.getState(item, true)}
@@ -370,6 +399,7 @@ function extraBottomClick(event: MouseEvent) {
 				onNavigate={data => forwardNavigation(data, item)}
 				onViewReady={() => handleViewReady(item)}
 				onScrollRequest={options => handleScrollRequest(options, item)}
+				onKeyboardExit={event => nodeKeyboardExit(event, item)}
 			/>
 		</div>
 	{/each}

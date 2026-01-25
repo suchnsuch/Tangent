@@ -1,7 +1,7 @@
 import { derived } from 'svelte/store'
 import type { EditorRange } from "@typewriter/document"
 import { escapeRegExp } from '@such-n-such/core'
-import { type NodeViewState, type DetailsViewState, NodeViewSettingsVisibilityStore, DetailsViewStateStore } from "./NodeViewState"
+import { type NodeViewState, type DetailsViewState, NodeViewSettingsVisibilityStore, DetailsViewStateStore, type NodeFocusMode } from "./NodeViewState"
 import type NoteFile from "../NoteFile"
 import { type PartialLink, StructureType } from "common/indexing/indexTypes"
 import { ForwardingStore, ReadableStore, subscribeUntil, WritableStore } from 'common/stores'
@@ -195,8 +195,10 @@ export default class NoteViewState implements NodeViewState, LensViewState {
 		}
 	}
 
-	focus(element: HTMLElement) {
+	focus(element: HTMLElement, mode?: NodeFocusMode) {
 		if (!element) return false
+
+		mode = mode ?? 'auto'
 
 		if (this.note?.meta?.virtual && this.details) {
 			this.details.open()
@@ -206,12 +208,16 @@ export default class NoteViewState implements NodeViewState, LensViewState {
 		
 		const list = element?.querySelectorAll('.noteEditor')
 		if (list) {
+			let targetHeaderElement: HTMLElement = null
 			let targetEditorElement: HTMLElement = null
 			let wasAnyActive = false
 
 			list.forEach(noteEditor => {
-				const editorElement = noteEditor.querySelector('article')
 				const headerElement = noteEditor.querySelector('header > .title')
+				const editorElement = noteEditor.querySelector('article')
+				if (!targetHeaderElement) {
+					targetHeaderElement = headerElement as HTMLElement
+				}
 				if (!targetEditorElement) {
 					targetEditorElement = editorElement
 				}
@@ -220,7 +226,17 @@ export default class NoteViewState implements NodeViewState, LensViewState {
 				}
 			})
 
-			if (!wasAnyActive && targetEditorElement) {
+			if (mode === 'auto' && !wasAnyActive && targetEditorElement) {
+				targetEditorElement.dispatchEvent(new Event('resumeFocus'))
+				return true
+			}
+			if (mode === 'start' && targetHeaderElement) {
+				document.getSelection().selectAllChildren(targetHeaderElement)
+				return true
+			}
+			if (mode === 'end' && targetEditorElement) {
+				const end = this.note.length - 1
+				this.selection.set([end, end])
 				targetEditorElement.dispatchEvent(new Event('resumeFocus'))
 				return true
 			}

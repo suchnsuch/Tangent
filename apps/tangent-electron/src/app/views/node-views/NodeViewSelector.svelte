@@ -4,7 +4,7 @@ import { fly, fade } from 'svelte/transition'
 import { FocusLevel } from 'common/dataTypes/TangentInfo'
 import paths from 'common/paths'
 import type { TreeNode } from 'common/trees'
-import type { NavigationCallback, ViewReadyCallback } from 'app/events'
+import type { KeyboardExitCallback, NavigationCallback, ViewReadyCallback } from 'app/events'
 import type { DetailsViewState, NodeViewState } from 'app/model/nodeViewStates'
 import type { ScrollToCallback } from 'app/utils/scrollto'
 import { resizeObserver } from 'app/utils/resizeObserver'
@@ -41,6 +41,7 @@ export let extraBottom = 0
 export let onNavigate: NavigationCallback
 export let onScrollRequest: ScrollToCallback = null
 export let onViewReady: ViewReadyCallback = null
+export let onKeyboardExit: KeyboardExitCallback = null
 
 $: node = state.node instanceof WorkspaceTreeNode ? state.node : null
 $: lensState = state.currentLens
@@ -267,6 +268,7 @@ function onDetailsResized(entries: ResizeObserverEntry[]) {
 			{onNavigate}
 			{onViewReady}
 			{onScrollRequest}
+			{onKeyboardExit}
 		/>
 	{:else}
 		<div class="missing">
