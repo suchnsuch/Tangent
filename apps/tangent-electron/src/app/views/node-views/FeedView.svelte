@@ -285,30 +285,34 @@ function updateShowCreateFromHover(event: MouseEvent) {
 }
 
 function forwardNavigation(data: NavigationData, item: TreeNodeOrReference) {
+	if (!onNavigate) return
+
 	if (data.direction === 'out') {
 		// Inject a navigation event from the feed to the feed child
 		const node = getNode(item, workspace.directoryStore)
-		if (onNavigate) onNavigate({
-			target: node,
-			direction: 'out',
-			origin: state.parent.node
-		})
+		if ($currentItem !== item) {
+			onNavigate({
+				target: node,
+				direction: 'out',
+				origin: state.parent.node
+			})
+		}
 
 		// Pass on the event from the feed child to the target
-		if (onNavigate) onNavigate({
+		onNavigate({
 			...data
 		})
 	}
 	else if (data.direction === 'in') {
 		// Replace origin with self so that feed lens is maintained
-		if (onNavigate) onNavigate({
+		onNavigate({
 			...data,
 			origin: state.parent.node
 		})
 	}
 	else if (data.direction === 'replace') {
 		// Pass on the normal event
-		if (onNavigate) onNavigate({
+		onNavigate({
 			...data
 		})
 	}

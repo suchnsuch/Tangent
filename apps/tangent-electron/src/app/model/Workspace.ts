@@ -711,10 +711,13 @@ export default class Workspace extends EventDispatcher {
 			}
 		}
 		else {
+			const thread = tangent.thread.value
+			const targetIndex = thread.indexOf(targetNode)
+			const fallback = targetIndex >= 0 ? 'retain' : null
 			tangent.updateThread({
 				currentNode: targetNode,
-				from: direction === 'out' ? origin : null,
-				to: direction === 'in' ? origin : null
+				from: direction === 'out' ? origin : fallback,
+				to: direction === 'in' ? origin : fallback
 			})
 		}
 

@@ -585,7 +585,7 @@ export default class Session extends ObjectStore {
 			const fromThreadIndex = from === 'retain' ? currentNodeIndex - 1 : thread.indexOf(from)
 			const fromNode = from === 'retain' ? thread[fromThreadIndex] : from
 			const toThreadIndex = to === 'retain' ? currentNodeIndex + 1 : thread.indexOf(to)
-			const toNode = to === 'retain' ? thread[to] : to
+			const toNode = to === 'retain' ? thread[toThreadIndex] : to
 
 			const shouldRebuildThread = currentNodeIndex < 0 ||
 			(
