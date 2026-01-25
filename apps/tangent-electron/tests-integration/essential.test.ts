@@ -171,11 +171,11 @@ test('Opening & Moving Note', async ({ tangent, workspace }) => {
 
 	expect(await window.getCurrentEditorText()).toEqual('Some content.')
 
-	await window.shortcut('Mod+P')	// Open command palette
-	await keyboard.type('Move')		// Search for Move Command
-	await keyboard.press('Enter')	// Accept command
-	await keyboard.type('Folder')	// Search for "A Folder"
-	await keyboard.press('Enter')	// Accept move
+	await window.shortcut('Mod+P') // Open command palette
+	await keyboard.type('Move File') // Search for Move Command
+	await keyboard.press('Enter') // Accept command
+	await keyboard.type('Folder') // Search for "A Folder"
+	await keyboard.press('Enter') // Accept move
 
 	await wait(500)
 
