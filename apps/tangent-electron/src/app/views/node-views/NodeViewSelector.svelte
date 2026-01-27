@@ -59,7 +59,7 @@ $: showSettings = showSettingsFromMouse || showSettingsFromHover || willShowSett
 let container: HTMLElement
 let settingsContainer: HTMLElement
 let settingsHeight: number = extraTop
-const settingsFocusSelector = '.arrowNavigate, .WorkspaceFileHeader .title'
+const settingsFocusSelector = '.arrowNavigate, .WorkspaceFileHeader .title, .QueryEditor article'
 
 let closeSettingsCommands = createCommandHandler([
 	workspace.commands.openPaneSettings,

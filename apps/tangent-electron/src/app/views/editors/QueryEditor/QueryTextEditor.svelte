@@ -13,7 +13,7 @@ import QueryAutocompleteMenu from './QueryAutocompleteMenu.svelte'
 import QueryAutocompleter from './QueryAutocompleter'
 import TagAutocompleter from '../autocomplete/TagAutocompleter'
 import TagAutocompleteMenu from '../autocomplete/TagAutocompleteMenu.svelte'
-    import { getInitialQuerySelection } from 'common/queryModel';
+import { getInitialQuerySelection } from 'common/queryModel'
 
 const workspace = getContext('workspace') as Workspace
 

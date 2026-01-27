@@ -1,15 +1,16 @@
-import type { Workspace } from 'app/model';
-import { defaultModules, Editor, type EditorOptions } from 'typewriter-editor';
+import type { Workspace } from 'app/model'
+import { defaultModules, Editor, type EditorOptions } from 'typewriter-editor'
 import WikiLinkAutocompleter from '../autocomplete/WikiLinkAutocompleter'
 import autocompleteBuilder from '../autocomplete/autocompleteModule'
 import autoBraces from '../autobraces/autoBracesModule'
-import editorModule from './editorModule';
+import editorModule from './editorModule'
 import { queryTypeset } from 'common/queryModel/typewriterTypes'
-import { MATCHING_BRACES } from '@such-n-such/tangent-query-parser';
-import QueryAutocompleter from './QueryAutocompleter';
-import { selectionModule } from '../selectionEvents';
-import TagAutocompleter from '../autocomplete/TagAutocompleter';
-import autoWrapping from '../autobraces/autoWrappingModule';
+import { MATCHING_BRACES } from '@such-n-such/tangent-query-parser'
+import QueryAutocompleter from './QueryAutocompleter'
+import { selectionModule } from '../selectionEvents'
+import TagAutocompleter from '../autocomplete/TagAutocompleter'
+import autoWrapping from '../autobraces/autoWrappingModule'
+import { noArrowNavigate } from 'app/utils/noArrowNavigate'
 
 export default class QueryEditor extends Editor {
 	constructor(workspace: Workspace, options?: EditorOptions) {
@@ -38,6 +39,7 @@ export default class QueryEditor extends Editor {
 					}),
 					new QueryAutocompleter()
 				]) : null,
+				noArrowNavigate,
 
 				...trimmedDefaultModules,
 
