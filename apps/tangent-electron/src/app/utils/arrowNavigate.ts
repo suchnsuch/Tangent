@@ -2,12 +2,37 @@ import { Point } from "common/geometry"
 import scrollTo, { type ScrollMargin } from './scrollto'
 import { wait } from "@such-n-such/core"
 
-function elementCenter(node: HTMLElement): Point {
-	const rect = node.getBoundingClientRect()
+function rectCenter(rect: DOMRect) {
 	return Point.make(
 		rect.left + rect.width * .5,
 		rect.top + rect.height * .5
 	)
+}
+
+function elementCenter(node: HTMLElement): Point {
+	if (document.activeElement === node && node.getAttribute('contenteditable') === 'true') {
+		const range = document.getSelection().getRangeAt(0)
+		if (range) {
+			return rectCenter(range.getBoundingClientRect())
+		}
+	}
+
+	return rectCenter(node.getBoundingClientRect())
+}
+
+function closestEdgePoint(node: HTMLElement, point: Point): Point {
+	const rect = node.getBoundingClientRect()
+	const result = Point.make(0, 0)
+
+	if (point.x < rect.left) result.x = rect.left
+	else if (point.x > rect.right) result.x = rect.right
+	else result.x = point.x
+
+	if (point.y < rect.top) result.y = rect.top
+	else if (point.y > rect.bottom) result.y = rect.bottom
+	else result.y = point.y
+
+	return result
 }
 
 function directionFromKey(event: KeyboardEvent) {
@@ -174,7 +199,7 @@ export default function arrowNavigate(node: HTMLElement, options?: ArrowNavigate
 			if (!(target instanceof HTMLElement)) continue
 			if (!fallback) fallback = target
 
-			const itemPoint = elementCenter(target)
+			const itemPoint = closestEdgePoint(target, currentPoint)
 			const dirToItem = Point.normalize(Point.subtract(itemPoint, currentPoint))
 			const dot = Point.dot(direction, dirToItem)
 			
