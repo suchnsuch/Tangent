@@ -37,9 +37,16 @@ export class NodeViewSettingsVisibilityStore extends WritableStore<NodeViewSetti
 		this.pinOverride = pinOverride ?? false
 	}
 
-	get() {
+	get value(): NodeViewSettingsVisibility {
 		if (this.pinOverride) return 'pin'
 		return super.value
+	}
+
+	set value(value: NodeViewSettingsVisibility) {
+		if (value === 'pin') {
+			this.setPinOverride(true)
+		}
+		else super.value = value
 	}
 
 	setPinOverride(override: boolean) {
