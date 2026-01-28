@@ -19,14 +19,14 @@ const maxWidth = workspace.settings.noteWidthMax
 interface Props {
 	canShow: boolean
 	state: SetViewState
+	willCreateNewFiles?: boolean
 }
 
 let {
 	canShow,
-	state: setViewState
+	state: setViewState,
+	willCreateNewFiles = $bindable(false)
 }: Props = $props()
-
-let willCreateNewFiles = $state(false)
 
 </script>
 

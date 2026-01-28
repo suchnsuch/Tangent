@@ -10,6 +10,7 @@ import { BaseSetViewState } from 'app/model/nodeViewStates/SetViewState'
 import NodeIcon from '../smart-icons/NodeIcon.svelte'
 import arrowNavigate from 'app/utils/arrowNavigate'
 import FloatingSetCreationRules, { shouldShowCreationRulesFromHover } from './FloatingSetCreationRules.svelte'
+    import EmptyList from './EmptyList.svelte';
 
 const workspace = getContext('workspace') as Workspace
 
@@ -83,7 +84,7 @@ function updateShowCreateFromHover(event: MouseEvent) {
 				</div>
 			{/if}
 		{:else}
-			<p class="empty">No children</p>
+			<EmptyList {layout} {extraTop} />
 		{/each}
 	</article>
 </main>

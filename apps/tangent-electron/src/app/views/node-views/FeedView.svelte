@@ -16,6 +16,7 @@ import { areNodesOrReferencesEquivalent, getNode, type TreeNodeOrReference } fro
 import { getContext, onMount, tick } from 'svelte'
 import NodeViewSelector from './NodeViewSelector.svelte'
 import FloatingSetCreationRules, { shouldShowCreationRulesFromHover } from './FloatingSetCreationRules.svelte'
+import EmptyList from './EmptyList.svelte'
 
 const workspace = getContext('workspace') as Workspace
 
@@ -406,6 +407,8 @@ function extraBottomClick(event: MouseEvent) {
 				onKeyboardExit={event => nodeKeyboardExit(event, item)}
 			/>
 		</div>
+	{:else}
+		<EmptyList {extraTop} />
 	{/each}
 	<!-- svelte-ignore a11y-click-events-have-key-events -->
 	<div class="extraBottom" style:height={`${effectiveExtraBottom}px`} on:click={extraBottomClick}></div>

@@ -13,6 +13,7 @@ import SetCreationRules from './SetCreationRules.svelte'
 import NodePreview from '../summaries/NodePreview.svelte'
 import arrowNavigate from 'app/utils/arrowNavigate'
 import FloatingSetCreationRules, { shouldShowCreationRulesFromHover } from './FloatingSetCreationRules.svelte'
+import EmptyList from './EmptyList.svelte'
 
 const workspace = getContext('workspace') as Workspace
 
@@ -81,6 +82,7 @@ function sendViewReady() {
 let showCreateFromHover = false
 let showCreateFromScroll = false
 let container: HTMLElement = null
+let willCreateNewFiles = false
 
 function onScroll() {
 	if (!container) return
@@ -140,12 +142,17 @@ function updateShowCreateFromHover(event: MouseEvent) {
 				/>
 			</div>
 		</svelte:fragment>
+		<svelte:fragment slot="empty">
+			{#if !willCreateNewFiles}
+				<EmptyList {layout} {extraTop}/>
+			{/if}
+		</svelte:fragment>
 		<SetCreationRules slot="after" state={state.parent} _class="card create"/>
 	</LazyScrolledList>
 
 </div>
 
-<FloatingSetCreationRules state={state.parent} canShow={showCreateFromHover && showCreateFromScroll} />
+<FloatingSetCreationRules state={state.parent} canShow={showCreateFromHover && showCreateFromScroll} bind:willCreateNewFiles />
 
 <style lang="scss">
 .CardsView {
