@@ -23,8 +23,6 @@ function nodeOptionEvent(option: any, event: Event) {
 		selectedIndex={selectedItemIndex}
 		onItemEvent={nodeOptionEvent}
 	>
-		<svelte:fragment slot="item" let:item={item}>
-
-		</svelte:fragment>
+		<svelte:fragment slot="item" let:item={item}>{item}</svelte:fragment>
 	</ScrollingItemList>
 </div>
