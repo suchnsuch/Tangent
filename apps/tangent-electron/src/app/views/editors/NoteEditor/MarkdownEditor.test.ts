@@ -56,6 +56,31 @@ describe('List Handling', () => {
 	D. list`)
 	})
 
+	it('Should transform list prefixes when a new item is added at the top', async () => {
+
+		editor.doc = markdownToTextDocument(`
+	
+	- Simple
+	- List`)
+
+		editor.change
+			.insert(2, '1.')
+			.apply()
+			
+		await wait(waitTime)
+
+		editor.change
+			.insert(4, ' ')
+			.apply()
+		
+		await wait(waitTime)
+		
+		expect(editor.getText()).toEqual(`
+	1. 
+	2. Simple
+	3. List`)
+	})
+
 	test('Merging different list types should not die', async () => {
 		editor.doc = markdownToTextDocument(`
 1. A simple

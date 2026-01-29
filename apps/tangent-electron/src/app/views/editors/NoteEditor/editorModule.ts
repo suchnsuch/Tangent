@@ -237,7 +237,7 @@ export default function editorModule(editor: Editor, options: {
 	function isListGlyphCreationChange(delta: Delta) {
 		const changeInsert = getEditInfo(delta)
 		if (changeInsert?.insert?.length === 1) {
-			return changeInsert.insert.match(/[\.\w\d\*\-\+]/) != null
+			return changeInsert.insert.match(/[\.\w\d\*\-\+ ]/) != null
 		}
 		if (changeInsert?.shift < 0) {
 			return false // Not a glyph creator, still a valid edit change
