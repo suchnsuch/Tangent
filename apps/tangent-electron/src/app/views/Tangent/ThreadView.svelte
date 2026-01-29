@@ -156,10 +156,10 @@ function scrollToCurrent(state: NodeViewState, _c?, minWidth = trueMinWidth) {
 	}
 }
 
-function getNodeContainerStyle(index: number, min: number) {
+function getNodeContainerStyle(totalCount: number, index: number, min: number) {
 	let result = `min-width: ${min}px;`
 	result += `left: ${collapsedWidth * index}px;`
-	result += `right: -${min - collapsedWidth * ($states.length - index)}px;`
+	result += `right: -${min - collapsedWidth * (totalCount - index)}px;`
 	return result
 }
 
@@ -203,7 +203,7 @@ function onWheel(event: WheelEvent, state: NodeViewState) {
 		<!-- svelte-ignore a11y-click-events-have-key-events -->
 		<!-- svelte-ignore a11y-no-static-element-interactions -->
 		<div class="nodeContainer"
-			style={getNodeContainerStyle(index, trueMinWidth)}
+			style={getNodeContainerStyle($states.length, index, trueMinWidth)}
 			class:current={isCurrent}
 			on:click={e => onNodeContainerClicked(e, state)}
 			on:wheel={e => onWheel(e, state)}
