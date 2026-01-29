@@ -6,10 +6,19 @@
  * However, they are solving a real problem.
  ****/
 
+export function getDetailsPane(container: HTMLElement): HTMLElement {
+	if (!container) return null
+	let target = container.querySelector('.details')
+	return target instanceof HTMLElement ? target : null
+}
+
 export function selectDetailsPane(container: HTMLElement): boolean {
 	if (!container) return false
-	let target = container.querySelector('.details .focusable.focused')
-	if (!target) target = container.querySelector('.details .focusable')
+	const details = getDetailsPane(container)
+	if (!details) return false
+
+	let target = details.querySelector('.focusable.focused')
+	if (!target) target = details.querySelector('.focusable')
 	if (target instanceof HTMLElement) {
 		target.focus({
 			preventScroll: true
@@ -17,7 +26,6 @@ export function selectDetailsPane(container: HTMLElement): boolean {
 		return true
 	}
 }
-
 
 export function getLeftSidebarElement() {
 	const target = document.querySelector('.sidebar.left')

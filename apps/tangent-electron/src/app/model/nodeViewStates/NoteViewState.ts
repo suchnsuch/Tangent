@@ -22,7 +22,7 @@ import type MarkdownEditor from 'app/views/editors/NoteEditor/MarkdownEditor'
 import { createContentIdMatcher } from 'common/markdownModel/links'
 import { deepEqual } from 'fast-equals'
 import NoteDetailsSummary from 'app/views/summaries/NoteDetailsSummary.svelte'
-import { selectDetailsPane } from 'app/utils/selection'
+import { getDetailsPane, selectDetailsPane } from 'app/utils/selection'
 
 export enum NoteDetailMode {
 	None = 0,
@@ -200,8 +200,12 @@ export default class NoteViewState implements NodeViewState, LensViewState {
 
 		mode = mode ?? 'auto'
 
-		if (this.note?.meta?.virtual && this.details) {
+		// Don't open the details if focus is already in the details pane
+		const detailsElement = getDetailsPane(element)
+		if (this.note?.meta?.virtual && !this.details.value?.open && (!detailsElement || !detailsElement.contains(document.activeElement))) {
 			this.details.open()
+			// The system will handle selection
+			return true
 		}
 
 		if (this.details?.value?.open && selectDetailsPane(element)) return true
@@ -228,6 +232,10 @@ export default class NoteViewState implements NodeViewState, LensViewState {
 
 			if (mode === 'auto' && !wasAnyActive && targetEditorElement) {
 				targetEditorElement.dispatchEvent(new Event('resumeFocus'))
+				if (document.activeElement !== targetEditorElement) {
+					// TODO: Not sure why this sometimes fails. Worth more exploration.
+					targetEditorElement.focus()
+				}
 				return true
 			}
 			if (mode === 'start' && targetHeaderElement) {
