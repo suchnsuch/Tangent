@@ -17,6 +17,7 @@ import SvgIcon from './smart-icons/SVGIcon.svelte'
 import { tooltip } from 'app/utils/tooltips'
 import { wait } from '@such-n-such/core'
 import { focusLeftSidebar } from 'app/utils/selection'
+import { getTreeNodeTransfer, hasTreeNodeTransfer } from 'app/utils/dragDrop'
 
 const workspace = getContext('workspace') as Workspace
 
@@ -43,6 +44,7 @@ export let hasFocus: boolean
 export let resizing: boolean = false
 export let width = 100
 
+let container: HTMLElement = null
 let windowWidth = 100
 
 $: width = Math.min($size, windowWidth - 40)
@@ -139,13 +141,41 @@ function onKeydown(event: KeyboardEvent) {
 		return
 	}
 }
+
+function onDragOverRoot(event: DragEvent) {
+	if (!hasTreeNodeTransfer(event.dataTransfer)) return null
+	event.preventDefault()
+	event.dataTransfer.dropEffect = 'move'
+}
+
+function onDragEnterRoot(event: DragEvent) {
+	if (hasTreeNodeTransfer(event.dataTransfer)) {
+		container.classList.add('dragover')
+	}
+}
+
+function onDragLeaveRoot(event: DragEvent) {
+	container.classList.remove('dragover')
+}
+
+function onDropRoot(event: DragEvent) {
+	container.classList.remove('dragover')
+	const draggedNode = getTreeNodeTransfer(event.dataTransfer, workspace.directoryStore)
+	if (draggedNode) {
+		workspace.commands.moveFile.execute({
+			subject: draggedNode,
+			target: workspace.directoryStore.files
+		})
+	}
+}
 </script>
 
 <svelte:window bind:innerWidth={windowWidth} />
 
 <!-- svelte-ignore a11y-mouse-events-have-key-events -->
 <!-- svelte-ignore a11y-no-static-element-interactions -->
-<div 
+<div
+	bind:this={container}
 	class="sidebar left"
 	class:pinned={$mode === SidebarMode.pinned}
 	class:visible={visible}
@@ -158,7 +188,12 @@ function onKeydown(event: KeyboardEvent) {
 	on:keydown={onKeydown}
 	style={ `width: ${width}px; transform: translateX(${visible ? 0 : -width - 10}px);` }
 >
-	<header>
+	<header
+		on:dragover={onDragOverRoot}
+		on:dragenter={onDragEnterRoot}
+		on:dragleave={onDragLeaveRoot}
+		on:drop={onDropRoot}
+	>
 		<div
 			class="workspace-name"
 			use:tooltip={workspace.directoryStore.files.path}
@@ -232,6 +267,12 @@ function onKeydown(event: KeyboardEvent) {
 			<FileTree directoryView={workspace.viewState.tagTreeView} />
 		{/if}
 	</div>
+	<div style:flex-grow="1"
+		on:dragover={onDragOverRoot}
+		on:dragenter={onDragEnterRoot}
+		on:dragleave={onDragLeaveRoot}
+		on:drop={onDropRoot}
+	></div>
 	<div class="sidebar-resizer"
 		on:mousedown={startLeftDrag}
 	></div>
@@ -319,6 +360,11 @@ function onKeydown(event: KeyboardEvent) {
 
 .scroller {
 	overflow-y: auto;
-	flex-grow: 1;
+}
+
+.sidebar {
+	&:global(.dragover) {
+		background-color: var(--dropTargetBackgroundColor) !important;
+	}
 }
 </style>
