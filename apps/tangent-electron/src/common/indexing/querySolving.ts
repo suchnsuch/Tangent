@@ -349,8 +349,13 @@ export async function solveQuery(query: Query, interop: QuerySolverInterop): Pro
 			if (iterator) {
 				return new Set(filterIterator(set, item => {
 					return iterator(reference => {
-						if (isNode(item)) {
-							for (const connection of IndexData.outgoingConnections(item.meta)) {
+						if (isSubReference(item)) {
+							log.warn('References in sub references not yet supported!', item)
+							return false
+						}
+						const node = getNode(item, interop.directory)
+						if (node) {
+							for (const connection of IndexData.outgoingConnections(node.meta)) {
 								if (connection.to === reference.path) {
 									return true
 								}
