@@ -1,18 +1,9 @@
-import { defineProject } from 'vitest/config'
+import { defineConfig } from 'vitest/config'
 
-export default defineProject({
+export default defineConfig({
 	test: {
-		name: 'tangent-query-parser',
-		environment: 'node',
-		include: [
-			'tests/**/*.test.[jt]s'
-		],
-		server: {
-			deps: {
-				inline: [
-					/@such-n-such/
-				]
-			}
-		}
+		projects: [
+			'vitest.config.project.*'
+		]
 	}
 })
