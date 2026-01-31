@@ -235,7 +235,7 @@ export default function arrowNavigate(node: HTMLElement, options?: ArrowNavigate
 	}
 
 	function onClick(event: MouseEvent) {
-		if (!(event.target instanceof HTMLElement)) return
+		if (!(event.target instanceof Element)) return
 
 		// Wind up to our immediate child
 		let target = event.target
@@ -247,7 +247,7 @@ export default function arrowNavigate(node: HTMLElement, options?: ArrowNavigate
 
 		if (focusClasses) {
 			clearFocusedClasses()
-			addFocusClasses(target)
+			addFocusClasses(target as HTMLElement)
 		}
 	}
 
