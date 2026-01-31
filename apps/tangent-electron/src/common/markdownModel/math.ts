@@ -19,10 +19,9 @@ export function parseInlineMath(char: string, parser: NoteParser): boolean {
 
 	const isBlock = feed.checkFor('$$')
 	const token = isBlock ? '$$' : char
-	let leftTouchingText = !isWhitespace(feed.peek(-token.length))
 	let rightTouchingText = !isWhitespace(feed.peek())
 
-	if (!leftTouchingText && rightTouchingText) {
+	if (rightTouchingText) {
 		feed.next()
 		const findResult = feed.findNext(token)
 		if (findResult.foundMatch) {
