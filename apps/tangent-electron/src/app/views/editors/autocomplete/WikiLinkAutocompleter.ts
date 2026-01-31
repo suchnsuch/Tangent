@@ -9,7 +9,7 @@ import { safeHeaderLine } from "common/markdownModel/header";
 import { rangeContainsRange } from 'common/typewriterUtils';
 import { EmbedType, getEmbedType } from 'common/embedding';
 import { buildFuzzySegementMatcher, buildMatcher, orderTreeNodesForSearch, type SegmentSearchNodePair, type SearchMatchResult } from 'common/search';
-import { implicitExtensionsMatch } from 'common/fileExtensions';
+import { implicitExtensionsMatch, knownExtensionsMatch } from 'common/fileExtensions';
 import paths, { normalizeSeperators } from "common/paths";
 import { wrappedIndex } from 'common/collections';
 
@@ -241,9 +241,21 @@ export default class WikiLinkAutocompleter implements AutocompleteHandler {
 				if (relativePath) relativePath = normalizeSeperators(relativePath, '/')
 				
 				if (match.input !== relativePath && match.input !== selectedNode.node.path) {
-					// This matched to an alias
-					// Strip out any path information that was presented with the alias.
-					result += '|' + paths.basename(match.input)
+					// This matched to an alias or header
+					if (selectedNode.node.fileType === 'folder') {
+						result += '|' + selectedNode.node.name
+					}
+					else {
+						const headerIndex = match.input.lastIndexOf('#')
+						if (headerIndex >= 0 && match.input.substring(0, headerIndex) === relativePath) {
+							// This is a header
+							result += '#' + match.input.substring(headerIndex + 1)
+						}
+						else {
+							// This is an alias
+							result += '|' + paths.basename(match.input, paths.extname(match.input))
+						}
+					}
 				}
 			}
 		}
