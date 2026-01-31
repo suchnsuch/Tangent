@@ -77,6 +77,7 @@ function nodeKeydown(event: KeyboardEvent, ref: TreeNodeOrReference) {
 
 function sendViewReady() {
 	if (onViewReady) onViewReady()
+	updateShowCreateFromScroll()
 }
 
 let showCreateFromHover = false
@@ -85,6 +86,10 @@ let container: HTMLElement = null
 let willCreateNewFiles = false
 
 function onScroll() {
+	updateShowCreateFromScroll()
+}
+
+function updateShowCreateFromScroll() {
 	if (!container) return
 
 	// Hide the creation rule button when we're scrolled to the bottom as there is
