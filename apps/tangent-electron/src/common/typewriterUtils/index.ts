@@ -109,6 +109,13 @@ export function areLinesOpTextEquivalent(a: Line, b: Line) {
 	return true
 }
 
+export function deltaHasTextChanges(delta: Delta): boolean {
+	for (const op of delta.ops) {
+		if (op.delete || op.insert) return true
+	}
+	return false
+}
+
 export function findWordAroundPositionInDocument(doc: TextDocument, position: number): EditorRange {
 	const line = doc.getLineAt(position)
 	const [start, end] = doc.getLineRange(line)

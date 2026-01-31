@@ -399,7 +399,7 @@ function initializeSelection(_h?, _e?) {
 		else if ($annotations?.length) {
 			updateAnnotations($annotations)
 		}
-		else {
+		else if (!note.meta?.virtual) {
 			editorElement.dispatchEvent(new Event('resumeFocus'))
 		}
 
@@ -783,12 +783,6 @@ function applyAnnotations(event?: DecorateEvent) {
 }
 
 function resumeFocus(arg?) {
-	if (arg instanceof Event && virtual) {
-		// TODO: Some way of opening details automatically
-		// openDetails()
-		return
-	}
-
 	if (!$note.isReady) {
 		return // Will be ready later
 	}

@@ -232,10 +232,6 @@ export default class NoteViewState implements NodeViewState, LensViewState {
 
 			if (mode === 'auto' && !wasAnyActive && targetEditorElement) {
 				targetEditorElement.dispatchEvent(new Event('resumeFocus'))
-				if (document.activeElement !== targetEditorElement) {
-					// TODO: Not sure why this sometimes fails. Worth more exploration.
-					targetEditorElement.focus()
-				}
 				return true
 			}
 			if (mode === 'start' && targetHeaderElement) {
