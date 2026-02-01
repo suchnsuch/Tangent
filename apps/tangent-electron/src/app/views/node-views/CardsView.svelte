@@ -229,7 +229,6 @@ function updateShowCreateFromHover(event: MouseEvent) {
 				font-size: 120%;
 
 				color: var(--deemphasizedTextColor);
-				background-color: unset;
 				--inputBorderRadius: var(--borderRadius);
 
 				padding: unset;

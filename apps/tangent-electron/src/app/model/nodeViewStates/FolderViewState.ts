@@ -2,7 +2,8 @@ import type FolderInfo from 'common/dataTypes/FolderInfo'
 import { DirectoryStore, iterateOverChildren, TreePredicateResult } from "common/trees"
 import { getEmbedType } from 'common/embedding'
 import type CreationRule from 'common/settings/CreationRule'
-import type { CreationRuleDefinition } from 'common/settings/CreationRule'
+import { nameFromRule, type CreationRuleDefinition } from 'common/settings/CreationRule'
+import paths from 'common/paths'
 import { WritableStore } from 'common/stores'
 import { derived } from 'svelte/store'
 import type DataFile from '../DataFile'
@@ -51,13 +52,29 @@ export default class FolderViewState extends BaseSetViewState {
 					[workspace.directoryStore, settings.creationRules],
 					([directory, rules]) => {
 					const relativeFolder = (directory as DirectoryStore).pathToRelativePath(this.folder.path)
+					if (relativeFolder === false) return []
+
+					let exactMatches = 0
 	
 					const filtered: (CreationRule|CreationRuleDefinition)[] = rules
 						.filter(rule => {
-							return rule.folder.value === relativeFolder
+							const folder = rule.folder.value
+							if (relativeFolder === folder) {
+								exactMatches++
+								return true
+							}
+							if (folder && relativeFolder.startsWith(folder)) {
+								// Calculate where this rule would actually create files
+								const nameResult = nameFromRule(rule)
+								if (!nameResult) return false
+								const newPath = paths.join(folder, typeof nameResult === 'string' ? nameResult : nameResult.preName)
+								// Only show parent paths that would affect this folder or a child
+								return newPath.startsWith(relativeFolder)
+							}
+							return false
 						})
 	
-					if (filtered.length === 0) {
+					if (exactMatches === 0) {
 						filtered.push({
 							name: `Note in "${this.folder?.name}"`,
 							nameTemplate: '%name%',

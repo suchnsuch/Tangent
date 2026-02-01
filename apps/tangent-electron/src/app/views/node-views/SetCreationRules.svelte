@@ -141,11 +141,19 @@ function determineWillCreateNewFiles(rules: (CreationRule | CreationRuleDefiniti
 		cursor: default;
 		align-items: stretch !important;
 		justify-content: stretch;
+		background-color: unset;
 
-		.label {
-			flex-grow: 1;
-			
+		&.row {
+			.label {
+				margin: 0 1em;
+			}
 		}
+		&.column {
+			.label {
+				margin: .66em 0;
+			}
+		}
+		
 		button {
 			flex-grow: 1;
 		}
