@@ -43,7 +43,7 @@ function updateDetails() {
 		let wordCount = 0
 		for (const line of note.lines) {
 			const text = lineToText(line)
-			wordCount += text.match(/\w+/g)?.length ?? 0
+			wordCount += text.match(/\S+/g)?.length ?? 0
 		}
 		result += pluralize(
 			wordCount,
