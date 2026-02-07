@@ -1,3 +1,5 @@
+import type NoteParser from "./NoteParser"
+
 export type TemplateDefinition = {
 	/** The text that will be replaced by the template */
 	text: string
@@ -107,3 +109,35 @@ export const dateTemplates: TemplateDefinition[] = [
 export const templates: TemplateDefinition[] = [
 	...dateTemplates
 ]
+
+export const templateLookup: { [key: string]: TemplateDefinition } = {}
+for (const template of templates) {
+	templateLookup[template.text] = template
+}
+
+export function parseTemplateTokens(char: string, parser: NoteParser): boolean {
+	if (char !== '%') return false
+
+	const start = parser.feed.index
+	const { contentCount, foundMatch } = parser.feed.findNext('%', start + 1)
+	if (!foundMatch) return false
+
+	const token = parser.feed.substring(start, start + contentCount + 2)
+
+	console.log({
+		start,
+		contentCount,
+		token
+	})
+	const definition = templateLookup[token]
+	if (!definition) return false
+
+	// Close any earlier content
+	parser.commitSpan(null, 0)
+
+	parser.feed.nextByLength(contentCount + 1)
+
+	parser.commitSpan({ templateToken: definition })
+
+	return true
+}

@@ -213,10 +213,10 @@ export default class CharacterFeeder {
 	 * Does _not_ consume characters. Can't understand surrogate pairs.
 	 * Returns the characters skipped to find the match.
 	 */
-	findNext(value: string, stopOnNewLine=true) {
+	findNext(value: string, index?: number, stopOnNewLine=true) {
 		const firstChar = value[0]
 		let total = 0
-		let index = this.index
+		index = index ?? this.index
 		let currentChar = this.currentChar
 		while (index < this.text.length) {
 			if (stopOnNewLine && currentChar === '\n') {

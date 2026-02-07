@@ -81,6 +81,8 @@
 
 	--dropTargetBackgroundColor: var(--accentBackgroundColor);
 	--dropTargetChildBackgroundColor: rgb(0 0 0 / .1);
+
+	--revealedTextColor: green;
 }
 
 :where(.dark) {

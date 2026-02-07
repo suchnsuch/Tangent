@@ -132,7 +132,7 @@ function parseCloseTag(char: string, parser: NoteParser): boolean {
 
 		parser.commitSpan({ code_syntax: 'tag' })
 
-		const { foundMatch, contentCount } = feed.findNext('>', false)
+		const { foundMatch, contentCount } = feed.findNext('>', undefined, false)
 
 		if (contentCount > 0) {
 			feed.nextByLength(contentCount)

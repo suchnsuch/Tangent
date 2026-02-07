@@ -59,6 +59,7 @@ import LineGutterLeft from './LineGutterLeft.svelte';
 import LineGutterRight from './LineGutterRight.svelte';
 import { dropTooltip, requestTooltip, type TooltipConfig } from 'app/utils/tooltips';
 import YamlTooltip from './YamlTooltip.svelte';
+    import TemplateTokenTooltip from './TemplateTokenTooltip.svelte';
 
 // Technically, this just needs to exist _somewhere_. Putting it here because of the svelte dependency
 // Force the use of the variable so that it is included in the bundle
@@ -947,6 +948,13 @@ function getTooltipConfig(target: HTMLElement): TooltipConfig {
 				tooltip: YamlTooltip,
 				args: {
 					message
+				}
+			}
+		case 'templateToken':
+			return {
+				tooltip: TemplateTokenTooltip,
+				args: {
+					token: target.textContent
 				}
 			}
 	}

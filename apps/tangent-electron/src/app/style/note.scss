@@ -210,7 +210,7 @@ article.note {
 
 			&.revealed {
 				span.text {
-					color: green;	
+					color: var(--revealedTextColor);
 				}
 				&.checkbox t-checkbox {
 					display: none;
@@ -247,7 +247,7 @@ article.note {
 
 	.line {
 		.hidden, .line_format {
-			color: green;
+			color: var(--revealedTextColor);
 		}
 
 		&.collapsed:not(.collapsed-revealed) {
@@ -629,6 +629,11 @@ article.note {
 				}
 			}
 		}
+	}
+
+	.templateToken {
+		font-family: var(--codeFontFamily);
+		color: var(--revealedTextColor);
 	}
 
 	.error {

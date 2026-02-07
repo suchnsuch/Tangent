@@ -738,6 +738,17 @@ const noteTypeset:TypesetTypes = {
 			}
 		},
 
+		{
+			name: 'templateToken',
+			selector: 'span.templateToken',
+			render: (attributes, children) => {
+				return h('span', {
+					className: 'templateToken',
+					'data-tooltip-type': 'templateToken',
+				}, children)
+			}
+		},
+
 		hideableFormat('link_internal'),
 		hideableFormat('tag_internal')
 	]

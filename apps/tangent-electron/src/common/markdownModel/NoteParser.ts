@@ -14,6 +14,7 @@ import { parseTag } from './tag'
 import { parseCodeBlock, parseInlineCode, readCodeLines } from './code'
 import { getLanguage } from './codeSyntax'
 import { parseHtml } from './html'
+import { parseTemplateTokens } from './templates'
 
 const blockPrograms: ParsingProgram[] = [
 	parseHeader,
@@ -40,7 +41,8 @@ const inlineFormattingPrograms: ParsingProgram[] = [
 	parseStrikethrough,
 	parseHighlight,
 	parseEmojiHighlight,
-	parseBackslashEscape
+	parseBackslashEscape,
+	parseTemplateTokens
 ]
 
 const basePrograms = [
