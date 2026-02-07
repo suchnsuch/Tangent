@@ -35,7 +35,9 @@ export function parseInlineMath(char: string, parser: NoteParser): boolean {
 						source: feed.substring(index, index + findResult.contentCount),
 						isBlock
 					},
-					hidden: true
+					// Using hiddenGroup instead of hidden allows for math to embed within inline formatting.
+					// The "hidden" class is implicit and added afterwards.
+					hiddenGroup: true
 				})
 				return true
 			}

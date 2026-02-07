@@ -175,7 +175,7 @@ function error(message: string) {
 function getBaseStyle() {
 	let style = 'max-width: 100%;'
 	if (block) {
-		style += 'margin: 0 auto .5em;'
+		style += 'margin: 0 auto;'
 	}
 	return style
 }

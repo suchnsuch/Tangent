@@ -286,6 +286,13 @@ article.note {
 		tab-size: unset;
 	}
 
+	// This gives a consistent "revealed" styling for things like images, code preview, math, etc.
+	.output-container.revealed .output {
+		border-radius: var(--inputBorderRadius);
+		outline: 1px solid var(--textColor);
+		outline-offset: .5em;
+	}
+
 	.horizontal_rule {
 		height: rhythmUnit(1);
 		position: relative;
@@ -520,7 +527,13 @@ article.note {
 		}
 	}
 
-	span.math {
+	.inline-math-container.revealed {
+		outline: 2px solid var(--textColor);
+		outline-offset: 4px;
+		border-radius: var(--inputBorderRadius);
+	}
+
+	span.math-source {
 		font-family: var(--codeFontFamily);
 		color: var(--accentTextColor);
 
@@ -535,19 +548,11 @@ article.note {
 
 	t-math[block] {
 		display: block;
+		margin-top: .5em;
+		margin-bottom: .5em;
 		&.indented {
 			margin-left: calc(var(--spaceWidth) * var(--lineIndent));
 		}
-		&.revealed {
-			background: var(--backgroundColor);
-			border-radius: var(--borderRadius);
-			padding: 2px;
-		}
-	}
-
-	t-math.revealed {
-		background: var(--backgroundColor);
-		padding: 2px;
 	}
 
 	.annotation {
@@ -786,7 +791,16 @@ t-link[form="wiki"] {
 	}
 }
 
+t-code-preview {
+	display: block;
+	margin-top: .5em;
+	margin-bottom: .5em;
+}
+
 t-embed {
+	display: block;
+	margin-top: .5em;
+	margin-bottom: .5em;
 	&[link-state="error"] {
 		color: var(--emptyLinkTextColor);
 

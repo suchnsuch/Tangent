@@ -332,17 +332,23 @@ const noteTypeset:TypesetTypes = {
 				)
 
 				if (codeData.source) {
-					let previewStyle = ''
+					let figureClass = 'output-container'
+					let figureStyle = ''
 					if (isSectionCollapsed && !isRevealed) {
-						previewStyle += 'display: none;'
+						figureStyle += 'display: none;'
+					}
+					if (isRevealed) {
+						figureClass += ' revealed'
 					}
 					return h('figure',
 						{
-							style: previewStyle
+							className: figureClass,
+							style: figureStyle
 						},
 						[
 							content,
 							h('t-code-preview', {
+								className: 'output',
 								language: codeData.language,
 								source: codeData.source
 							})
@@ -401,10 +407,12 @@ const noteTypeset:TypesetTypes = {
 					return h('div', props, children)
 				})
 
+				let containerClass = 'math-block-container output-container'
+
 				const codeClass = 'language-latext'
 				let preClass = codeClass + ' hidden'
 
-				let mathClass = ''
+				let mathClass = 'output'
 				let mathStyle = ''
 
 				if (indent) {
@@ -412,6 +420,7 @@ const noteTypeset:TypesetTypes = {
 					mathClass += ' indented'
 				}
 				if (revealed) {
+					containerClass += ' revealed'
 					preClass += ' revealed'
 					mathClass += ' revealed'
 				}
@@ -420,7 +429,9 @@ const noteTypeset:TypesetTypes = {
 					mathStyle += 'display: none;'
 				}
 
-				return h('figure', { }, [
+				return h('figure', {
+					className: containerClass
+				}, [
 					h('pre',
 						{
 							className: preClass,
@@ -524,7 +535,7 @@ const noteTypeset:TypesetTypes = {
 			name: 't_embed',
 			selector: '.t-embed',
 			render: (attributes, children) => {
-				let className = 't-embed'
+				let className = 't-embed output-container'
 				if (attributes.revealed) {
 					className += ' revealed'
 				}
@@ -539,6 +550,7 @@ const noteTypeset:TypesetTypes = {
 				
 				// forward the link information
 				node.t_embed_props = attributes.t_link
+				node.t_embed_props.className = 'output'
 
 				return node
 			},
@@ -562,8 +574,8 @@ const noteTypeset:TypesetTypes = {
 				return h(
 					't-link',
 					{
-						class: className,
-						...attributes.t_link
+						...attributes.t_link,
+						className: className
 					},
 					children)
 			}
@@ -694,26 +706,34 @@ const noteTypeset:TypesetTypes = {
 
 		{
 			name: 'math',
-			selector: 'span.math',
+			selector: 'span.math-source',
 			render: (attributes, children) => {
-				let className = 'math hidden'
+
+				let containerAttr = {
+					className: 'inline-math-container'
+				}
+
+				let sourceAttr = {
+					className: 'math-source hidden'
+				}
 				
-				let mathAttr = {
+				let tMathAttr = {
 					'math-source': attributes.math.source,
 				} as any
 
 				if (attributes.revealed) {
-					className += ' revealed'
-					mathAttr.className = 'revealed'
+					containerAttr.className += ' revealed'
+					sourceAttr.className += ' revealed'
+					tMathAttr.className = 'revealed'
 				}
 
 				if (attributes.math.isBlock) {
-					mathAttr.block = ''
+					tMathAttr.block = ''
 				}
 
-				return h('span', {}, [
-					h('span', { className }, children),
-					h('t-math', mathAttr, [])
+				return h('span', containerAttr, [
+					h('span', sourceAttr, children),
+					h('t-math', tMathAttr, [])
 				])
 			}
 		},
