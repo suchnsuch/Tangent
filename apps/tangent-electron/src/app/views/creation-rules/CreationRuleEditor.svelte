@@ -8,6 +8,7 @@ import editable from 'app/utils/editable'
 import SettingView from '../System/SettingView.svelte'
 import { tooltip } from 'app/utils/tooltips'
 import CreationRuleTemplateButton from './CreationRuleTemplateButton.svelte'
+    import { dateTemplates } from 'common/markdownModel/templates';
 
 const workspace = getContext('workspace') as Workspace
 export let rule: CreationRule
@@ -152,25 +153,9 @@ function onValidateShortcut(shortcut: string) {
 		<p>These tokens are replaced with the appropriate values based on when the note is created.</p>
 		<figure>
 			<table><tbody>
-				<tr><th><CreationRuleTemplateButton templateText="%YYYY%" insertTemplateText={insertTextIntoTemplate}/></th><td>The full year.</td></tr>
-				<tr><th><CreationRuleTemplateButton templateText="%YY%" insertTemplateText={insertTextIntoTemplate}/></th><td>The last two digits of the year.</td></tr>
-				<tr><th><CreationRuleTemplateButton templateText="%MM%" insertTemplateText={insertTextIntoTemplate}/></th><td>The two digit month. e.g. "05" for May.</td></tr>
-				<tr><th><CreationRuleTemplateButton templateText="%M%" insertTemplateText={insertTextIntoTemplate}/></th><td>The single digit month. e.g. "5" for May, "10" for October.</td></tr>
-				<tr><th><CreationRuleTemplateButton templateText="%DD%" insertTemplateText={insertTextIntoTemplate}/></th><td>The two digit day of the month. e.g. "07".<sup>1</sup></td></tr>
-				<tr><th><CreationRuleTemplateButton templateText="%D%" insertTemplateText={insertTextIntoTemplate}/></th><td>The single digit day of the month. e.g. "5", "15".<sup>1</sup></td></tr>
-				<tr><th><CreationRuleTemplateButton templateText="%HH%" insertTemplateText={insertTextIntoTemplate}/></th><td>The two digit hour of the day (24 hour clock).</td></tr>
-				<tr><th><CreationRuleTemplateButton templateText="%H%" insertTemplateText={insertTextIntoTemplate}/></th><td>The single digit hour of the day (24 hour clock).</td></tr>
-				<tr><th><CreationRuleTemplateButton templateText="%mm%" insertTemplateText={insertTextIntoTemplate}/></th><td>The two digit minute of the hour.</td></tr>
-				<tr><th><CreationRuleTemplateButton templateText="%m%" insertTemplateText={insertTextIntoTemplate}/></th><td>The single digit minute of the hour.</td></tr>
-				<tr><th><CreationRuleTemplateButton templateText="%ss%" insertTemplateText={insertTextIntoTemplate}/></th><td>The two digit second of the minute.</td></tr>
-				<tr></tr>
-				<tr><th><CreationRuleTemplateButton templateText="%Month%" insertTemplateText={insertTextIntoTemplate}/></th><td>The full name of the month.<sup>2</sup></td></tr>
-				<tr><th><CreationRuleTemplateButton templateText="%Mth%" insertTemplateText={insertTextIntoTemplate}/></th><td>The shortened name of the month.<sup>2</sup></td></tr>
-				<tr><th><CreationRuleTemplateButton templateText="%WeekDay%" insertTemplateText={insertTextIntoTemplate}/></th><td>The full name of the week day.<sup>2</sup></td></tr>
-				<tr><th><CreationRuleTemplateButton templateText="%WDay%" insertTemplateText={insertTextIntoTemplate}/></th><td>The short name of the week day.<sup>2</sup></td></tr>
-				<tr></tr>
-				<tr><th><CreationRuleTemplateButton templateText="%WW%" insertTemplateText={insertTextIntoTemplate} /></th><td>The double digit ISO week of the year.</td></tr>
-				<tr><th><CreationRuleTemplateButton templateText="%W%" insertTemplateText={insertTextIntoTemplate} /></th><td>The single digit ISO week of the year.</td></tr>
+				{#each dateTemplates as dateTemplate}
+					<tr><th><CreationRuleTemplateButton templateText={dateTemplate.text} insertTemplateText={insertTextIntoTemplate}/></th><td>{dateTemplate.description}</td></tr>	
+				{/each}
 			</tbody></table>
 			<figcaption>
 				<table><tbody>
@@ -253,7 +238,7 @@ details {
 }
 
 figure {
-	margin-right: 0;
+	margin: 1em 0;
 }
 
 figcaption {
