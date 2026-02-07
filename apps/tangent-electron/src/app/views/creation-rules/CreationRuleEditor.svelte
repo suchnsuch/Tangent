@@ -183,6 +183,7 @@ function onValidateShortcut(shortcut: string) {
 	<div class="settingsGroup">
 		<SettingView setting={rule.shortcut} {onValidateShortcut} />
 		<SettingView setting={rule.folder} />
+		<SettingView setting={rule.contentTemplate} />
 		<SettingView setting={rule.mode} />
 		<SettingView setting={rule.showInMenu} />
 		<SettingView setting={rule.description} />

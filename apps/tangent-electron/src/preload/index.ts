@@ -161,6 +161,9 @@ const bridge: WindowApi = {
 		delete(filepath) {
 			return ipcRenderer.invoke('delete', filepath)
 		},
+		getFileContents(filepath) {
+			return ipcRenderer.invoke('getFileContents', filepath)
+		},
 		openFile(filepath) {
 			ipcRenderer.send('openFile', filepath)
 		},

@@ -10,6 +10,8 @@ import CreationRule, { type CreationMode, type CreationRuleDefinition, nameFromR
 import type { NavigationData } from 'app/events'
 import { isModKey } from 'app/utils/events'
 import { knownExtensionsMatch } from 'common/fileExtensions'
+import NoteFile from '../NoteFile'
+import { fillDateFormat } from 'common/dates'
 
 type CreationRuleOrDefinition = CreationRule | CreationRuleDefinition
 
@@ -36,6 +38,7 @@ type CreationValues = {
 	name: string
 	extension: string
 	creationMode: CreationMode
+	contentTemplateFile?: NoteFile
 }
 
 export default class CreateNewFileCommand extends WorkspaceCommand {
@@ -81,6 +84,8 @@ export default class CreateNewFileCommand extends WorkspaceCommand {
 
 		updateSelection = updateSelection ?? true
 
+		let contentTemplateFile: NoteFile = undefined
+
 		if (rule instanceof CreationRule) {
 			rule = rule.getDefinition()
 		}
@@ -113,6 +118,14 @@ export default class CreateNewFileCommand extends WorkspaceCommand {
 
 			// Combining into a relative path allows rule name templates to define folders
 			relativePath = paths.join(folderPath || rule.folder, name + '.md')
+
+			if (rule.contentTemplate) {
+				const path = paths.join(this.workspace.directoryStore.files.path, rule.contentTemplate)
+				const result = this.workspace.directoryStore.get(path)
+				if (result instanceof NoteFile) {
+					contentTemplateFile = result
+				}
+			}
 		}
 
 		if (path && !relativePath) {
@@ -190,13 +203,14 @@ export default class CreateNewFileCommand extends WorkspaceCommand {
 			folderPath,
 			name,
 			extension,
-			creationMode: creationMode || rule?.mode
+			creationMode: creationMode || rule?.mode,
+			contentTemplateFile
 		}
 	}
 
 	private createNode(values: CreationValues) {
 		const { directoryStore } = this.workspace
-		let { folderPath, name, extension, creationMode } = values
+		let { folderPath, name, extension, creationMode, contentTemplateFile } = values
 		// Make the thing!
 
 		// The "name" might contain path information
@@ -239,12 +253,27 @@ export default class CreateNewFileCommand extends WorkspaceCommand {
 			fileType: extension
 		}
 
-		const newNode = this.workspace.createTreeNode({ node: newRawNode })
-		if (newNode instanceof File) {
-			newNode.loadState = 'new'
+		const { node, onComplete } = this.workspace.createTreeNode({ node: newRawNode, paired: true })
+		if (node instanceof File) {
+			node.loadState = 'new'
+
+			if (onComplete && contentTemplateFile) {
+				const getContent = this.workspace.api.file.getFileContents(contentTemplateFile.path)
+				Promise.all([getContent, onComplete]).then(([template, _]) => {
+
+					const now = new Date()
+					let content = fillDateFormat(template, now)
+
+					// TODO: This is _gross_, and should not be necessary.
+					// `setFileContent()` should be the thing that does this.
+					node.isDirty = true
+					node.setFileContent(content)
+					node.saveFile()
+				})
+			}
 		}
 
-		return newNode
+		return node
 	}
 
 	canExecute(context?: CreateNewFileCommandContext): boolean {

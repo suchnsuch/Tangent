@@ -256,8 +256,8 @@ ipcMain.handle('selectPath', async (event, options: SelectPathOptions) => {
 				const errorResult = await dialog.showMessageBox(
 					windowHandle.window,
 					{
-						title: 'Must Be Workspace Folder',
-						message: 'The selected folder must be within the workspace.',
+						title: 'Must Be Within Workspace',
+						message: `The selected ${mode} must be within the workspace.`,
 						type: 'warning',
 						buttons: ['Cancel', 'Select Folder']
 					})
@@ -350,6 +350,29 @@ ipcMain.handle('delete', async (event, filepath) => {
 			filepath
 		})
 		windowHandle.postUserMessage('error', 'A file was attempted to be deleted outside of the workspace and was not deleted. ' + filepath)
+	}
+})
+
+ipcMain.handle('getFileContents', (event, filepath) => {
+	const windowHandle = getWindowHandle(event.sender)
+	const workspace = validateWorkspaceForHandleFilepath(windowHandle, filepath)
+
+	if (windowHandle && workspace) {
+		log.trace('reading file', filepath)
+		try {
+			return workspace.getFileContents(filepath)
+		}
+		catch (err) {
+			log.error('Failed to open file', filepath, err)
+			const filename = workspace.contentsStore.pathToRelativePath(filepath) || filepath
+			windowHandle.postUserMessage('error', `Tangent failed to read ${filename}. See logs for more details.`)
+		}
+	}
+	else {
+		// If we get here, that's bad
+		log.error('A window requested a file outside of an open workspace', {
+			filepath
+		})
 	}
 })
 

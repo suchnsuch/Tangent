@@ -84,9 +84,9 @@ function selectPath(event: MouseEvent) {
 		title: `Select ${setting.name}`,
 		message: setting.description,
 		mode: setting.form as any // These should align
-	}).then(folder => {
-		if (folder !== undefined) {
-			$setting = (folder ?? '') as any
+	}).then(path => {
+		if (path !== undefined) {
+			$setting = (path ?? '') as any
 		}
 	})
 }
@@ -228,7 +228,7 @@ function toggleItem(item) {
 					bind:value={$setting}/>
 			</div>
 		{:else if typeof $setting === 'string'}
-			<div class="buttonGroup" use:tooltip={setting.description}>
+			<div class="buttonGroup grow" use:tooltip={setting.description}>
 				{#if form === 'textarea'}
 					<textarea
 						bind:value={$setting}
@@ -250,7 +250,7 @@ function toggleItem(item) {
 						bind:value={$setting}
 						placeholder={setting.placeholder ?? (setting.form === 'folder' ? 'Workspace Root' : '')}
 					/>
-					{#if setting.form === 'folder' || setting.form === 'path'}
+					{#if setting.form === 'file' || setting.form === 'folder' || setting.form === 'path'}
 						<button on:click={selectPath} class={"inputButton " + inputClass}>
 							<SvgIcon ref={'folder.svg#folder'} size={16} />
 						</button>

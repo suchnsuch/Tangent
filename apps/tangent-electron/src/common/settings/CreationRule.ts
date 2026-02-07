@@ -10,6 +10,7 @@ export interface CreationRuleDefinition {
 	name: string
 	nameTemplate: string
 	folder: string
+	contentTemplate: string
 	mode: CreationMode
 	description: string
 	showInMenu?: boolean
@@ -63,6 +64,13 @@ const folderStoreDefinition: SettingDefinition<string> = {
 	description: 'The folder in which the note will be created.',
 	defaultValue: '',
 	form: 'folder'
+}
+
+const templateStoreDefinition: SettingDefinition<string> = {
+	name: 'Template File',
+	description: 'The template that will be used to generate the file.',
+	defaultValue: '',
+	form: 'file' // In the future, could be a tangent-integrated file search
 }
 
 const creationModeDefinition: SettingDefinition<CreationMode> = {
@@ -121,6 +129,7 @@ export default class CreationRule extends ObjectStore {
 	shortcut: Setting<string>
 
 	folder: Setting<string>
+	contentTemplate: Setting<string>
 	mode: Setting<CreationMode>
 
 	description: Setting<string>
@@ -139,6 +148,7 @@ export default class CreationRule extends ObjectStore {
 		})
 		this.nameTemplate = new WritableStore('%name%')
 		this.folder = new Setting(folderStoreDefinition)
+		this.contentTemplate = new Setting(templateStoreDefinition)
 		this.mode = new Setting(creationModeDefinition)
 		this.description = new Setting(descriptionDefinition)
 		this.showInMenu = new Setting(showInMenuDefinition)

@@ -32,23 +32,13 @@
 			"folder": "Inbox"
 		},
 		{
-			"name": "Super duper fancy wild inbox note!",
-			"nameTemplate": "%name%",
-			"shortcut": "Mod+Ctrl+Alt+P",
-			"folder": "Inbox"
-		},
-		{
-			"name": "Even more inbox notes are great",
-			"nameTemplate": "%name%",
-			"folder": "Inbox"
-		},
-		{
-			"name": "Nested Folder Rule",
-			"nameTemplate": "%YYYY%/%Month%/%name%"
-		},
-		{
 			"name": "Rule With Bad Characters",
 			"nameTemplate": "My: Fancy/aux/%name%"
+		},
+		{
+			"name": "Rule with Template",
+			"nameTemplate": "%name%",
+			"contentTemplate": "Integration Tests/Example Template.md"
 		}
 	],
 	"styleFiles": []

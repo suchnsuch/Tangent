@@ -47,7 +47,9 @@ const menuContext = {}
 
 type CreateTreeNodeOptions = {
 	node: TreeNode
+	// Whether to actually propagate the creation message to the backend
 	sendCreationMessage?: boolean
+	// Whether to to create parents if they are not already present
 	ensureParents?: boolean
 }
 

@@ -88,6 +88,8 @@ export default interface WindowAPI {
 		copy(filepath: string, newPath?: string): Promise<void>
 		delete(filepath: string): Promise<void>
 		
+		/** Gets the contents of a file, but does not mark it as opened */
+		getFileContents(filepath): Promise<string>
 		/** Open a file and receive any changes via `onReceiveFileContents` */
 		openFile(filepath: string)
 		/** Add a handler to this to receive contents when an open file is loaded or changes. */
