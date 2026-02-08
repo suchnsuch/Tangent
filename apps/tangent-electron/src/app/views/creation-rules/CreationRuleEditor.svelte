@@ -157,22 +157,16 @@ function onValidateShortcut(shortcut: string) {
 					<tr><th><CreationRuleTemplateButton templateText={dateTemplate.text} insertTemplateText={insertTextIntoTemplate}/></th><td>{dateTemplate.description}</td></tr>	
 				{/each}
 			</tbody></table>
-			<figcaption>
-				<table><tbody>
-					<tr><th>1</th><td>Append "o" to use ordinal numbers, e.g. "1st", "2nd", "3rd".</td></tr>
-					<tr><th>2</th><td>Can be made all-caps or all lowercase by making the token all caps or all lowercase.</td></tr>
-				</tbody></table>
-			</figcaption>
 		</figure>
 	</details>
 	<div class="settingsGroup">
 		<SettingView setting={rule.shortcut} {onValidateShortcut} />
+		<SettingView setting={rule.mode} />
 		<SettingView setting={rule.folder} />
 		<SettingView setting={rule.contentTemplate} />
-		<SettingView setting={rule.mode} />
+		<SettingView setting={rule.openInContext} />
 		<SettingView setting={rule.showInMenu} />
 		<SettingView setting={rule.description} />
-		<SettingView setting={rule.openInContext} />
 	</div>
 </main>
 
@@ -239,16 +233,6 @@ details {
 
 figure {
 	margin: 1em 0;
-}
-
-figcaption {
-	color: var(--deemphasizedTextColor);
-	padding-top: 1em;
-
-	th {
-		color: var(--textColor);
-		vertical-align: top;
-	}
 }
 
 </style>

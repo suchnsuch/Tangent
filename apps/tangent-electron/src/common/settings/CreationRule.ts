@@ -52,6 +52,13 @@ export function willPromptForName(template: string) {
 	return template.indexOf(nameToken) >= 0
 }
 
+const contentTemplateDefinition: SettingDefinition<string> = {
+	name: 'Content Template',
+	description: 'The markdown template file that seeds the initial content of a file.',
+	defaultValue: '',
+	form: 'file' // In the future, could be a tangent-integrated file search
+}
+
 const shortcutDefinition: SettingDefinition<string> = {
 	name: 'Shortcut',
 	description: 'If set, this shortcut will invoke this creation rule.',
@@ -60,17 +67,10 @@ const shortcutDefinition: SettingDefinition<string> = {
 }
 
 const folderStoreDefinition: SettingDefinition<string> = {
-	name: 'Target Folder',
+	name: 'Parent Folder',
 	description: 'The folder in which the note will be created.',
 	defaultValue: '',
 	form: 'folder'
-}
-
-const templateStoreDefinition: SettingDefinition<string> = {
-	name: 'Template File',
-	description: 'The template that will be used to generate the file.',
-	defaultValue: '',
-	form: 'file' // In the future, could be a tangent-integrated file search
 }
 
 const creationModeDefinition: SettingDefinition<CreationMode> = {
@@ -125,11 +125,11 @@ export default class CreationRule extends ObjectStore {
 
 	name: ValidatingStore<string>
 	nameTemplate: WritableStore<string>
+	contentTemplate: Setting<string>
 
 	shortcut: Setting<string>
 
 	folder: Setting<string>
-	contentTemplate: Setting<string>
 	mode: Setting<CreationMode>
 
 	description: Setting<string>
@@ -148,7 +148,7 @@ export default class CreationRule extends ObjectStore {
 		})
 		this.nameTemplate = new WritableStore('%name%')
 		this.folder = new Setting(folderStoreDefinition)
-		this.contentTemplate = new Setting(templateStoreDefinition)
+		this.contentTemplate = new Setting(contentTemplateDefinition)
 		this.mode = new Setting(creationModeDefinition)
 		this.description = new Setting(descriptionDefinition)
 		this.showInMenu = new Setting(showInMenuDefinition)
