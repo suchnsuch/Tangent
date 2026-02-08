@@ -15,7 +15,9 @@ let workspace: Workspace = getContext('workspace')
 
 export let link: ConnectionInfo
 export let target: 'to' | 'from'
+
 export let className = ''
+export let showHeader = true
 
 export let onSelect: (event: KeyboardEvent|MouseEvent) => void
 
@@ -65,7 +67,7 @@ function onContextMenu(event: MouseEvent) {
 	on:keydown={onKeydown}
 	on:contextmenu={onContextMenu}
 >
-	<h1>{targetNode?.name || paths.basename(targetPath)}</h1>
+	{#if showHeader}<h1>{targetNode?.name || paths.basename(targetPath)}</h1>{/if}
 	{#if editor}
 		<article class="note" use:asRoot={editor}></article>
 	{:else if link.context}
@@ -94,10 +96,13 @@ h1 {
 
 article.note {
 	font-size: 80%;
-	margin-top: .5em;
 	margin-bottom: 0;
 	padding: 0;
 	overflow: hidden;
 	text-overflow: ellipsis;
+
+	&:not(:first-child) {
+		margin-top: .5em;
+	}
 }
 </style>

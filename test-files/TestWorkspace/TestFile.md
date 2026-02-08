@@ -33,3 +33,5 @@ These are some links that need case-insensitive links enabled to work: [[headers
 this is some more stuff.
 
 Neither the file nor the folder [[Other/Link]] exist. Their presence here means there should be virtual versions of both in the store.
+
+Let's link to [[Test File The Second]] again.

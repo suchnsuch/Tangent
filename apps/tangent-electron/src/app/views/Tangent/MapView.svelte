@@ -26,6 +26,9 @@ import type { RemoveFromMapCommandContext } from 'app/model/commands/RemoveFromM
 import type { ThreadHistoryItem, UpdateThreadOptions } from 'common/dataTypes/Session';
 import { isMac } from 'common/platform'
 import { createCommandHandler } from 'app/model/commands/Command'
+import { IndexData, type ConnectionInfo } from 'common/indexing/indexTypes';
+import LinkInfoView from '../summaries/LinkInfoView.svelte';
+import { implicitExtensionsMatch } from 'common/fileExtensions';
 
 const workspace = getContext('workspace') as Workspace
 
@@ -127,6 +130,9 @@ let highlightWires: SVGSVGElement = null
 
 let dateDetails: Point & { connection: MapConnection } = null
 let showDateTimeout = null
+
+let connectionDetails: Point & { links: ConnectionInfo[] } = null
+let showConnectionTimeout = null
 
 $: placeNodes(nodes, $connectionsStore, wires)
 function placeNodes(nodes: MapNode[], _c?, _w?) {
@@ -761,6 +767,50 @@ function onConnectionMouseEnter(event: MouseEvent, meta: ConnectionMeta) {
 			y: event.clientY - rect.y + view.scrollTop - 50,
 			connection: meta.connection
 		}
+		
+		connectionDetails = null
+		const fromNode = meta.connection.fromTreeNode
+		if (fromNode.meta?.structure) {
+			const toNode = meta.connection.toTreeNode
+
+			// We want to ignore connections that are just the link.
+			// It looks bad and doesn't add any new information
+			const shortLink = '[[' + workspace.directoryStore.getPathToItem(toNode, {
+				length: 'short',
+				includeExtension: type => !type.match(implicitExtensionsMatch)
+			}) + ']]'
+
+			const fullLink = '[[' + workspace.directoryStore.getPathToItem(toNode, {
+				length: 'full',
+				includeExtension: type => !type.match(implicitExtensionsMatch)
+			}) + ']]'
+
+			const connections = IndexData.outgoingConnections(fromNode.meta, c => {
+				if (c.to !== toNode.path) return false
+				const trimmed = c.context.trim()
+				return trimmed !== shortLink && trimmed !== fullLink
+			})
+
+			// Don't repeat contexts
+			const links: ConnectionInfo[] = []
+			const map = new Map<string, ConnectionInfo>()
+			for (const connection of connections) {
+				if (!map.has(connection.context)) {
+					map.set(connection.context, connection)
+					links.push(connection)
+				}
+			}
+
+			if (links.length) {
+				showConnectionTimeout = setTimeout(() => {
+					connectionDetails = {
+						x: event.clientX - rect.x + view.scrollLeft,
+						y: event.clientY - rect.y + view.scrollTop + 50,
+						links
+					}
+				}, 1000)
+			}
+		}
 
 		if (meta.threadIndex != undefined && meta.threadIndex !== 0) {
 			const newHighlightConnection: ConnectionMeta[] = []
@@ -800,7 +850,9 @@ function onConnectionMouseLeave() {
 
 function cleanupConnectionHover() {
 	clearTimeout(showDateTimeout)
+	clearTimeout(showConnectionTimeout)
 	dateDetails = null
+	connectionDetails = null
 
 	if (highlightConnections.length) {
 		highlightConnections = []
@@ -895,6 +947,19 @@ function cleanupConnectionHover() {
 				<span class="time">{clockTime(dateDetails.connection.dateCreated)}</span>
 			</div>
 		{/if}
+
+		{#if connectionDetails}
+			<div class="connectionDetails"
+				transition:fly={{ duration: 500 }}
+				style:transform={`translate(${connectionDetails.x}px, ${connectionDetails.y}px)`}
+				style:--backgroundColor="none"
+			>
+				{#each connectionDetails.links as link, index}
+					{#if index}<hr/>{/if}
+					<LinkInfoView {link} target="to" showHeader={false} className="connection" onSelect={() => {}} />
+				{/each}
+			</div>
+		{/if}
 	</div>
 </main>
 
@@ -983,6 +1048,29 @@ svg {
 		word-wrap: none;
 		position: relative;
 		z-index: 1;
+	}
+}
+
+.connectionDetails {
+	position: absolute;
+	top: 0;
+	left: -100px;
+	z-index: 1000;
+
+	max-width: 24em;
+
+	border-radius: var(--borderRadius);
+	box-shadow: 0 0 20px rgba(0, 0, 0, .3);
+
+	background-color: var(--transparentBackgroundColor);
+	backdrop-filter: blur(20px);
+
+	hr {
+		margin: 0 .75em;
+		border: none;
+		height: 1px;
+		background-color: var(--deemphasizedTextColor);
+		opacity: .5;
 	}
 }
 </style>
