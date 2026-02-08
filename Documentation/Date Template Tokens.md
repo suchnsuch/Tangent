@@ -1,0 +1,26 @@
+The following tokens can be used in [[Template Notes]] and the name template of [[Creation Rules]].
+
+- `%YYYY%` – The full year.
+- `%YY%` – The last two digits of the year.
+- `%MM%` – The two digit month. e.g. "05" for May.
+- `%M%` – The single digit month. e.g. "5" for May, "10" for October.
+- `%Month%` – The full name of the month.
+- `%MONTH%` – The full name of the month in all caps.
+- `%Mth%` – The shortened name of the month.
+- `%MTH%` – The shortened name of the month in all caps.
+- `%DD%` – The two digit day of the month. e.g. "07".
+- `%DDo%` – The two digit ordinal day of the month. e.g. "07th", "02nd".
+- `%D%` – The single digit day of the month. e.g. "5", "15".
+- `%Do%` – The single digit ordinal day of the month. e.g. "3rd", "15th".
+- `%WeekDay%` – The full name of the week day.
+- `%WEEKDAY%` – The full name of the week day in all caps.
+- `%WDay%` – The short name of the week day.
+- `%WDAY%` – The short name of the week day in all caps.
+- `%wday%` – The short name of the week, all lowercase.
+- `%WW%` – The double digit ISO week of the year.
+- `%W%` – The single digit ISO week of the year.
+- `%HH%` – The two digit hour of the day (24 hour clock).
+- `%H%` – The single digit hour of the day (24 hour clock).
+- `%mm%` – The two digit minute of the hour.
+- `%m%` – The single digit minute of the hour.
+- `%ss%` – The two digit second of the minute.

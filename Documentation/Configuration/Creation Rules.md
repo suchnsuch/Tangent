@@ -12,13 +12,16 @@ The Name Template setting lets you inject automatic values into a note name when
 
 If your rule's name template doesn't use the `%name%` token, it is deterministic and doesn't require any additional input to create a new note. For example, the name template `%YYYY% Yearly Theme` is deterministic and will create notes like "2023 Yearly Theme". On the other hand `%YYYY% Yearly Theme – %name%` will ask you to fill in the `%name%` template on creation and will create notes like "2022 Yearly Theme – The Year of Tangent".
 
+## Content Template
+When present, the set file will be used as a template for new notes. Its content will seed the initial contents of notes created by this rule. In addition, any [[Date Template Tokens]] will be replaced using the current date.
+
 ## Creation Mode
 The Creation Mode determines what happens when there is already a note with the given name in the given folder when the rule is invoked. 
 * The __Create__ option will always create a new note, appending numbers to the end of the note's title to create a unique name if necessary.
 * The __Create or Open__ option will instead open an existing note. The default "Daily Note" rule uses this option so that you only ever have a single note for a day.
 
 ## Other Settings
-__Target Folder__ lets you select the folder the new note will be created in. If the folder does not exist when a note is created through the rule, the folder will be created.
+__Parent Folder__ lets you select the folder the new note will be created in. If the folder does not exist when a note is created through the rule, the folder will be created.
 
 __Show In Menu__ controls whether or not the creation rule is displayed in the "New Note" button's drop-down menu. Creation rules are _always_ shown in the [[Command Palette]].
 
