@@ -124,11 +124,6 @@ export function parseTemplateTokens(char: string, parser: NoteParser): boolean {
 
 	const token = parser.feed.substring(start, start + contentCount + 2)
 
-	console.log({
-		start,
-		contentCount,
-		token
-	})
 	const definition = templateLookup[token]
 	if (!definition) return false
 

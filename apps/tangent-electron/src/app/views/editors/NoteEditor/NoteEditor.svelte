@@ -59,7 +59,9 @@ import LineGutterLeft from './LineGutterLeft.svelte';
 import LineGutterRight from './LineGutterRight.svelte';
 import { dropTooltip, requestTooltip, type TooltipConfig } from 'app/utils/tooltips';
 import YamlTooltip from './YamlTooltip.svelte';
-    import TemplateTokenTooltip from './TemplateTokenTooltip.svelte';
+import TemplateTokenTooltip from './TemplateTokenTooltip.svelte';
+import TemplateTokenAutocompleter from '../autocomplete/TemplateTokenAutocompleter';
+import TemplateTokenAutocompleteMenu from '../autocomplete/TemplateTokenAutocompleteMenu.svelte';
 
 // Technically, this just needs to exist _somewhere_. Putting it here because of the svelte dependency
 // Force the use of the variable so that it is included in the bundle
@@ -1371,6 +1373,8 @@ function updateCodeBlockSizing() {
 			<UnicodeAutocompleteMenu {handler} />
 		{:else if handler instanceof CodeBlockAutocompleter}
 			<CodeBlockAutocompleteMenu {handler} />
+		{:else if handler instanceof TemplateTokenAutocompleter}
+			<TemplateTokenAutocompleteMenu {handler} />
 		{/if}
 	</AutoCompleteMenu>
 	<LineGutterLeft {editor} target={leftHoverdLineTarget} />

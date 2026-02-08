@@ -31,6 +31,6 @@ h1 {
 }
 
 code {
-	color: var(--revealedTextColor);
+	color: var(--templateTokenTextColor);
 }
 </style>

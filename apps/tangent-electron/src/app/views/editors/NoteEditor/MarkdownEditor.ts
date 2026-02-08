@@ -15,6 +15,7 @@ import UnicodeAutocompleter from '../autocomplete/UnicodeAutocompleter'
 import CodeBlockAutocompleter from '../autocomplete/CodeBlockAutoCompleter'
 import autoWrapping from '../autobraces/autoWrappingModule'
 import { collapsingSections, type CollapsingSectionsModule } from './collapsingSections'
+import TemplateTokenAutocompleter from "../autocomplete/TemplateTokenAutocompleter"
 
 function indentLines(editor: MarkdownEditor, direction: -1 | 1) {
 	const { doc } = editor
@@ -143,7 +144,8 @@ export default class MarkdownEditor extends Editor {
 					new WikiLinkAutocompleter(workspace),
 					new TagAutocompleter(workspace),
 					new UnicodeAutocompleter(workspace),
-					new CodeBlockAutocompleter()
+					new CodeBlockAutocompleter(),
+					new TemplateTokenAutocompleter()
 				]) : null,
 
 				...trimmedDefaultModules,
