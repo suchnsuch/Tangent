@@ -735,9 +735,10 @@ export default class Workspace extends EventDispatcher {
 			if (isReference(target) && target.annotations) {
 				nodeState.setAnnotations(target.annotations)
 			}
-			if (link) {
-				nodeState.highlightLink(link)
-			}
+		}
+
+		if (link && nodeState.highlightLink) {
+			nodeState.highlightLink(link)
 		}
 	}
 

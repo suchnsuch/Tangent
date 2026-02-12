@@ -8,6 +8,8 @@ import type { UrlDataError, WebsiteData } from 'common/urlData'
 import PdfPreview from 'app/views/node-views/PdfPreview.svelte'
 
 type Form = {
+	content_id?: string
+} & ({
 	mode: 'error'
 	message: string
 } | {
@@ -31,7 +33,7 @@ type Form = {
 	title: string
 } | {
 	mode: 'website'
-} & WebsiteData
+} & WebsiteData)
 
 export let link: HrefFormedLink
 export let block: boolean
@@ -39,6 +41,8 @@ export let workspace: Workspace
 
 export let onForm: (form: Form) => void
 let form: Form = null
+
+let height = -1
 
 $: nodeHandle = workspace?.getHandle(link)
 $: onNodeHandleChanged(nodeHandle ? $nodeHandle : null)
@@ -162,6 +166,11 @@ function onNodeHandleChanged(value: HandleResult) {
 			...value as WebsiteData
 		}
 	}
+	
+	if (link?.content_id) {
+		form.content_id = link.content_id
+	}
+
 	onForm(form)
 }
 
@@ -303,9 +312,8 @@ function websiteImageStyle(form: WebsiteData) {
 		</media-control-bar>
 	</media-controller>
 {:else if form.mode === 'pdf'}
-	<div class="pdf">
-		<PdfPreview path={form.src} />
-		<div class="pdf-cover"></div>
+	<div class="pdf" style:height={height > 0 ? height + 'px' : ''}>
+		<PdfPreview path={form.src} content_id={form.content_id} bind:height />
 	</div>
 {:else if form.mode === 'website'}
 	<div class={'website-preview ' + form.mediaType} class:description={form.description} style={websiteStyle(form)}>

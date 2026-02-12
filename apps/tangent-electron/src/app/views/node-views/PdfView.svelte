@@ -1,5 +1,5 @@
 <script lang="ts">
-import { getContext } from 'svelte'
+import { getContext, onDestroy } from 'svelte'
 import { Workspace } from 'app/model'
 import PdfViewState from 'app/model/nodeViewStates/PdfViewState'
 import WorkspaceFileHeader from 'app/utils/WorkspaceFileHeader.svelte'
@@ -7,6 +7,8 @@ import WorkspaceFileHeader from 'app/utils/WorkspaceFileHeader.svelte'
 import * as pdfjs from 'pdfjs-dist'
 import * as pdfviewer from 'pdfjs-dist/web/pdf_viewer.mjs'
 import { resizeObserver } from 'app/utils/resizeObserver'
+import { scrollTo } from 'app/utils'
+import { smoothScrollTime } from 'app/utils/style'
 
 const workspace = getContext('workspace') as Workspace
 const {
@@ -19,6 +21,8 @@ export let editable: boolean = true
 export let layout: 'fill' | 'auto' = 'fill'
 export let extraTop: number = 0
 export let extraBottom: number = 0
+
+$: targetPage = state.targetPage
 
 let container: HTMLDivElement
 let viewerElement: HTMLDivElement
@@ -39,9 +43,52 @@ async function doPDF() {
 	onResize(null)
 }
 
+onDestroy(() => {
+	if (targetInterval) clearInterval(targetInterval)
+})
+
 doPDF().catch(e => {
 	console.error(e)
 })
+
+let targetInterval = null
+$: pageTarget($targetPage)
+function pageTarget(target: number) {
+	if (target < 0) {
+		clearInterval(targetInterval)
+		targetInterval = null
+		return
+	}
+
+	// Shouldn't go on forever. Number chosen out of hat (allows for a delay of 2.5s).
+	let attemptsRemaining = 20
+
+	function goToTarget() {
+		if (!viewerElement) return false
+
+		const targetElement = viewerElement.querySelector(`.page[data-page-number="${target}"]`)
+		if (targetElement instanceof HTMLElement) {
+			scrollTo({
+				target: targetElement,
+				duration: smoothScrollTime
+			})
+			return true
+		}
+
+		return false
+	}
+
+	if (!goToTarget()) {
+		// Is this the best? No. But it works.
+		targetInterval = setInterval(() => {
+			attemptsRemaining--
+			if (goToTarget() || attemptsRemaining === 0) {
+				clearInterval(targetInterval)
+				targetInterval = null
+			}
+		}, 150)
+	}
+}
 
 function onResize(resizeEntries: ResizeObserverEntry[]) {
 	if (viewer) {

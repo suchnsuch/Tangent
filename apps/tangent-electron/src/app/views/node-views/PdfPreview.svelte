@@ -2,18 +2,39 @@
 import { onMount } from 'svelte'
 import * as pdfjs from 'pdfjs-dist'
 import { resizeObserver } from 'app/utils/resizeObserver'
+import { clamp } from 'common/utils'
 
-export let path: string
+let {
+	path,
+	content_id,
+	height = $bindable(-1)
+} : {
+	path: string
+	content_id?: string
+/** Bind to get the height of the content */
+	height?: number
+} = $props()
 
 let container: HTMLElement
 let canvas: HTMLCanvasElement
 
-async function getFirstPage() {
-	let pdf = await pdfjs.getDocument(path).promise
-	return pdf.getPage(1)
-}
+let pagePromise = $derived.by(() => {
+	let page = 1
+	const matched = content_id?.match(/page=(\d+)/)
+	if (matched) {
+		page = parseInt(matched[1])
+	}
 
-let pagePromise = getFirstPage()
+	return pdfjs.getDocument(path).promise.then(async pdf => {
+		page = clamp(page, 1, pdf.numPages)
+		return pdf.getPage(page)
+	})
+})
+
+$effect(() => {
+	if (pagePromise) debouncedRenderPage()
+})
+
 let pageRender: pdfjs.RenderTask = null
 let dirtyTimeout: any = null
 let isPendingPromise = false
@@ -66,6 +87,8 @@ function renderPage() {
 
 		canvas.width = viewport.width * outputScale
 		canvas.height = viewport.height * outputScale
+
+		height = viewport.height
 
 		const transform = outputScale !== 1 
 			? [outputScale, 0, 0, outputScale, 0, 0]

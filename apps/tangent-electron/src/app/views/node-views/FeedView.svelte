@@ -17,6 +17,7 @@ import { getContext, onMount, tick } from 'svelte'
 import NodeViewSelector from './NodeViewSelector.svelte'
 import FloatingSetCreationRules, { shouldShowCreationRulesFromHover } from './FloatingSetCreationRules.svelte'
 import EmptyList from './EmptyList.svelte'
+import { smoothScrollTime } from 'app/utils/style'
 
 const workspace = getContext('workspace') as Workspace
 
@@ -195,7 +196,7 @@ function reactToCurrent(currentNode) {
 			container: feedContainer,
 			// The extra one helps not overshoot the scroll mechanism
 			y,
-			duration: 500
+			duration: smoothScrollTime
 		})
 	}
 }

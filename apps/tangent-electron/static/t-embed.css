@@ -82,12 +82,6 @@
 	position: relative;
 	width: 100%;
 	min-height: 16em;
-
-	.pdf-cover {
-		position: absolute;
-		inset: 0;
-		background: linear-gradient(180deg, transparent 75%, var(--noteBackgroundColor) 100%);
-	}
 }
 
 media-control-bar {

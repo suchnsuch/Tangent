@@ -45,7 +45,7 @@ import { getActiveSentenceRange } from 'common/markdownModel/line';
 import paths from 'common/paths';
 import TagAutocompleter from '../autocomplete/TagAutocompleter';
 import TagAutocompleteMenu from '../autocomplete/TagAutocompleteMenu.svelte';
-import { getPixelValue } from 'app/utils/style';
+import { getPixelValue, smoothScrollTime } from 'app/utils/style';
 import UnicodeAutocompleter from '../autocomplete/UnicodeAutocompleter';
 import UnicodeAutocompleteMenu from '../autocomplete/UnicodeAutocompleteMenu.svelte';
 import CodeBlockAutocompleter from '../autocomplete/CodeBlockAutoCompleter';
@@ -293,7 +293,7 @@ function updateExtraSpace(et?, eb?, fl?, ct?) {
 
 		if (editor.doc.selection) {
 			wait().then(() => {
-				centerOnEditorRange(editor.doc.selection, 500)
+				centerOnEditorRange(editor.doc.selection, smoothScrollTime)
 			})
 		}
 	}
@@ -440,7 +440,7 @@ function updateAnnotations(annotations: Annotation[], index=0) {
 				const bufferHeight = containerRect.height * .2
 				
 				if (containerRect.top + bufferHeight > bounds.top || containerRect.bottom - bufferHeight < bounds.bottom) {
-					centerOnEditorRange(range, 500)
+					centerOnEditorRange(range, smoothScrollTime)
 				}
 			}, 100)
 
@@ -919,7 +919,7 @@ function onEditorMouseUp(event: MouseEvent) {
 	isEditorMouseDown = false
 	if (focusLevel >= FocusLevel.Typewriter) {
 		if (editor.doc.selection) {
-			centerOnEditorRange(editor.doc.selection, 500)
+			centerOnEditorRange(editor.doc.selection, smoothScrollTime)
 		}
 	}
 }

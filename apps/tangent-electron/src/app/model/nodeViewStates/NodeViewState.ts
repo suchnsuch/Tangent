@@ -2,6 +2,7 @@ import type { SvelteConstructor } from 'app/utils/svelte'
 import type { TreeChange, TreeNode } from 'common/trees'
 import { WritableStore, type ReadableStore } from 'common/stores'
 import type LensViewState from './LensViewState'
+import type { PartialLink } from 'common/indexing/indexTypes'
 
 export type NodeViewSettingsVisibility = boolean | 'pin'
 
@@ -24,8 +25,19 @@ export interface NodeViewState {
 	detailsSummaryComponent?: SvelteConstructor
 	readonly details?: DetailsViewStateStore<DetailsViewState>
 
+	/** Called when the view state is being removed */
 	dispose?()
+
+	/** Implement to customize where focus lands */
 	focus?(element: HTMLElement, mode?: NodeFocusMode): boolean
+
+	/**
+	 * Called as part of navigation with the link that lead to navigating to this node.
+	 * Implement to navigate to or highlight what the link is referencing (if any).
+	 */
+	highlightLink?(link: PartialLink)
+
+	/** Implement to handle a TreeChange (i.e. nodes being added or re/moved) */
 	onTreeChange?(change: TreeChange)
 }
 
