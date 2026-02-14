@@ -3,6 +3,7 @@ import { onMount } from 'svelte'
 import * as pdfjs from 'pdfjs-dist'
 import { resizeObserver } from 'app/utils/resizeObserver'
 import { clamp } from 'common/utils'
+import { pageFromContentId } from 'app/model/nodeViewStates/PdfViewState'
 
 let {
 	path,
@@ -19,11 +20,7 @@ let container: HTMLElement
 let canvas: HTMLCanvasElement
 
 let pagePromise = $derived.by(() => {
-	let page = 1
-	const matched = content_id?.match(/page=(\d+)/)
-	if (matched) {
-		page = parseInt(matched[1])
-	}
+	let page = pageFromContentId(content_id) || 1
 
 	return pdfjs.getDocument(path).promise.then(async pdf => {
 		page = clamp(page, 1, pdf.numPages)

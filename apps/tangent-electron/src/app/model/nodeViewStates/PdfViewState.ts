@@ -6,6 +6,14 @@ import PdfView from 'app/views/node-views/PdfView.svelte'
 import { DetailsViewStateStore } from './NodeViewState'
 import type { PartialLink } from 'common/indexing/indexTypes'
 
+export function pageFromContentId(content_id: string) {
+	const matched = content_id?.match(/page=(\d+)/)
+	if (matched) {
+		return parseInt(matched[1])
+	}
+	return -1
+}
+
 export default class PdfViewState implements NodeViewState, LensViewState {
 	readonly file: EmbedFile
 
@@ -29,10 +37,7 @@ export default class PdfViewState implements NodeViewState, LensViewState {
 		if (!link) return
 
 		if (link.content_id) {
-			const matched = link.content_id.match(/page=(\d+)/)
-			if (matched) {
-				this.targetPage.set(parseInt(matched[1]))
-			}
+			this.targetPage.set(pageFromContentId(link.content_id))
 		}
 	}
 }

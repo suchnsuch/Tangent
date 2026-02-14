@@ -37,6 +37,16 @@ export class ForwardingStore<T> extends WritableStore<T> {
 		}
 	}
 
+	forwardFromRetainingCurrentValue(store: Readable<T> | Writable<T>) {
+		if (store !== this._store) {
+			const currentValue = this.value
+			this.forwardFrom(store)
+			if (currentValue !== undefined) {
+				this.value = currentValue
+			}
+		}
+	}
+
 	set(value: T) {
 		if (this._store && 'set' in this._store) {
 			this._store.set(value)

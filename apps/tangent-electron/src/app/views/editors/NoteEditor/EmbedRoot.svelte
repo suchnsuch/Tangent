@@ -6,10 +6,9 @@ import type EmbedFile from 'app/model/EmbedFile'
 import { type HandleResult, isNode } from 'app/model/NodeHandle'
 import type { UrlDataError, WebsiteData } from 'common/urlData'
 import PdfPreview from 'app/views/node-views/PdfPreview.svelte'
+import { timeFromContentId } from 'app/model/nodeViewStates/AudioVideoViewState'
 
 type Form = {
-	content_id?: string
-} & ({
 	mode: 'error'
 	message: string
 } | {
@@ -20,20 +19,23 @@ type Form = {
 	src: string 
 } | {
 	mode: 'audio'
-	src: string
+	src: string,
+	time?: number
 } | {
 	mode: 'video'
-	src: string
+	src: string,
+	time?: number
 } | {
 	mode: 'pdf',
-	src: string
+	src: string,
+	content_id?: string
 } | {
 	mode: 'youtube'
 	src: string
 	title: string
 } | {
 	mode: 'website'
-} & WebsiteData)
+} & WebsiteData
 
 export let link: HrefFormedLink
 export let block: boolean
@@ -41,6 +43,7 @@ export let workspace: Workspace
 
 export let onForm: (form: Form) => void
 let form: Form = null
+let mediaElement: HTMLVideoElement | HTMLAudioElement = null
 
 let height = -1
 
@@ -84,13 +87,15 @@ function onNodeHandleChanged(value: HandleResult) {
 			case EmbedType.Audio:
 				form = {
 					mode: 'audio',
-					src: (value as EmbedFile).cacheBustPath
+					src: (value as EmbedFile).cacheBustPath,
+					time: timeFromContentId(link?.content_id) || 0
 				}
 				break
 			case EmbedType.Video:
 				form = {
 					mode: 'video',
-					src: (value as EmbedFile).cacheBustPath
+					src: (value as EmbedFile).cacheBustPath,
+					time: timeFromContentId(link?.content_id) || 0
 				}
 				break
 			case EmbedType.PDF:
@@ -98,6 +103,7 @@ function onNodeHandleChanged(value: HandleResult) {
 					mode: 'pdf',
 					src: (value as EmbedFile).cacheBustPath
 				}
+				if (link?.content_id) form.content_id = link.content_id
 				break
 			default:
 				error(`Invalid file type. Cannot embed a "${value.fileType}" file.`)
@@ -114,13 +120,15 @@ function onNodeHandleChanged(value: HandleResult) {
 	else if (value.mediaType === 'audio') {
 		form = {
 			mode: 'audio',
-			src: value.url
+			src: value.url,
+			time: timeFromContentId(link.content_id) || 0
 		}
 	}
 	else if (value.mediaType === 'video') {
 		form = {
 			mode: 'video',
-			src: value.url
+			src: value.url,
+			time: timeFromContentId(link.content_id) || 0
 		}
 	}
 	else if (value.mediaType === 'website') {
@@ -158,6 +166,7 @@ function onNodeHandleChanged(value: HandleResult) {
 			mode: 'pdf',
 			src: link.href
 		}
+		if (link.content_id) form.content_id = link.content_id
 	}
 	else {
 		// Fall back to website info
@@ -165,10 +174,6 @@ function onNodeHandleChanged(value: HandleResult) {
 			mode: 'website',
 			...value as WebsiteData
 		}
-	}
-	
-	if (link?.content_id) {
-		form.content_id = link.content_id
 	}
 
 	onForm(form)
@@ -238,6 +243,19 @@ function websiteImageStyle(form: WebsiteData) {
 	}
 	return ''
 }
+
+function avloaded(this: HTMLAudioElement | HTMLVideoElement, event: Event) {
+	if ((form.mode === 'audio' || form.mode === 'video') && form.time) {
+		this.currentTime = form.time
+	}
+}
+
+$: mediaHacks(mediaElement, form)
+function mediaHacks(element: HTMLAudioElement | HTMLVideoElement, form: Form) {
+	if (element && form && (form.mode === 'audio' || form.mode === 'video')) {
+		element.currentTime = form.time
+	}
+}
 </script>
 
 {#if form.mode === 'error'}
@@ -249,7 +267,7 @@ function websiteImageStyle(form: WebsiteData) {
 	<!-- svelte-ignore a11y-click-events-have-key-events -->
 	<!-- svelte-ignore a11y-no-static-element-interactions -->
 	<media-controller style={audioStyle()} audio class="audio" on:click|preventDefault>
-		<audio slot="media" src={form.src} ></audio>
+		<audio bind:this={mediaElement} slot="media" src={form.src} currenttime={form.time} on:loadedmetadata={avloaded}></audio>
 		<media-settings-menu hidden anchor="auto">
 			<media-settings-menu-item>
 				Speed
@@ -282,7 +300,7 @@ function websiteImageStyle(form: WebsiteData) {
 	<!-- svelte-ignore a11y-no-static-element-interactions -->
 	<media-controller style={getBaseStyle()} on:click|preventDefault>
 		<!-- svelte-ignore a11y-media-has-caption -->
-		<video slot="media" src={form.src} ></video>
+		<video bind:this={mediaElement} slot="media" src={form.src} currenttime={form.time} on:loadedmetadata={avloaded}></video>
 		<media-settings-menu hidden anchor="auto">
 			<media-settings-menu-item>
 				Speed
