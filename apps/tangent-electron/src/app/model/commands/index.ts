@@ -37,7 +37,7 @@ import { isMac } from 'common/platform'
 import { NativeCommand } from './NativeCommand'
 import { OpenDocumentationCommand } from './OpenDocumentation'
 import { DeleteSidebarItem, RenameSidebarItem } from './SidebarCommands'
-import { CopyFileToClipboardCommand } from './CopyFileToClipboard'
+import { CopyFileToClipboardCommand, UpdateFileFromClipboardCommand } from './CopyFileToClipboard'
 import { OpenDetailsCommand } from './DetailCommands'
 import { OpenPaneSettingsCommand } from './PaneSettingsCommands'
 export { Command, CommandAction, type WorkspaceCommand }
@@ -118,6 +118,7 @@ function createAllCommands(workspace: Workspace) {
 		deleteNode: new DeleteNodeCommand(workspace),
 
 		copyFileToClipboard: new CopyFileToClipboardCommand(workspace),
+		updateFileFromClipboard: new UpdateFileFromClipboardCommand(workspace),
 
 		setFocusLevel: new SetFocusLevelCommand(workspace, null, true),
 		setMapFocusLevel: new SetFocusLevelCommand(workspace, {

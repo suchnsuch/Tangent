@@ -1133,6 +1133,12 @@ function onContextMenu(event: MouseEvent) {
 							commandContext: { file: resolution }
 						})
 					}
+					if (resolution.canUpdateFromClipboard()) {
+						menu.push({
+							command: workspace.commands.updateFileFromClipboard,
+							commandContext: { file: resolution }
+						})
+					}
 				}
 			}
 		}

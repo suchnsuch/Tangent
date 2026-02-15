@@ -139,11 +139,19 @@ function itemContext(event: MouseEvent, item: TreeNode) {
 			}
 		})
 
-		if (item instanceof EmbedFile && item.canCopyToClipboard()) {
-			menu.push({
-				command: workspace.commands.copyFileToClipboard,
-				commandContext: { file: item }
-			})
+		if (item instanceof EmbedFile) {
+			if (item.canCopyToClipboard()) {
+				menu.push({
+					command: workspace.commands.copyFileToClipboard,
+					commandContext: { file: item }
+				})
+			}
+			if (item.canUpdateFromClipboard()) {
+				menu.push({
+					command: workspace.commands.updateFileFromClipboard,
+					commandContext: { file: item }
+				})
+			}
 		}
 
 		menu.push({

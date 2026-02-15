@@ -29,11 +29,24 @@ export default class EmbedFile extends WorkspaceTreeNode {
 		return this.embedType === EmbedType.Image && this.fileType.match(/(png|jpeg|jpg)/i) !== null
 	}
 
+	canUpdateFromClipboard() {
+		return this.canCopyToClipboard()
+	}
+
 	copyToClipboard() {
 		if (this.canCopyToClipboard()) {
 			switch (this.embedType) {
 				case EmbedType.Image:
 					return this.workspace.api.system.copyImageToClipboard(this.path)
+			}
+		}
+	}
+
+	updateFromClipboard() {
+		if (this.canUpdateFromClipboard()) {
+			switch (this.embedType) {
+				case EmbedType.Image:
+					return this.workspace.api.system.updateImageFromClipboard(this.path)
 			}
 		}
 	}

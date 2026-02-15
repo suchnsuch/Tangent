@@ -99,6 +99,12 @@ function onContextMenu(event: MouseEvent) {
 			commandContext: { file }
 		})
 	}
+	if (file.canUpdateFromClipboard) {
+		menu.push({
+			command: file.workspace.commands.updateFileFromClipboard,
+			commandContext: { file }
+		})
+	}
 
 	appendContextTemplate(event, menu)
 }

@@ -618,6 +618,37 @@ ipcMain.handle('copyImageToClipboard', async (event, path: string) => {
 	}
 })
 
+ipcMain.handle('updateImageFromClipboard', async (event, path: string) => {
+	const windowHandle = getWindowHandle(event.sender)
+	if (!windowHandle) return
+
+	const file = windowHandle.workspace.contentsStore.get(path)
+	if (!file) return
+
+	const image = clipboard.readImage()
+	if (!image || image.isEmpty()) {
+		windowHandle.postUserMessage(
+			'warning',
+			'No Image in Clipboard',
+			'Could not update the file. There was no image in the clipboard to update with.'
+		)
+		return
+	}
+
+	let data: Buffer<ArrayBufferLike> = null
+
+	if (file.fileType.match(/(jpeg|jpg)/i)) {
+		data = image.toJPEG(90)
+	}
+	else if (file.fileType.match(/png/i)) {
+		data = image.toPNG()
+	}
+
+	if (!data) return
+
+	return fs.promises.writeFile(path, data)
+})
+
 ipcMain.handle('getLinkTitle', async (event, href: string) => {
 	try {
 		const response = await fetch(href)

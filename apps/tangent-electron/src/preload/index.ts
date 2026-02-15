@@ -121,6 +121,9 @@ const bridge: WindowApi = {
 		copyImageToClipboard(path) {
 			return ipcRenderer.invoke('copyImageToClipboard', path)
 		},
+		updateImageFromClipboard(path) {
+			return ipcRenderer.invoke('updateImageFromClipboard', path)
+		},
 		messageDialog(options) {
 			return ipcRenderer.invoke('messageDialog', options)
 		}
