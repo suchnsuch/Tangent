@@ -194,11 +194,16 @@ export default class WindowHandle {
 	}
 
 	restoreWindowState(window_state: any) {
+		log.info('Restoring window state', window_state)
+
 		const setPosition = (x, y) => {
 			if (typeof x !== 'number' || typeof y !== 'number') return
 
 			const display = screen.getDisplayNearestPoint({ x, y })
-			if (!display) return
+			if (!display) {
+				log.warn(`  Could not find a display near (${x}, ${y})`)
+				return
+			}
 
 			const rect = display.workArea
 			if (x < rect.x || x > rect.x + rect.width) {
