@@ -63,7 +63,6 @@ export default function tlinkModule(editor: Editor, options?: {
 	}
 
 	function onClick(event: MouseEvent) {
-		console.log('click', event.defaultPrevented)
 		if (!event.defaultPrevented && isLinkFollowingEvent(event)) {
 			if (TangentLink.isTangentLinkEvent(event)) {
 				event.preventDefault()

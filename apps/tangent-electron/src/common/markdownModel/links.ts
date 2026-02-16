@@ -263,6 +263,42 @@ export function createContentIdMatcher(contentId: string): RegExp {
 	return new RegExp('^' + segments.join('([-_ ]|%20)') + '$', 'i')
 }
 
+export function linkTextFromLink(link: HrefFormedLink): string {
+	if (!link) return null
+
+	if (link.form === 'md') {
+		let href = link.href
+
+		if (link.content_id) {
+			href += '#' + link.content_id
+		}
+
+		if (link.title) {
+			href += ' "' + link.title + '"'
+		}
+
+		return `[${link.text}](${href})`
+	}
+
+	if (link.form === 'wiki') {
+		let result = '[[' + link.href
+
+		if (link.content_id) {
+			result += '#' + link.content_id
+		}
+
+		if (link.text) {
+			result += '|' + link.text
+		}
+
+		return result + ']]'
+	}
+	
+	if (link.form === 'raw') {
+		return link.href
+	}
+}
+
 export function parseRawLink(char: string, parser: NoteParser): boolean {
 	if (char === ':' && parser.feed.checkFor('://', false)) {
 		const { feed, builder } = parser

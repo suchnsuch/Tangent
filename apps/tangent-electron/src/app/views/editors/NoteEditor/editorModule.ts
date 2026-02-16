@@ -931,8 +931,6 @@ export default function editorModule(editor: Editor, options: {
 			editor: markdownEditor
 		}
 
-		console.log(commandContext, editor.doc.selection )
-
 		menu.push({
 			label: 'Links',
 			submenu: [

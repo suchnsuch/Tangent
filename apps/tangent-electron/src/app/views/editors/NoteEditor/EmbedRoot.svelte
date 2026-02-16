@@ -7,6 +7,8 @@ import { type HandleResult, isNode } from 'app/model/NodeHandle'
 import type { UrlDataError, WebsiteData } from 'common/urlData'
 import PdfPreview from 'app/views/node-views/PdfPreview.svelte'
 import { timeFromContentId } from 'app/model/nodeViewStates/AudioVideoViewState'
+import { appendContextTemplate, type ContextMenuConstructorOptions } from 'app/model/menus'
+import { linkTextFromLink } from 'common/markdownModel/links'
 
 type Form = {
 	mode: 'error'
@@ -256,6 +258,29 @@ function mediaHacks(element: HTMLAudioElement | HTMLVideoElement, form: Form) {
 		element.currentTime = form.time
 	}
 }
+
+function onMediaContext(event: MouseEvent) {
+	if (!mediaElement) return
+
+	const menu: ContextMenuConstructorOptions[] = []
+
+	const currentTimeLinkText = linkTextFromLink({
+		...link,
+		content_id: `time=${mediaElement.currentTime}`
+	})
+
+	if (currentTimeLinkText) {
+		menu.push({
+			label: 'Copy link at current time',
+			toolTip: 'Adds a link to this file at the current timestamp',
+			click: () => {
+				navigator.clipboard.writeText(currentTimeLinkText)
+			}
+		})
+	}
+
+	appendContextTemplate(event, menu)
+}
 </script>
 
 {#if form.mode === 'error'}
@@ -266,7 +291,7 @@ function mediaHacks(element: HTMLAudioElement | HTMLVideoElement, form: Form) {
 {:else if form.mode === 'audio'}
 	<!-- svelte-ignore a11y-click-events-have-key-events -->
 	<!-- svelte-ignore a11y-no-static-element-interactions -->
-	<media-controller style={audioStyle()} audio class="audio" on:click|preventDefault>
+	<media-controller style={audioStyle()} audio class="audio" on:click|preventDefault on:contextmenu={onMediaContext}>
 		<audio bind:this={mediaElement} slot="media" src={form.src} currenttime={form.time} on:loadedmetadata={avloaded}></audio>
 		<media-settings-menu hidden anchor="auto">
 			<media-settings-menu-item>
@@ -298,7 +323,7 @@ function mediaHacks(element: HTMLAudioElement | HTMLVideoElement, form: Form) {
 {:else if form.mode === 'video'}
 	<!-- svelte-ignore a11y-click-events-have-key-events -->
 	<!-- svelte-ignore a11y-no-static-element-interactions -->
-	<media-controller style={getBaseStyle()} on:click|preventDefault>
+	<media-controller style={getBaseStyle()} on:click|preventDefault on:contextmenu={onMediaContext}>
 		<!-- svelte-ignore a11y-media-has-caption -->
 		<video bind:this={mediaElement} slot="media" src={form.src} currenttime={form.time} on:loadedmetadata={avloaded}></video>
 		<media-settings-menu hidden anchor="auto">
