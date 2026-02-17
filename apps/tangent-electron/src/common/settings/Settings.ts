@@ -459,7 +459,7 @@ export default class Settings extends ObjectStore {
 	})
 	
 	// Links
-	linkAutocompleteForm = new Setting<string>({
+	linkAutocompleteForm = new Setting<'short' | 'full'>({
 		name: 'Link Autocomplete',
 		description: 'How wikilinks will autocomplete',
 		defaultValue: 'short',

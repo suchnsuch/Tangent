@@ -7,6 +7,8 @@ import { EmbedType } from 'common/embedding'
 
 import 'media-chrome'
 import 'media-chrome/menu'
+import { appendContextTemplate, type ContextMenuConstructorOptions } from 'app/model/menus'
+import { linkTextFromLink } from 'common/markdownModel/links'
 
 const workspace = getContext('workspace') as Workspace
 const {
@@ -20,6 +22,8 @@ export let layout: 'fill' | 'auto' = 'fill'
 export let extraTop: number = 0
 export let extraBottom: number = 0
 
+let mediaElement: HTMLAudioElement | HTMLVideoElement = null
+
 $: playbackPosition = state?.playbackPosition
 
 $: embedType = state?.file?.embedType
@@ -30,6 +34,30 @@ function updatePlayback(this: HTMLAudioElement | HTMLVideoElement, event: Event)
 
 function setPlayback(this: HTMLAudioElement | HTMLVideoElement, event: Event) {
 	this.currentTime = playbackPosition.value
+}
+
+function onMediaContext(event: MouseEvent) {
+	if (!mediaElement) return
+
+	const menu: ContextMenuConstructorOptions[] = []
+
+	const currentTimeLinkText = '[['
+		+ workspace.directoryStore.getPathToItem(state.node, {
+			includeExtension: true,
+			length: workspace.settings.linkAutocompleteForm.value
+		})
+		+ `#time=${mediaElement.currentTime}`
+		+ ']]'
+
+	menu.push({
+		label: 'Copy link at current time',
+		toolTip: 'Adds a link to this file at the current timestamp',
+		click: () => {
+			navigator.clipboard.writeText(currentTimeLinkText)
+		}
+	})
+
+	appendContextTemplate(event, menu)
 }
 
 </script>
@@ -45,12 +73,15 @@ function setPlayback(this: HTMLAudioElement | HTMLVideoElement, event: Event) {
 		{editable}
 	/>
 	<article>
+		<!-- svelte-ignore a11y_no_static_element_interactions -->
 		<media-controller
 			audio={embedType === EmbedType.Audio}
 			class:audio={embedType === EmbedType.Audio}
+			on:contextmenu={onMediaContext}
 		>
 			{#if embedType === EmbedType.Audio}
 				<audio
+					bind:this={mediaElement}
 					slot="media"
 					src={state.file.cacheBustPath}
 					currenttime={$playbackPosition}
@@ -62,6 +93,7 @@ function setPlayback(this: HTMLAudioElement | HTMLVideoElement, event: Event) {
 			{:else if embedType === EmbedType.Video}
 				<!-- svelte-ignore a11y-media-has-caption -->
 				<video
+					bind:this={mediaElement}
 					slot="media" preload="auto"
 					src={state.file.cacheBustPath}
 					currenttime={$playbackPosition}
