@@ -50,7 +50,7 @@ function onMediaContext(event: MouseEvent) {
 		+ ']]'
 
 	menu.push({
-		label: 'Copy link at current time',
+		label: 'Copy Link at Current Time',
 		toolTip: 'Adds a link to this file at the current timestamp',
 		click: () => {
 			navigator.clipboard.writeText(currentTimeLinkText)
