@@ -208,7 +208,7 @@ ipcMain.on('showContextMenu', (event, template: ContextMenuTemplate) => {
 
 	const windowHandle = getWindowHandle(event.sender)
 	if (windowHandle) {
-		windowHandle.contextMenuCustomizations = template	
+		windowHandle.onContextMenuTemplate(template)
 	}
 })
 

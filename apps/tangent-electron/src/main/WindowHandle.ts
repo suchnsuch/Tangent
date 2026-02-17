@@ -12,12 +12,13 @@ import type { ProgressInfo, UpdateInfo } from 'electron-updater'
 import { getSettings, subscribeToSettings } from './settings'
 import Logger from 'js-logger'
 import migrate, { latestViewStateVersion, migrateLegacyComputerNameWorkspaceViewState } from './migrations/viewStateMigrator'
-import type { ContextMenuTemplate } from 'common/menus'
+import { cleanMenuTemplate, type ContextMenuTemplate } from 'common/menus'
 import type { FileContent } from './File'
 import type { HrefForm, HrefFormedLink } from 'common/indexing/indexTypes'
 import { getSafeComputerName, getSafeHostName, getWorkspaceNamePrefix } from './environment'
 import type { UserMessage } from 'common/WindowApi'
 import { dropWorkspace } from './workspaces'
+import type { MenuItemConstructorOptions } from 'electron/main'
 
 const log = Logger.get('workspace-view')
 
@@ -39,7 +40,9 @@ export default class WindowHandle {
 
 	menuUpdateFunctions: ((menu: Menu) => void)[]
 
-	contextMenuCustomizations?: ContextMenuTemplate
+	private contextTimeout: any = null
+	private electronContextMenu?: Electron.ContextMenuParams
+	private contextMenuCustomizations?: ContextMenuTemplate
 
 	private readyActions: HandleReadyAction[] = []
 
@@ -332,5 +335,143 @@ export default class WindowHandle {
 			message.title = messageOrTitle
 		}
 		this.window?.webContents?.send('message', message)
+	}
+
+	/*
+	 * These two functions work through some context menu malarky:
+	 *   * We need the electron event for copy/paste & spelling context.
+	 *   * The Tangent web events want to create customizations _after_ click-based
+	 *     selection changes have occurred.
+	 *   * _Sometimes_ electron will not fire a `context-menu` event even though
+	 *     the actual `contextmenu` web event worked exactly as expect.
+	 * These functions allow both or just one of these events to occur and still get
+	 * a context menu.
+	 */
+	onElectronContextMenu(params: Electron.ContextMenuParams) {
+		this.electronContextMenu = params
+		if (this.contextTimeout) {
+			clearTimeout(this.contextTimeout)
+			this.contextTimeout = null
+			this.generateContextMenu()
+			return
+		}
+		this.contextTimeout = setTimeout(() => {
+			this.generateContextMenu()
+		}, 40)
+	}
+
+	onContextMenuTemplate(template: ContextMenuTemplate) {
+		this.contextMenuCustomizations = template
+		if (this.contextTimeout) {
+			clearTimeout(this.contextTimeout)
+			this.contextTimeout = null
+			this.generateContextMenu()
+		}
+		this.contextTimeout = setTimeout(() => {
+			this.generateContextMenu()
+		}, 40)
+	}
+
+	private generateContextMenu() {
+		const template: MenuItemConstructorOptions[] = []
+
+		const customizations = this.contextMenuCustomizations
+		delete this.contextMenuCustomizations
+
+		const input = this.electronContextMenu
+		delete this.electronContextMenu
+
+		if (customizations?.top) {
+			template.push(...customizations.top)
+		}
+
+		if (input?.misspelledWord) {
+
+			template.push({ type: 'separator' })
+
+			if (input.dictionarySuggestions.length === 0) {
+				template.push({
+					label: 'No Guesses Found',
+					enabled: false
+				})
+			}
+
+			for (const suggestion of input.dictionarySuggestions) {
+				template.push({
+					label: `Replace with "${suggestion}"`,
+					click: () => this.window.webContents.replaceMisspelling(suggestion)
+				})
+			}
+
+			template.push(
+				{
+					label: `Add "${input.misspelledWord}" to dictionary`,
+					click: () => this.window.webContents.session.addWordToSpellCheckerDictionary(input.misspelledWord)
+				},
+				{ type: 'separator' }
+			)
+		}
+
+		if (input?.isEditable) {
+
+			// Pull the main menu items for accelerator rebinding
+			const mainMenu = Menu.getApplicationMenu()
+			const copy = mainMenu.getMenuItemById('window_copy')
+			const cut = mainMenu.getMenuItemById('window_cut')
+			const paste = mainMenu.getMenuItemById('window_paste')
+			const pasteAndMatchStyle = mainMenu.getMenuItemById('window_pasteAndMatchStyle')
+
+			template.push(
+				{ type: 'separator' },
+				{
+					label: 'Copy',
+					accelerator: copy?.accelerator,
+					registerAccelerator: false,
+					enabled: input.editFlags.canCopy,
+					click: () => {
+						this.window.webContents.copy()
+					}
+				},
+				{
+					label: 'Cut',
+					accelerator: cut?.accelerator,
+					registerAccelerator: false,
+					enabled: input.editFlags.canCut,
+					click: () => {
+						this.window.webContents.cut()
+					}
+				},
+				{
+					label: 'Paste',
+					accelerator: paste?.accelerator,
+					registerAccelerator: false,
+					enabled: input.editFlags.canPaste,
+					click: () => {
+						this.window.webContents.paste()
+					}
+				},
+				{
+					label: 'Paste and Match Style',
+					accelerator: pasteAndMatchStyle?.accelerator,
+					registerAccelerator: false,
+					enabled: input.editFlags.canPaste,
+					click: () => {
+						this.window.webContents.pasteAndMatchStyle()
+					}
+				},
+				{ type: 'separator' }
+			)
+		}
+
+		if (customizations?.middle) {
+			template.push(...customizations.middle)
+		}
+
+		if (customizations?.bottom) {
+			template.push(...customizations.bottom)
+		}
+
+		const menu = Menu.buildFromTemplate(cleanMenuTemplate(template))
+		menu.popup()
 	}
 }
