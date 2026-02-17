@@ -16,7 +16,7 @@ Tangent can display web link previews:
 https://en.wikipedia.org/wiki/Capuchin_monkey
 
 Images:
-https://pixnio.com/free-images/2021/10/18/2021-10-18-06-25-57-550x367.jpg
+https://www.tangentnotes.com/shots/thread-short-dark-2x.jpeg
 
 Audio:
 https://www.computerhope.com/jargon/m/example.mp3
@@ -37,3 +37,13 @@ You can specify the width of an image. Both of the following set the width of th
 You can also specify the width and height of the image:
 * `![[image.jpeg|300x200]]`
 * `![300x200](url.com/image.jpg)`
+
+# PDF Pages
+You can link to specific pages in a PDF by appending `#page=2` to a link. For instance: `[[file.pdf#page=6]]`.
+
+# Audio & Video Time
+You can link to a specific time in an audio or video file by appending `#time=hh:mm:ss` to a link. For instance `[[file.mp4#time=1:45]]` or `[[audio.mp3#time=1:34:10]]`.
+
+You can link to sub-second times like `#time=12.45`.
+
+You can copy a link to a video at the current time by right-clicking and selecting the "Copy Link at Current Time" option.
