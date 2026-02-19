@@ -356,6 +356,7 @@ export default class WindowHandle {
 			return
 		}
 		this.contextTimeout = setTimeout(() => {
+			this.contextTimeout = null
 			this.generateContextMenu()
 		}, 40)
 	}
@@ -366,8 +367,10 @@ export default class WindowHandle {
 			clearTimeout(this.contextTimeout)
 			this.contextTimeout = null
 			this.generateContextMenu()
+			return
 		}
 		this.contextTimeout = setTimeout(() => {
+			this.contextTimeout = null
 			this.generateContextMenu()
 		}, 40)
 	}
