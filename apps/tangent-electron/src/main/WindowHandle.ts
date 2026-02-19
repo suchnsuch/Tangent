@@ -225,11 +225,16 @@ export default class WindowHandle {
 			this.window.setSize(width, height, false)
 		}
 		
-		setPosition(window_state.x, window_state.y)
-		setSize(window_state.width, window_state.height)
-		
 		if (window_state.fullscreen) {
 			this.window.setFullScreen(window_state.fullscreen)
+		}
+
+		if (window_state.maximized) {
+			this.window.maximize()
+		}
+		else {
+			setPosition(window_state.x, window_state.y)
+			setSize(window_state.width, window_state.height)
 		}
 	}
 
@@ -243,10 +248,12 @@ export default class WindowHandle {
 			// Write out window state
 			const pos = this.window.getPosition()
 			const size = this.window.getSize()
-			const fullscreen =  this.window.isFullScreen()
+			const maximized = this.window.isMaximized()
+			const fullscreen = this.window.isFullScreen()
 			viewState.window_state = {
 				x: pos[0], y: pos[1],
 				width: size[0], height: size[1],
+				maximized,
 				fullscreen
 			}
 
