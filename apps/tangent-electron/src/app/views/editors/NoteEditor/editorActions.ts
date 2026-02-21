@@ -6,6 +6,7 @@ import { findLinkAround, matchMarkdownLink, matchWikiLink, resolveLink } from 'c
 import { getLineFormattingPrefix } from 'common/markdownModel/line'
 import { repeatString } from '@such-n-such/core'
 import { findSectionLines } from 'common/markdownModel/sections'
+import { numberOf } from 'common/stringUtils'
 
 export function toggleInlineFormat(editor: Editor, selection: EditorRange, formattingCharacters: string, predicate: AttributePredicate, event?: Event) {
 	const { doc } = editor
@@ -277,6 +278,14 @@ export async function toggleLink(editor: MarkdownEditor, selection: EditorRange,
 			clipboardContents = ''
 		}
 
+		if (clipboardContents) {
+			const openCount = numberOf('(', clipboardContents)
+			const closeCount = numberOf(')', clipboardContents)
+			if (openCount != closeCount) {
+				clipboardContents = '<' + clipboardContents + '>'
+			}
+		}
+		
 		if (at === to) {
 			[textStart, textEnd] = findWordAroundPositionInDocument(doc, at)
 			if (textStart === textEnd) return

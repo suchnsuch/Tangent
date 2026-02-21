@@ -94,8 +94,16 @@ export function matchMarkdownLink(text: string, startIndex=0): LinkInfo {
 	
 	index++ 
 	depth = 1
-	const hrefStart = index
 	
+	// CommonMark feature https://spec.commonmark.org/0.31.2/#example-492
+	let useParenthesesDepth = true
+	if (text[index] === '<') {
+		useParenthesesDepth = false
+		index++
+	}
+
+	const hrefStart = index
+
 	let hrefEnd = -1
 	let contentIdStart = -1
 	let contentIdEnd = -1
@@ -105,10 +113,15 @@ export function matchMarkdownLink(text: string, startIndex=0): LinkInfo {
 	// Move through matched `()` pairs, finding content id & title
 	for (; depth > 0 && index < text.length; index++) {
 		let char = text[index]
-		if (char === '(') {
+		if (!useParenthesesDepth && char === '>') {
+			useParenthesesDepth = true
+			if (hrefEnd === -1) hrefEnd = index
+			if (contentIdStart && contentIdEnd === -1) contentIdEnd = index
+		}
+		else if (useParenthesesDepth && char === '(') {
 			depth++
 		}
-		else if (char === ')') {
+		else if (useParenthesesDepth && char === ')') {
 			depth--
 		}
 		else if (char === '#' && depth === 1) {
@@ -655,11 +668,20 @@ function finishMarkdownLink(parser: NoteParser, linkInfo: LinkInfo, offset=0) {
 
 	// Commit the `](` and link
 	feed.next(2 + offset)
+
+	// Skip a leading '<'; CommonMark feature https://spec.commonmark.org/0.31.2/#example-492
+	if (feed.peek() === '<') feed.next()
+	
+	// Consume the link
 	feed.nextByLength(linkInfo.href.length)
 	if (linkInfo.content_id !== undefined) {
 		// Consume the '#' character and the id
 		feed.nextByLength(1 + linkInfo.content_id.length)
 	}
+
+	// Skip a trailing '>'
+	if (feed.peek() === '>') feed.next()
+
 	if (linkInfo.title !== undefined) {
 		// Consume the leading ` "` and trailing `"`
 		feed.nextByLength(3 + linkInfo.title.length)

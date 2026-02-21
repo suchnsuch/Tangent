@@ -64,6 +64,30 @@ describe('Markdown Links', () => {
 		})
 	})
 
+	// CommonMark feature https://spec.commonmark.org/0.31.2/#example-492
+	it('Should handle unbalanced parentheses via angle brackets', () => {
+		expect(matchMarkdownLink('[Links with unbalanced parentheses](<https://example.com/test1).html>)')).toEqual({
+			type: StructureType.Link,
+			start: 0,
+			end: 70,
+			form: 'md',
+			text: 'Links with unbalanced parentheses',
+			href: 'https://example.com/test1).html'
+		})
+	})
+
+	it('Should handle unbalanced parentheses via angle brackets and a header', () => {
+		expect(matchMarkdownLink('[Links with unbalanced parentheses](<https://example.com/test1).html#foo>)')).toEqual({
+			type: StructureType.Link,
+			start: 0,
+			end: 74,
+			form: 'md',
+			text: 'Links with unbalanced parentheses',
+			href: 'https://example.com/test1).html',
+			content_id: 'foo'
+		})
+	})
+
 	it('Should handle paired brackets within the text', () => {
 		expect(matchMarkdownLink('My [md [link]](with/an/href)')).toEqual({
 			type: StructureType.Link,

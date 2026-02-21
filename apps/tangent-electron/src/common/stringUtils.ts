@@ -73,3 +73,13 @@ export function padString(text: string, length: number) {
 	}
 	return text
 }
+
+export function numberOf(target: string, content: string) {
+	let count = 0
+	let index = content.indexOf(target)
+	while (index >= 0) {
+		count++
+		index = content.indexOf(target, index + 1)
+	}
+	return count
+}

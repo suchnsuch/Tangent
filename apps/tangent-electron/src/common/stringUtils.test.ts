@@ -1,6 +1,6 @@
-import { describe, test, expect } from 'vitest'
+import { describe, test, expect, it } from 'vitest'
 
-import { findWordAround } from './stringUtils'
+import { findWordAround, numberOf } from './stringUtils'
 
 describe('findWordAround', () => {
 	test('Start of line', () => {
@@ -28,5 +28,14 @@ describe('findWordAround', () => {
 		expect(findWordAround('   ', 0)).toEqual([0, 0])
 		expect(findWordAround('   ', 1)).toEqual([1, 1])
 		expect(findWordAround('   ', 3)).toEqual([3, 3])
+	})
+})
+
+describe('numberOf', () => {
+	it('Should find the correct number', () => {
+		expect(numberOf('(', '((foo(')).toEqual(3)
+	})
+	it('Should return 0 if nothing is found', () => {
+		expect(numberOf('x', 'yyy')).toEqual(0)
 	})
 })
