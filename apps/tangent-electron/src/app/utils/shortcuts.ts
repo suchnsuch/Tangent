@@ -101,11 +101,17 @@ function codeToShortcutKey(code: string) {
 	return code
 }
 
-export function shortcutFromEvent(event: KeyboardEvent) {
+let defaultUseKeyCode = false
+export function setDefaultUseKeyCode(value: boolean) {
+	defaultUseKeyCode = value
+}
+
+export function shortcutFromEvent(event: KeyboardEvent, useKeyCode?: boolean) {
 	const shortcutArray: string[] = []
 	if (!event.key) return ''
 
-	let key = codeSubs[event.key] ?? event.key
+	useKeyCode = useKeyCode ?? defaultUseKeyCode
+	let key = useKeyCode ? codeToShortcutKey(event.code) : (codeSubs[event.key] ?? event.key)
 
 	if (event.metaKey) shortcutArray.push(isMac ? 'Mod' : 'Meta')
 	if (event.ctrlKey) shortcutArray.push(isMac ? 'Ctrl' : 'Mod')
@@ -114,7 +120,7 @@ export function shortcutFromEvent(event: KeyboardEvent) {
 
 	if (!eventIsModifier(event)) {
 
-		if (isMac && event.altKey && event.code) {
+		if (!useKeyCode && isMac && event.altKey && event.code) {
 			// The altKey on mac can change the key value (e.g. Cmd+Alt+R will show up as Cmd+Alt+® if we don't do this)
 			// This will only work properly on QWERTY keyboard layouts… The alternative is a map of mac option characters to keys…
 			key = codeToShortcutKey(event.code)

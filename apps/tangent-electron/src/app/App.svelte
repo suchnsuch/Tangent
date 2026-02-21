@@ -24,6 +24,7 @@ import { updateMermaidStyle } from './style/mermaidStyle'
 
 // Doing this here so that mhchem is loaded
 import 'katex/contrib/mhchem/mhchem'
+import { setDefaultUseKeyCode } from './utils/shortcuts'
 
 let applicationState: 'initializing' | 'choosingWorkspace' | 'buildingWorkspace' | 'usingWorkspace' | 'error' = 'initializing'
 let showLoading = false
@@ -81,6 +82,11 @@ $: {
 	const linkPaneMode = (linkClickPaneBehavior != null && $linkClickPaneBehavior) ?? 'new'
 	document.body.classList.remove('link-click-pane-new', 'link-click-pane-replace')
 	document.body.classList.add('link-click-pane-' + linkPaneMode)
+}
+
+$: useKeyCodeShortcuts = workspace?.settings.useKeyCodeShortcuts
+$: {
+	setDefaultUseKeyCode($useKeyCodeShortcuts)
 }
 
 $: accentHue = workspace?.settings.accentHue

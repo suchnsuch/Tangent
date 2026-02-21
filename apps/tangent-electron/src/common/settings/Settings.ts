@@ -554,6 +554,12 @@ export default class Settings extends ObjectStore {
 	// Keymap
 	keymap = new KeymapSettings()
 
+	useKeyCodeShortcuts = new Setting<boolean>({
+		name: 'Use KeyCode Shortcuts',
+		description: 'When enabled, keyboard shortcuts will be based off of US Keyboard KeyCode values. They will remain in the same physical location & binding no matter what language is currently active.',
+		defaultValue: false
+	})
+
 	// Code in notes
 	letCodeExpand = new Setting<boolean>({
 		name: 'Extra Wide Code',

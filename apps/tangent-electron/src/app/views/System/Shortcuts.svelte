@@ -10,6 +10,7 @@ import { tooltip } from 'app/utils/tooltips'
 import ShortcutsEditorCommandTooltip from './ShortcutsEditorCommandTooltip.svelte'
 import SVGIcon from '../smart-icons/SVGIcon.svelte'
 import ShortcutInput from 'app/utils/ShortcutInput.svelte'
+import SettingView from './SettingView.svelte'
 
 const workspace = getContext('workspace') as Workspace
 const keymap = workspace.settings.keymap
@@ -84,12 +85,10 @@ function getKeyboardList(commands: WorkspaceCommands, keymap: Map<string, string
 	}
 
 	let result = [...groups.values()].sort((a, b) => {
-		if (a.title < b.title) {
-			return -1
-		}
-		if (a.title > b.title) {
-			return 1
-		}
+		if (a.title === 'Global') return -1
+		if (b.title === 'Global') return 1
+		if (a.title < b.title) return -1
+		if (a.title > b.title) return 1
 		return 0
 	})
 
@@ -157,6 +156,10 @@ function resetToDefault(key: string) {
 
 <main>
 	<nav><input type="search" bind:value={filter} placeholder="Search" /></nav>
+	<details>
+		<summary>Advanced</summary>
+		<SettingView setting={workspace.settings.useKeyCodeShortcuts} />
+	</details>
 	<table><tbody>
 		{#each list as group (group.title)}
 			<tr>
@@ -245,7 +248,21 @@ function resetToDefault(key: string) {
 <style lang="scss">
 nav {
 	margin-bottom: .5em;
+	display: flex;
+	gap: 1em;
+
+	input {
+		flex-grow: 1;
+	}
 }
+
+details {
+	margin: 1em;
+	summary {
+		color: var(--deemphasizedTextColor);
+	}
+}
+
 .hidden {
 	visibility: hidden;
 }
