@@ -526,7 +526,7 @@ export function parseLink(char: string, parser: NoteParser): boolean {
 	}
 	
 	const mdLinkInfo = matchMarkdownLink(line, feed.index)
-	if (mdLinkInfo?.start === feed.index && (mdLinkInfo.text || isEmbed)) {
+	if (mdLinkInfo?.start === feed.index) {
 		// Commit everything before the `!` in the case of an embed
 		parser.commitSpan(null, isEmbed ? -1 : 0)
 

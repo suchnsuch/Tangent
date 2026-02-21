@@ -206,9 +206,15 @@ export async function toggleLink(editor: MarkdownEditor, selection: EditorRange,
 				linkStart += opLength
 			}
 
+			// CommonMark feature https://spec.commonmark.org/0.31.2/#example-492
+			const linkText = editor.getText([linkStart, linkEnd])
+			const openCount = numberOf('(', linkText)
+			const closeCount = numberOf(')', linkText)
+			const needsBrackets = openCount != closeCount
+
 			editor.change
-				.insert(linkStart, '[](')
-				.insert(linkEnd, ')')
+				.insert(linkStart, needsBrackets ? '[](<' : '[](')
+				.insert(linkEnd, needsBrackets ? '>)' : ')')
 				.select(linkStart + 1)
 				.apply()
 

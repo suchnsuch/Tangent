@@ -157,6 +157,16 @@ describe('Markdown Links', () => {
 			title: 'Title of "Doom"'
 		})
 	})
+
+	it('Works for empty text', () => {
+		expect(matchMarkdownLink('foo [](http://foo.com)')).toEqual({
+			type: StructureType.Link,
+			start: 4,
+			end: 22,
+			form: 'md',
+			href: 'http://foo.com',
+		})
+	})
 })
 
 describe('Content ID Matching', () => {
