@@ -568,6 +568,7 @@ article.note {
 	mark {
 		background: var(--highlightBackgroundColor);
 		color: var(--highlightTextColor);
+		caret-color: var(--highlightTextColor);
 		border-radius: 1px;
 		padding: 0 .1em;
 
