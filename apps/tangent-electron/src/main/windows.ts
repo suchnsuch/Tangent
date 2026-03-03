@@ -62,8 +62,10 @@ export function createWindow(assignedWorkspace?: string) {
 	})
 
 	newWindow.webContents.session.webRequest.onBeforeSendHeaders((details, callback) => {
-		// Inject a non-local-host referer so that YouTube embeds work properly
-		details.requestHeaders.Referer = 'https://www.tangentnotes.com/'
+		if (details.url.toLowerCase().startsWith('https://www.youtube.com/')) {
+			// Inject a non-local-host referer so that YouTube embeds work properly
+			details.requestHeaders.Referer = 'https://www.tangentnotes.com/'
+		}
 		callback(details)
 	})
 
