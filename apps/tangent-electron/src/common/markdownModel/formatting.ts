@@ -63,7 +63,8 @@ function openOrCloseFormatting(formatting: string, attributes: AttributeMap, par
 	const { feed, builder } = parser
 
 	const leftTouchingText = !isWhitespace(feed.peek(-formatting.length))
-	const rightTouchingText = !isWhitespace(feed.peek())
+	const rightChar = feed.peek()
+	const rightTouchingText = !isWhitespace(rightChar) && !formatting.includes(rightChar)
 
 	if (leftTouchingText || rightTouchingText) {
 		if (!parser.isStartOfContent) parser.commitSpan(null, parser.feed.currentStepLength - formatting.length)
