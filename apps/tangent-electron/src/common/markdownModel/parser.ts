@@ -4,6 +4,7 @@ import CharacterFeeder from './CharacterFeeder'
 import DocumentFeeder from './DocumentFeeder'
 import { lineIsMultiLineFormat } from './line'
 import NoteParser, { type MarkdownParsingOptions } from './NoteParser'
+import { linkTextFromLink } from './links'
 
 export type { MarkdownParsingOptions } from './NoteParser'
 
@@ -83,15 +84,10 @@ interface ParseResult {
 }
 
 export function linkInfoToText(link: ConnectionInfo): string {
-	let result = '[['
+	const result = linkTextFromLink(link)
 	if (link.type === StructureType.Embed) {
-		result = '!' + result
+		return '!' + result
 	}
-	result += link.href
-	if (link.text) {
-		result += '|'
-		result += link.text
-	}
-	return result + ']]'
+	return result
 }
 

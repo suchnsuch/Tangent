@@ -4,7 +4,7 @@ import type { ObjectStore } from 'common/stores'
 import { type ConnectionInfo, type HrefFormedLink, IndexData, type IndexDataUpdate, type StructureData, StructureType } from './indexTypes'
 
 import { linkInfoToText, type MarkdownParsingOptions, parseMarkdown } from '../markdownModel/parser'
-import { getExtensionRegex } from '../fileExtensions'
+import { audioFileExtensions, getExtensionRegex, pdfFileExtensions, videoFileExtensions } from '../fileExtensions'
 
 import Logger from 'js-logger'
 import paths from '../paths'
@@ -23,7 +23,10 @@ const queryLog = Logger.get('queries')
 const parseableFileMatch = getExtensionRegex(noteFileExtensions)
 const indexableFileMatch = getExtensionRegex([
 	...noteFileExtensions,
-	...imageFileExtensions
+	...imageFileExtensions,
+	...audioFileExtensions,
+	...videoFileExtensions,
+	...pdfFileExtensions
 ])
 
 interface LinkConfirmation {
