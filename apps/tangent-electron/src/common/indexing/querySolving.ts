@@ -2,8 +2,8 @@ import { filterIterator, mapIterator } from '@such-n-such/core'
 import { type Clause, type ClauseGroup, ClauseType, ClauseMod, isGroup, parseQueryText, type PartialClauseReference, type PartialClauseValue, type Query, type QueryError, type PartialClauseType, TodoQueryState, tagContainsTag, ClauseGroupMod } from '@such-n-such/tangent-query-parser'
 import QueryInfo, { queryFileType } from 'common/dataTypes/QueryInfo'
 import { DirectoryStore, type TreeNode, TreePredicateResult, validatePath } from 'common/trees'
-import { getFileTypeRegex, imageFileExtensions } from 'common/fileExtensions'
-import { addPreviewToReference, type Annotation, areNodesOrReferencesEquivalent, cleanReference, createReference, getNode, getNodeFromReference, isNode, isReference, isSubReference, type TreeNodeOrReference } from 'common/nodeReferences'
+import { getExtensionRegex, getFileTypeRegex, imageFileExtensions, noteFileExtensions } from 'common/fileExtensions'
+import { addPreviewToReference, type Annotation, areNodesOrReferencesEquivalent, cleanReference, createReference, getNode, getNodeFromReference, isNode, isReference, isSubReference, type TreeNodeOrReference, type TreeNodeReference } from 'common/nodeReferences'
 import type { ObjectStore } from 'common/stores'
 import { IndexData, type TodoState } from './indexTypes'
 import { getTextAnnotations } from './queryAnnotations'
@@ -34,6 +34,14 @@ function doesTextMatch(text: string, partial: PartialClauseValue): boolean {
 		return text.match(partial.regex) != null
 	}
 	return false
+}
+
+const textReadableMatch = getExtensionRegex([
+	...noteFileExtensions
+])
+
+function isTextReadable(item: TreeNodeOrReference): boolean {
+	return item.path.match(textReadableMatch) != null
 }
 
 
@@ -440,6 +448,8 @@ export async function solveQuery(query: Query, interop: QuerySolverInterop): Pro
 			}
 			else if ('text' in clause || 'regex' in clause) {
 				const contentsResult = await Promise.all(mapIterator(set, async ref => {
+
+					if (!isTextReadable(ref)) return null
 
 					ref = await cacheNodeContents(ref)
 
