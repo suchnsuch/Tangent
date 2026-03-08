@@ -12,6 +12,8 @@ import { buildFuzzySegementMatcher, buildMatcher, compareNodeSearch, orderTreeNo
 import PaletteActionView from 'app/utils/PaletteActionView.svelte'
 import { getLinkDirectionFromEvent, type NavigationData } from 'app/events'
 import { visibleFileTypeMatch, implicitExtensionsMatch } from 'common/fileExtensions'
+import { getNode, getPreview, type TreeNodeReference } from 'common/nodeReferences'
+import QueryResultItemSummary from 'app/views/summaries/QueryResultItemSummary.svelte'
 
 let workspace = getContext('workspace') as Workspace
 
@@ -40,6 +42,7 @@ function getPlaceholder(text: string) {
 
 interface Option {
 	node?: TreeNode
+	ref?: TreeNodeReference
 	action?: PaletteAction
 	match?: SearchMatchResult
 }
@@ -47,6 +50,7 @@ interface Option {
 let commandActions: PaletteAction[] = null
 
 let options: Option[] = []
+let searchTimeout = null
 let selectedIndex = 0
 $: updateOptions(text)
 
@@ -71,11 +75,15 @@ function tagNodeFilter(node: TreeNode) {
 }
 
 function updateOptions(text: string) {
-	let mode: 'file' | 'command' | 'tag' = 'file'
+	let mode: 'file' | 'command' | 'search' | 'tag' = 'file'
 
 	if (text.startsWith('>')) {
 		text = text.substring(1)
 		mode = 'command'
+	}
+	else if (text.startsWith('?')) {
+		text = text.substring(1)
+		mode = 'search'
 	}
 	else if (text.startsWith('#')) {
 		// Drop the tag leader
@@ -83,6 +91,11 @@ function updateOptions(text: string) {
 		mode = 'tag'
 	}
 	text = text.trim()
+
+	if (searchTimeout && mode !== 'search') {
+		clearTimeout(searchTimeout)
+		searchTimeout = null
+	}
 
 	switch (mode) {
 		case 'file':
@@ -122,7 +135,29 @@ function updateOptions(text: string) {
 				})
 			}
 		}
-		
+		break
+		case 'search':
+		{
+			if (searchTimeout) clearTimeout(searchTimeout)
+
+			searchTimeout = setTimeout(() => {
+				searchTimeout = 'pending-query'
+				workspace.api.query.resultsForQuery(`Files named '${text}' or with '${text}'`).then(result => {
+					console.log(result)
+					if (searchTimeout == null) return
+
+					if (result.items) {
+						options = result.items.map(i => {
+							return { ref: i }
+						})
+					}
+					else {
+						options = []
+					}
+					searchTimeout = 0
+				})
+			}, 150)
+		}
 		break
 		case 'tag':
 		{
@@ -225,10 +260,12 @@ function onAutocomplete(option: Option) {
 }
 
 function selectOption(option: Option, event: KeyboardEvent | MouseEvent) {
-	if (option.node) {
+	if (option.node || option.ref) {
+
+		const node = option.node ?? getNode(option.ref, workspace.directoryStore)
 
 		const nav: NavigationData = {
-			target: option.node
+			target: node
 		}
 
 		if (option.match?.type === 'header') {
@@ -275,9 +312,12 @@ function selectOption(option: Option, event: KeyboardEvent | MouseEvent) {
 	workspace.viewState.modal.close()
 }
 
-function optionID(option) {
+function optionID(option: Option) {
 	if (option.action) {
 		return option.action.name
+	}
+	if (option.ref) {
+		return option.ref
 	}
 	else {
 		return option.node
@@ -314,6 +354,8 @@ function shouldShowShortcut(action: PaletteAction) {
 					showFileType={!option.node.fileType.match(implicitExtensionsMatch)}
 					showModDate={true}
 					nameMatch={option.match} />
+			{:else if option.ref}
+				<QueryResultItemSummary reference={option.ref} />
 			{:else if option.action}
 				<PaletteActionView
 					action={option.action}
@@ -350,4 +392,5 @@ function shouldShowShortcut(action: PaletteAction) {
 	margin-top: .5em;
 	color: var(--deemphasizedTextColor);
 }
+
 </style>

@@ -210,6 +210,13 @@ export function addPreviewToReference(reference: TreeNodeReference, preview: Nod
 	reference.preview.push(preview)
 }
 
+export function getPreview(reference: TreeNodeReference, index: number): NodePreview {
+	if (!reference?.preview) return undefined
+	if (Array.isArray(reference.preview)) return reference.preview[index]
+	if (index === 0) return reference.preview
+	return undefined
+}
+
 export function indexOfMatch(list: TreeNodeOrReference[], target: TreeNodeOrReference) {
 	if (isNode(target)) {
 		for (let i = 0; i < list.length; i++) {
