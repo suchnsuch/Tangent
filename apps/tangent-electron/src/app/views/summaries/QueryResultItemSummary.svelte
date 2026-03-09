@@ -66,6 +66,9 @@ function buildPreviewContent(reference: TreeNodeReference) {
 
 	background-color: var(--noteBackgroundColor);
 	border-radius: var(--inputBorderRadius);
+
+	overflow: hidden;
+	overflow-x: auto;
 }
 
 </style>
