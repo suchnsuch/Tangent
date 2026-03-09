@@ -454,6 +454,8 @@ export async function solveQuery(query: Query, interop: QuerySolverInterop): Pro
 							else ref.annotations.push(...annotations)
 
 							for (const annotation of annotations) {
+								if (annotation.target ?? 'content' !== 'content') continue;
+
 								let lineStart = 0
 								for (const line of ref.lines) {
 									const lineEnd = lineStart + line.length
@@ -464,7 +466,10 @@ export async function solveQuery(query: Query, interop: QuerySolverInterop): Pro
 											start: lineStart,
 											content: line
 										})
+										break
 									}
+
+									lineStart = lineEnd + 1
 								}
 							}
 

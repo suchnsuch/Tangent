@@ -203,6 +203,24 @@ export function cleanReference(reference: TreeNodeReference) {
 	delete reference.lines
 }
 
+function comparePreviews(a: NodePreview, b: NodePreview): false | NodePreview {
+	if (typeof a === 'string') {
+		if (typeof b === 'string') {
+			return a === b ? a : false
+		}
+		return false
+	}
+	else if (typeof b === 'string') return false
+
+	if (a.start === b.start) {
+		if (a.content === b.content) return a
+		if (a.content.includes(b.content)) return a
+		if (b.content.includes(a.content)) return b
+	}
+	// TODO: solving for joining partial previews together
+	return false
+}
+
 export function addPreviewToReference(reference: TreeNodeReference, preview: NodePreview) {
 	if (!reference.preview) {
 		reference.preview = preview
@@ -211,6 +229,14 @@ export function addPreviewToReference(reference: TreeNodeReference, preview: Nod
 
 	if (!Array.isArray(reference.preview)) {
 		reference.preview = [reference.preview]
+	}
+	// Ensure no duplicate previews
+	for (let i = 0; i < reference.preview.length; i++) {
+		const result = comparePreviews(reference.preview[i], preview)
+		if (result !== false) {
+			reference.preview[i] = result
+			return
+		}
 	}
 	reference.preview.push(preview)
 }
