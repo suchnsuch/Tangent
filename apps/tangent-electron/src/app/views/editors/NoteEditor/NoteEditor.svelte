@@ -735,6 +735,9 @@ function applyAnnotations(event?: DecorateEvent) {
 	if ($annotations) {
 
 		function applyAnnotation(annotation: Annotation, current: boolean) {
+			// Only display annotations targeting the content
+			if (annotation.target ?? 'content' !== 'content') return
+			
 			let className = 'annotation'
 			if (current) {
 				className += ' current'

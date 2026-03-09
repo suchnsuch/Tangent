@@ -1,8 +1,7 @@
-import { mapIterator } from '@such-n-such/core'
 import type { PartialClauseValue } from '@such-n-such/tangent-query-parser'
 import type { Annotation } from 'common/nodeReferences'
 
-export function getTextAnnotations(text: string, partial: PartialClauseValue): Annotation[] {
+export function getTextAnnotations(text: string, partial: PartialClauseValue, target?: Annotation['target']): Annotation[] {
 	if ('text' in partial) {
 		let startIndex = 0
 		let annotations: Annotation[] = []
@@ -10,6 +9,7 @@ export function getTextAnnotations(text: string, partial: PartialClauseValue): A
 			const index = text.indexOf(partial.text, startIndex)
 			if (index >= 0) {
 				annotations.push({
+					target,
 					data: partial,
 					start: index,
 					end: index + partial.text.length
@@ -37,6 +37,7 @@ export function getTextAnnotations(text: string, partial: PartialClauseValue): A
 					const last = result.at(-1)
 					if (!last || (last.start !== start || last.end !== end)) {
 						result.push({
+							target,
 							data: { ...partial, group: groupIndex },
 							start,
 							end
@@ -47,6 +48,7 @@ export function getTextAnnotations(text: string, partial: PartialClauseValue): A
 				return result
 			}
 			return [{
+				target,
 				data: partial,
 				start: match.index,
 				end: match.index + match[0].length

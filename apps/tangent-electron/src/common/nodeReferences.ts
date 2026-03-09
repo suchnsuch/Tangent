@@ -31,6 +31,11 @@ export interface Annotation {
 	start: number
 	end: number
 	/**
+	 * An identifier of the source of the annotation.
+	 * Default is text content. 
+	 */
+	target?: undefined | 'content' | 'name'
+	/**
 	 * A string intends for a simple message to be attached to the text range.
 	 * Other information could be handled in some custom manner.
 	 */

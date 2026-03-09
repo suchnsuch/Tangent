@@ -11,6 +11,7 @@ import paths, { normalizeSeperators } from 'common/paths';
 import { applyAnnotation, type ChildList, childrenToHTML } from 'common/annotations/nodeAnnotations';
 import { isTagTreeNode } from 'common/indexing/TagNode';
 import { tooltip } from 'app/utils/tooltips'
+import type { Annotation } from 'common/nodeReferences'
 
 const workspace = getContext('workspace') as Workspace
 
@@ -22,6 +23,7 @@ export let showModDate = false
 export let highlightName = true
 export let shrinkNonHighlights = true
 export let nameMatch: SearchMatchResult = null
+export let annotations: Annotation[] = null
 
 $: content = getContent(node, relativeTo, showFileType, nameMatch)
 function getContent(node: TreeNode, relativeTo: string | TreeNode, showFileType: boolean, match: SearchMatchResult): string {
@@ -66,68 +68,82 @@ function getContent(node: TreeNode, relativeTo: string | TreeNode, showFileType:
 	}
 
 	let extension = paths.extname(relativePath)
-	const extenstionStart = relativePath.length - extension.length
+	const extensionStart = relativePath.length - extension.length
 	const extensionHeaderIndex = extension.lastIndexOf('#')
 	if (extensionHeaderIndex >= 0) {
 		// Strip off the header
 		extension = extension.substring(0, extensionHeaderIndex)
-		relativePath = relativePath.substring(0, extenstionStart + extensionHeaderIndex) + '→' + relativePath.substring(extenstionStart + extensionHeaderIndex + 1)
+		relativePath = relativePath.substring(0, extensionStart + extensionHeaderIndex) + '→' + relativePath.substring(extensionStart + extensionHeaderIndex + 1)
 	}
-	const extensionEnd = extenstionStart + extension.length
+	const extensionEnd = extensionStart + extension.length
 	
 	let showExtension: false|true|'highlighted' = showFileType && extension.startsWith('.') || extensionHeaderIndex >= 0
 
 	const indices = (match as any)?.indices
 	if (indices && extension.startsWith('.')) {
 		for (let index = 1; index < indices.length; index++) {
-			if (indices[index][1] > extenstionStart && indices[index][0] < extensionEnd) {
+			if (indices[index][1] > extensionStart && indices[index][0] < extensionEnd) {
 				showExtension = 'highlighted'
 				break
 			}
 		}
 	}
 
-	relativePath = showExtension ? relativePath : relativePath.substring(0, extenstionStart)
+	relativePath = showExtension ? relativePath : relativePath.substring(0, extensionStart)
 
-	let annotations: ChildList = [ relativePath ]
+	let annotatedChildren: ChildList = [ relativePath ]
 
+	let nameStart = 0
 	if (highlightName) {
 		const dirName = paths.dirname(relativePath)
 		if (dirName !== '.') {
-			annotations = applyAnnotation(annotations, {
+			nameStart = dirName.length + 1
+			annotatedChildren = applyAnnotation(annotatedChildren, {
 				className: 'directory'
-			}, [0, dirName.length + 1])
-			annotations = applyAnnotation(annotations, {
+			}, [0, nameStart])
+			annotatedChildren = applyAnnotation(annotatedChildren, {
 				className: 'name'
-			}, [dirName.length + 1, extenstionStart])
+			}, [nameStart, extensionStart])
+			
 		}
 		else {
-			annotations = applyAnnotation(annotations, {
+			annotatedChildren = applyAnnotation(annotatedChildren, {
 				className: 'name'
-			}, [0, extenstionStart])
+			}, [0, extensionStart])
 		}
 	}
 
 	if (showExtension) {
-		annotations = applyAnnotation(annotations, {
+		annotatedChildren = applyAnnotation(annotatedChildren, {
 			className: 'fileType' + (showExtension === 'highlighted' ? ' highlighted' : '')
-		}, [extenstionStart, extensionEnd])
+		}, [extensionStart, extensionEnd])
 	}
 
 	if (extensionHeaderIndex >= 0) {
-		annotations = applyAnnotation(annotations, {
+		annotatedChildren = applyAnnotation(annotatedChildren, {
 			className: 'headerHash'
-		}, [extenstionStart + extensionHeaderIndex, extenstionStart + extensionHeaderIndex + 1])
-		annotations = applyAnnotation(annotations, {
+		}, [extensionStart + extensionHeaderIndex, extensionStart + extensionHeaderIndex + 1])
+		annotatedChildren = applyAnnotation(annotatedChildren, {
 			className: 'headerName'
-		}, [extenstionStart + extensionHeaderIndex + 1, relativePath.length])
+		}, [extensionStart + extensionHeaderIndex + 1, relativePath.length])
 	}
 
 	if (match) {
-		annotations = annotateMatchText(match, annotations)
+		annotatedChildren = annotateMatchText(match, annotatedChildren)
 	}
 
-	return childrenToHTML(annotations)
+	if (annotations) {
+		for (const annotation of annotations) {
+			const target = annotation.target ?? 'content'
+			if (target === 'name') {
+				annotatedChildren = applyAnnotation(annotatedChildren, {
+					className: 'match-highlight'
+				}, [annotation.start + nameStart, annotation.end + nameStart])
+			}
+		}
+	}
+
+	return childrenToHTML(annotatedChildren)
 }
 
 </script>

@@ -50,7 +50,8 @@ function buildPreviewContent(reference: TreeNodeReference) {
 
 <NodeLine {node}
 	showFileType={!node.fileType.match(implicitExtensionsMatch)}
-	showModDate={true}/>
+	showModDate={true}
+	annotations={reference.annotations}/>
 {#if preview}
 	<div class="preview">{@html preview}</div>
 {/if}

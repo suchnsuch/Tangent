@@ -26,16 +26,6 @@ export interface QuerySolverInterop {
 
 type ReferenceIterator = (handler: (item: TreeNodeOrReference, mod?: ClauseMod) => boolean) => boolean
 
-function doesTextMatch(text: string, partial: PartialClauseValue): boolean {
-	if ('text' in partial) {
-		return text.includes(partial.text)
-	}
-	if ('regex' in partial) {
-		return text.match(partial.regex) != null
-	}
-	return false
-}
-
 const textReadableMatch = getExtensionRegex([
 	...noteFileExtensions
 ])
@@ -304,7 +294,7 @@ export async function solveQuery(query: Query, interop: QuerySolverInterop): Pro
 
 	async function solveClause(clause: Clause, set: Set<TreeNodeOrReference>) {
 		if (clause.type === ClauseType.Named) {
-			return new Set(filterIterator(set, n => {
+			return new Set(queryFilter(set, n => {
 				let name: string = null
 				if (isReference(n)) {
 					name = n.title ?? getNodeFromReference(n, directory).name
@@ -313,7 +303,7 @@ export async function solveQuery(query: Query, interop: QuerySolverInterop): Pro
 					name = n.name
 				}
 
-				return doesTextMatch(name, clause)
+				return getTextAnnotations(name, clause, 'name')
 			}))
 		}
 		else if (clause.type === ClauseType.In) {
