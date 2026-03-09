@@ -8,7 +8,7 @@ const queryPath = '.tangent/Temp/Query'
 
 export default class OpenQueryPaneCommand extends WorkspaceCommand {
 	constructor(workspace: Workspace) {
-		super(workspace, { shortcut: 'Mod+Shift+F' })
+		super(workspace, { shortcut: 'Mod+Alt+Shift+F' })
 	}
 
 	execute(context: CommandContext) {

@@ -102,6 +102,7 @@ function createAllCommands(workspace: Workspace) {
 		openInFileBrowser: new ShowInFileBrowserCommand(workspace),
 		
 		do: new ShowCommandPaletteCommand(workspace, { shortcut: 'Mod+P', prefix: '> ' }),
+		search: new ShowCommandPaletteCommand(workspace, { shortcut: 'Mod+Shift+F', prefix: '? '}),
 
 		closeCurrentFile: new CloseFileCommand(workspace, { mode: 'current', shortcut: 'Mod+W' }),
 		closeOtherFiles: new CloseFileCommand(workspace, { mode: 'others', shortcut: 'Mod+Shift+W'}),

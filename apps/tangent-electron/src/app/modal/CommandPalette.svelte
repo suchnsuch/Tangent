@@ -14,11 +14,17 @@ import { getLinkDirectionFromEvent, type NavigationData } from 'app/events'
 import { visibleFileTypeMatch, implicitExtensionsMatch } from 'common/fileExtensions'
 import { getNode, getPreview, sortReferences, type TreeNodeReference } from 'common/nodeReferences'
 import QueryResultItemSummary from 'app/views/summaries/QueryResultItemSummary.svelte'
+import { shortcutFromEvent } from 'app/utils/shortcuts'
+import ShowCommandPaletteCommand from 'app/model/commands/ShowCommandPalette'
 
 let workspace = getContext('workspace') as Workspace
 
+let paletteShortcuts = [
+	...Object.values(workspace.commands).filter(c => c instanceof ShowCommandPaletteCommand)
+]
+
 export let prefix: string
-let text: string = prefix || ''
+let searchInput: string = prefix || ''
 
 let inputElement: HTMLInputElement
 
@@ -26,16 +32,22 @@ $: {
 	inputElement?.focus()
 }
 
-$:placeholder = getPlaceholder(text)
+$:placeholder = getPlaceholder(searchInput)
 
 function getPlaceholder(text: string) {
 	if (!text) {
 		return 'Type to search for a file to jump to'
 	}
 	switch (text) {
+		case '#':
+		case '# ':
+			return 'Search for a tag'
 		case '>':
 		case '> ':
 			return 'Run a command'
+		case '?':
+		case '? ':
+			return 'Search in files'
 	}
 	return ''
 }
@@ -52,7 +64,7 @@ let commandActions: PaletteAction[] = null
 let options: Option[] = []
 let searchTimeout = null
 let selectedIndex = 0
-$: updateOptions(text)
+$: updateOptions(searchInput)
 
 function nodeFilter(node: TreeNode) {
 	if (node.name.startsWith('.')) {
@@ -74,7 +86,7 @@ function tagNodeFilter(node: TreeNode) {
 	return TreePredicateResult.Include
 }
 
-function updateOptions(text: string) {
+function getInputMode(text: string) {
 	let mode: 'file' | 'command' | 'search' | 'tag' = 'file'
 
 	if (text.startsWith('>')) {
@@ -90,7 +102,14 @@ function updateOptions(text: string) {
 		text = text.substring(1)
 		mode = 'tag'
 	}
+
 	text = text.trim()
+	return { mode, text }
+}
+
+function updateOptions(input: string) {
+	
+	const { mode, text } = getInputMode(input)
 
 	if (searchTimeout && mode !== 'search') {
 		clearTimeout(searchTimeout)
@@ -246,16 +265,31 @@ function updateOptions(text: string) {
 	}
 }
 
+function onKeydown(event: KeyboardEvent) {
+	if (event.defaultPrevented) return
+
+	const shortcut = shortcutFromEvent(event)
+
+	for (const command of paletteShortcuts) {
+		if (command.shortcuts.includes(shortcut)) {
+			const { mode, text } = getInputMode(searchInput)
+			searchInput = (command.prefix ?? '') + text
+			event.preventDefault()
+			return
+		}
+	}
+}
+
 function onAutocomplete(option: Option) {
 	const tabOption = options[selectedIndex]
 	if (tabOption) {
 		if (tabOption.node) {
-			text = workspace.directoryStore.getPathToItem(tabOption.node, {
+			searchInput = workspace.directoryStore.getPathToItem(tabOption.node, {
 				includeExtension: false
 			})
 		}
 		else if (tabOption.action) {
-			text = '> ' + tabOption.action.name
+			searchInput = '> ' + tabOption.action.name
 		}
 	}
 }
@@ -337,13 +371,16 @@ function shouldShowShortcut(action: PaletteAction) {
 
 </script>
 
-<main class="ModalContainer">
+<!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
+<main class="ModalContainer"
+	on:keydown={onKeydown}
+>
 	<ModalInputSelect
 		{options}
 		{placeholder}
 		placeholderMode={'always'}
 		bind:selectedIndex
-		bind:text
+		bind:text={searchInput}
 		{onAutocomplete}
 		onSelect={selectOption}
 		itemID={optionID}

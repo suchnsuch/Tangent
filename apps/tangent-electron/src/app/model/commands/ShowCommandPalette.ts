@@ -54,6 +54,9 @@ export default class ShowCommandPaletteCommand extends WorkspaceCommand {
 		if (prefix.match(/^> ?$/)) {
 			return 'Open Command Palette'
 		}
+		if (prefix.match(/^\? ?$/)) {
+			return 'Search Files'
+		}
 	}
 
 	getTooltip(context: ShowCommandPaletteCommandContext) {
@@ -65,6 +68,9 @@ export default class ShowCommandPaletteCommand extends WorkspaceCommand {
 		}
 		if (prefix.match(/^> ?$/)) {
 			return 'Opens a search box for all commands.'
+		}
+		if (prefix.match(/^\? ?$/)) {
+			return 'Opens a search box for the names and content of all files.'
 		}
 	}
 
