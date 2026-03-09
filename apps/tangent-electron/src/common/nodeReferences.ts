@@ -203,6 +203,44 @@ export function cleanReference(reference: TreeNodeReference) {
 	delete reference.lines
 }
 
+function compareAnnotations(a: Annotation, b: Annotation): number {
+	const startDiff = a.start - b.start
+	if (startDiff !== 0) return startDiff
+	const endDiff = a.end - b.end
+	if (endDiff !== 0) return -endDiff
+
+	return 0
+}
+
+function getBestAnnotation(annotations: Annotation[]): Annotation {
+	let best: Annotation = null
+	for (const annotation of annotations) {
+		if (!best || compareAnnotations(best, annotation) > 0) {
+			best = annotation
+		}
+	}
+	return best
+}
+
+export function sortReferences(a: TreeNodeReference, b: TreeNodeReference): number {
+	const aa = a.annotations
+	const ba = b.annotations
+
+	if (aa && ba) {
+		const bestA = getBestAnnotation(aa)
+		const bestB = getBestAnnotation(ba)
+		const comparison = compareAnnotations(bestA, bestB)
+		if (comparison !== 0) return comparison
+	}
+	if (aa && !ba) {
+		return -1
+	}
+	if (!aa && ba) {
+		return 1
+	}
+	return a.path.localeCompare(b.path)
+}
+
 function comparePreviews(a: NodePreview, b: NodePreview): false | NodePreview {
 	if (typeof a === 'string') {
 		if (typeof b === 'string') {

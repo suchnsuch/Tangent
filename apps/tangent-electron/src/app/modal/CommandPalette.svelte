@@ -12,7 +12,7 @@ import { buildFuzzySegementMatcher, buildMatcher, compareNodeSearch, orderTreeNo
 import PaletteActionView from 'app/utils/PaletteActionView.svelte'
 import { getLinkDirectionFromEvent, type NavigationData } from 'app/events'
 import { visibleFileTypeMatch, implicitExtensionsMatch } from 'common/fileExtensions'
-import { getNode, getPreview, type TreeNodeReference } from 'common/nodeReferences'
+import { getNode, getPreview, sortReferences, type TreeNodeReference } from 'common/nodeReferences'
 import QueryResultItemSummary from 'app/views/summaries/QueryResultItemSummary.svelte'
 
 let workspace = getContext('workspace') as Workspace
@@ -147,6 +147,7 @@ function updateOptions(text: string) {
 					if (searchTimeout == null) return
 
 					if (result.items) {
+						result.items.sort(sortReferences)
 						options = result.items.map(i => {
 							return { ref: i }
 						})
