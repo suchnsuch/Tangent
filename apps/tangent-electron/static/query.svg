@@ -6,4 +6,14 @@
 		<line style="stroke: var(--iconStroke, black); stroke-width: 3px; fill: var(--iconFill, none); stroke-linecap: round;"
 			x1="16" y1="16" x2="20" y2="20"/>
 	</symbol>
+	<symbol id="query-small" viewBox="0 0 24 24">
+		<circle style="stroke: var(--iconStroke, black); stroke-width: 1.5px; fill: var(--iconFill, none);"
+			cx="9" cy="10" r="6"/>
+		<line style="stroke: var(--iconStroke, black); stroke-width: 2px; fill: var(--iconFill, none); stroke-linecap: round;"
+			x1="14" y1="14" x2="18" y2="18"/>
+	</symbol>
+	<symbol id="plus" viewBox="0 0 24 24">
+		<path style="stroke: var(--iconStroke, black); stroke-width: 1.5px; fill: var(--iconFill, none);"
+			d="m20,4 0,8 m-4,-4 8,0"/>
+	</symbol>
 </svg>

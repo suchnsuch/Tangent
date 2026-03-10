@@ -64,13 +64,13 @@ export default class ShowCommandPaletteCommand extends WorkspaceCommand {
 
 		const prefix = context?.prefix ?? this.prefix
 		if (!prefix) {
-			return 'Opens a search box for all files.'
+			return 'Open a search box for all files.'
 		}
 		if (prefix.match(/^> ?$/)) {
-			return 'Opens a search box for all commands.'
+			return 'Open a search box for all commands.'
 		}
 		if (prefix.match(/^\? ?$/)) {
-			return 'Opens a search box for the names and content of all files.'
+			return 'Open a search box for the names and content of all files.'
 		}
 	}
 

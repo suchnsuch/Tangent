@@ -398,6 +398,71 @@ function onViewContextMenu(event: MouseEvent) {
 		</span>
 	</nav>
 	<nav class="buttonBar" slot="right">
+
+		<PopUpButton
+			buttonClass="subtle"
+			command={workspace.commands.goTo}
+			placement={'bottom'}
+			menuMode="low-profile"
+			closeMenuOnClick
+		>
+			<svelte:fragment slot="button">
+				<SvgIcon ref={[
+					"query.svg#query"
+				]} />
+			</svelte:fragment>
+			<div class="popUpButtonList">
+				<!-- svelte-ignore a11y_consider_explicit_label -->
+				<button class="subtle"
+					use:command={{
+						command: workspace.commands.goTo
+					}}
+				>
+					<SvgIcon ref={[
+						"query.svg#query"
+					]} />
+					<div>Files</div>
+				</button>
+				<!-- svelte-ignore a11y_consider_explicit_label -->
+				<button class="subtle"
+					use:command={{
+						command: workspace.commands.search
+					}}
+				>
+					<SvgIcon ref={[
+						"file.svg#document",
+						"commandPalette.svg#magnifying-glass"
+					]} />
+					<div>Content</div>
+				</button>
+				<!-- svelte-ignore a11y_consider_explicit_label -->
+				<button class="subtle"
+					use:command={{
+						command: workspace.commands.do
+					}}
+				>
+					<SvgIcon ref={[
+						"commandPalette.svg#command"
+					]} />
+					<div>Commands</div>
+				</button>
+				<!-- svelte-ignore a11y_consider_explicit_label -->
+				<button class="subtle"
+					use:command={{
+						command: workspace.commands.openQueryPane
+					}}
+				>
+					<SvgIcon ref={[
+						"query.svg#query-small",
+						"query.svg#plus"
+					]} />
+					<div>New Query</div>
+				</button>
+			</div>
+		</PopUpButton>
+
+		<div class="spacer"></div>
+
 		<System bind:detailsOpen={$systemMenuIsOpen}></System>
 	</nav>
 </WindowBar>

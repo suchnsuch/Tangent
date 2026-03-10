@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<svg xmlns="http://www.w3.org/2000/svg">
+	<symbol id="command" viewBox="0 0 24 24">
+		<path d="m 6,6 6,6 -6,6  m 7,0 7,0" stroke="#000" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75"
+			style="fill: none; stroke: var(--iconStroke, black);" />
+	</symbol>
+	<symbol id="magnifying-glass" viewBox="0 0 24 24">
+		<circle style="stroke: var(--iconStroke, black); stroke-width: 1.5px; fill: var(--iconFill, none);"
+			cx="11" cy="12" r="4"/>
+		<line style="stroke: var(--iconStroke, black); stroke-width: 2px; fill: var(--iconFill, none); stroke-linecap: round;"
+			x1="14" y1="15" x2="17" y2="18"/>
+	</symbol>
+</svg>
