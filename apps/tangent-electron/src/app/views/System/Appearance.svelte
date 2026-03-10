@@ -33,6 +33,7 @@ let settings = workspace.settings
 	<div class="settingsGroup">
 		<SettingView setting={settings.sidebarHoverHotspot} />
 		<SettingView setting={settings.panelSettingsHoverHotspot} />
+		<SettingView setting={settings.showPromptInstructions} />
 	</div>
 </main>
 

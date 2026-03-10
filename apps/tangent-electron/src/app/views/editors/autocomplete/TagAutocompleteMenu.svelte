@@ -4,6 +4,10 @@ import { shortcutsHtmlString } from 'app/utils/shortcuts'
 import TagAutocompleteItem from './TagAutocompleteItem.svelte'
 import type { TagOption } from './TagAutocompleter'
 import type TagAutocompleter from './TagAutocompleter'
+import { getContext } from 'svelte'
+import type { Workspace } from 'app/model'
+
+let workspace = getContext('workspace') as Workspace
 
 export let handler: TagAutocompleter
 
@@ -34,16 +38,18 @@ function tagOptionEvent(option: TagOption, event: Event) {
 		</svelte:fragment>
 	</ScrollingItemList>
 
-	<div class="instructions">
-		<div>
-			Type
-			<span class="key">.</span> or <span class="key">/</span>
-			to accept the current sub-name
+	{#if workspace.settings.showPromptInstructions.value}
+		<div class="instructions">
+			<div>
+				Type
+				<span class="key">.</span> or <span class="key">/</span>
+				to accept the current sub-name
+			</div>
+			<div>
+				Press
+				<span class="shortcut">{@html shortcutsHtmlString('Mod+\\')}</span>
+				to disable the tag with a backslash.
+			</div>
 		</div>
-		<div>
-			Press
-			<span class="shortcut">{@html shortcutsHtmlString('Mod+\\')}</span>
-			to disable the tag with a backslash.
-		</div>
-	</div>
+	{/if}
 </div>

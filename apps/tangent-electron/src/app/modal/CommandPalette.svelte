@@ -446,12 +446,17 @@ function shouldShowShortcut(action: PaletteAction) {
 			{/if}
 		{/if}
 	{/if}
-	{#if showShortcuts === 'query'}
+	{#if workspace.settings.showPromptInstructions.value && (showShortcuts === 'query' || !searchInput)}
 		<div class="instructions">
-			<button
-				class="subtle"
-				on:click={goToQuery}
-			>Press <span class="key">{@html shortcutsHtmlString(workspace.commands.openQueryPane.shortcuts)}</span> to open as a Query.</button>
+			{#if !searchInput}
+				<div>Type <span class="key">?</span> to search content. Type <span class="key">&gt;</span> to search commands.</div>
+			{/if}
+			{#if showShortcuts === 'query'}
+				<button
+					class="subtle"
+					on:click={goToQuery}
+				>Press <span class="key">{@html shortcutsHtmlString(workspace.commands.openQueryPane.shortcuts)}</span> to open as a Query.</button>
+			{/if}
 		</div>
 	{/if}
 </main>

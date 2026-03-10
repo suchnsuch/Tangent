@@ -7,6 +7,10 @@ import ScrollingItemList from 'app/utils/ScrollingItemList.svelte'
 import { showFileType } from './WikiLinkAutocompleter';
 import SvgIcon from 'app/views/smart-icons/SVGIcon.svelte';
 import { noteIcon } from 'common/icons';
+import { getContext } from 'svelte'
+import type { Workspace } from 'app/model'
+
+let workspace = getContext('workspace') as Workspace
 
 export let handler: WikiLinkAutocompleter
 
@@ -86,36 +90,37 @@ function nodeOptionEvent(option: any, event: Event) {
 		</ScrollingItemList>
 	{/if}
 	
-
-	<div class="instructions">
-		{#if $isEmbed}
-			{#if $mode === 'text'}
-				<div>"<code>100</code>" will set the width and retain the aspect ratio.</div>
-				<div>"<code>100x100</code>" will set the width and height.</div>
-			{:else}
-				<div>Type <span class="key">|</span> to customize the embed options.</div>
-			{/if}
-		{:else}
-			{#if $mode === 'node' && handler.options.enableContent}
-				<div>Type <span class="key">#</span> to link to a header.</div>
-			{/if}
-
-			{#if $mode === 'text'}
-				<div>Type what the link will be displayed as.</div>
-				<div>Type <span class="key">|</span> to select all customized text.</div>
-			{:else if handler.options.enableText}
-				<div>Type <span class="key">|</span> to customize link text.</div>
-			{/if}
-		{/if}
-		{#if handler.options.enableEmbedding}
-			<div>
-				Type <span class="key">!</span> to
-				{#if $isEmbed}
-					switch to linking.
+	{#if workspace.settings.showPromptInstructions.value}
+		<div class="instructions">
+			{#if $isEmbed}
+				{#if $mode === 'text'}
+					<div>"<code>100</code>" will set the width and retain the aspect ratio.</div>
+					<div>"<code>100x100</code>" will set the width and height.</div>
 				{:else}
-					switch to embedding.
+					<div>Type <span class="key">|</span> to customize the embed options.</div>
 				{/if}
-			</div>
-		{/if}
-	</div>
+			{:else}
+				{#if $mode === 'node' && handler.options.enableContent}
+					<div>Type <span class="key">#</span> to link to a header.</div>
+				{/if}
+
+				{#if $mode === 'text'}
+					<div>Type what the link will be displayed as.</div>
+					<div>Type <span class="key">|</span> to select all customized text.</div>
+				{:else if handler.options.enableText}
+					<div>Type <span class="key">|</span> to customize link text.</div>
+				{/if}
+			{/if}
+			{#if handler.options.enableEmbedding}
+				<div>
+					Type <span class="key">!</span> to
+					{#if $isEmbed}
+						switch to linking.
+					{:else}
+						switch to embedding.
+					{/if}
+				</div>
+			{/if}
+		</div>
+	{/if}
 </div>

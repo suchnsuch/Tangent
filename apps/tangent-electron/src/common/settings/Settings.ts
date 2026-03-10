@@ -209,6 +209,12 @@ export default class Settings extends ObjectStore {
 		}
 	})
 
+	showPromptInstructions = new Setting<boolean>({
+		name: 'Show Prompt Instructions',
+		description: 'When enabled, command palettes and autocomplete menus display relevant shortcuts.',
+		defaultValue: true
+	})
+
 	// Navigation
 	linkClickPaneBehavior = new Setting<string>({
 		name: 'Links & Panes',
