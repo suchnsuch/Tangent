@@ -14,7 +14,7 @@ import { getLinkDirectionFromEvent, type NavigationData } from 'app/events'
 import { visibleFileTypeMatch, implicitExtensionsMatch } from 'common/fileExtensions'
 import { getNode, getPreview, sortReferences, type TreeNodeReference } from 'common/nodeReferences'
 import QueryResultItemSummary from 'app/views/summaries/QueryResultItemSummary.svelte'
-import { shortcutFromEvent } from 'app/utils/shortcuts'
+import { shortcutFromEvent, shortcutHtmlString, shortcutsDisplayString, shortcutsHtmlString } from 'app/utils/shortcuts'
 import ShowCommandPaletteCommand from 'app/model/commands/ShowCommandPalette'
 
 let workspace = getContext('workspace') as Workspace
@@ -62,6 +62,7 @@ interface Option {
 let commandActions: PaletteAction[] = null
 
 let options: Option[] = []
+let showShortcuts: boolean | 'query' = false
 let searchTimeout = null
 let selectedIndex = 0
 $: updateOptions(searchInput)
@@ -128,11 +129,13 @@ function updateOptions(input: string) {
 					fuzzy: true,
 					filter: nodeFilter
 				})
+				showShortcuts = 'query'
 			}
 			else {
 				nodes = [...iterateOverChildren(workspace.directoryStore.files, nodeFilter)].map(node => ({
 					node, match: undefined
 				}))
+				showShortcuts = true
 			}
 			nodes.sort((a, b) => orderTreeNodesForSearch(a, b))
 			if (!text) {
@@ -170,9 +173,11 @@ function updateOptions(input: string) {
 						options = result.items.map(i => {
 							return { ref: i }
 						})
+						showShortcuts = 'query'
 					}
 					else {
 						options = []
+						showShortcuts = false
 					}
 					searchTimeout = 0
 				})
@@ -181,6 +186,7 @@ function updateOptions(input: string) {
 		break
 		case 'tag':
 		{
+			showShortcuts = false
 			let nodes: SegmentSearchNodePair[] = null
 			let pathMatch: PathMatch = null
 			if (text) {
@@ -204,6 +210,7 @@ function updateOptions(input: string) {
 		}
 		break
 		case 'command':
+			showShortcuts = false
 			const searchMatcher = buildFuzzySegementMatcher(text)
 			if (commandActions === null) {
 				// Only build the actions once per palette opening
@@ -277,6 +284,30 @@ function onKeydown(event: KeyboardEvent) {
 			event.preventDefault()
 			return
 		}
+	}
+
+	if (workspace.commands.openQueryPane.shortcuts.includes(shortcut)) {
+		return goToQuery(event)
+	}
+}
+
+function goToQuery(event: KeyboardEvent | MouseEvent) {
+	const { mode, text } = getInputMode(searchInput)
+	if (mode === 'file') {
+		workspace.commands.openQueryPane.execute({
+			queryText: `Files Named '${text}'`
+		})
+		event.preventDefault()
+		workspace.viewState.modal.close()
+		return
+	}
+	if (mode === 'search') {
+		workspace.commands.openQueryPane.execute({
+			queryText: `Files Named '${text}' or With '${text}'`
+		})
+		event.preventDefault()
+		workspace.viewState.modal.close()
+		return
 	}
 }
 
@@ -415,6 +446,14 @@ function shouldShowShortcut(action: PaletteAction) {
 			{/if}
 		{/if}
 	{/if}
+	{#if showShortcuts === 'query'}
+		<div class="instructions">
+			<button
+				class="subtle"
+				on:click={goToQuery}
+			>Press <span class="key">{@html shortcutsHtmlString(workspace.commands.openQueryPane.shortcuts)}</span> to open as a Query.</button>
+		</div>
+	{/if}
 </main>
 
 <style lang="scss">
@@ -429,6 +468,15 @@ function shouldShowShortcut(action: PaletteAction) {
 	padding: .2rem .4rem;
 	margin-top: .5em;
 	color: var(--deemphasizedTextColor);
+}
+
+.instructions {
+	margin-top: 1em;
+
+	button {
+		width: 100%;
+		text-align: left;
+	}
 }
 
 </style>

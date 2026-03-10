@@ -6,12 +6,16 @@ import WorkspaceCommand from './WorkspaceCommand';
 
 const queryPath = '.tangent/Temp/Query'
 
+export interface OpenQueryCommandContext extends CommandContext {
+	queryText?: string
+}
+
 export default class OpenQueryPaneCommand extends WorkspaceCommand {
 	constructor(workspace: Workspace) {
 		super(workspace, { shortcut: 'Mod+Alt+Shift+F' })
 	}
 
-	execute(context: CommandContext) {
+	execute(context: OpenQueryCommandContext) {
 		// Create a new one or reuse?
 		const directoryStore = this.workspace.directoryStore
 		const tangent = this.workspace.viewState.tangent
@@ -42,7 +46,13 @@ export default class OpenQueryPaneCommand extends WorkspaceCommand {
 		}) as DataFile
 
 		file.loadData<QueryInfo>().then(info => {
-			info.resetQueryString()
+			const queryString = context?.queryText
+			if (queryString) {
+				info.queryString.set(queryString)
+			}
+			else {
+				info.resetQueryString()
+			}
 			file.dropFile()
 		})
 

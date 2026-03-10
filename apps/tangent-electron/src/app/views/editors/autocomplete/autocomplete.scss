@@ -22,39 +22,6 @@
 			border: 2px solid var(--accentBackgroundColor);
 		}
 	}
-
-	.instructions {
-		color: var(--deemphasizedTextColor);
-		font-size: 80%;
-		text-align: left;
-
-		> div {
-			padding: 0 .5rem;
-			&:first-child {
-				padding-top: .5rem;
-			}
-			&:last-child {
-				padding-bottom: .5rem;
-			}
-		}
-
-		.key {
-			font-size: 110%;
-			color: var(--textColor);
-			font-weight: bold;
-		}
-		.shortcut {
-			font-size: 110%;
-			color: var(--textColor);
-			font-weight: bold;
-			display: inline-flex;
-			gap: .1em;
-		}
-
-		code {
-			color: var(--textColor);
-		}
-	}
 }
 
 .autocompleting {
@@ -69,5 +36,38 @@ t-link {
 				padding-bottom: 0.05em;
 			}
 		}
+	}
+}
+
+.instructions {
+	color: var(--deemphasizedTextColor);
+	font-size: 80%;
+	text-align: left;
+
+	> div {
+		padding: 0 .5rem;
+		&:first-child {
+			padding-top: .5rem;
+		}
+		&:last-child {
+			padding-bottom: .5rem;
+		}
+	}
+
+	.key {
+		font-size: 110%;
+		color: var(--textColor);
+		font-weight: bold;
+	}
+	.shortcut {
+		font-size: 110%;
+		color: var(--textColor);
+		font-weight: bold;
+		display: inline-flex;
+		gap: .1em;
+	}
+
+	code {
+		color: var(--textColor);
 	}
 }
