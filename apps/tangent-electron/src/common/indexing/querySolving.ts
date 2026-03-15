@@ -3,7 +3,7 @@ import { type Clause, type ClauseGroup, ClauseType, ClauseMod, isGroup, parseQue
 import QueryInfo, { queryFileType } from 'common/dataTypes/QueryInfo'
 import { DirectoryStore, type TreeNode, TreePredicateResult, validatePath } from 'common/trees'
 import { getExtensionRegex, getFileTypeRegex, imageFileExtensions, noteFileExtensions } from 'common/fileExtensions'
-import { addPreviewToReference, type Annotation, areNodesOrReferencesEquivalent, cleanReference, createReference, getNode, getNodeFromReference, isNode, isReference, isSubReference, type TreeNodeOrReference, type TreeNodeReference } from 'common/nodeReferences'
+import { addPreviewToReference, type Annotation, areNodesOrReferencesEquivalent, cleanReference, createReference, getNode, getNodeFromReference, getNodeOrReferenceId, isNode, isReference, isReferenceEquivalentToNode, isSubReference, type TreeNodeOrReference, type TreeNodeReference } from 'common/nodeReferences'
 import type { ObjectStore } from 'common/stores'
 import { IndexData, type TodoState } from './indexTypes'
 import { getTextAnnotations } from './queryAnnotations'
@@ -524,8 +524,16 @@ export async function solveQuery(query: Query, interop: QuerySolverInterop): Pro
 		}
 
 		if (group.mod === ClauseGroupMod.Not) {
+
+			const idSet = new Set<string>()
+			for (const item of set)
+			{
+				// TODO: support for sub-file references
+				idSet.add(item.path)
+			}
+
 			// Negate the group
-			return new Set(queryFilter(sourceSet, i => !set.has(i)))
+			return new Set(queryFilter(sourceSet, i => !idSet.has(i.path)))
 		}
 		
 		return set

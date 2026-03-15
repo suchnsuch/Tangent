@@ -81,15 +81,22 @@ function areNodePreviewsEquivalent(a: NodePreview, b: NodePreview) {
 
 export function isReferenceEquivalentToNode(reference: TreeNodeReference, node: TreeNode) {
 	if (reference.path !== node.path) return false
-	if (reference.annotations) return false // An annotated node has more information and is not the same
 	if (reference.start || reference.end) return false
 	return true
 }
 
+/**
+ * Whether two references refer to the same fundamental content.
+ */
 export function areReferencesEquivalent(a: TreeNodeReference, b: TreeNodeReference) {
 	if (a.path != b.path) return false
 	if (a.start !== b.start || a.end !== b.end) return false
 	if (a.title != b.title) return false
+	return true
+}
+
+export function areReferencesEqual(a: TreeNodeReference, b: TreeNodeReference) {
+	if (!areReferencesEquivalent(a, b)) return false
 
 	if (a.annotations != b.annotations) {
 		if (!a.annotations || !b.annotations) return false
@@ -120,6 +127,8 @@ export function areReferencesEquivalent(a: TreeNodeReference, b: TreeNodeReferen
 			return false
 		}
 	}
+
+	return true
 }
 
 export function areNodesOrReferencesEquivalent(a: TreeNodeOrReference, b: TreeNodeOrReference) {
