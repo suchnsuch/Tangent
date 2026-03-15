@@ -1,6 +1,6 @@
 Queries form the backbone of "serious search" within Tangent. They are designed around finding files by way of their connections and relationships to others. In the future, queries will also allow for searching for tags and values, and selecting elements of a note like headers or To Do items.
 
-You can pull up a query pane by pressing `Cmd/Ctrl+Shift+F`.
+You can pull up a query pane by pressing `Cmd/Ctrl+Alt+Shift+F`.
 ![[Query Example.png|300px]]
 
 # Syntax Overview

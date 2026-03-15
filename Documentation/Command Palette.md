@@ -6,6 +6,9 @@ The command palette is a quick and easy way to jump around to different notes an
 # Go To Tag
 By prefixing your search with a `#` character, you can explicitly search only for tags within your workspace.
 
+# Full Text Search
+`Cmd/Ctrl+Shift+F` opens up the palette with a `?` prefix, placing the palette into full text search mode. Text entered into the palette is interpreted as a `Files named '<your text>' or with '<your text>'` [[Queries|Query]]. Results will show previews of the text matched in the file.
+
 # Invoke Commands
 `Cmd/Ctrl+P` opens up the palette with a `>` prefix, placing the palette into "command" mode. This lists all commands available to the palette. You can type to search for an appropriate command, use the cursor keys to select, and hit `Enter` to run the command.
 
