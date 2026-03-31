@@ -66,6 +66,8 @@ async function getSpellCheckLanguages() {
 		<SettingView setting={settings.allowInterTextUnderscoreFormatting} />
 		<SettingView setting={settings.smartParagraphBreaks} />
 		<SettingView setting={settings.enableSpellCheck} />
+		<SettingView setting={settings.filenameSpellCheck} />
+		<SettingView setting={settings.contentSpellCheck} />
 		{#if !isMac}
 			<SettingView setting={settings.spellCheckLanguages}
 				includeDefault={false}

@@ -78,7 +78,8 @@ const {
 	crossOutFinishedTodos,
 	smartParagraphBreaks,
 	fixedTitle: fixedTitleSetting,
-	letCodeExpand
+	letCodeExpand,
+	contentSpellCheck
 } = workspace.settings
 
 const editor = new MarkdownEditor(workspace)
@@ -145,6 +146,13 @@ $: updateAnnotations($annotations, $annotationIndex)
 $: focusing = workspace.viewState.focusing
 $: if (isCurrent) {
 	$focusing = (focusLevel >= FocusLevel.Paragraph) && (layout !== 'fill' || hasSelection && !justScrolled)
+}
+
+$: showSpellCheck = determineSpellCheck(isCurrent, $contentSpellCheck)
+function determineSpellCheck(isCurrent: boolean, setting: 'never'|'editing'|'always') {
+	if (setting === 'never') return false
+	if (setting === 'always') return true
+	return isCurrent
 }
 
 $: virtual = $note.meta?.virtual
@@ -1360,6 +1368,7 @@ function updateCodeBlockSizing() {
 		on:contextmenu={onContextMenu}
 		class="note"
 		class:focusing={$focusing}
+		spellcheck={showSpellCheck}
 	></article>
 	{#if (!editorIsFocused || !editable) && virtual}
 		<div

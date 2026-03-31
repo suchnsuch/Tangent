@@ -1,5 +1,6 @@
 <script lang="ts">
 import { getContext, onDestroy } from 'svelte';
+import type { Workspace } from 'app/model';
 import type WorkspaceTreeNode from 'app/model/WorkspaceTreeNode';
 import OneLineEditor from 'app/views/editors/OneLineEditor/OneLineEditor';
 import { Source, asRoot } from 'typewriter-editor';
@@ -10,7 +11,13 @@ import UnicodeAutocompleter from 'app/views/editors/autocomplete/UnicodeAutocomp
 import UnicodeAutocompleteMenu from 'app/views/editors/autocomplete/UnicodeAutocompleteMenu.svelte';
 
 // Using an editor here to have full control over paste behavior.
-const editor = new OneLineEditor(getContext('workspace'));
+const workspace = getContext('workspace') as Workspace
+
+const {
+	filenameSpellCheck
+} = workspace.settings
+
+const editor = new OneLineEditor(workspace);
 editor.on('root', bindEditor)
 
 onDestroy(() => {
@@ -18,20 +25,49 @@ onDestroy(() => {
 	unbindEditor()
 })
 
-export let headerElement: HTMLElement = null
-export let headerEditElement: HTMLElement = null
-export let editable = true
+let {
+	node,
 
-export let preventMouseUpDefault = false
-export let showIcon = true
-export let showExtension = true
+	headerElement = $bindable(),
+	headerEditElement = $bindable(),
+	editable = true,
 
-export let onRename: (newName: string) => boolean|undefined = null
-export let onKeyboardExit: (event: KeyboardEvent) => void = null
+	preventMouseUpDefault = false,
+	showIcon = true,
+	showExtension = true,
 
-export let node: WorkspaceTreeNode
-$: updateText(node ? $node.name : '')
-$: editor.enabled = editable
+	onRename,
+	onKeyboardExit
+} : {
+	node: WorkspaceTreeNode
+
+	headerElement?: HTMLElement
+	headerEditElement?: HTMLElement
+	editable?: boolean
+
+	preventMouseUpDefault?: boolean
+	showIcon?: boolean
+	showExtension?: boolean
+
+	onRename?: (newName: string) => boolean|undefined
+	onKeyboardExit?: (event: KeyboardEvent) => void
+} = $props()
+
+$effect(() => {
+	updateText(node ? $node.name : '')
+})
+
+$effect(() => {
+	editor.enabled = editable
+})
+
+let hasFocus = $state(false)
+
+let showSpellcheck = $derived.by(() => {
+	if ($filenameSpellCheck === 'never') return false
+	if ($filenameSpellCheck === 'always') return true
+	return hasFocus
+})
 
 function updateText(text: string) {
 	if (headerEditElement && document.activeElement === headerEditElement) {
@@ -62,7 +98,12 @@ function headerMouseUp(event: MouseEvent) {
 	}
 }
 
-function renameFile() {
+function onFocus() {
+	hasFocus = true;
+}
+
+function onBlur() {
+	hasFocus = false
 	// Trim to remove any trailing newline from the editor
 	let newName = editor.getText().trim()
 	if (node.name !== newName) {
@@ -114,17 +155,19 @@ function onHeaderKeydown(event: KeyboardEvent) {
 }
 </script>
 
-<!-- svelte-ignore a11y-no-static-element-interactions -->
+<!-- svelte-ignore a11y_no_static_element_interactions -->
 <header
-	on:mouseup={headerMouseUp}
 	bind:this={headerElement}
 	class="WorkspaceFileHeader"
+	onmouseup={headerMouseUp}
 >{#if showIcon}<span class="icon"><NodeIcon {node} size="1em" /></span>{/if}<span
 	class="title"
 	bind:this={headerEditElement}
 	use:asRoot={editor}
-	on:mouseup={mouseUp}
-	on:blur={renameFile}
+	onmouseup={mouseUp}
+	onfocus={onFocus}
+	onblur={onBlur}
+	spellcheck={showSpellcheck}
 	></span>{#if showExtension}<span class="extension"
 	>{$node.fileType}</span>{/if}
 </header>

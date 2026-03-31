@@ -539,16 +539,62 @@ export default class Settings extends ObjectStore {
 		defaultValue: false
 	})
 
+	autoSetChildListGlyphs = new Setting<boolean>({
+		name: 'Change List Glyphs on Indent',
+		description: 'Automatically set the glyphs of list items when indenting.',
+		defaultValue: true
+	})
+
 	enableSpellCheck = new Setting<boolean>({
 		name: 'Use Spell Check',
 		description: 'Whether Tangent should use spell check or not.',
 		defaultValue: true
 	})
 
-	autoSetChildListGlyphs = new Setting<boolean>({
-		name: 'Change List Glyphs on Indent',
-		description: 'Automatically set the glyphs of list items when indenting.',
-		defaultValue: true
+	filenameSpellCheck = new Setting<'never'|'editing'|'always'>({
+		name: 'Spell Check Filenames',
+		description: 'When and how Tangent should use spell check in filenames.',
+		validValues: [
+			{
+				value: 'never',
+				displayName: 'Never',
+				description: 'Do not use spell check for note filenames.'
+			},
+			{
+				value: 'editing',
+				displayName: 'When Editing',
+				description: 'Show filename spell check when the filename has focus.'
+			},
+			{
+				value: 'always',
+				displayName: 'Always',
+				description: 'Always show filename spell check.'
+			}
+		],
+		defaultValue: 'editing'
+	})
+
+	contentSpellCheck = new Setting<'never'|'editing'|'always'>({
+		name: 'Spell Check Content',
+		description: 'When and how Tangent should use spell check in note content.',
+		validValues: [
+			{
+				value: 'never',
+				displayName: 'Never',
+				description: 'Do not use spell check for note content.'
+			},
+			{
+				value: 'editing',
+				displayName: 'When Editing',
+				description: 'Show spell check while a note has focus.'
+			},
+			{
+				value: 'always',
+				displayName: 'Always',
+				description: 'Always show content spell check.'
+			}
+		],
+		defaultValue: 'editing'
 	})
 	
 	spellCheckLanguages = new Setting<string, string[]>({
