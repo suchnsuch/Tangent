@@ -9,6 +9,7 @@ import PdfPreview from 'app/views/node-views/PdfPreview.svelte'
 import { timeFromContentId } from 'app/model/nodeViewStates/AudioVideoViewState'
 import { appendContextTemplate, type ContextMenuConstructorOptions } from 'app/model/menus'
 import { linkTextFromLink } from 'common/markdownModel/links'
+import { deepEqual } from 'fast-equals'
 
 type Form = {
 	mode: 'error'
@@ -52,94 +53,105 @@ let height = -1
 $: nodeHandle = workspace?.getHandle(link)
 $: onNodeHandleChanged(nodeHandle ? $nodeHandle : null)
 function onNodeHandleChanged(value: HandleResult) {
+	console.log('Handle changed!', value)
+	
+	const newForm = handleToForm(value)
+	if (!deepEqual(form, newForm)) {
+		form = newForm
+		onForm(form)
+	}
+}
+
+function handleToForm(value: HandleResult): Form {
 	if (!value) {
-		form = {
+		return {
 			mode: 'pending',
 			src: link.href
 		}
 	}
-	else if (typeof value === 'string') {
+
+	if (typeof value === 'string') {
 		// This occurs with a bad md link
 		// Assume this is an image embed from outside the directory
-		form = {
+		return {
 			mode: 'image',
 			src: link.href
 		}
 	}
-	else if (Array.isArray(value)) {
+
+	if (Array.isArray(value)) {
 		if (value.length > 0) {
-			error('Could not resolve the link to a single file. Be more specific.')
+			return errorForm('Could not resolve the link to a single file. Be more specific.')
 		}
-		else {
-			error('Could not resolve the link. Is it correct?')
-		}
+		return errorForm('Could not resolve the link. Is it correct?')
 	}
-	else if (isNode(value)) {
+
+	if (isNode(value)) {
 		if (value.meta?.virtual) {
-			error('Cannot embed a virtual file: it doesn\'t exist!')
+			return errorForm('Cannot embed a virtual file: it doesn\'t exist!')
 		}
-		else {
-			switch (getEmbedType(value)) {
-			case EmbedType.Image:
-				form = {
-					mode: 'image',
-					src: (value as EmbedFile).cacheBustPath
-				}
-				break
-			case EmbedType.Audio:
-				form = {
-					mode: 'audio',
-					src: (value as EmbedFile).cacheBustPath,
-					time: timeFromContentId(link?.content_id) || 0
-				}
-				break
-			case EmbedType.Video:
-				form = {
-					mode: 'video',
-					src: (value as EmbedFile).cacheBustPath,
-					time: timeFromContentId(link?.content_id) || 0
-				}
-				break
-			case EmbedType.PDF:
-				form = {
-					mode: 'pdf',
-					src: (value as EmbedFile).cacheBustPath
-				}
-				if (link?.content_id) form.content_id = link.content_id
-				break
-			default:
-				error(`Invalid file type. Cannot embed a "${value.fileType}" file.`)
-				break
+
+		switch (getEmbedType(value)) {
+		case EmbedType.Image:
+			return {
+				mode: 'image',
+				src: (value as EmbedFile).cacheBustPath
 			}
+		case EmbedType.Audio:
+			return {
+				mode: 'audio',
+				src: (value as EmbedFile).cacheBustPath,
+				time: timeFromContentId(link?.content_id) || 0
+			}
+		case EmbedType.Video:
+			return {
+				mode: 'video',
+				src: (value as EmbedFile).cacheBustPath,
+				time: timeFromContentId(link?.content_id) || 0
+			}
+		case EmbedType.PDF:
+			let form: Form = {
+				mode: 'pdf',
+				src: (value as EmbedFile).cacheBustPath
+			}
+			if (link?.content_id) form.content_id = link.content_id
+			return form
+		default:
+			return errorForm(`Invalid file type. Cannot embed a "${value.fileType}" file.`)
 		}
 	}
-	else if (value.mediaType === 'image') {
-		form = {
+
+	if (value.mediaType === 'image') {
+		return {
 			mode: 'image',
 			src: value.url
 		}
 	}
-	else if (value.mediaType === 'audio') {
-		form = {
+
+	if (value.mediaType === 'audio') {
+		return {
 			mode: 'audio',
 			src: value.url,
 			time: timeFromContentId(link.content_id) || 0
 		}
 	}
-	else if (value.mediaType === 'video') {
-		form = {
+
+	if (value.mediaType === 'video') {
+		return {
 			mode: 'video',
 			src: value.url,
 			time: timeFromContentId(link.content_id) || 0
 		}
 	}
-	else if (value.mediaType === 'website') {
-		form = {
+
+	if (value.mediaType === 'website') {
+		return {
 			mode: 'website',
 			...value as WebsiteData
 		}
 	}
-	else if (value.mediaType === 'video.other' && 'siteName' in value && value.siteName === 'YouTube') {
+
+	if (value.mediaType === 'video.other' && 'siteName' in value && value.siteName === 'YouTube') {
 		// Explicitly handle youtube embedding
 		const youtubePrefix = 'https://www.youtube.com/watch?v='
 		const index = value.url.indexOf(youtubePrefix)
@@ -150,39 +162,41 @@ function onNodeHandleChanged(value: HandleResult) {
 				watchCode = watchCode.substring(0, ampIndex)
 			}
 
-			form = {
+			return {
 				mode: 'youtube',
 				src: 'https://www.youtube.com/embed/' + watchCode,
 				title: value.title
 			}
 		}
-		else {
-			error('Bad youtube link!')
-		}
+		return errorForm('Bad youtube link!')
 	}
-	else if (value.mediaType === 'error') {
-		error((value as UrlDataError).message)
+
+	if (value.mediaType === 'error') {
+		return errorForm((value as UrlDataError).message)
 	}
-	else if (link.href.endsWith('.pdf')) {
-		form = {
+
+	if (link.href.endsWith('.pdf')) {
+		let form: Form = {
 			mode: 'pdf',
 			src: link.href
 		}
 		if (link.content_id) form.content_id = link.content_id
+		return form
 	}
-	else {
-		// Fall back to website info
-		form = {
-			mode: 'website',
-			...value as WebsiteData
-		}
+	
+	// Fall back to website info
+	return {
+		mode: 'website',
+		...value as WebsiteData
 	}
-
-	onForm(form)
 }
 
 function error(message: string) {
-	form = {
+	form = errorForm(message)
+}
+
+function errorForm(message: string): Form {
+	return {
 		mode: 'error',
 		message
 	}

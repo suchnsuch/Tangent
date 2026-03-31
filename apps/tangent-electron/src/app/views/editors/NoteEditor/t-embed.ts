@@ -70,7 +70,9 @@ class TangentEmbed extends TangentLink {
 			case 'content_id':
 			case 'text':
 			case 'block':
-				this.requestUpdateState()
+				if (oldValue != newValue) {
+					this.requestUpdateState()
+				}
 				break
 		}
 	}
