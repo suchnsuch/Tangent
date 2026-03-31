@@ -108,13 +108,13 @@ $: currentMenu = menus.find(m => m.name === $section) ?? menus[0]
 >
 	<svelte:fragment slot="button">
 		<div class={'buttonContent ' + $mode} class:supressed={suppressUpdates}>
-			<div><svg style={`width: 24px; height: 24px;`}>
+			<svg style={`width: 24px; height: 24px;`}>
 				{#if $mode === 'ready'}
 					<use href="update.svg#arrow" />
 				{:else}
 				<use href="system.svg#gear" />
 				{/if}
-			</svg></div>
+			</svg>
 			<div class="progressBar" class:show={downloadPercent}>
 				<div class="progress" style={`width: ${downloadPercent}%;`}></div>
 			</div>
@@ -164,8 +164,9 @@ $: currentMenu = menus.find(m => m.name === $section) ?? menus[0]
 }
 
 .buttonContent {
+	display: flex;
+	align-items: center;
 	position: relative;
-	top: 1px;
 	&.ready {
 		--updateFill: var(--accentTextColor);
 		--iconStroke: var(--accentTextColor);
