@@ -53,8 +53,6 @@ let height = -1
 $: nodeHandle = workspace?.getHandle(link)
 $: onNodeHandleChanged(nodeHandle ? $nodeHandle : null)
 function onNodeHandleChanged(value: HandleResult) {
-	console.log('Handle changed!', value)
-	
 	const newForm = handleToForm(value)
 	if (!deepEqual(form, newForm)) {
 		form = newForm
