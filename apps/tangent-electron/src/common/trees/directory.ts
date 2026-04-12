@@ -246,10 +246,16 @@ export function moveTree(node: TreeNode, newPath: string): TreeChangeMovedItem[]
 	forAllNodes(node, (n, p) => {
 		const oldPath = n.path
 		n.path = n.path.replace(oldParentPath, newPath)
-		const extension = paths.extname(n.path)
-		n.name = paths.basename(n.path, extension)
-		if (extension) {
-			n.fileType = extension
+		
+		if (n.fileType === 'folder') {
+			n.name = paths.basename(n.path)
+		}
+		else {
+			const extension = paths.extname(n.path)
+			n.name = paths.basename(n.path, extension)
+			if (extension) {
+				n.fileType = extension
+			}
 		}
 
 		moved.push({
