@@ -25,7 +25,7 @@ import TangentCheckbox from './t-checkbox'
 import TangentCodePreview from './t-code-preview' // No deletey
 import TangentMath from './t-math' // No deletey
 import { indentMatcher } from 'common/markdownModel/matches'
-import { getAutoChild, getGlyphForNumber, ListDefinition, ListForm, listMatcher } from 'common/markdownModel/list'
+import { getAutoChild, getDelimiterForGlyph, getGlyphForNumber, ListDefinition, ListForm, listMatcher } from 'common/markdownModel/list'
 import type { Workspace } from 'app/model'
 import { deltaHasTextChanges, getEditInfo, getLineRangeWhile, getRangeWhile, getRangesIntersecting, getSelectedLines, intersectRanges, lineToText } from 'common/typewriterUtils'
 import { isLeftClick, startDrag } from 'app/utils'
@@ -237,7 +237,7 @@ export default function editorModule(editor: Editor, options: {
 	function isListGlyphCreationChange(delta: Delta) {
 		const changeInsert = getEditInfo(delta)
 		if (changeInsert?.insert?.length === 1) {
-			return changeInsert.insert.match(/[\.\w\d\*\-\+ ]/) != null
+			return changeInsert.insert.match(/[\.\)\w\d\*\-\+ ]/) != null
 		}
 		if (changeInsert?.shift < 0) {
 			return false // Not a glyph creator, still a valid edit change
@@ -419,6 +419,11 @@ export default function editorModule(editor: Editor, options: {
 			targetGlyph = targetListData.glyph
 		}
 
+		function getTargetGlyph() {
+			const targetDelimiter: string = getDelimiterForGlyph(targetGlyph)
+			return getGlyphForNumber(targetForm, basisNumber, targetDelimiter) ?? targetGlyph
+		}
+
 		let offset = 0
 		function offsetSelection(position: number, addition: number) {
 			if (selection) {
@@ -435,20 +440,17 @@ export default function editorModule(editor: Editor, options: {
 
 		let didSomething = false
 
-		// Propegate the target form & basis to the indicated line
+		targetGlyph = getTargetGlyph()
+
+		// Propagate the target form & basis to the indicated line
 		if (targetListData && targetIndent === intendedIndent) {
-			if (targetListData.form !== targetForm || targetListData.index !== basisNumber) {
+			if (targetListData.glyph != targetGlyph) {
 
 				change = change || editor.change
 
 				const listMatch = lineText.match(listMatcher)
-				let newGlyph = getGlyphForNumber(targetForm, basisNumber)
-				if (!newGlyph) {
-					newGlyph = targetGlyph
-				}
-
 				const lineStart = targetRange[0]
-				const insertedText = listMatch[1] + newGlyph + ' '
+				const insertedText = listMatch[1] + targetGlyph + ' '
 				const sizeDiff = insertedText.length - listMatch[0].length
 				const deleteEnd = lineStart + listMatch[0].length
 				change
@@ -461,7 +463,7 @@ export default function editorModule(editor: Editor, options: {
 			if (basisNumber) basisNumber++
 		}
 		
-		// Propegate the target form & basis all following list lines on the indent level
+		// Propagate the target form & basis all following list lines on the indent level
 		for (let lineIndex = targetLineIndex + 1; lineIndex < doc.lines.length; lineIndex++) {
 			let nextLine = doc.lines[lineIndex]
 			let nextText = deltaToText(nextLine.content)
@@ -471,18 +473,14 @@ export default function editorModule(editor: Editor, options: {
 				const listData = nextLine.attributes.list as ListDefinition
 				if (!listData) break // End of the road
 
-				if (listData.form !== targetForm || listData.index !== basisNumber) {
+				targetGlyph = getTargetGlyph()
+				if (listData.glyph !== targetGlyph) {
 					change = change || editor.change
 
 					const listMatch = nextText.match(listMatcher)
-					let newGlyph = getGlyphForNumber(targetForm, basisNumber)
-					if (!newGlyph) {
-						newGlyph = targetGlyph
-					}
-
 					let lineRange = doc.getLineRange(nextLine)
 					const lineStart = lineRange[0]
-					const insertedText = listMatch[1] + newGlyph + ' '
+					const insertedText = listMatch[1] + targetGlyph + ' '
 					const sizeDiff = insertedText.length - listMatch[0].length
 					const deleteEnd = lineStart + listMatch[0].length
 					change

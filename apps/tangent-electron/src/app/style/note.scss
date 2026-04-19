@@ -238,10 +238,10 @@ article.note {
 		}
 	}
 
-	// We want * lists to have extra space around them, but we don't want extra space when adjacent to blank lines.
-	// We also don't want extra space between a * list item and a child - list item.
-	// Technically a * followed by a - sibling also doesn't have space, but I'm okay with that slight glitch.
-	.line:not(.empty) + .list[listglyph^="*"], .list[listglyph^="*"] + .line:not([listglyph]):not(.empty) {
+	// We want large lists to have extra space around them, but we don't want extra space when adjacent to blank lines.
+	// We also don't want extra space between a large list item and a child normal list item.
+	// Technically a large followed by a small sibling also doesn't have space, but I'm okay with that slight glitch.
+	.line:not(.empty) + .list.largeList, .list.largeList + .line:not(.list):not(.empty) {
 		margin-top: .5em;
 	}
 

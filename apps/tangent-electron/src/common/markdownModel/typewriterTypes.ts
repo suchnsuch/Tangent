@@ -3,7 +3,7 @@ import { h } from 'typewriter-editor/rendering/vdom'
 import katex from 'katex'
 import type { IndentDefinition } from './line'
 import { isEqual, type AttributeMap } from '@typewriter/document'
-import type { ListDefinition } from './list'
+import { isLargeList, type ListDefinition } from './list'
 import type { TagSectionData } from './tag'
 import type { CodeData } from './code'
 import type { MathData } from './math'
@@ -212,6 +212,10 @@ const noteTypeset:TypesetTypes = {
 				let props = getCoreLineProperties(attributes, 'list') as any
 				props.listForm = listData.form
 				props.listGlyph = listData.glyph
+
+				if (isLargeList(listData)) {
+					props.className += ' largeList'
+				}
 
 				if (listData.todoState) {
 					props.className += ' checkbox ' + listData.todoState

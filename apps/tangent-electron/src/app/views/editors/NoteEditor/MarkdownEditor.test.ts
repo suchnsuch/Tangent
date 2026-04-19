@@ -54,6 +54,19 @@ describe('List Handling', () => {
 	B. Tabbed
 	C. and dashed
 	D. list`)
+
+		editor.change
+			.delete([3, 4])
+			.insert(3, ')')
+			.apply()
+
+		await wait(waitTime)
+
+		expect(editor.getText()).toEqual(`
+	A) A simple
+	B) Tabbed
+	C) and dashed
+	D) list`)
 	})
 
 	it('Should transform list prefixes when a new item is added at the top', async () => {

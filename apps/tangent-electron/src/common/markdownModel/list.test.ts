@@ -29,6 +29,16 @@ test('Numeric conversion', () => {
 	expect(getGlyphForNumber(ListForm.AlphaLower, 1)).toEqual('a.')
 	expect(getGlyphForNumber(ListForm.AlphaLower, 5)).toEqual('e.')
 	expect(getGlyphForNumber(ListForm.AlphaUpper, 10)).toEqual('J.')
+
+	expect(getGlyphForNumber(ListForm.Digit, 11, ')')).toEqual('11)')
+	expect(getGlyphForNumber(ListForm.AlphaLower, 1, ')')).toEqual('a)')
+	expect(getGlyphForNumber(ListForm.AlphaLower, 5, ')')).toEqual('e)')
+	expect(getGlyphForNumber(ListForm.AlphaUpper, 10, ')')).toEqual('J)')
+
+	expect(getGlyphForNumber(ListForm.AlphaUpper, 25)).toEqual('Y.')
+	expect(getGlyphForNumber(ListForm.AlphaUpper, 26)).toEqual('Z.')
+	expect(getGlyphForNumber(ListForm.AlphaLower, 25)).toEqual('y.')
+	expect(getGlyphForNumber(ListForm.AlphaLower, 26)).toEqual('z.')
 })
 
 describe('Match List', () => {
@@ -62,6 +72,20 @@ describe('Match List', () => {
 			indent: '\t',
 			form: ListForm.Digit,
 			glyph: '4.',
+			index: 4
+		})
+
+		expect(matchList('1) Hello')).toEqual<ListDefinition>({
+			indent: '',
+			form: ListForm.Digit,
+			glyph: '1)',
+			index: 1
+		})
+
+		expect(matchList('\t4) Hello')).toEqual<ListDefinition>({
+			indent: '\t',
+			form: ListForm.Digit,
+			glyph: '4)',
 			index: 4
 		})
 	})

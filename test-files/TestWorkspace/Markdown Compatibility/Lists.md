@@ -47,3 +47,15 @@ C. Much awesome
 	c. I think it adds differentiation
 		1. This one has _third_ level items
 		2. Heck yeah
+
+# List Delimiters
+1. This is a list with a `.` delimiter.
+2. And more
+3. Etc.
+
+1) This is a list with a `)` delimiter.
+2) It acts like a "large" list, similar to `*`.
+
+A) Alpha characters
+B) Are Also
+C) Supported

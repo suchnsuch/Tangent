@@ -12,7 +12,7 @@ import NoteParser from './NoteParser'
  * 	7: upper-case single letters
  * 8: Checkbox on top of list
  */
-export const listMatcher = /^([ \t]*)(([-+\*])|((\d+)|([a-z])|([A-Z]))\.)( \[[ x\-]?\])? /
+export const listMatcher = /^([ \t]*)(([-+\*])|((\d+)|([a-z])|([A-Z]))[\.\)])( \[[ x\-]?\])? /
 
 /**
  * A subset of the above match
@@ -152,23 +152,45 @@ export function getFormOfGlyph(glyph: string): Partial<ListDefinition> {
 	return undefined
 }
 
-export function getGlyphForNumber(form: ListForm, index: number = 1) {
+export function getGlyphForNumber(form: ListForm, index: number = 1, delimiter = '.') {
 	switch (form) {
 		case ListForm.Unordered:
 		case ListForm.UnorderedLarge:
 			return undefined
 		case ListForm.AlphaUpper:
-			if (index > 0 && index < Z_index - A_index) {
-				return String.fromCharCode(A_index - 1 + index) + '.'
+			if (index > 0 && index <= Z_index - A_index + 1) {
+				return String.fromCharCode(A_index - 1 + index) + delimiter
 			}
 			break
 		case ListForm.AlphaLower:
-			if (index > 0 && index < z_index - a_index) {
-				return String.fromCharCode(a_index - 1 + index) + '.'
+			if (index > 0 && index <= z_index - a_index + 1) {
+				return String.fromCharCode(a_index - 1 + index) + delimiter
 			}
 			break
 	}
-	return index.toString() + '.'
+	return index.toString() + delimiter
+}
+
+export function getDelimiterForGlyph(glyph: string) {
+	if (glyph) {
+		if (glyph.endsWith('.')) return '.'
+		if (glyph.endsWith(')')) return ')'
+	}
+	return undefined
+}
+
+export function isLargeList(definition: ListDefinition) {
+	switch (definition.form) {
+		case ListForm.Unordered:
+			return false
+		case ListForm.UnorderedLarge:
+			return true
+		case ListForm.Digit:
+		case ListForm.AlphaLower:
+		case ListForm.AlphaUpper:
+			return definition.glyph?.endsWith(')')
+	}
+	return false
 }
 
 export function parseListItem(char: string, parser: NoteParser): boolean {

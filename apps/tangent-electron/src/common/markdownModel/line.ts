@@ -1,6 +1,6 @@
 import { Line, deltaToText, type EditorRange, TextDocument } from '@typewriter/document'
 import noteTypeset from './typewriterTypes'
-import { getGlyphForNumber, ListForm, matchList } from './list'
+import { getDelimiterForGlyph, getGlyphForNumber, ListForm, matchList } from './list'
 import { indentMatcher } from './matches'
 import NoteParser from './NoteParser'
 
@@ -68,7 +68,7 @@ export function getLineFormattingPrefix(line: Line, forNextLine = false): string
 			if (forNextLine) {
 				if (ListForm.isNumeric(match.form)) {
 					// Increment the number from the current value
-					nextGlyph = getGlyphForNumber(match.form, match.index + 1)
+					nextGlyph = getGlyphForNumber(match.form, match.index + 1, getDelimiterForGlyph(nextGlyph))
 				}
 				if (match.todoState !== undefined) {
 					nextGlyph = nextGlyph.replace(/\[[x-]?\]/, '[ ]')
