@@ -161,11 +161,9 @@ class TangentEmbed extends TangentLink {
 		return result
 	}
 
-	getTooltip(): TooltipConfig {
-		const tooltip = super.getTooltip()
-		tooltip.placement = 'mouse-below'
-		tooltip.args.errorMessage = this.errorMessage
-		return tooltip
+	makeTooltipRequest(event: MouseEvent): void {
+		// Disable embed tooltips completely,
+		// allowing embeds to stand on their own.
 	}
 }
 
