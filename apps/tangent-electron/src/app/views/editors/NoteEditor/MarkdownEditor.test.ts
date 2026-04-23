@@ -641,6 +641,24 @@ describe('Inline formatting', () => {
 		expect(editor.getText()).toEqual('This is a line of text.')
 		expect(editor.doc.selection).toEqual([11, 11])
 	})
+	it('Should toggle inline formatting off when selection is touching the start of a range of formatted text', async () => {
+		editor.doc = markdownToTextDocument(`This is _a line of text._`)
+		editor.select(8)
+		await wait(waitTime)
+		toggleItalic(editor)
+
+		expect(editor.getText()).toEqual('This is a line of text.')
+		expect(editor.doc.selection).toEqual([8, 8])
+	})
+	it('Should toggle inline formatting off when selection is touching the end of a range of formatted text', async () => {
+		editor.doc = markdownToTextDocument(`This is _a line of text._ `)
+		editor.select(25)
+		await wait(waitTime)
+		toggleItalic(editor)
+
+		expect(editor.getText()).toEqual('This is a line of text. ')
+		expect(editor.doc.selection).toEqual([23, 23])
+	})
 	it('Should toggle long inline formatting off when selection is touching a range of formatted text', async () => {
 		editor.doc = markdownToTextDocument(`This is **a line of text.**`)
 		editor.select(12)
@@ -649,6 +667,15 @@ describe('Inline formatting', () => {
 
 		expect(editor.getText()).toEqual('This is a line of text.')
 		expect(editor.doc.selection).toEqual([10, 10])
+	})
+	it('Should toggle inline formatting on when touching a word that comes before a range of the same format', async () => {
+		editor.doc = markdownToTextDocument(`This is _a line of text._`)
+		editor.select(2)
+		await wait(waitTime)
+		toggleItalic(editor)
+
+		expect(editor.getText()).toEqual('_This_ is _a line of text._')
+		expect(editor.doc.selection).toEqual([3, 3])
 	})
 
 	it('Should toggle inline formatting on for selected text', async () => {

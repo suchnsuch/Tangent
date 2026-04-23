@@ -311,6 +311,9 @@ export function getRangesIntersecting(
 		opIndex = startOpDetails.index
 	}
 
+	// We don't intersect anything
+	if (!nextRange && startIndex >= endIndex) return ranges
+
 	// Move forward to catch future intersections
 	while (moveNext(1)) {
 		const length = Op.length(walkingOp)
