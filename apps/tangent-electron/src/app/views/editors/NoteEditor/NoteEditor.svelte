@@ -1253,7 +1253,7 @@ function onContextMenu(event: MouseEvent) {
 	}], 'bottom')
 }
 
-function selectEnd(event?: MouseEvent) {
+function selectFromVerticalPosition(event?: MouseEvent) {
 	if (selectEndEnabled && !event?.defaultPrevented) {
 		if (!event || (event.target != container && (event.target as HTMLElement).parentElement != container)) {
 			return
@@ -1265,6 +1265,24 @@ function selectEnd(event?: MouseEvent) {
 		editor.root.focus({
 			preventScroll: true
 		})
+
+		for (const line of editor.doc.lines) {
+			const range = editor.doc.getLineRange(line)
+			// Don't include the last character (which represents a newline)
+			const rect = editor.getBounds([range[0], range[1] - 1])
+			if (rect.bottom > event.clientY) {
+				if (rect.left >= event.clientX) {
+					editor.select(range[0])
+					return
+				}
+				if (rect.right <= event.clientX) {
+					editor.select(range[1] - 1)
+					return
+				}
+			}
+		}
+		
+		// The cursor is beyond the document, so select the end
 		editor.select(editor.doc.length - 1)
 	}
 }
@@ -1331,7 +1349,7 @@ function updateCodeBlockSizing() {
 <!-- svelte-ignore a11y-mouse-events-have-key-events -->
 <main
 	on:mousedown={onMouseDown}
-	on:mouseup={selectEnd}
+	on:mouseup={selectFromVerticalPosition}
 	on:mousemove={onMouseMove}
 	on:mouseleave={onMouseLeave}
 	on:wheel={onWheel}
