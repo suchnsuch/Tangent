@@ -340,6 +340,10 @@ export default function editorModule(editor: Editor, options: {
 		let targetForm: ListForm = undefined
 		let targetGlyph: string = undefined
 		let basisNumber: number = undefined
+
+		function stripCompleteCheckbox(glyph: string) {
+			return glyph.replace(/\[\S\]$/, '[ ]')
+		}
 		
 		if (options.basis === 'self') {
 			if (!targetListData) {
@@ -363,7 +367,7 @@ export default function editorModule(editor: Editor, options: {
 					const listData = prevLine.attributes.list as ListDefinition
 					if (listData) {
 						targetForm = listData.form
-						targetGlyph = listData.glyph
+						targetGlyph = stripCompleteCheckbox(listData.glyph)
 						basisNumber = listData.index
 
 						if (basisNumber) basisNumber++
@@ -398,7 +402,7 @@ export default function editorModule(editor: Editor, options: {
 	
 					// We might have removed the top out
 					targetForm = listData.form
-					targetGlyph = listData.glyph
+					targetGlyph = stripCompleteCheckbox(listData.glyph)
 					basisNumber = listData.index
 
 					if (basisNumber) {
@@ -462,6 +466,8 @@ export default function editorModule(editor: Editor, options: {
 			}
 			if (basisNumber) basisNumber++
 		}
+
+		targetGlyph = stripCompleteCheckbox(targetGlyph)
 		
 		// Propagate the target form & basis all following list lines on the indent level
 		for (let lineIndex = targetLineIndex + 1; lineIndex < doc.lines.length; lineIndex++) {
