@@ -292,7 +292,7 @@ ipcMain.handle('move', async (event, filepath, newPath) => {
 
 	if (workspace && otherSpace) {
 		try {
-			await workspace.move(filepath, newPath)
+			await workspace.move(filepath, newPath, windowHandle)
 		}
 		catch (err) {
 			log.error(`Failed to move ${filepath} to ${newPath}.`, err)

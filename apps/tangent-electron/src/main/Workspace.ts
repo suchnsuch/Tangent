@@ -662,7 +662,7 @@ export default class Workspace {
 		}
 	}
 
-	async move(filepath: string, newPath: string) {
+	async move(filepath: string, newPath: string, requestingHandle?: WindowHandle) {
 		const node = this.contentsStore.get(filepath)
 		if (!node) {
 			throw new Error('Cannot move; file not found in the index: ' + filepath)
@@ -677,6 +677,20 @@ export default class Workspace {
 			else {
 				// Reject the name change by moving the node to the same place
 				ioLog.warn(chalk.red('Move rejected'), chalk.grey(filepath), chalk.gray(newPath))
+
+				if (requestingHandle) {
+
+					let existingName = existingNode.name
+					if (existingNode.fileType !== 'folder') {
+						existingName += existingNode.fileType
+					}
+
+					requestingHandle?.postUserMessage(
+						'warning',
+						'Could Not Move or Rename',
+						`"${existingName}" already exists in this folder.`
+					)
+				}
 
 				this.sendTreeChange({
 					moved: [{

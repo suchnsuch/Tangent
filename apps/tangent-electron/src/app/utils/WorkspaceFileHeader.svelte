@@ -73,7 +73,7 @@ function updateText(text: string) {
 	if (headerEditElement && document.activeElement === headerEditElement) {
 		return
 	}
-	editor.setText(text, undefined, Source.api)
+	editor.setText(text, null, Source.api)
 }
 
 function bindEditor() {
@@ -107,7 +107,7 @@ function onBlur() {
 	// Trim to remove any trailing newline from the editor
 	let newName = editor.getText().trim()
 	if (node.name !== newName) {
-		if (onRename && onRename(newName) === false || !node.rename(newName)) {
+		if (onRename ? onRename(newName) === false : !node.rename(newName)) {
 			wait().then(() => {
 				editor.setText(node ? $node.name : '', undefined, Source.api)
 			})

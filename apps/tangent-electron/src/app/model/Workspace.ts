@@ -408,6 +408,9 @@ export default class Workspace extends EventDispatcher {
 					if (result !== DirectoryStoreAddResult.Success) {
 						console.error('Did not move', item, DirectoryStoreAddResult.describe(result), change)
 					}
+					if (existingNode instanceof WorkspaceTreeNode) {
+						existingNode.notifyChanged()
+					}
 					changed = true
 				}
 				else {
