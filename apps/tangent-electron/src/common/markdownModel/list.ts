@@ -73,6 +73,22 @@ export namespace ListDefinition {
 			a.index == b.index &&
 			a.todoState == b.todoState
 	}
+	export function areEqualExceptForActiveTodoState(a: ListDefinition, b: ListDefinition) {
+		if (a.indent !== b.indent) return false
+		if (a.form !== b.form) return false
+		// Use `==` to allow undefined & null to match as those are equivalent for our purposes
+		if (a.index != b.index) return false
+		const aTodoUndefined = !a.todoState
+		const bTodoUndefined = !b.todoState
+		if (aTodoUndefined != bTodoUndefined) return false
+
+		const splitA = splitCheckboxGlyphs(a.glyph)
+		const splitB = splitCheckboxGlyphs(b.glyph)
+
+		if (splitA.base !== splitB.base) return false
+
+		return true
+	}
 }
 
 function checkboxGlyphToTodoState(glyph: string): TodoState {
@@ -177,6 +193,20 @@ export function getDelimiterForGlyph(glyph: string) {
 		if (glyph.endsWith(')')) return ')'
 	}
 	return undefined
+}
+
+export function splitCheckboxGlyphs(glyph: string) {
+	const match = glyph?.match(checkboxMatcher)
+	if (match) {
+		return {
+			base: glyph.substring(0, glyph.length - match[0].length).trimEnd(),
+			box: match[0]
+		}
+	}
+	return {
+		base: glyph,
+		box: undefined
+	}
 }
 
 export function isLargeList(definition: ListDefinition) {

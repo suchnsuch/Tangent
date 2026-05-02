@@ -540,6 +540,26 @@ describe('List Handling', () => {
 	Foo`)
 		})
 
+		it('Should let you check a checkbox without making siblings change into checkboxes', async () => {
+			editor.doc = markdownToTextDocument(`
+	- [] An unchecked list item
+	- Test
+	- Boo
+	Foo`)
+			await wait(waitTime)
+
+			editor.select(5)
+			editor.insert('x')
+			
+			await wait(waitTime)
+
+			expect(editor.getText()).toEqual(`
+	- [x] An unchecked list item
+	- Test
+	- Boo
+	Foo`)
+		})
+
 		it('Should let you delete a checkbox without causing pain', async () => {
 			editor.doc = markdownToTextDocument(`
 	- [x] An unchecked list item

@@ -25,7 +25,7 @@ import TangentCheckbox from './t-checkbox'
 import TangentCodePreview from './t-code-preview' // No deletey
 import TangentMath from './t-math' // No deletey
 import { indentMatcher } from 'common/markdownModel/matches'
-import { checkboxMatcher, getAutoChild, getDelimiterForGlyph, getGlyphForNumber, ListDefinition, ListForm, listMatcher } from 'common/markdownModel/list'
+import { checkboxMatcher, getAutoChild, getDelimiterForGlyph, getGlyphForNumber, ListDefinition, ListForm, listMatcher, splitCheckboxGlyphs } from 'common/markdownModel/list'
 import type { Workspace } from 'app/model'
 import { deltaHasTextChanges, getEditInfo, getLineRangeWhile, getRangeWhile, getRangesIntersecting, getSelectedLines, intersectRanges, lineToText } from 'common/typewriterUtils'
 import { isLeftClick, startDrag } from 'app/utils'
@@ -276,7 +276,7 @@ export default function editorModule(editor: Editor, options: {
 			})
 		} 
 		else if (oldList && newList) {
-			if (!ListDefinition.areEqual(oldList, newList)) {
+			if (!ListDefinition.areEqualExceptForActiveTodoState(oldList, newList)) {
 				// Only do anything if there is a difference
 				if (oldList.indent === newList.indent) {
 					// Any change to form should propegate down
@@ -341,20 +341,6 @@ export default function editorModule(editor: Editor, options: {
 		let targetGlyph: string = undefined
 		let basisNumber: number = undefined
 
-		function splitCheckboxGlyphs(glyph: string) {
-			const match = glyph?.match(checkboxMatcher)
-			if (match) {
-				return {
-					base: glyph.substring(0, glyph.length - match[0].length).trimEnd(),
-					box: match[0]
-				}
-			}
-			return {
-				base: glyph,
-				box: undefined
-			}
-		}
-		
 		if (options.basis === 'self') {
 			if (!targetListData) {
 				console.error('Was told to verify a basis of "self", but the target line had no list data')
