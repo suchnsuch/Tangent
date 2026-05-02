@@ -25,7 +25,7 @@ import TangentCheckbox from './t-checkbox'
 import TangentCodePreview from './t-code-preview' // No deletey
 import TangentMath from './t-math' // No deletey
 import { indentMatcher } from 'common/markdownModel/matches'
-import { getAutoChild, getDelimiterForGlyph, getGlyphForNumber, ListDefinition, ListForm, listMatcher } from 'common/markdownModel/list'
+import { checkboxMatcher, getAutoChild, getDelimiterForGlyph, getGlyphForNumber, ListDefinition, ListForm, listMatcher } from 'common/markdownModel/list'
 import type { Workspace } from 'app/model'
 import { deltaHasTextChanges, getEditInfo, getLineRangeWhile, getRangeWhile, getRangesIntersecting, getSelectedLines, intersectRanges, lineToText } from 'common/typewriterUtils'
 import { isLeftClick, startDrag } from 'app/utils'
@@ -341,8 +341,18 @@ export default function editorModule(editor: Editor, options: {
 		let targetGlyph: string = undefined
 		let basisNumber: number = undefined
 
-		function stripCompleteCheckbox(glyph: string) {
-			return glyph.replace(/\[\S\]$/, '[ ]')
+		function splitCheckboxGlyphs(glyph: string) {
+			const match = glyph?.match(checkboxMatcher)
+			if (match) {
+				return {
+					base: glyph.substring(0, glyph.length - match[0].length).trimEnd(),
+					box: match[0]
+				}
+			}
+			return {
+				base: glyph,
+				box: undefined
+			}
 		}
 		
 		if (options.basis === 'self') {
@@ -367,7 +377,7 @@ export default function editorModule(editor: Editor, options: {
 					const listData = prevLine.attributes.list as ListDefinition
 					if (listData) {
 						targetForm = listData.form
-						targetGlyph = stripCompleteCheckbox(listData.glyph)
+						targetGlyph = listData.glyph
 						basisNumber = listData.index
 
 						if (basisNumber) basisNumber++
@@ -402,7 +412,7 @@ export default function editorModule(editor: Editor, options: {
 	
 					// We might have removed the top out
 					targetForm = listData.form
-					targetGlyph = stripCompleteCheckbox(listData.glyph)
+					targetGlyph = listData.glyph
 					basisNumber = listData.index
 
 					if (basisNumber) {
@@ -422,6 +432,10 @@ export default function editorModule(editor: Editor, options: {
 			targetForm = targetListData.form
 			targetGlyph = targetListData.glyph
 		}
+
+		const split = splitCheckboxGlyphs(targetGlyph)
+		targetGlyph = split.base
+		const hasCheckbox = split.box !== undefined
 
 		function getTargetGlyph() {
 			const targetDelimiter: string = getDelimiterForGlyph(targetGlyph)
@@ -444,31 +458,38 @@ export default function editorModule(editor: Editor, options: {
 
 		let didSomething = false
 
-		targetGlyph = getTargetGlyph()
-
-		// Propagate the target form & basis to the indicated line
-		if (targetListData && targetIndent === intendedIndent) {
-			if (targetListData.glyph != targetGlyph) {
-
+		function enforceGlyphOnLine(listData: ListDefinition, lineStart: number, lineText: string) {
+			const { base, box } = splitCheckboxGlyphs(listData.glyph)
+			const targetBase = getTargetGlyph()
+			if (base !== targetBase || (!box && hasCheckbox)) {
 				change = change || editor.change
 
+				let finalTarget = targetBase
+				if (box) finalTarget += box
+				else if (hasCheckbox) finalTarget += ' [ ]'
+
 				const listMatch = lineText.match(listMatcher)
-				const lineStart = targetRange[0]
-				const insertedText = listMatch[1] + targetGlyph + ' '
+				const insertedText = listMatch[1] + finalTarget + ' '
 				const sizeDiff = insertedText.length - listMatch[0].length
 				const deleteEnd = lineStart + listMatch[0].length
 				change
 					.delete([lineStart, deleteEnd])
 					.insert(deleteEnd, insertedText)
-				didSomething = true
 
+				didSomething = true
+				
 				offsetSelection(lineStart, sizeDiff)
+				return true
 			}
+			return false
+		}
+
+		// Propagate the target form & basis to the indicated line
+		if (targetListData && targetIndent === intendedIndent) {
+			enforceGlyphOnLine(targetListData, targetRange[0], lineText)
 			if (basisNumber) basisNumber++
 		}
 
-		targetGlyph = stripCompleteCheckbox(targetGlyph)
-		
 		// Propagate the target form & basis all following list lines on the indent level
 		for (let lineIndex = targetLineIndex + 1; lineIndex < doc.lines.length; lineIndex++) {
 			let nextLine = doc.lines[lineIndex]
@@ -478,26 +499,8 @@ export default function editorModule(editor: Editor, options: {
 			if (indent === intendedIndent) {
 				const listData = nextLine.attributes.list as ListDefinition
 				if (!listData) break // End of the road
-
-				targetGlyph = getTargetGlyph()
-				if (listData.glyph !== targetGlyph) {
-					change = change || editor.change
-
-					const listMatch = nextText.match(listMatcher)
-					let lineRange = doc.getLineRange(nextLine)
-					const lineStart = lineRange[0]
-					const insertedText = listMatch[1] + targetGlyph + ' '
-					const sizeDiff = insertedText.length - listMatch[0].length
-					const deleteEnd = lineStart + listMatch[0].length
-					change
-						.delete([lineStart, deleteEnd])
-						.insert(deleteEnd, insertedText)
-
-					didSomething = true
-					
-					offsetSelection(lineStart, sizeDiff)
-				}
-
+				const lineRange = doc.getLineRange(nextLine)
+				enforceGlyphOnLine(listData, lineRange[0], nextText)
 				if (basisNumber) basisNumber++
 			}
 			else if (indent.length < intendedIndent.length) {

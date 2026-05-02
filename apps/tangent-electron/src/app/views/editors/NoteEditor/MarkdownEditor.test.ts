@@ -476,6 +476,70 @@ describe('List Handling', () => {
 	Foo`)
 		})
 
+		it('Should let you uncheck a checkbox via delete without affecting other checkboxes or text', async () => {
+			editor.doc = markdownToTextDocument(`
+	- [x] An unchecked list item
+	- [x] Test
+	- [x] 
+	Foo`)
+			await wait(waitTime)
+
+			editor.select(6)
+			editor.delete(-1)
+			
+			await wait(waitTime)
+
+			expect(editor.getText()).toEqual(`
+	- [] An unchecked list item
+	- [x] Test
+	- [x] 
+	Foo`)
+		})
+
+		it('Should let you uncheck a checkbox via replace without affecting other checkboxes or text', async () => {
+			editor.doc = markdownToTextDocument(`
+	- [x] An unchecked list item
+	- [x] Test
+	- [x] 
+	Foo`)
+			await wait(waitTime)
+
+			editor.select([5, 6])
+			editor.insert(' ')
+			
+			await wait(waitTime)
+
+			expect(editor.getText()).toEqual(`
+	- [ ] An unchecked list item
+	- [x] Test
+	- [x] 
+	Foo`)
+		})
+
+		it('Should let you create a checkbox and have that flow to lower siblings', async () => {
+			editor.doc = markdownToTextDocument(`
+	- A line
+	- Test
+	- Other
+	Foo`)
+			await wait(waitTime)
+
+			editor.select(4)
+			editor.insert('[')
+			await wait(waitTime)
+			editor.insert(']')
+			await wait(waitTime)
+			editor.insert(' ')
+			
+			await wait(waitTime)
+
+			expect(editor.getText()).toEqual(`
+	- [] A line
+	- [ ] Test
+	- [ ] Other
+	Foo`)
+		})
+
 		it('Should let you delete a checkbox without causing pain', async () => {
 			editor.doc = markdownToTextDocument(`
 	- [x] An unchecked list item
