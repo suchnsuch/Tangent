@@ -59,6 +59,11 @@ $effect(() => {
 
 $effect(() => {
 	editor.enabled = editable
+	
+	if (editable && editor._root) {
+		// Hack to ensure the correct contenteditable value
+		editor._root.contentEditable = 'plaintext-only'
+	}
 })
 
 let hasFocus = $state(false)
@@ -77,12 +82,16 @@ function updateText(text: string) {
 }
 
 function bindEditor() {
-	const root = editor.root
-	root.addEventListener('shortcut', onHeaderKeydown)
+	const root = editor._root
+	if (root) {
+		root.addEventListener('shortcut', onHeaderKeydown)
+	}
 }
 function unbindEditor() {
-	const root = editor.root
-	root.removeEventListener('shortcut', onHeaderKeydown)
+	const root = editor._root
+	if (root) {
+		root.removeEventListener('shortcut', onHeaderKeydown)
+	}
 }
 
 function mouseUp(event: MouseEvent) {
