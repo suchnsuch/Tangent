@@ -861,8 +861,6 @@ function cleanupConnectionHover() {
 
 </script>
 
-<svelte:window on:keydown={commandHandler} />
-
 <!-- svelte-ignore a11y-no-noninteractive-tabindex -->
 <!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
 <main

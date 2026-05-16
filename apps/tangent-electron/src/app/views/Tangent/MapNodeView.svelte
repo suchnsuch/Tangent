@@ -231,7 +231,9 @@ article {
 	&.threaded {
 		border-color: var(--accentBackgroundColor);
 	}
+}
 
+:global(.active:focus) article {
 	&.current {
 		background-color: var(--accentBackgroundColor);
 	}

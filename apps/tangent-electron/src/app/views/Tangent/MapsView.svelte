@@ -88,13 +88,11 @@ type ContainMode = 'buffer' | 'center' | 'center-hard'
 
 function ensureCurrentNodeIsContained(mode: ContainMode = 'buffer', scrollTime = 0) {
 	if (!container) return
-	console.log('Containing with', mode)
 	// Ensure that the current node is visible
 	const element = container.querySelector('.active .MapNodeView.current')
 	if (element) {
 		const elementContainer = element.getBoundingClientRect()
 		const viewContainer = view.getBoundingClientRect()
-		console.log(viewContainer)
 		const buffer = 100
 
 		let containX: Containment = 'in'
@@ -137,7 +135,6 @@ function ensureCurrentNodeIsContained(mode: ContainMode = 'buffer', scrollTime =
 		}
 		
 		if (scrollX !== undefined || scrollY !== undefined) {
-			console.log({ scrollX, scrollY })
 			setScroll(scrollX, scrollY, scrollTime)
 		}
 	}

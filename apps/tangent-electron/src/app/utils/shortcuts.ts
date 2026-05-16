@@ -139,7 +139,12 @@ export function eventIsModifier(event: KeyboardEvent) {
 }
 
 export function eventIsShortcutable(event: KeyboardEvent) {
-	return event.metaKey || event.altKey || event.ctrlKey || event.key.length > 1 || (event as any).shortcutable === true
+	if (event.target instanceof HTMLInputElement || (event.target instanceof HTMLElement && event.target.isContentEditable)) {
+		if ((event as any).shortcutable === true || event.metaKey || event.altKey || event.ctrlKey) return true
+		if (event.key === 'Delete' || event.key === 'Backspace') return false
+		return event.key.length > 1
+	}
+	return true
 }
 
 export function markEventAsShortcutable(event: KeyboardEvent) {
