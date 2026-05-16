@@ -15,16 +15,23 @@ import FolderDetailsSummary from 'app/views/summaries/FolderDetailsSummary.svelt
 
 export default class FolderViewState extends BaseSetViewState {
 	readonly folder: Folder
-	readonly folderInfoFile: DataFile
 	readonly folderInfo = new WritableStore<FolderInfo>(null)
+	
+	private folderInfoFile: DataFile
+	private folderUnsub: () => void = null
 
 	constructor(context: ViewStateContext, folder: Folder) {
 		super(context)
 		this.folder = folder
-		this.folderInfoFile = folder.getFolderInfoFile()
 
-		this.folderInfoFile.loadData<FolderInfo>().then(info => {
-			this.folderInfo.set(info)
+		this.folderUnsub = folder.subscribe(f => {
+			if (!f.meta?.virtual && !this.folderInfoFile) {
+				this.folderInfoFile = folder.getFolderInfoFile()
+
+				this.folderInfoFile.loadData<FolderInfo>().then(info => {
+					this.folderInfo.set(info)
+				})
+			}
 		})
 
 		const workspace = this.folder.workspace
@@ -94,6 +101,10 @@ export default class FolderViewState extends BaseSetViewState {
 	dispose() {
 		super.dispose()
 		this.folderInfoFile.unloadFile()
+		if (this.folderUnsub) {
+			this.folderUnsub()
+			this.folderUnsub = null
+		}
 	}
 
 	get settingsComponent() { return FolderSettingsView }

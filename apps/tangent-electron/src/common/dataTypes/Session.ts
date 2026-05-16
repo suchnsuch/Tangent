@@ -135,6 +135,7 @@ export class ThreadHistoryList extends PatchableList<ThreadHistoryItem, ThreadHi
 
 		// Construct a placeholder for cases such as moved/deleted files
 		const fakeNode = nodeFromPath(path)
+		fakeNode.meta = { uuid: undefined, virtual: true }
 
 		return fakeNode
 	}
@@ -195,6 +196,7 @@ class PlaceholderingDirectory implements DirectoryLookup {
 
 		if (this.createPlaceholders) {
 			const newFakeNode = nodeFromPath(path)
+			newFakeNode.meta = { uuid: undefined, virtual: true }
 			this.placeholders.set(path, newFakeNode)
 			return newFakeNode
 		}
@@ -382,12 +384,25 @@ export default class Session extends ObjectStore {
 
 		if (change.removed) {
 			// Removed nodes need to be removed
-			// TODO: Or perhaps replaced by placeholders? Maybe only if the session is closed?
-
 			let updateHistory = false
 			let { thread, currentNode } = this.currentThread.value
 
-			// Clean the thread of removed nodes
+			// Replace all affected thread history with fake/virtual nodes
+			for (const item of this.threadHistory) {
+				for (let i = 0; i < item.thread.length; i++) {
+					const node = item.thread[i]
+					for (const removed of change.removed) {
+						if (node.path.startsWith(removed)) {
+							const replacement = nodeFromPath(node.path)
+							replacement.meta = { uuid: undefined, virtual: true }
+							item.thread[i] = replacement
+							break
+						}
+					}
+				}
+			}
+			
+			// Remove items from the current thread
 			const currentIndex = thread.indexOf(currentNode)
 			const newThread = thread.filter(node => {
 				for (const removed of change.removed) {
@@ -403,6 +418,7 @@ export default class Session extends ObjectStore {
 				updateHistory = true
 			}
 
+			// Remove items from the map
 			const keysToRemove: TreeNode[] = []
 			for (const key of this.map.nodes.keys()) {
 				for (const removed of change.removed) {
