@@ -4,7 +4,7 @@
 	--topBarHeight: 36px;
 
 	/* Styling */
-	--fontFamily: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+	--fontFamily: system-ui, sans-serif;
 	--codeFontFamily: 'FiraCode-Retina', FiraCode, Consolas, Menlo, Monaco, 'Courier New', monospace;
 	--spaceWidth: .25em;
 	--indentSize: 8;
