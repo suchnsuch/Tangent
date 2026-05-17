@@ -23,8 +23,7 @@ import {
 	getWorkspacesInfoPath, 
 	saveAndCloseWorkspaces,
 	findClosestWorkspace,
-	contentsMap,
-	hasShutdownWorkspaces
+	hasStartedWorkspaceShutdown
 } from './workspaces'
 
 import Logger from 'js-logger'
@@ -94,21 +93,44 @@ Tangent ${app.getVersion()} Launched With Arguments:`, process.argv)
 		})
 	}
 
-	function processArgs(argv) {
+	function processArgs(argv: string[]) {
 		if (process.env.INTEGRATION_TEST) {
 			argv = argv.slice(2)
 		}
 		else {
-			argv = hideBin(argv).filter(v => {
-				switch (v) {
-					// Attempt to strip out chromium options
+
+			let newArgs: string[] = []
+
+			let positionalArgCount = 0
+
+			function skip(arg: string) {
+				switch (arg) {
+					// Attempt to strip out chromium & electron options
 					case '--allow-file-access-from-files':
 					case '--original-process-start-time':
-						return false
+						return 1
+					// Consume the next arg as well
+					case '--require':
+						return 2
 					default:
-						return true
+						return 0
 				}
-			})
+			}
+
+			for (let i = 0; i < argv.length; i++) {
+				const skipCount = skip(argv[i])
+				if (skipCount) {
+					i += skipCount - 1
+				}
+				else if (positionalArgCount < 2) {
+					positionalArgCount++
+				}
+				else {
+					newArgs.push(argv[i])
+				}
+			}
+
+			argv = newArgs
 		}
 
 		Logger.log('processed args', argv)
@@ -266,8 +288,7 @@ Tangent ${app.getVersion()} Launched With Arguments:`, process.argv)
 
 	// Application is attempting to quite, but windows haven't been closed yet.
 	app.on('before-quit', () => {
-		if (!hasShutdownWorkspaces())
-		{
+		if (!hasStartedWorkspaceShutdown()) {
 			// This ensures open workspaces are retained
 			addShutDownTask(saveAndCloseWorkspaces())
 		}
@@ -286,12 +307,7 @@ Tangent ${app.getVersion()} Launched With Arguments:`, process.argv)
 
 let shouldInit = true
 
-if (mode !== 'production') {
-	require('electron-reload')(__dirname, {
-		awaitWriteFinish: true
-	})
-}
-else {
+if (mode === 'production') {
 	const hasLock = app.requestSingleInstanceLock()
 	if (!hasLock) {
 		app.quit()

@@ -3,7 +3,7 @@ import fs from 'fs'
 import { load } from 'cheerio'
 import { app, BrowserWindow, clipboard, dialog, ipcMain, nativeImage, shell } from 'electron'
 import { getDocumentationPath } from 'main/documentation'
-import { getWindowHandle, getWorkspace, validateWorkspaceForHandleFilepath, hasShutdownWorkspaces, workspaceMap } from 'main/workspaces'
+import { getWindowHandle, getWorkspace, validateWorkspaceForHandleFilepath, hasStartedWorkspaceShutdown, workspaceMap } from 'main/workspaces'
 
 import fetch from 'node-fetch'
 import type { SelectPathOptions } from 'common/WindowApi'
@@ -402,7 +402,7 @@ ipcMain.on('openFile', (event, filepath) => {
 
 ipcMain.on('closeFile', (event, filepath) => {
 	// When the app is closing, these don't matter
-	if (hasShutdownWorkspaces()) return
+	if (hasStartedWorkspaceShutdown()) return
 	
 	const windowHandle = getWindowHandle(event.sender)
 

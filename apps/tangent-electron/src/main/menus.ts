@@ -142,8 +142,7 @@ ipcMain.on('menus.setMainMenu', (event, template) => {
 							async click(menuItem, window: BrowserWindow, event) {
 								await window.webContents.session.clearCache()
 								await window.webContents.session.clearStorageData({
-									storages: ['filesystem', 'cachestorage'],
-									quotas: ['temporary']
+									storages: ['filesystem', 'cachestorage']
 								});
 								window.reload()
 							},

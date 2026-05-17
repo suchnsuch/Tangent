@@ -141,7 +141,9 @@ export async function saveAndCloseWorkspaces() {
 	workspaceShutdownState = 'finished'
 }
 
-export function hasShutdownWorkspaces() { return workspaceShutdownState === 'finished' }
+export function hasStartedWorkspaceShutdown() {
+	return workspaceShutdownState !== 'open'
+}
 
 /**
  * Finds the closest .tangent directory, or uses the given directory / parent directory (for files)

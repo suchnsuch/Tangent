@@ -12,7 +12,8 @@
 			"main/*": ["../main/*"],
 			"common/*": ["../common/*"]
 		},
-		"verbatimModuleSyntax": true
+		"verbatimModuleSyntax": true,
+		"strict": false
 	},
 	"include": [
 		".",
