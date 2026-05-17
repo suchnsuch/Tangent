@@ -401,7 +401,7 @@ export default class Indexer {
 	 * @param oldPath The node's path prior to being renamed
 	 */
 	async handleNodeRename(seedNode: TreeNode, oldPath?: string) {
-		if (!this.isIndexableFile(seedNode)) return
+		if (seedNode.fileType !== 'folder' && !this.isIndexableFile(seedNode)) return
 
 		const linkedNodes: Map<string, LinkConfirmation> = new Map()
 
