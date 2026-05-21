@@ -12,7 +12,7 @@ import NoteParser from './NoteParser'
  * 	7: upper-case single letters
  * 8: Checkbox on top of list
  */
-export const listMatcher = /^([ \t]*)(([-+\*])|((\d+)|([a-z])|([A-Z]))[\.\)])( \[[ x\-]?\])? /
+export const listMatcher = /^([ \t]*)(([-+\*•·])|((\d+)|([a-z])|([A-Z]))[\.\)])( \[[ x\-]?\])? /
 
 /**
  * A subset of the above match
