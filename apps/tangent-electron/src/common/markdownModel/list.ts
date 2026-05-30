@@ -1,5 +1,35 @@
 import { StructureType, type TodoState } from 'common/indexing/indexTypes'
 import NoteParser from './NoteParser'
+import { escapeRegExp } from '@such-n-such/core'
+
+// Unordered glyphs are split by visual weight because large glyphs get extra
+// vertical spacing via ListForm.UnorderedLarge / .largeList styling.
+const largeUnorderedGlyphs = '*\u2022\u204C\u204D\u25D8\u2765\u29BE\u29BF'
+/* U+2022 •	(Bullet)
+ * U+204c ⁌	Black Leftwards Bullet
+ * U+204d ⁍	(Black Rightwards Bullet)
+ * U+25d8 ◘	(Inverse Bullet)
+ * U+2765 ❥	(Rotated Heavy Black Heart Bullet)
+ * U+29be ⦾	(Circled White Bullet)
+ * U+29bf ⦿	(Circled Bullet) */
+ 
+const standardUnorderedGlyphs = '-+\u2023\u2043\u2219\u22C5\u25E6\u2619\u2767\u25C9'
+/* U+2219 ∙	(Bullet Operator)
+ * U+22C5 ⋅	(Dot Operator)
+ * U+2023 ‣	(Triangular Bullet)
+ * U+2043 ⁃	(Hyphen Bullet)
+ * U+25e6 ◦	(White Bullet)
+ * U+2619 ☙	(Reversed Rotated Floral Heart Bullet)
+ * U+2767 ❧	(Rotated Floral Heart Bullet)
+ * U+25c9 ◉	(Fisheye (Japanese Bullet)) */
+
+const largeUnorderedGlyphSet = new Set(largeUnorderedGlyphs)
+
+// Build the unordered branch as data so adding glyphs does not disturb the
+// capture-group layout consumed by matchList().
+const unorderedGlyphMatcher = `(?:${[...standardUnorderedGlyphs + largeUnorderedGlyphs]
+	.map(escapeRegExp)
+	.join('|')})`
 
 /**
  * This is a very complicated match
@@ -12,7 +42,9 @@ import NoteParser from './NoteParser'
  * 	7: upper-case single letters
  * 8: Checkbox on top of list
  */
-export const listMatcher = /^([ \t]*)(([-+\*])|((\d+)|([a-z])|([A-Z]))[\.\)])( \[[ x\-]?\])? /
+export const listMatcher = new RegExp(
+	`^([ \\t]*)((${unorderedGlyphMatcher})|((\\d+)|([a-z])|([A-Z]))[\\.\\)])( \\[[ x\\-]?\\])? `
+)
 
 /**
  * A subset of the above match
@@ -25,8 +57,8 @@ export const numericGlyphMatcher = /(\d+)|([a-z])|([A-Z])/
 export const checkboxMatcher = /\[([x\- ]?)\]/
 
 export enum ListForm {
-	Unordered, // -,+
-	UnorderedLarge, // *
+	Unordered,
+	UnorderedLarge,
 	Digit,
 	AlphaUpper,
 	AlphaLower
@@ -108,11 +140,12 @@ export function matchList(line: string): ListDefinition {
 		const definition = {
 			indent: match[1],
 			glyph: match[2]
-		} as Partial<ListDefinition>
-
+		} as Partial<ListDefinition>	
 		if (match[3]) {
 			// Unordered list
-			definition.form = match[3] === '*' ? ListForm.UnorderedLarge : ListForm.Unordered
+			definition.form = largeUnorderedGlyphSet.has(match[3])
+				? ListForm.UnorderedLarge
+				: ListForm.Unordered
 		}
 		else {
 			const { form, index } = extractNumericValueFromMatch(match, 4)

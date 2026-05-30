@@ -60,6 +60,42 @@ describe('Match List', () => {
 		})
 	})
 
+	it('Can find standard unicode bullets', () => {
+		expect(matchList('\t\u2023 Hello')).toEqual<ListDefinition>({
+			indent: '\t',
+			form: ListForm.Unordered,
+			glyph: '\u2023'
+		})
+		expect(matchList('\u2043 Hello')).toEqual<ListDefinition>({
+			indent: '',
+			form: ListForm.Unordered,
+			glyph: '\u2043'
+		})
+		expect(matchList('\u22C5 Hello')).toEqual<ListDefinition>({
+			indent: '',
+			form: ListForm.Unordered,
+			glyph: '\u22C5'
+		})
+	})
+
+	it('Can find large unicode bullets', () => {
+		expect(matchList('\u2022 Hello')).toEqual<ListDefinition>({
+			indent: '',
+			form: ListForm.UnorderedLarge,
+			glyph: '\u2022'
+		})
+		expect(matchList('\t\u2765 Hello')).toEqual<ListDefinition>({
+			indent: '\t',
+			form: ListForm.UnorderedLarge,
+			glyph: '\u2765'
+		})
+		expect(matchList('\u29BF Hello')).toEqual<ListDefinition>({
+			indent: '',
+			form: ListForm.UnorderedLarge,
+			glyph: '\u29BF'
+		})
+	})
+
 	it('Can find numbers', () => {
 		expect(matchList('1. Hello')).toEqual<ListDefinition>({
 			indent: '',
