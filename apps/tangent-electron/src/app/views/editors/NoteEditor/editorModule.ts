@@ -451,7 +451,7 @@ export default function editorModule(editor: Editor, options: {
 				change = change || editor.change
 
 				let finalTarget = targetBase
-				if (box) finalTarget += box
+				if (box) finalTarget += ' ' + box
 				else if (hasCheckbox) finalTarget += ' [ ]'
 
 				const listMatch = lineText.match(listMatcher)

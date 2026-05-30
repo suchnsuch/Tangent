@@ -578,6 +578,23 @@ describe('List Handling', () => {
 	- [ ]`)
 		})
 			
+		it('Should let you un-indent a checkbox while converting the base glyph', async () => {
+			editor.doc = markdownToTextDocument(`
+	* A big list
+		- [ ] Child
+		- [ ] Other child`)
+			await wait(waitTime)
+
+			editor.select(editor.doc.length - 1)
+			editor.outdent()
+			
+			await wait(waitTime)
+
+			expect(editor.getText()).toEqual(`
+	* A big list
+		- [ ] Child
+	* [ ] Other child`)
+		})
 	})
 
 
