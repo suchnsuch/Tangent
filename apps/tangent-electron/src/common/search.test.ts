@@ -178,7 +178,7 @@ describe('Alias Searching', () => {
 })
 
 describe('Diacritics', () => {
-	test('Fuzy matches hit diacritics', () => {
+	it('Fuzy matches diacritics', () => {
 		let matcher = buildMatcher('Note', { fuzzy: true })
 		expect(matcher.test('Noté')).toBeTruthy()
 		expect(matcher.test('note')).toBeTruthy()
@@ -187,5 +187,18 @@ describe('Diacritics', () => {
 
 		matcher = buildMatcher('and', { fuzzy: true })
 		expect(matcher.test('ånd')).toBeTruthy()
+	})
+
+	it('Fuzzy matching i', () => {
+		let matcher = buildMatcher('diacritics', { fuzzy: true })
+		expect(matcher.test('Dîacritics')).toBeTruthy()
+	})
+
+	it('Fuzy matches diacritics across multiple tokens', () => {
+		let matcher = buildMatcher('note with diacritics', { fuzzy: true })
+		expect(matcher.test('Noté With dîacritics')).toBeTruthy()
+		expect(matcher.test('note with diacritics')).toBeTruthy()
+		expect(matcher.test('nôte With Dîacritics')).toBeTruthy()
+		expect(matcher.test('nøte with diacritics')).toBeTruthy()
 	})
 })
