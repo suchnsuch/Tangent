@@ -237,7 +237,11 @@ export default function editorModule(editor: Editor, options: {
 	function isListGlyphCreationChange(delta: Delta) {
 		const changeInsert = getEditInfo(delta)
 		if (changeInsert?.insert?.length === 1) {
-			return changeInsert.insert.match(/[\.\)\w\d\*\-\+ ]/) != null
+			if (changeInsert.insert === '\n') return '\n'
+			if (changeInsert.insert.match(/[\.\)\w\d\*\-\+ ]/) != null) {
+				return true
+			}
+			return false
 		}
 		if (changeInsert?.shift < 0) {
 			return false // Not a glyph creator, still a valid edit change
@@ -305,7 +309,7 @@ export default function editorModule(editor: Editor, options: {
 		else if (newList) {
 			// Was not a list line, now it is
 			const isGlyphCreator = isListGlyphCreationChange(delta)
-			if (isGlyphCreator != null) { // Ignore non-single-key edits (probably a paste)
+			if (isGlyphCreator != null && isGlyphCreator !== '\n') { // Ignore non-single-key edits (probably a paste)
 				pushVerification({
 					func: verifyListContext,
 					options: {

@@ -399,6 +399,24 @@ describe('List Handling', () => {
 3. Three
 4. Four`)
 	})
+
+	it('Should allow for splitting numbered lists', async () => {
+		editor.doc = markdownToTextDocument(`
+1. Some line
+2. Some other line
+3. One more`)
+		
+		editor.select(14)
+		await wait(waitTime)
+		editor.insert('\n')
+		await wait(waitTime)
+
+		expect(editor.getText()).toEqual(`
+1. Some line
+
+1. Some other line
+2. One more`)
+	})
 	
 	describe('Checkboxes', () => {
 
