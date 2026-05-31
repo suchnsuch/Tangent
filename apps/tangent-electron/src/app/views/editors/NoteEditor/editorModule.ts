@@ -855,7 +855,7 @@ export default function editorModule(editor: Editor, options: {
 	function onKeyDown(event: ShortcutEvent) {
 		if (event.defaultPrevented) return
 
-		if (commandHandler(event)) return
+		if (commandHandler && commandHandler(event)) return
 
 		switch (event.modShortcut) {
 			case 'Enter':
