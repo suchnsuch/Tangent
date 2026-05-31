@@ -212,7 +212,7 @@ export default function editorModule(editor: Editor, options: {
 	
 	function pushVerification<T>(instruction: VerificationInstruction<T>) {
 		if (verificationInstructions.length === 0) {
-			requestCallbackOnIdle(() => {
+			setTimeout(() => {
 				const instructions = verificationInstructions
 				verificationInstructions = []
 
@@ -225,7 +225,7 @@ export default function editorModule(editor: Editor, options: {
 					change.apply()
 				}
 				allowVerification = true
-			})
+			}, 0)
 		}
 		verificationInstructions.push(instruction)
 	}
