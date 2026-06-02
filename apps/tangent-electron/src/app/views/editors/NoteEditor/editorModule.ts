@@ -57,6 +57,8 @@ interface VerifyListOptions {
 	targetIndent: string,
 	// Whether to apply the line's list format or incorporate into siblings'
 	basis: 'self' | 'rebasis'
+	// Whether to enforce that unordered glyphs are the same
+	normalizeUnorderedGlyphs: boolean
 }
 
 // Force the inclusion of elements so it is included in the module
@@ -267,7 +269,8 @@ export default function editorModule(editor: Editor, options: {
 				options: {
 					id,
 					targetIndent: newIndent,
-					basis: (isGlyphCreator && newList) ? 'self' : 'rebasis'
+					basis: (isGlyphCreator && newList) ? 'self' : 'rebasis',
+					normalizeUnorderedGlyphs: true
 				}
 			})
 			pushVerification({
@@ -275,7 +278,8 @@ export default function editorModule(editor: Editor, options: {
 				options: {
 					id,
 					targetIndent: oldIndent,
-					basis: 'rebasis'
+					basis: 'rebasis',
+					normalizeUnorderedGlyphs: true
 				}
 			})
 		} 
@@ -289,7 +293,8 @@ export default function editorModule(editor: Editor, options: {
 						options: {
 							id,
 							targetIndent: oldIndent,
-							basis: 'self'
+							basis: 'self',
+							normalizeUnorderedGlyphs: true
 						}
 					})
 				}
@@ -302,20 +307,24 @@ export default function editorModule(editor: Editor, options: {
 				options: {
 					id,
 					targetIndent: oldIndent,
-					basis: 'rebasis'
+					basis: 'rebasis',
+					normalizeUnorderedGlyphs: isListGlyphCreationChange(delta) !== '\n'
 				}
 			})
 		}
 		else if (newList) {
 			// Was not a list line, now it is
 			const isGlyphCreator = isListGlyphCreationChange(delta)
-			if (isGlyphCreator != null && isGlyphCreator !== '\n') { // Ignore non-single-key edits (probably a paste)
+			// Ignore non-single-key edits (probably a paste)
+			// Ignore new-line edits. Fixup will be handled by the other line
+			if (isGlyphCreator != null && isGlyphCreator !== '\n') { 
 				pushVerification({
 					func: verifyListContext,
 					options: {
 						id,
 						targetIndent: newIndent,
-						basis: isGlyphCreator ? 'self' : 'rebasis'
+						basis: isGlyphCreator ? 'self' : 'rebasis',
+						normalizeUnorderedGlyphs: true
 					}
 				})
 			}
@@ -451,7 +460,21 @@ export default function editorModule(editor: Editor, options: {
 		function enforceGlyphOnLine(listData: ListDefinition, lineStart: number, lineText: string) {
 			const { base, box } = splitCheckboxGlyphs(listData.glyph)
 			const targetBase = getTargetGlyph()
-			if (base !== targetBase || (!box && hasCheckbox)) {
+
+			let applyChange = false
+			if (base !== targetBase) {
+				if (options.normalizeUnorderedGlyphs) {
+					applyChange = true
+				}
+				else if (targetForm !== listData.form || !(targetForm === ListForm.Unordered || targetForm === ListForm.UnorderedLarge)) {
+					applyChange = true
+				}
+			}
+			else if (!box && hasCheckbox) {
+				applyChange = true
+			}
+
+			if (applyChange) {
 				change = change || editor.change
 
 				let finalTarget = targetBase
