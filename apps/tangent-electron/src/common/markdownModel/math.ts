@@ -17,17 +17,20 @@ export function parseInlineMath(char: string, parser: NoteParser): boolean {
 
 	const { feed } = parser
 
-	const isBlock = feed.checkFor('$$')
+	const isBlock = feed.checkFor('$$', false)
 	const token = isBlock ? '$$' : char
-	let rightTouchingText = !isWhitespace(feed.peek())
+	let rightTouchingText = !isWhitespace(feed.peek(token.length))
 
 	if (rightTouchingText) {
-		feed.next()
-		const findResult = feed.findNext(token)
+		const postTokenIndex = feed.index + token.length + 1
+		const findResult = feed.findNext(token, postTokenIndex)
 		if (findResult.foundMatch) {
-			if (!isWhitespace(feed.peek(findResult.contentCount - 1))) {
+			if (!isWhitespace(feed.peek(token.length + findResult.contentCount))) {
 				// We've got it!
-				parser.commitSpan(null, -token.length)
+				// Close old stuff
+				parser.commitSpan(null, 0)
+				// Consume the opening token
+				feed.next(token.length + 1)
 				const index = feed.index
 				feed.next(findResult.contentCount + token.length - 1)
 				parser.commitSpan({

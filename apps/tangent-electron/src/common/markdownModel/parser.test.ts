@@ -216,6 +216,34 @@ End`
 			})
 			expect(doc.lines[4].attributes.math).toBeFalsy()
 		})
+
+		it('Does not consume characters when inline fails', () => {
+			// This catches a bug where math parsing triggered by the `$` character
+			// consumed the following `_` character, breaking inline math.
+			const text = `Some not _math$_ and things`
+			const doc = parser.parseMarkdown(text)
+
+			expect(doc.lines[0].content.ops).toEqual(buildOpsFromInsertList([
+				'Some not ',
+				'_', {
+					italic: true,
+					hidden: true,
+					hiddenGroup: true,
+					start: true
+				},
+				'math$', {
+					hiddenGroup: true,
+					italic: true
+				},
+				'_', {
+					italic: true,
+					hidden: true,
+					hiddenGroup: true,
+					end: true
+				},
+				' and things'
+			], true))
+		})
 	})
 })
 
