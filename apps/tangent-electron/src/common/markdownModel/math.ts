@@ -30,12 +30,12 @@ export function parseInlineMath(char: string, parser: NoteParser): boolean {
 				// Close old stuff
 				parser.commitSpan(null, 0)
 				// Consume the opening token
-				feed.next(token.length + 1)
+				feed.next(token.length)
 				const index = feed.index
-				feed.next(findResult.contentCount + token.length - 1)
+				feed.next(findResult.contentCount + token.length)
 				parser.commitSpan({
 					math: {
-						source: feed.substring(index, index + findResult.contentCount),
+						source: feed.substring(index, index + findResult.contentCount + 1),
 						isBlock
 					},
 					// Using hiddenGroup instead of hidden allows for math to embed within inline formatting.

@@ -217,6 +217,72 @@ End`
 			expect(doc.lines[4].attributes.math).toBeFalsy()
 		})
 
+		it('Finds inline math', () => {
+			const text = `Some $math$ here`
+			const doc = parser.parseMarkdown(text)
+
+			expect(doc.lines[0].content.ops).toEqual(buildOpsFromInsertList([
+				'Some ',
+				'$math$', {
+					hiddenGroup: true,
+					math: {
+						isBlock: false,
+						source: 'math'
+					}
+				},
+				' here'
+			], true))
+		})
+
+		it('Finds inline block math', () => {
+			const text = `Some $$math$$ here`
+			const doc = parser.parseMarkdown(text)
+
+			expect(doc.lines[0].content.ops).toEqual(buildOpsFromInsertList([
+				'Some ',
+				'$$math$$', {
+					hiddenGroup: true,
+					math: {
+						isBlock: true,
+						source: 'math'
+					}
+				},
+				' here'
+			], true))
+		})
+
+		it('Does not start math when the lead $ is not touching text to its right', () => {
+			const text = `Some $ not$ math`
+			const doc = parser.parseMarkdown(text)
+			expect(doc.lines[0].content.ops).toEqual(buildOpsFromInsertList([
+				'Some $ not$ math'
+			], true))
+		})
+
+		it('Does not start math when the lead $$ is not touching text to its right', () => {
+			const text = `Some $$ not$$ math`
+			const doc = parser.parseMarkdown(text)
+			expect(doc.lines[0].content.ops).toEqual(buildOpsFromInsertList([
+				'Some $$ not$$ math'
+			], true))
+		})
+
+		it('Does not end math when the trailing $ is not touching text to its left', () => {
+			const text = `Some $not $math`
+			const doc = parser.parseMarkdown(text)
+			expect(doc.lines[0].content.ops).toEqual(buildOpsFromInsertList([
+				'Some $not $math'
+			], true))
+		})
+
+		it('Does not end math when the trailing $$ is not touching text to its left', () => {
+			const text = `Some $$not $$math`
+			const doc = parser.parseMarkdown(text)
+			expect(doc.lines[0].content.ops).toEqual(buildOpsFromInsertList([
+				'Some $$not $$math'
+			], true))
+		})
+
 		it('Does not consume characters when inline fails', () => {
 			// This catches a bug where math parsing triggered by the `$` character
 			// consumed the following `_` character, breaking inline math.
