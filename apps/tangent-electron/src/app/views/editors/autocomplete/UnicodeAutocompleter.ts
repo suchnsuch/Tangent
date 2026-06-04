@@ -46,6 +46,34 @@ const matches: MatcherItem[] = [
 		]
 	},
 	{
+		match: /=>/,
+		replace: [
+			'⇒',
+			'⟹',
+		]
+	},
+	{
+		match: /==>/,
+		replace: [
+			'⟹',
+			'⇒',
+		]
+	},
+	{
+		match: /<=/,
+		replace: [
+			'⇐',
+			'⟸',
+		]
+	},
+	{
+		match: /<==/,
+		replace: [
+			'⟸',
+			'⇐',
+		]
+	},
+	{
 		match: /---/,
 		replace: [
 			'—',
