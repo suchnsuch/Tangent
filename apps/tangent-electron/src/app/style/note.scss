@@ -817,4 +817,14 @@ t-embed {
 			tab-size: unset;
 		}
 	}
+
+	&.float-left {
+		float: left;
+		margin-right: 1em;
+	}
+	
+	&.float-right {
+		float: right;
+		margin-left: 1em;
+	}
 }

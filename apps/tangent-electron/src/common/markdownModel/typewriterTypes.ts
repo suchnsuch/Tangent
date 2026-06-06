@@ -8,6 +8,8 @@ import type { TagSectionData } from './tag'
 import type { CodeData } from './code'
 import type { MathData } from './math'
 import { hasCollapsedChildren, isCollapsed } from './sections'
+import type { HrefFormedLink } from 'common/indexing/indexTypes'
+import { getMediaCustomizationsFromText } from './links'
 
 const defaultOptions = {}
 
@@ -551,10 +553,25 @@ const noteTypeset:TypesetTypes = {
 					},
 					children
 				) as any
+
+				let link = attributes.t_link as HrefFormedLink
+				
+				let embedClassname = 'output'
+				const customizations = getMediaCustomizationsFromText(link.text)
+				if (customizations) {
+					if (customizations.float === 'left') {
+						embedClassname += ' float-left'
+					}
+					else if (customizations.float === 'right') {
+						embedClassname += ' float-right'
+					}
+				}
 				
 				// forward the link information
-				node.t_embed_props = attributes.t_link
-				node.t_embed_props.className = 'output'
+				node.t_embed_props = {
+					...attributes.t_link,
+					className: embedClassname
+				}
 
 				return node
 			},

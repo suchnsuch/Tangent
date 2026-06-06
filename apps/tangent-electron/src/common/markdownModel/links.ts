@@ -312,6 +312,39 @@ export function linkTextFromLink(link: HrefFormedLink): string {
 	}
 }
 
+type MediaCustomizations = {
+	width?: number
+	height?: number
+	float?: 'left'|'right'
+}
+export function getMediaCustomizationsFromText(text: string): MediaCustomizations {
+	if (!text) return null
+	let result: MediaCustomizations = {}
+
+	for (let part of text.split(/\s+/).map(p => p.trim())) {
+		const match = part.match(/((\d+)(x(\d+))?)|((left)|(right))/i)
+		if (match) {
+			if (match[2]) {
+				const width = parseInt(match[1])
+				if (width !== undefined) {
+					result.width = width
+				}
+			}
+			if (match[4]) {
+				const height = parseInt(match[4])
+				if (height !== undefined) {
+					result.height = height
+				}
+			}
+			if (match[5]) {
+				result.float = match[5].toLowerCase() as 'left'|'right'
+			}
+		}
+	}
+
+	return result
+}
+
 export function parseRawLink(char: string, parser: NoteParser): boolean {
 	if (char === ':' && parser.feed.checkFor('://', false)) {
 		const { feed, builder } = parser

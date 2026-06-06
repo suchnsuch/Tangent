@@ -8,7 +8,7 @@ import type { UrlDataError, WebsiteData } from 'common/urlData'
 import PdfPreview from 'app/views/node-views/PdfPreview.svelte'
 import { timeFromContentId } from 'app/model/nodeViewStates/AudioVideoViewState'
 import { appendContextTemplate, type ContextMenuConstructorOptions } from 'app/model/menus'
-import { linkTextFromLink } from 'common/markdownModel/links'
+import { getMediaCustomizationsFromText, linkTextFromLink } from 'common/markdownModel/links'
 import { deepEqual } from 'fast-equals'
 
 type Form = {
@@ -221,32 +221,22 @@ function getBaseStyle() {
 	return style
 }
 
-function imageStyle(customizations: string) {
+function imageStyle(customizationText: string) {
 
 	let style = getBaseStyle() + 'border-radius: 1px;'
 
+	const customizations = getMediaCustomizationsFromText(customizationText)
 	if (customizations) {
-		for (let part of customizations.split(/\s+/).map(p => p.trim())) {
-			const match = part.match(/((\d+)(x(\d+))?)|((left)|(right))/i)
-			if (match) {
-				if (match[2]) {
-					const width = parseInt(match[1])
-					if (width >= 10) {
-						style += `width: ${width}px;`
-					}
-				}
-				if (match[4]) {
-					const height = parseInt(match[4])
-					if (height >= 10) {
-						style += `height: ${height}px;`
-					}
-				}
-				if (match[5]) {
-					const form = match[5].toLowerCase()
-					style += `float: ${form};`
-				}
-			}
+		if (customizations.width >= 10) {
+			style += `width: ${customizations.width}px;`
 		}
+		if (customizations.height >= 10) {
+			style += `height: ${customizations.height}px;`
+		}
+	}
+
+	if (!customizations?.float) {
+		style += 'margin: 0 auto;'
 	}
 
 	return style
