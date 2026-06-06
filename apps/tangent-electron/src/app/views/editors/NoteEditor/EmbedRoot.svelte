@@ -221,38 +221,36 @@ function getBaseStyle() {
 	return style
 }
 
-function imageStyle(customizationText: string) {
+let containerStyle = $derived.by(() => {
+	let style = 'max-width: 100%;'
 
-	let style = getBaseStyle() + 'border-radius: 1px;'
-
-	const customizations = getMediaCustomizationsFromText(customizationText)
-	if (customizations) {
-		if (customizations.width >= 10) {
-			style += `width: ${customizations.width}px;`
-		}
-		if (customizations.height >= 10) {
-			style += `height: ${customizations.height}px;`
-		}
+	let setWidth = false
+	const customizations = getMediaCustomizationsFromText(link.text)
+	if (customizations?.width >= 10) {
+		style += `width: ${customizations.width}px;`
+		setWidth = true
+	}
+	else if (form.mode === 'audio' || form.mode === 'video') {
+		style += `width: 100%;`
+		setWidth = true
 	}
 
-	if (!customizations?.float) {
+	if (height > 0) {
+		style += `height: ${height}px;`
+	}
+	else if (customizations?.height >= 10) {
+		style += `height: ${customizations.height}px;`
+	}
+
+	if (customizations?.float && !setWidth && (form.mode === 'pdf' || form.mode === 'website')) {
+		style += 'width: 18em;' // I'd like this to be percentage-based, but that wasn't working…
+	}
+
+	if (block || !customizations?.float) {
 		style += 'margin: 0 auto;'
 	}
-
 	return style
-}
-
-function audioStyle() {
-	let style = getBaseStyle()
-	if (block) {
-		style +="width: 100%;"
-	}
-	return style
-}
-
-function websiteStyle(form: WebsiteData) {
-	return getBaseStyle()
-}
+})
 
 function websiteImageStyle(form: WebsiteData) {
 	if (form.images?.length) {
@@ -301,11 +299,11 @@ function onMediaContext(event: MouseEvent) {
 	<span class="error">⚠</span>
 {:else if form.mode === 'image'}
 	<!-- svelte-ignore a11y_missing_attribute -->
-	<img src={form.src} style={imageStyle(link.text)} onerror={e => error('Image not found!')} />
+	<img src={form.src} style={containerStyle} onerror={e => error('Image not found!')} />
 {:else if form.mode === 'audio'}
 	<!-- svelte-ignore a11y_click_events_have_key_events -->
 	<!-- svelte-ignore a11y_no_static_element_interactions -->
-	<media-controller style={audioStyle()} audio class="audio" onclick={e => e.preventDefault()} oncontextmenu={onMediaContext}>
+	<media-controller style={containerStyle} audio class="audio" onclick={e => e.preventDefault()} oncontextmenu={onMediaContext}>
 		<audio bind:this={mediaElement} slot="media" src={form.src} currenttime={form.time} onloadedmetadata={onAvLoaded}></audio>
 		<media-settings-menu hidden anchor="auto">
 			<media-settings-menu-item>
@@ -337,7 +335,7 @@ function onMediaContext(event: MouseEvent) {
 {:else if form.mode === 'video'}
 	<!-- svelte-ignore a11y_click_events_have_key_events -->
 	<!-- svelte-ignore a11y_no_static_element_interactions -->
-	<media-controller style={getBaseStyle()} onclick={e => e.preventDefault()} oncontextmenu={onMediaContext}>
+	<media-controller style={containerStyle} onclick={e => e.preventDefault()} oncontextmenu={onMediaContext}>
 		<!-- svelte-ignore a11y_media_has_caption -->
 		<video bind:this={mediaElement} slot="media" src={form.src} currenttime={form.time} onloadedmetadata={onAvLoaded}></video>
 		<media-settings-menu hidden anchor="auto">
@@ -369,11 +367,11 @@ function onMediaContext(event: MouseEvent) {
 		</media-control-bar>
 	</media-controller>
 {:else if form.mode === 'pdf'}
-	<div class="pdf" style:height={height > 0 ? height + 'px' : ''}>
+	<div class="pdf" style={containerStyle}>
 		<PdfPreview path={form.src} content_id={form.content_id} bind:height />
 	</div>
 {:else if form.mode === 'website'}
-	<div class={'website-preview ' + form.mediaType} class:description={form.description} style={websiteStyle(form)}>
+	<div class={'website-preview ' + form.mediaType} class:description={form.description} style={containerStyle}>
 		<div class="info">
 			{#if form.title}
 				<h1>{form.title.trim()}</h1>
@@ -394,7 +392,10 @@ function onMediaContext(event: MouseEvent) {
 		{/if}
 	</div>
 {:else if form.mode === 'youtube'}
-	<iframe style={getBaseStyle()} title={form.title} src={form.src} width="480" height="270" frameborder="0" allow="encrypted-media; picture-in-picture;" allowFullScreen></iframe>
+	{@const customizations = getMediaCustomizationsFromText(link.text)}
+	{@const width = customizations?.width ?? 480}
+	{@const height = customizations?.height ?? width / (16/9)}
+	<iframe style={getBaseStyle()} title={form.title} src={form.src} width={width} height={height} frameborder="0" allow="encrypted-media; picture-in-picture;" allowFullScreen></iframe>
 {/if}
 
 <!--
