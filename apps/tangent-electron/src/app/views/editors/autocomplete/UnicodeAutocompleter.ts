@@ -46,13 +46,6 @@ const matches: MatcherItem[] = [
 		]
 	},
 	{
-		match: /=>/,
-		replace: [
-			'⇒',
-			'⟹',
-		]
-	},
-	{
 		match: /==>/,
 		replace: [
 			'⟹',
@@ -60,10 +53,10 @@ const matches: MatcherItem[] = [
 		]
 	},
 	{
-		match: /<=/,
+		match: /=>/,
 		replace: [
-			'⇐',
-			'⟸',
+			'⇒',
+			'⟹',
 		]
 	},
 	{
@@ -71,6 +64,13 @@ const matches: MatcherItem[] = [
 		replace: [
 			'⟸',
 			'⇐',
+		]
+	},
+	{
+		match: /<=/,
+		replace: [
+			'⇐',
+			'⟸',
 		]
 	},
 	{
