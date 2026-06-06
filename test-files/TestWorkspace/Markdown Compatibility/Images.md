@@ -15,4 +15,4 @@ And also with encoded URIs:
 
 ![[Attachments/Pasted on 2021-11-01 at 14.58.47.png]]
 
-![[Attachments/Pasted on 2021-11-01 at 16.39.06.png]]	
+![[Attachments/Pasted on 2021-11-01 at 16.39.06.png|right]]You should be able to float images to the left or right of your content.

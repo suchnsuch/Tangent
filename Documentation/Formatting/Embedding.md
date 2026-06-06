@@ -28,16 +28,21 @@ https://download.samplelib.com/mp4/sample-5s.mp4
 And YouTube links:
 https://www.youtube.com/watch?v=qAuwW7Wzrng
 
-# Image Sizing
-You can resize images in both the wiki link and markdown syntax.
+# Embed Sizing
+You can resize embedded links in both the wiki link and markdown syntax. These customizations go where the display text would normally go in the link.
 
-You can specify the width of an image. Both of the following set the width of their embedded image to 150 pixels:
+You can specify the width with a single number. Both of the following set the width of their embedded image to 150 pixels:
 * `![[image.jpeg|150]]
 * `![150](url.com/image.jpg)`
 
-You can also specify the width and height of the image:
+You can also specify the width and height:
 * `![[image.jpeg|300x200]]`
 * `![300x200](url.com/image.jpg)`
+
+# Floating Embeds
+![[Lense Selection.png|right]]You can float embedded items to the left or right of your content. Your writing will wrap around the embedded content as you would expect.
+
+In the above example: `![[Lense Selection.png|right]]`
 
 # PDF Pages
 You can link to specific pages in a PDF by appending `#page=2` to a link. For instance: `[[file.pdf#page=6]]`.
