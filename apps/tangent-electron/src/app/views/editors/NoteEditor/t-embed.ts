@@ -6,7 +6,6 @@ import { TangentLink, type LinkState } from './t-link'
 import { markAsSelectionRequest } from 'app/events'
 import { deepEqual } from 'fast-equals'
 import type { HandleResult } from 'app/model/NodeHandle'
-import type { TooltipConfig } from 'app/utils/tooltips'
 import { isExternalLink } from 'common/links'
 
 function createStyleElement(href: string) {
@@ -105,11 +104,11 @@ class TangentEmbed extends TangentLink {
 
 		if (this.component) {
 			const component = this.component
-			if (component.block !== block) {
-				component.block = block
+			if (component.getBlock() !== block) {
+				component.setBlock(block)
 			}
-			if (!deepEqual(component.link, link)) {
-				component.link = link
+			if (!deepEqual(component.getLink(), link)) {
+				component.setLink(link)
 			}
 		}
 		else {
