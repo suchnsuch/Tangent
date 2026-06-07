@@ -9,49 +9,117 @@ import NoteParser from './NoteParser'
 import { ParsingContextType, type ParsingProgram } from './parsingContext'
 import { isExternalLink } from 'common/links'
 
-export const wikiLinkMatcher = /(\[\[)([^\[\]\n|#]*)(#[^\[\]\n|#]*)?(\|[^\[\]\n|#]*)?(\]\])?/
-
 interface ExtendedLinkInfo extends LinkInfo {
 	complete?: boolean
 }
 
+// A `[[` that is at the beginning of a string or has a non=`\` character in front
+const wikiLinkStartMatcher = /(?<=^|[^\\])(\[\[)/
+
+function indexOrNoneIfBeyond(index: number, limit: number) {
+	if (index > limit) return -1
+	return index
+}
+
+/**
+ * Identifies and extracts information about a [[wiki link]] in a string
+ * @param text The text to check and extract wiki link information from
+ * @param startIndex An offset to be applied to the found information (e.g. if the provided text is a slice of a larger string.)
+ * @returns Information about the matched link, or null if no link was found
+ */
 export function matchWikiLink(text: string, startIndex=0, options?: {
 	allowIncomplete?: boolean,
 	snipFormatCharacters?: boolean
 }): ExtendedLinkInfo {
-	const match = text.match(wikiLinkMatcher)
-	if (match && (options?.allowIncomplete || match[5])) {
-		const snipFormatCharacters = options?.snipFormatCharacters ?? true
-		let details: ExtendedLinkInfo = {
-			type: StructureType.Link,
-			form: 'wiki',
-			start: startIndex + match.index,
-			end: startIndex + match.index + match[0].length,
-			href: match[2]
-		}
+	const match = text.match(wikiLinkStartMatcher)
+	if (!match) return null
 
-		if (match[4]) {
-			// Optionally chop off the `|`
-			details.text = snipFormatCharacters ? match[4]?.substr(1) : match[4] 
-		}
+	const linkStart = match.index
 
-		if (match[3]) {
-			// Optionally chop off the `#`
-			details.content_id = snipFormatCharacters ? match[3].substr(1) : match[3]
+	// Move through matched `[]` pairs
+	let depth = 0
+	let index = linkStart + 2
+	for (; depth >= 0 && index < text.length; index++) {
+		let char = text[index]
+		if (char === '[') {
+			depth++
 		}
-
-		if (options?.allowIncomplete && match[5]) {
-			// No need to mark this otherwise
-			details.complete = true
+		else if (char === ']') {
+			depth--
 		}
-
-		return details
+		else if (char === '\\') {
+			// Jump the next character
+			index++
+		}
+		else if (char === '#' || char === '|' || char === '\n') {
+			break
+		}
 	}
-	return null
+
+	const hrefEnd = index + (depth <= -1 ? -1 : 0)
+
+	let contentIdStart = -1
+	let contentIdEnd = -1
+	let textStart = -1
+	let textEnd = -1
+
+	if (text[hrefEnd] === '#') {
+		contentIdStart = hrefEnd
+	}
+
+	const nextNewline = text.indexOf('\n', hrefEnd)
+	const lastIndex = nextNewline > -1 ? nextNewline : text.length
+	textStart = indexOrNoneIfBeyond(text.indexOf('|', hrefEnd), lastIndex)
+
+	if (textStart > -1) {
+		if (contentIdStart > -1) contentIdEnd = textStart
+	}
+
+	let endIndex = indexOrNoneIfBeyond(text.indexOf(']]', textStart > -1 ? textStart : hrefEnd), lastIndex)
+	let linkEnd = -1
+	if (endIndex > -1) {
+		linkEnd = endIndex + 2
+	}
+	else if (options?.allowIncomplete) {
+		endIndex = lastIndex
+		linkEnd = lastIndex
+	}
+
+	if (endIndex > -1) {
+		if (contentIdStart > -1 && contentIdEnd == -1) contentIdEnd = endIndex
+		if (textStart > -1 && textEnd == -1) textEnd = endIndex
+	}
+	else return null
+
+	const details: ExtendedLinkInfo = {
+		type: StructureType.Link,
+		form: 'wiki',
+		start: startIndex + linkStart,
+		end: startIndex + linkEnd,
+		href: text.substring(linkStart + 2, hrefEnd)
+	}
+
+	const snipFormatCharacters = options?.snipFormatCharacters ?? true
+
+	if (contentIdEnd > 0) {
+		details.content_id = text.substring(
+			snipFormatCharacters ? contentIdStart + 1 : contentIdStart,
+			contentIdEnd
+		)
+	}
+
+	if (textEnd > 0) {
+		details.text = text.substring(
+			snipFormatCharacters ? textStart + 1 : textStart,
+			textEnd
+		)
+	}
+
+	return details
 }
 
 // A `[` that is at the beginning of a string or has a non=`\` character in front
-const linkStartMatcher = /(?<=^|[^\\])(\[)/
+const markdownLinkStartMatcher = /(?<=^|[^\\])(\[)/
 
 /**
  * Identifies and extracts information about a markdown link in a string
@@ -60,7 +128,7 @@ const linkStartMatcher = /(?<=^|[^\\])(\[)/
  * @returns Information about the matched link, or null if no link was found
  */
 export function matchMarkdownLink(text: string, startIndex=0): LinkInfo {
-	const match = text.match(linkStartMatcher)
+	const match = text.match(markdownLinkStartMatcher)
 	if (!match) return null
 
 	const linkStart = match.index

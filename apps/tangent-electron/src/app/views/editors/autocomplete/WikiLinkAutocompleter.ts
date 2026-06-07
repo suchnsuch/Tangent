@@ -3,7 +3,7 @@ import { TextDocument, type EditorRange, Editor, normalizeRange, ShortcutEvent }
 import type { AutocompleteHandler, AutocompleteModule } from "./autocompleteModule";
 import { iterateOverChildren, type TreeNode, type TreePredicate, TreePredicateResult } from 'common/trees'
 import { WritableStore } from 'common/stores'
-import { matchWikiLink, wikiLinkMatcher } from 'common/markdownModel/links'
+import { matchWikiLink } from 'common/markdownModel/links'
 import { type HeaderInfo, IndexData } from "common/indexing/indexTypes";
 import { safeHeaderLine } from "common/markdownModel/header";
 import { rangeContainsRange } from 'common/typewriterUtils';
@@ -103,17 +103,17 @@ export default class WikiLinkAutocompleter implements AutocompleteHandler {
 
 			let textIndex = 0
 			while (textIndex < text.length) {
-				const match = text.substr(textIndex).match(wikiLinkMatcher)
+				const match = matchWikiLink(text.substring(textIndex), textIndex, {
+					allowIncomplete: true
+				})
 				if (!match) break
 
-				const start = match.index + textIndex
-				const matchRange = [lineRange[0] + start, lineRange[0] + start + match[0].length] as EditorRange
+				const matchRange = [lineRange[0] + match.start, lineRange[0] + match.end] as EditorRange
 				if (rangeContainsRange(matchRange, selection)) {
-
 					return matchRange
 				}
 				else {
-					textIndex += match.index + match[0].length
+					textIndex += match.end
 				}
 			}
 		}

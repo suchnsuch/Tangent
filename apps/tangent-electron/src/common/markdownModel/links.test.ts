@@ -1,7 +1,145 @@
 import { describe, expect, it } from 'vitest'
 
 import { StructureType } from 'common/indexing/indexTypes'
-import { createContentIdMatcher, matchMarkdownLink } from './links'
+import { createContentIdMatcher, matchMarkdownLink, matchWikiLink } from './links'
+
+describe('Wiki Links', () => {
+	it('Should work for the basics', () => {
+		expect(matchWikiLink('[[File Name]]')).toEqual({
+			type: StructureType.Link,
+			start: 0,
+			end: 13,
+			form: 'wiki',
+			href: 'File Name'
+		})
+	})
+
+	it('Should allow for custom text', () => {
+		expect(matchWikiLink('[[File Name|my text]]')).toEqual({
+			type: StructureType.Link,
+			start: 0,
+			end: 21,
+			form: 'wiki',
+			href: 'File Name',
+			text: 'my text'
+		})
+	})
+
+	it('Should allow for header links', () => {
+		expect(matchWikiLink('[[File Name#My Header]]')).toEqual({
+			type: StructureType.Link,
+			start: 0,
+			end: 23,
+			form: 'wiki',
+			href: 'File Name',
+			content_id: 'My Header'
+		})
+	})
+
+	it('Should allow for header links all alone', () => {
+		expect(matchWikiLink('[[#My Header]]')).toEqual({
+			type: StructureType.Link,
+			start: 0,
+			end: 14,
+			form: 'wiki',
+			href: '',
+			content_id: 'My Header'
+		})
+	})
+
+	it('Should allow for header and custom text', () => {
+		expect(matchWikiLink('[[File Name#My Header|my text]]')).toEqual({
+			type: StructureType.Link,
+			start: 0,
+			end: 31,
+			form: 'wiki',
+			href: 'File Name',
+			content_id: 'My Header',
+			text: 'my text'
+		})
+	})
+
+	it('Should optionally include format characters', () => {
+		expect(matchWikiLink('[[File Name#My Header|my text]]', 0, {
+			snipFormatCharacters: false
+		})).toEqual({
+			type: StructureType.Link,
+			start: 0,
+			end: 31,
+			form: 'wiki',
+			href: 'File Name',
+			content_id: '#My Header',
+			text: '|my text'
+		})
+	})
+
+
+
+	it('Can match names with nested brackets', () => {
+		expect(matchWikiLink('[[[Bracket] Name]]')).toEqual({
+			type: StructureType.Link,
+			start: 0,
+			end: 18,
+			form: 'wiki',
+			href: '[Bracket] Name'
+		})
+	})
+
+	it('Should not find an unclosed link', () => {
+		expect(matchWikiLink('My [[Dead Link', )).toBeNull()
+		expect(matchWikiLink('My [[Dead Link]', )).toBeNull()
+	})
+
+	it('Can find links later in the string', () => {
+		expect(matchWikiLink('Here is a [[File Name]]')).toEqual({
+			type: StructureType.Link,
+			start: 10,
+			end: 23,
+			form: 'wiki',
+			href: 'File Name'
+		})
+	})
+
+	it('Offsets the reported index by the provided value', () => {
+		expect(matchWikiLink('Here is a [[File Name]]', 10)).toEqual({
+			type: StructureType.Link,
+			start: 20,
+			end: 33,
+			form: 'wiki',
+			href: 'File Name'
+		})
+	})
+
+	it('Should not match over newlines', () => {
+		expect(matchWikiLink('Here is a [[File\nName]]', 10)).toBeNull()
+	})
+
+	describe('Incomplete Wiki Links', () => {
+		const options = {
+			allowIncomplete: true
+		}
+
+		it('Should find opening brackets and text', () => {
+			expect(matchWikiLink('[[Unclosed Link', 0, options)).toEqual({
+				type: StructureType.Link,
+				start: 0,
+				end: 15,
+				form: 'wiki',
+				href: 'Unclosed Link'
+			})
+		})
+
+		it('Does not include trailing newlines', () => {
+			expect(matchWikiLink('[[Unclosed link\nof doom', 0, options)).toEqual({
+				type: StructureType.Link,
+				start: 0,
+				end: 15,
+				form: 'wiki',
+				href: 'Unclosed link'
+			})
+		})
+	})
+})
 
 describe('Markdown Links', () => {
 	it('should work for basics', () => {
