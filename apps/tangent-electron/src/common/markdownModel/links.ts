@@ -1,5 +1,5 @@
 import { type EmbedInfo, type HrefFormedLink, type LinkInfo, StructureType } from "../indexing/indexTypes"
-import type { AttributeMap, TextDocument } from '@typewriter/document'
+import type { AttributeMap, Op, TextDocument } from '@typewriter/document'
 import { lineToText } from '../typewriterUtils'
 import { type TreeNode, validatePath } from 'common/trees'
 import paths from '../paths'
@@ -345,6 +345,23 @@ export function getMediaCustomizationsFromText(text: string): MediaCustomization
 	return result
 }
 
+function getIsAtStartOfContent(spans: Op[]) {
+	if (spans.length === 0) return true
+
+	for (let i = 0; i < spans.length; i++) {
+		const span = spans[i]
+		if (span.attributes.line_format === 'indent') continue
+		else if (span.attributes.list_format) {
+			if (i != spans.length - 2) return false
+			const next = spans[i + 1]
+			return next.retain === 1 || next.insert === ' ' // The space trailing a list glyph
+		}
+		else return false
+	}
+
+	return true
+}
+
 export function parseRawLink(char: string, parser: NoteParser): boolean {
 	if (char === ':' && parser.feed.checkFor('://', false)) {
 		const { feed, builder } = parser
@@ -359,7 +376,7 @@ export function parseRawLink(char: string, parser: NoteParser): boolean {
 		// Close old data
 		parser.commitSpan(null, firstChar - feed.index)
 
-		const isAtStartOfContent = builder.spans.length === 0 || builder.spans[0].attributes.line_format === 'indent'
+		const isAtStartOfContent = getIsAtStartOfContent(builder.spans)
 
 		feed.consumeUntil(' ')
 		const t_link: HrefFormedLink & { block?: boolean } = {
