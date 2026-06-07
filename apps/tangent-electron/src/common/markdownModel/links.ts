@@ -397,6 +397,7 @@ export function parseRawLink(char: string, parser: NoteParser): boolean {
 
 		if (isAtStartOfContent && !restOfLine.trim()) {
 			isEmbed = isEmbed || parser.autoEmbedRawLinks
+			parser.lineData.embedLine = true
 			t_link.block = isEmbed
 		}
 
@@ -431,6 +432,8 @@ export function parseLink(char: string, parser: NoteParser): boolean {
 		// Commit everything before the `!` in the case of an embed
 		parser.commitSpan(null, isEmbed ? -1 : 0)
 
+		const isAtStartOfContent = getIsAtStartOfContent(builder.spans)
+
 		const t_link: HrefFormedLink & { block?: boolean } = {
 			href: wikiLinkInfo.href,
 			form: 'wiki',
@@ -442,7 +445,16 @@ export function parseLink(char: string, parser: NoteParser): boolean {
 		// helps ensure sane-looking output
 		if (isEmbed) {
 			// TODO: Convert to allowing indentation for embeds
-			t_link.block = parser.lineStart === feed.index - 1
+			t_link.block = isAtStartOfContent
+			if (isAtStartOfContent) {
+				const restOfLine = feed.getLineText(wikiLinkInfo.end)
+				if (!restOfLine.trim()) {
+					const customizations = getMediaCustomizationsFromText(wikiLinkInfo.text)
+					//if (!customizations?.float) {
+						parser.lineData.embedLine = true
+					//}
+				}
+			}
 		}
 		if (parser.filepath) {
 			t_link.from = parser.filepath
@@ -580,6 +592,8 @@ export function parseLink(char: string, parser: NoteParser): boolean {
 		// Commit everything before the `!` in the case of an embed
 		parser.commitSpan(null, isEmbed ? -1 : 0)
 
+		const isAtStartOfContent = getIsAtStartOfContent(builder.spans)
+
 		const t_link: HrefFormedLink & { block?: boolean } = {
 			href: mdLinkInfo.href,
 			form: 'md',
@@ -592,7 +606,16 @@ export function parseLink(char: string, parser: NoteParser): boolean {
 		// helps ensure sane-looking output
 		if (isEmbed) {
 			// TODO: Convert to allowing indentation for embeds
-			t_link.block = parser.lineStart === feed.index - 1
+			t_link.block = isAtStartOfContent
+			if (isAtStartOfContent) {
+				const restOfLine = feed.getLineText(mdLinkInfo.end)
+				if (!restOfLine.trim()) {
+					const customizations = getMediaCustomizationsFromText(mdLinkInfo.text)
+					//if (!customizations?.float) {
+						parser.lineData.embedLine = true
+					//}
+				}
+			}
 		}
 		if (parser.filepath) {
 			t_link.from = parser.filepath

@@ -491,7 +491,13 @@ export default class Settings extends ObjectStore {
 
 	rawLinksAutoEmbed = new Setting<boolean>({
 		name: 'Auto Embed Raw Links',
-		description: 'When on, raw links on their own line are automatically treated as embed links. (Requires restart.)',
+		description: 'When enabled, raw links on their own line are automatically treated as embed links. (Requires restart.)',
+		defaultValue: true
+	})
+
+	collapseEmbedLinkLines = new Setting<boolean>({
+		name: 'Collapse Embed Link Lines',
+		description: 'When enabled, embedded links on their own line will collapse their link text, removing the blank space above the link.',
 		defaultValue: true
 	})
 

@@ -89,6 +89,16 @@ $: {
 	setDefaultUseKeyCode($useKeyCodeShortcuts)
 }
 
+$: collapseEmbedLinkLines = workspace?.settings.collapseEmbedLinkLines
+$: {
+	if ($collapseEmbedLinkLines) {
+		document.body.classList.add('collapse-embed-link-lines')
+	}
+	else {
+		document.body.classList.remove('collapse-embed-link-lines')
+	}
+}
+
 $: accentHue = workspace?.settings.accentHue
 $: accentSaturation = workspace?.settings.accentSaturation
 $: noteFont = workspace?.settings.noteFont

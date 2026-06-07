@@ -789,10 +789,45 @@ t-link[form="wiki"] {
 	}
 }
 
+.collapse-embed-link-lines {
+	.line.embedLine:not([data-focus="focused"]):not(:has(.error)) {
+		// List lines can still count as embed lines,
+		// but we don't want to collapse the list glyph
+		&.list {
+			display: flex;
+
+			.t-embed:not(.revealed):not(.error) {
+				display: flex;
+				justify-content: center;
+				flex-grow: 1;
+				t-link {
+					font-size: 0;
+					line-height: 0;
+				}
+				t-embed {
+					flex-grow: 1;
+				}
+			}
+		}
+		// Normal embed lines can be collapsed a little more directly
+		&:not(.list) {
+			line-height: 0;
+			font-size: 0;
+			min-height: 0;
+
+			
+			--lineIndent: 0;
+			t-embed {
+				margin-inline-start: calc(var(--spaceWidth) * var(--lineIndent));
+			}
+		}
+	}
+}
+
 .t-embed.error {
 	.hidden {
-		font-size: unset;
-		line-height: unset;
+		font-size: var(--fontSize);
+		line-height: rhythmUnit(1);
 		tab-size: unset;
 	}
 }
@@ -807,6 +842,11 @@ t-embed {
 	display: block;
 	margin-top: .5em;
 	margin-bottom: .5em;
+
+	// Ensure that line height and font size is always consistent, regardless of containing collapsed state
+	line-height: rhythmUnit(1);
+	font-size: var(--fontSize);
+
 	&[link-state="error"] {
 		color: var(--emptyLinkTextColor);
 

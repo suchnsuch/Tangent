@@ -124,6 +124,9 @@ function getCoreLineProperties(attributes, baseClass = ''): AttributeMap {
 	if (attributes.empty) {
 		props.className += ' empty'
 	}
+	if (attributes.embedLine) {
+		props.className += ' embedLine'
+	}
 
 	const indent = attributes.indent as IndentDefinition
 	if (indent) {
@@ -546,6 +549,21 @@ const noteTypeset:TypesetTypes = {
 					className += ' revealed'
 				}
 
+				let link = attributes.t_link as HrefFormedLink
+
+				let embedClassname = 'output'
+				const customizations = getMediaCustomizationsFromText(link.text)
+				if (customizations) {
+					if (customizations.float === 'left') {
+						className += ' float-left'
+						embedClassname += ' float-left'
+					}
+					else if (customizations.float === 'right') {
+						className += ' float-right'
+						embedClassname += ' float-right'
+					}
+				}
+
 				let node = h(
 					'span',
 					{
@@ -554,19 +572,6 @@ const noteTypeset:TypesetTypes = {
 					children
 				) as any
 
-				let link = attributes.t_link as HrefFormedLink
-				
-				let embedClassname = 'output'
-				const customizations = getMediaCustomizationsFromText(link.text)
-				if (customizations) {
-					if (customizations.float === 'left') {
-						embedClassname += ' float-left'
-					}
-					else if (customizations.float === 'right') {
-						embedClassname += ' float-right'
-					}
-				}
-				
 				// forward the link information
 				node.t_embed_props = {
 					...attributes.t_link,
