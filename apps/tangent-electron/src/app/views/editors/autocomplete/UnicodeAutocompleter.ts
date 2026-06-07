@@ -95,7 +95,7 @@ const matches: MatcherItem[] = [
 	}
 ]
 
-const activateChars = '-><.'
+const activateChars = '-><.='
 
 export default class UnicodeAutocompleter implements AutocompleteHandler {
 	workspace: Workspace
