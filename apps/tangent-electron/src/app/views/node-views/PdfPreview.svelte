@@ -103,7 +103,7 @@ function renderPage() {
 </script>
 
 <div bind:this={container} use:resizeObserver={onResize}>
-	<canvas bind:this={canvas}></canvas>
+	<canvas bind:this={canvas} style="max-width: 100%;"></canvas>
 </div>
 
 <style lang="scss">
