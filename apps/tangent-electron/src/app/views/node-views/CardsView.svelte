@@ -195,6 +195,8 @@ function updateShowCreateFromHover(event: MouseEvent) {
 
 				padding: .5rem;
 
+				text-align: -webkit-auto; // fixes strange behaviour for RTL where `dir=auto` does not work
+
 				--fontSize: calc(1rem * .8);
 				--headerFontSizeFactor: 2;
 
