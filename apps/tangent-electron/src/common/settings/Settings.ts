@@ -489,6 +489,12 @@ export default class Settings extends ObjectStore {
 		defaultValue: false
 	})
 
+	askWorkspaceEveryTime = new Setting<boolean>({
+		name: 'Always Ask Workspace',
+		description: 'Always asks for choosing workspace instead of opening default (previous) workspace at startup',
+		defaultValue: false
+	})
+
 	rawLinksAutoEmbed = new Setting<boolean>({
 		name: 'Auto Embed Raw Links',
 		description: 'When enabled, raw links on their own line are automatically treated as embed links. (Requires restart.)',

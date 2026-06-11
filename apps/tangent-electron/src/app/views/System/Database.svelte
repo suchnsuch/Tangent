@@ -21,4 +21,7 @@ let settings = workspace.settings
 	<div class="settingsGroup">
 		<SettingView setting={settings.areLinksCaseSensitive} />
 	</div>
+	<div class="settingsGroup">
+		<SettingView setting={settings.askWorkspaceEveryTime} />
+	</div>
 </main>
