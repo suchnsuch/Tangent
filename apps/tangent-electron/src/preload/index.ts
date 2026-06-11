@@ -1,4 +1,3 @@
-import type Settings from 'common/settings/Settings'
 import type WindowApi from 'common/WindowApi'
 import type { UserMessage } from 'common/WindowApi'
 import { contextBridge, ipcRenderer } from 'electron'
