@@ -6,7 +6,6 @@ import type { ContextMenuTemplate } from './menus'
 import type { QueryResult } from './indexing/queryResults'
 import type { QueryParseResult } from '@such-n-such/tangent-query-parser'
 import type { UrlData } from './urlData'
-import type Settings from './settings/Settings'
 
 export interface SelectPathOptions {
 	title?: string
