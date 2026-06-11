@@ -8,7 +8,7 @@ import WikiLinkAutocompleter from '../autocomplete/WikiLinkAutocompleter'
 import type { Workspace } from 'app/model'
 import { getLineFormattingPrefix } from 'common/markdownModel/line'
 import tlinkModule from '../t-linkModule'
-import newtCheckboxModule from "../t-checkboxModule"
+import newtCheckboxModule from '../t-checkboxModule'
 import TagAutocompleter from '../autocomplete/TagAutocompleter'
 import { getRegexMatchIndices } from '@such-n-such/core'
 import UnicodeAutocompleter from '../autocomplete/UnicodeAutocompleter'
