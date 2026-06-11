@@ -18,8 +18,15 @@ import './dictionary'
 import './themes'
 import './urlData'
 import { FileSaveResult } from 'main/File'
+import { getSettings } from 'main/settings'
+
 
 const log = Logger.get('messages')
+
+
+ipcMain.handle('loadStartupBehaviour', async (event) => {
+	return getSettings().startupBehaviourAboutWorkspace.value
+})
 
 ipcMain.handle('getKnownWorkspaces', async (event) => {
 

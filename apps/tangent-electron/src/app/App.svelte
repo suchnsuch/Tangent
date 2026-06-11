@@ -185,13 +185,24 @@ window.addEventListener('keyup', (event:KeyboardEvent) => {
 	}
 })
 
-// Try to load a default workspace
-api.getWorkspace()
-.then(state => setState(state.globalSettings.askWorkspaceEveryTime ? null : state))
-.catch(e => {
-	console.error('Could not load default workspace.')
+// startup behaviour
+api.loadStartupBehaviour().then(s => {
+	if (s == 'ask'){
+		setState(null)
+	}
+	else {
+		// Try to load a default workspace
+		api.getWorkspace().then(setState)
+		.catch(e => {
+			console.error('Could not load default workspace.')
+			console.log(e)
+		})
+	}
+}).catch(e => {
+	console.error('Could not load global settings.')
 	console.log(e)
 })
+
 
 let title = 'Tangent'
 async function setState(state: WorkspaceInitState) {

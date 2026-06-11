@@ -489,10 +489,22 @@ export default class Settings extends ObjectStore {
 		defaultValue: false
 	})
 
-	askWorkspaceEveryTime = new Setting<boolean>({
-		name: 'Always Ask Workspace',
-		description: 'Always asks for choosing workspace instead of opening default (previous) workspace at startup',
-		defaultValue: false
+	startupBehaviourAboutWorkspace = new Setting<'last' | 'ask'>({
+		name: 'Startup Behaviour',
+		description: 'whether automatically open the last workspace or let user choose one on startup',
+		validValues: [
+			{
+				value: 'last',
+				displayName: 'Last Opened',
+				description: 'the last workspace will be opened'
+			},
+			{
+				value: 'ask',
+				displayName: 'Workspace Selector',
+				description: 'let\'s you choose what workspace to open'
+			}
+		],
+		defaultValue: 'last'
 	})
 
 	rawLinksAutoEmbed = new Setting<boolean>({

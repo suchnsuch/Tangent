@@ -6,6 +6,7 @@ import type { ContextMenuTemplate } from './menus'
 import type { QueryResult } from './indexing/queryResults'
 import type { QueryParseResult } from '@such-n-such/tangent-query-parser'
 import type { UrlData } from './urlData'
+import Settings from 'common/settings/Settings'
 
 export interface SelectPathOptions {
 	title?: string
@@ -26,6 +27,8 @@ export interface UserMessage {
 type SelectPathResult<T extends SelectPathOptions> = T extends { selectMultiple: true } ? string[] : string
 
 export default interface WindowAPI {
+	loadStartupBehaviour(): Promise<string>
+	
 	getWorkspace(workspacePath?: string): Promise<WorkspaceInitState>
 	getKnownWorkspaces(): Promise<string[]>
 	forgetWorkspace(path: string)

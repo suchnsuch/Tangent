@@ -27,6 +27,10 @@ on('message', onMessages)
 
 const bridge: WindowApi = {
 
+	loadStartupBehaviour(){
+		return ipcRenderer.invoke('loadStartupBehaviour')
+	},
+
 	getKnownWorkspaces() {
 		return ipcRenderer.invoke('getKnownWorkspaces')
 	},

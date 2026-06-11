@@ -10,6 +10,9 @@ let settings = workspace.settings
 </script>
 
 <main>
+	<div class="settingsGroup">
+		<SettingView setting={settings.startupBehaviourAboutWorkspace} />
+	</div>
 	<h2>Files</h2>
 	<div class="settingsGroup">
 		<SettingView setting={settings.dirtyIndicatorVisibility} />
@@ -20,8 +23,5 @@ let settings = workspace.settings
 	</div>
 	<div class="settingsGroup">
 		<SettingView setting={settings.areLinksCaseSensitive} />
-	</div>
-	<div class="settingsGroup">
-		<SettingView setting={settings.askWorkspaceEveryTime} />
 	</div>
 </main>
