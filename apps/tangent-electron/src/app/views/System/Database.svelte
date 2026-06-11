@@ -11,7 +11,7 @@ let settings = workspace.settings
 
 <main>
 	<div class="settingsGroup">
-		<SettingView setting={settings.startupBehaviourAboutWorkspace} />
+		<SettingView setting={settings.startupBehaviour} />
 	</div>
 	<h2>Files</h2>
 	<div class="settingsGroup">
