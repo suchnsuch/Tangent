@@ -204,7 +204,6 @@ api.settings.get().then(s => {
 	console.log(e)
 })
 
-
 let title = 'Tangent'
 async function setState(state: WorkspaceInitState) {
 	if (showLoadingTimeout) {

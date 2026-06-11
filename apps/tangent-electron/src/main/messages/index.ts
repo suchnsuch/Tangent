@@ -19,9 +19,7 @@ import './themes'
 import './urlData'
 import { FileSaveResult } from 'main/File'
 
-
 const log = Logger.get('messages')
-
 
 ipcMain.handle('getKnownWorkspaces', async (event) => {
 
