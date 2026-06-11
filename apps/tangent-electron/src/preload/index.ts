@@ -1,3 +1,4 @@
+import type Settings from 'common/settings/Settings'
 import type WindowApi from 'common/WindowApi'
 import type { UserMessage } from 'common/WindowApi'
 import { contextBridge, ipcRenderer } from 'electron'
@@ -26,10 +27,6 @@ function onMessages(message: UserMessage) {
 on('message', onMessages)
 
 const bridge: WindowApi = {
-
-	loadStartupBehaviour(){
-		return ipcRenderer.invoke('loadStartupBehaviour')
-	},
 
 	getKnownWorkspaces() {
 		return ipcRenderer.invoke('getKnownWorkspaces')
@@ -221,6 +218,9 @@ const bridge: WindowApi = {
 		}
 	},
 	settings: {
+		get(): Promise<object> {
+			return ipcRenderer.invoke('getGlobalSettings')
+		},
 		patch(patch: any) {
 			ipcRenderer.send('patchGlobalSettings', patch)
 		}
