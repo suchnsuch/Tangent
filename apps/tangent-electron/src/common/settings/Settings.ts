@@ -426,6 +426,24 @@ export default class Settings extends ObjectStore {
 		defaultValue: true
 	})
 
+	checkBoxChar = new Setting<'x' | '+'>({
+		name: 'checkbox checked glyph',
+		description: 'only affects when you click on checkbox',
+		validValues: [
+			{
+				value: 'x',
+				displayName: 'x',
+				description: 'common markdown'
+			},
+			{
+				value: '+',
+				displayName: '+',
+				description: 'for RTL language, puts you outside of markdown standard'
+			}
+		],
+		defaultValue: 'x'
+	})
+
 	linkCursor: Setting<string> = new Setting<string>(linkCursorDefinition)
 
 	// Attachments
