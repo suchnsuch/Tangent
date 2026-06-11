@@ -491,17 +491,17 @@ export default class Settings extends ObjectStore {
 
 	startupBehaviourAboutWorkspace = new Setting<'last' | 'ask'>({
 		name: 'Startup Behaviour',
-		description: 'whether automatically open the last workspace or let user choose one on startup',
+		description: 'Whether automatically open the last workspace or let you choose one on startup',
 		validValues: [
 			{
 				value: 'last',
 				displayName: 'Last Opened',
-				description: 'the last workspace will be opened'
+				description: 'Reopen last workspace'
 			},
 			{
 				value: 'ask',
 				displayName: 'Workspace Selector',
-				description: 'you choose what workspace to open'
+				description: 'Ask which workspace to open'
 			}
 		],
 		defaultValue: 'last'
