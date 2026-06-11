@@ -489,7 +489,7 @@ export default class Settings extends ObjectStore {
 		defaultValue: false
 	})
 
-	startupBehaviourAboutWorkspace = new Setting<'last' | 'ask'>({
+	startupWorkspaceBehaviour = new Setting<'last' | 'ask'>({
 		name: 'Startup Behaviour',
 		description: 'Whether automatically open the last workspace or let you choose one on startup',
 		validValues: [

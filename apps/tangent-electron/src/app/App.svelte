@@ -189,7 +189,7 @@ window.addEventListener('keyup', (event:KeyboardEvent) => {
 
 // startup behaviour
 api.settings.getSafe().then(s => {
-	if ((s as Settings).startupBehaviourAboutWorkspace.value == 'ask'){
+	if ((s as Settings).startupWorkspaceBehaviour.value == 'ask'){
 		setState(null)
 	}
 	else {
