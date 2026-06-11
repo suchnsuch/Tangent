@@ -124,8 +124,8 @@ export default interface WindowAPI {
 	}
 
 	settings: {
-		/** Applies a patch to the system settings */
 		get(): Promise<object>
+		/** Applies a patch to the system settings */
 		patch(patch: any)
 	}
 
