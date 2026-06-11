@@ -187,7 +187,7 @@ window.addEventListener('keyup', (event:KeyboardEvent) => {
 
 
 // startup behaviour
-api.settings.get().then(s => {
+api.settings.getRaw().then(s => {
 	if (s['startupBehaviourAboutWorkspace'] == 'ask'){
 		setState(null)
 	}

@@ -124,7 +124,7 @@ export default interface WindowAPI {
 	}
 
 	settings: {
-		get(): Promise<object>
+		getRaw(): Promise<object>
 		/** Applies a patch to the system settings */
 		patch(patch: any)
 	}
