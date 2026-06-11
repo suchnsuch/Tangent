@@ -161,7 +161,6 @@ function updateShowCreateFromHover(event: MouseEvent) {
 
 <style lang="scss">
 .CardsView {
-	text-align: left;
 	padding-top: 3rem;
 
 	&.layout-fill {
