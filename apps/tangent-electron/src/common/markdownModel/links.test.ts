@@ -110,6 +110,56 @@ describe('Wiki Links', () => {
 		})
 	})
 
+	it('Does not get confused by links later in the string', () => {
+		expect(matchWikiLink('[[One Link]] and [[Two Link]]')).toEqual({
+			type: StructureType.Link,
+			start: 0,
+			end: 12,
+			form: 'wiki',
+			href: 'One Link'
+		})
+	})
+
+	it('Does not get confused by link text later in the string', () => {
+		expect(matchWikiLink('[[One Link]] and [[Two Link|stuff]]')).toEqual({
+			type: StructureType.Link,
+			start: 0,
+			end: 12,
+			form: 'wiki',
+			href: 'One Link'
+		})
+	})
+
+	it('Does not get confused by link content ids later in the string', () => {
+		expect(matchWikiLink('[[One Link]] and [[Two Link#Header]]')).toEqual({
+			type: StructureType.Link,
+			start: 0,
+			end: 12,
+			form: 'wiki',
+			href: 'One Link'
+		})
+	})
+
+	it('Does not get confused by pipes later in the string', () => {
+		expect(matchWikiLink('[[One Link]] and a|pipe')).toEqual({
+			type: StructureType.Link,
+			start: 0,
+			end: 12,
+			form: 'wiki',
+			href: 'One Link'
+		})
+	})
+
+	it('Does not get confused by hashes later in the string', () => {
+		expect(matchWikiLink('[[One Link]] and a #tag')).toEqual({
+			type: StructureType.Link,
+			start: 0,
+			end: 12,
+			form: 'wiki',
+			href: 'One Link'
+		})
+	})
+
 	it('Should not match over newlines', () => {
 		expect(matchWikiLink('Here is a [[File\nName]]', 10)).toBeNull()
 	})

@@ -16,11 +16,6 @@ interface ExtendedLinkInfo extends LinkInfo {
 // A `[[` that is at the beginning of a string or has a non=`\` character in front
 const wikiLinkStartMatcher = /(?<=^|[^\\])(\[\[)/
 
-function indexOrNoneIfBeyond(index: number, limit: number) {
-	if (index > limit) return -1
-	return index
-}
-
 /**
  * Identifies and extracts information about a [[wiki link]] in a string
  * @param text The text to check and extract wiki link information from
@@ -56,40 +51,51 @@ export function matchWikiLink(text: string, startIndex=0, options?: {
 		}
 	}
 
-	const hrefEnd = index + (depth <= -1 ? -1 : 0)
+	// Backstep to the first `[` of the end
+	if (depth <= -1) index--
+
+	const hrefEnd = index
 
 	let contentIdStart = -1
 	let contentIdEnd = -1
 	let textStart = -1
 	let textEnd = -1
-
-	if (text[hrefEnd] === '#') {
-		contentIdStart = hrefEnd
-	}
-
-	const nextNewline = text.indexOf('\n', hrefEnd)
-	const lastIndex = nextNewline > -1 ? nextNewline : text.length
-	textStart = indexOrNoneIfBeyond(text.indexOf('|', hrefEnd), lastIndex)
-
-	if (textStart > -1) {
-		if (contentIdStart > -1) contentIdEnd = textStart
-	}
-
-	let endIndex = indexOrNoneIfBeyond(text.indexOf(']]', textStart > -1 ? textStart : hrefEnd), lastIndex)
 	let linkEnd = -1
-	if (endIndex > -1) {
-		linkEnd = endIndex + 2
-	}
-	else if (options?.allowIncomplete) {
-		endIndex = lastIndex
-		linkEnd = lastIndex
+
+	for (; index < text.length; index++) {
+		const char = text[index]
+		if (char === '#') {
+			if (contentIdStart < 0) contentIdStart = index
+		}
+		else if (char === '|') {
+			if (contentIdStart >= 0) contentIdEnd = index
+			if (textStart < 0) textStart = index
+		}
+		else if (char === '\\') {
+			// Jump the next character
+			index++
+		}
+		else if (char === '\n') {
+			// Resolve as if the string has ended
+			break
+		}
+		else if (char === ']' && text[index + 1] === ']') {
+			if (contentIdStart > -1 && contentIdEnd == -1) contentIdEnd = index
+			if (textStart > -1 && textEnd == -1) textEnd = index
+			linkEnd = index + 2
+			break
+		}
 	}
 
-	if (endIndex > -1) {
-		if (contentIdStart > -1 && contentIdEnd == -1) contentIdEnd = endIndex
-		if (textStart > -1 && textEnd == -1) textEnd = endIndex
+	if (linkEnd < 0) {
+		if (options?.allowIncomplete) {
+			linkEnd = index
+			if (contentIdStart > -1 && contentIdEnd == -1) contentIdEnd = index
+			if (textStart > -1 && textEnd == -1) textEnd = index
+			linkEnd = index
+		}
+		else return null
 	}
-	else return null
 
 	const details: ExtendedLinkInfo = {
 		type: StructureType.Link,
