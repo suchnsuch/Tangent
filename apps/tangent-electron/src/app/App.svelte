@@ -25,6 +25,7 @@ import { updateMermaidStyle } from './style/mermaidStyle'
 // Doing this here so that mhchem is loaded
 import 'katex/contrib/mhchem/mhchem'
 import { setDefaultUseKeyCode } from './utils/shortcuts'
+import type Settings from 'common/settings/Settings';
 
 let applicationState: 'initializing' | 'choosingWorkspace' | 'buildingWorkspace' | 'usingWorkspace' | 'error' = 'initializing'
 let showLoading = false
@@ -187,8 +188,8 @@ window.addEventListener('keyup', (event:KeyboardEvent) => {
 
 
 // startup behaviour
-api.settings.getRaw().then(s => {
-	if (s['startupBehaviourAboutWorkspace'] == 'ask'){
+api.settings.getSafe().then(s => {
+	if ((s as Settings).startupBehaviourAboutWorkspace.value == 'ask'){
 		setState(null)
 	}
 	else {

@@ -217,7 +217,7 @@ const bridge: WindowApi = {
 		}
 	},
 	settings: {
-		getRaw(): Promise<object> {
+		getSafe(): Promise<object> {
 			return ipcRenderer.invoke('getGlobalSettings')
 		},
 		patch(patch: any) {
