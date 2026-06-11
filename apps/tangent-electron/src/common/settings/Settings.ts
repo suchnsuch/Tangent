@@ -501,7 +501,7 @@ export default class Settings extends ObjectStore {
 			{
 				value: 'ask',
 				displayName: 'Workspace Selector',
-				description: 'let\'s you choose what workspace to open'
+				description: 'you choose what workspace to open'
 			}
 		],
 		defaultValue: 'last'
