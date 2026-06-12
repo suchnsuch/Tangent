@@ -25,7 +25,6 @@ import { updateMermaidStyle } from './style/mermaidStyle'
 // Doing this here so that mhchem is loaded
 import 'katex/contrib/mhchem/mhchem'
 import { setDefaultUseKeyCode } from './utils/shortcuts'
-import type Settings from 'common/settings/Settings';
 
 let applicationState: 'initializing' | 'choosingWorkspace' | 'buildingWorkspace' | 'usingWorkspace' | 'error' = 'initializing'
 let showLoading = false
@@ -185,7 +184,6 @@ window.addEventListener('keyup', (event:KeyboardEvent) => {
 		document.body.classList.remove('shift-pressed')
 	}
 })
-
 
 // Try to load a default workspace
 api.getWorkspace().then(setState)
