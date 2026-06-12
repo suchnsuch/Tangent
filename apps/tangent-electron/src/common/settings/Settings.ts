@@ -427,18 +427,18 @@ export default class Settings extends ObjectStore {
 	})
 
 	checkBoxChar = new Setting<'x' | '+'>({
-		name: 'checkbox checked glyph',
-		description: 'only affects when you click on checkbox',
+		name: 'Default Todo Complete Glyph',
+		description: 'The character applied to a checkbox when you toggled it completed',
 		validValues: [
 			{
 				value: 'x',
 				displayName: 'x',
-				description: 'common markdown'
+				description: 'The standard Markdown character used to indicate a completed task'
 			},
 			{
 				value: '+',
 				displayName: '+',
-				description: 'for RTL language, puts you outside of markdown standard'
+				description: 'intended to use for right-to-left (RTL) language users'
 			}
 		],
 		defaultValue: 'x'

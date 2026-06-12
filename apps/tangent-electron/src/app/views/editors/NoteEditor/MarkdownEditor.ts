@@ -8,7 +8,7 @@ import WikiLinkAutocompleter from '../autocomplete/WikiLinkAutocompleter'
 import type { Workspace } from 'app/model'
 import { getLineFormattingPrefix } from 'common/markdownModel/line'
 import tlinkModule from '../t-linkModule'
-import newtCheckboxModule from '../t-checkboxModule'
+import tCheckboxModule from '../t-checkboxModule'
 import TagAutocompleter from '../autocomplete/TagAutocompleter'
 import { getRegexMatchIndices } from '@such-n-such/core'
 import UnicodeAutocompleter from '../autocomplete/UnicodeAutocompleter'
@@ -154,7 +154,7 @@ export default class MarkdownEditor extends Editor {
 				tLink: editor => tlinkModule(editor, {
 					linkFollowRequirement: workspace?.settings?.noteLinkFollowBehavior as any ?? 'mod'
 				}),
-				tCheckbox: newtCheckboxModule(workspace),
+				tCheckbox: (editor) => tCheckboxModule(editor, {workspace}),
 				autoWrap: autoWrapping,
 				// This goes before copy/paste to get priority over those events
 				tangent: editor => editorModule(editor, { workspace }),
