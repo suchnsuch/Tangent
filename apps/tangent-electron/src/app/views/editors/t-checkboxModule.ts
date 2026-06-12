@@ -82,8 +82,8 @@ export default function tCheckboxModule(editor: Editor, config: {defaultCheckbox
 		const originalSelection = doc.selection
 		const change = editor.change.delete([editStart, editEnd])
 
-		let t = config.defaultCheckboxCompleteChar
-		let x = typeof t === 'string' ? t : t.value
+		const t = config.defaultCheckboxCompleteChar
+		const x = typeof t === 'string' ? t : t.value
 
 		switch (targetState) {
 			case 'toggle':
