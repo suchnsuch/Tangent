@@ -489,19 +489,19 @@ export default class Settings extends ObjectStore {
 		defaultValue: false
 	})
 
-	startupBehaviour = new Setting<'last' | 'ask'>({
-		name: 'Startup Behaviour',
-		description: 'Whether automatically open the last workspace or let you choose one on startup',
+	startupBehavior = new Setting<'last' | 'ask'>({
+		name: 'Startup Behavior',
+		description: 'What windows Tangent opens on startup',
 		validValues: [
 			{
 				value: 'last',
 				displayName: 'Last Opened',
-				description: 'Reopen last workspace(s)'
+				description: 'Reopen last workspace(s).'
 			},
 			{
 				value: 'ask',
-				displayName: 'Workspace Selector',
-				description: 'Ask which workspace to open'
+				displayName: 'Select Workspace',
+				description: 'Ask which workspace to open.'
 			}
 		],
 		defaultValue: 'last'
