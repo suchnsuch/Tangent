@@ -496,7 +496,7 @@ export default class Settings extends ObjectStore {
 			{
 				value: 'last',
 				displayName: 'Last Opened',
-				description: 'Reopen last workspace'
+				description: 'Reopen last workspace(s)'
 			},
 			{
 				value: 'ask',

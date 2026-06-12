@@ -187,21 +187,10 @@ window.addEventListener('keyup', (event:KeyboardEvent) => {
 })
 
 
-// startup behaviour
-api.settings.getSafe().then(s => {
-	if ((s as Settings).startupBehaviour?.value == 'ask'){
-		setState(null)
-	}
-	else {
-		// Try to load a default workspace
-		api.getWorkspace().then(setState)
-		.catch(e => {
-			console.error('Could not load default workspace.')
-			console.log(e)
-		})
-	}
-}).catch(e => {
-	console.error('Could not load global settings.')
+// Try to load a default workspace
+api.getWorkspace().then(setState)
+.catch(e => {
+	console.error('Could not load default workspace.')
 	console.log(e)
 })
 

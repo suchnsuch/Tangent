@@ -224,7 +224,7 @@ Tangent ${app.getVersion()} Launched With Arguments:`, process.argv)
 				openPathInTangent(openOverride)
 				hasOpenedWindows = true
 			}
-			else if (workspaces.openWorkspaces) {
+			else if (getSettings().startupBehaviour.value == 'last' && workspaces.openWorkspaces) {
 				for (let workspacePath of workspaces.openWorkspaces) {
 					if (workspaceMap.get(workspacePath) !== undefined) {
 						// A null (or non null) value means this workspace was previously validated

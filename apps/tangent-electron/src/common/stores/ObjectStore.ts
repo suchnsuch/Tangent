@@ -217,26 +217,6 @@ export class ObjectStore extends SelfStore implements Patchable {
 		return changed
 	}
 
-	getSafeWithHoles(): any {
-		function clone(value) {
-			if (typeof value === 'function') return undefined
-			if (value === null || typeof value !== 'object') return value
-
-			if (value instanceof Date) return new Date(value)
-			if (value instanceof RegExp) return new RegExp(value)
-
-			if (Array.isArray(value)) return value.map(clone)
-			
-			const out = {}
-			for (let key of Object.keys(value)) {
-				if (key.startsWith('_')) key = key.substring(1)
-				out[key] = clone(value[key])
-			}
-			return out
-		}
-		return clone(this)
-	}
-
 	getRawValues(mode: RawValueMode = 'patch'): any {
 		let result = {}
 		let includedValue = false
