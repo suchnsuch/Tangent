@@ -154,7 +154,9 @@ export default class MarkdownEditor extends Editor {
 				tLink: editor => tlinkModule(editor, {
 					linkFollowRequirement: workspace?.settings?.noteLinkFollowBehavior as any ?? 'mod'
 				}),
-				tCheckbox: editor => tCheckboxModule(editor, { workspace }),
+				tCheckbox: editor => tCheckboxModule(editor, { 
+					defaultCheckboxCompleteChar: workspace?.settings?.defaultCheckboxCompleteChar as any ?? 'x'
+				 }),
 				autoWrap: autoWrapping,
 				// This goes before copy/paste to get priority over those events
 				tangent: editor => editorModule(editor, { workspace }),

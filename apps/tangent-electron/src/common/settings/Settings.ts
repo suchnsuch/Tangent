@@ -426,7 +426,7 @@ export default class Settings extends ObjectStore {
 		defaultValue: true
 	})
 
-	checkBoxChar = new Setting<'x' | '+'>({
+	defaultCheckboxCompleteChar = new Setting<'x' | '+'>({
 		name: 'Default Todo Complete Glyph',
 		description: 'The character applied to a checkbox when you toggled it completed.',
 		validValues: [
@@ -438,7 +438,7 @@ export default class Settings extends ObjectStore {
 			{
 				value: '+',
 				displayName: '+',
-				description: 'Intended to be used for right-to-left (RTL) languages.'
+				description: 'An alternative that doesn\' cause issues with right-to-left (RTL) languages.'
 			}
 		],
 		defaultValue: 'x'

@@ -4,9 +4,9 @@ import TangentCheckbox from './NoteEditor/t-checkbox';
 import { tick } from 'svelte';
 import { type ContextMenuConstructorOptions, appendContextTemplate } from 'app/model/menus'
 import type { TodoState } from 'common/indexing/indexTypes'
-import type { Workspace } from 'app/model';
+import type { ReadableStore } from 'common/stores';
 
-export default function tCheckboxModule(editor: Editor, config: {workspace: Workspace}){
+export default function tCheckboxModule(editor: Editor, config: {defaultCheckboxCompleteChar: string | ReadableStore<String>}){
 	function onClick(event: MouseEvent) {
 		if (event.defaultPrevented) return
 
@@ -82,7 +82,8 @@ export default function tCheckboxModule(editor: Editor, config: {workspace: Work
 		const originalSelection = doc.selection
 		const change = editor.change.delete([editStart, editEnd])
 
-		let x = config.workspace.settings.checkBoxChar.value
+		let t = config.defaultCheckboxCompleteChar
+		let x = typeof t === 'string' ? t : t.value
 
 		switch (targetState) {
 			case 'toggle':

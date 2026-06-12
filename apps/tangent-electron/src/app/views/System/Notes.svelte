@@ -56,7 +56,7 @@ async function getSpellCheckLanguages() {
 		<SettingView setting={settings.hangingHeaders} />
 		<SettingView setting={settings.cardViewCardsHoldAltToScroll} name="Require Alt to Scroll Cards" />
 		<SettingView setting={settings.crossOutFinishedTodos} />
-		<SettingView setting={settings.checkBoxChar} />
+		<SettingView setting={settings.defaultCheckboxCompleteChar} />
 	</div>
 
 	<h2>Editing</h2>
