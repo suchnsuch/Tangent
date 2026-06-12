@@ -438,7 +438,7 @@ export default class Settings extends ObjectStore {
 			{
 				value: '+',
 				displayName: '+',
-				description: 'Intended to use for right-to-left (RTL) language users'
+				description: 'Intended to be used for right-to-left (RTL) languages'
 			}
 		],
 		defaultValue: 'x'
