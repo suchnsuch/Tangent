@@ -84,8 +84,9 @@ export default function tCheckboxModule(editor: Editor, config: {
 		const originalSelection = doc.selection
 		const change = editor.change.delete([editStart, editEnd])
 
-		const t = config.defaultCheckboxCompleteChar
-		const x = typeof t === 'string' ? t : t.value
+		const completeChar = typeof config.defaultCheckboxCompleteChar === 'string' ? 
+									config.defaultCheckboxCompleteChar : 
+									config.defaultCheckboxCompleteChar.value
 
 		switch (targetState) {
 			case 'toggle':
@@ -95,14 +96,14 @@ export default function tCheckboxModule(editor: Editor, config: {
 				}
 				else {
 					// the checkbox was not checked
-					change.insert(editStart, `[${x}]`)
+					change.insert(editStart, `[${completeChar}]`)
 				}
 				break
 			case 'open':
 				change.insert(editStart, '[ ]')
 				break
 			case 'checked':
-				change.insert(editStart, `[${x}]`)
+				change.insert(editStart, `[${completeChar}]`)
 				break
 			case 'canceled':
 				change.insert(editStart, '[-]')
