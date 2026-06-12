@@ -491,7 +491,7 @@ export default class Settings extends ObjectStore {
 
 	startupBehavior = new Setting<'last' | 'ask'>({
 		name: 'Startup Behavior',
-		description: 'What windows Tangent opens on startup',
+		description: 'What windows Tangent opens on startup.',
 		validValues: [
 			{
 				value: 'last',
