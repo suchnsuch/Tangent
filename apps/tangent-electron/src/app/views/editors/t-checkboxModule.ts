@@ -6,7 +6,9 @@ import { type ContextMenuConstructorOptions, appendContextTemplate } from 'app/m
 import type { TodoState } from 'common/indexing/indexTypes'
 import type { ReadableStore } from 'common/stores';
 
-export default function tCheckboxModule(editor: Editor, config: {defaultCheckboxCompleteChar: string | ReadableStore<String>}){
+export default function tCheckboxModule(editor: Editor, config: { 
+	defaultCheckboxCompleteChar: string | ReadableStore<String> 
+}){
 	function onClick(event: MouseEvent) {
 		if (event.defaultPrevented) return
 
