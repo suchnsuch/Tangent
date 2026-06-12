@@ -138,7 +138,7 @@ function postSettings(patch?) {
 // Tests invoke this module outside of an electron context
 if (ipcMain) {
 	ipcMain.handle('getGlobalSettings', async (event) => {
-		return settings // BUG cannot pass `settings` object directly by IPC (since it has functions, ...)
+		return settings
 	})
 	
 	ipcMain.on('patchGlobalSettings', (event, patch) => {
