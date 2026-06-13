@@ -57,6 +57,9 @@ export default class NodeHandle {
 
 	pushChangesIfDirty() {
 		if (this.dirty) {
+			if (this.workspace.debug.nodeHandles) {
+				console.log('Pushing dirty changes for', this.link, this.value)
+			}
 			this.set(this.value)
 			this.dirty = false
 		}
