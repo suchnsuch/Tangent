@@ -61,9 +61,7 @@ let mediaElement: HTMLVideoElement | HTMLAudioElement = $state(null)
 let height = $state(-1)
 
 let nodeHandle = $derived(workspace?.getHandle(link))
-let nodeHandleResult = $derived(nodeHandle ? $nodeHandle : null)
-
-let form: Form = $derived(handleToForm(nodeHandleResult))
+let form: Form = $derived(handleToForm(nodeHandle ? $nodeHandle : null))
 let formCache: Form = undefined
 
 $effect(() => {

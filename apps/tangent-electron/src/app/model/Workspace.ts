@@ -86,7 +86,8 @@ export default class Workspace extends EventDispatcher {
 
 	debug = {
 		treeChanges: false,
-		fileCreation: false
+		fileCreation: false,
+		nodeHandles: false
 	}
 
 	constructor(state: Partial<WorkspaceInitState>, api: WindowApi) {
@@ -458,7 +459,7 @@ export default class Workspace extends EventDispatcher {
 				handle.pushChangesIfDirty()
 			}
 			const end = performance.now()
-			if (this.debug.treeChanges) {
+			if (this.debug.treeChanges || this.debug.nodeHandles) {
 				console.log(`Updated ${this.activeHandles.length} node handles in ${end - start}ms`)
 			}
 		}
@@ -479,6 +480,11 @@ export default class Workspace extends EventDispatcher {
 	getHandle(node: TreeNode): Readable<HandleResult>
 	getHandle(link: HrefFormedLink): Readable<HandleResult>
 	getHandle(arg: string | TreeNode | HrefFormedLink): Readable<HandleResult> {
+
+		if (this.debug.nodeHandles) {
+			console.trace('Requesting handle via:', arg)
+		}
+
 		let node: WorkspaceTreeNode = null
 		let link: HrefFormedLink
 		if (typeof arg === 'string') {
@@ -508,7 +514,12 @@ export default class Workspace extends EventDispatcher {
 			handle.resolve()
 			handle.pushChangesIfDirty()
 
-			return () => swapRemove(this.activeHandles, handle)
+			return () => {
+				if (this.debug.nodeHandles) {
+					console.trace('Dropping handle defined by:', arg)
+				}
+				swapRemove(this.activeHandles, handle)
+			}
 		})
 	}
 
