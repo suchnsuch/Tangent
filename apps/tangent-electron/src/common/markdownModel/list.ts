@@ -43,7 +43,7 @@ const unorderedGlyphMatcher = `(?:${[...standardUnorderedGlyphs + largeUnordered
  * 8: Checkbox on top of list
  */
 export const listMatcher = new RegExp(
-	`^([ \\t]*)((${unorderedGlyphMatcher})|((\\d+)|([a-z])|([A-Z]))[\\.\\)])( \\[[ x\\-]?\\])? `
+	`^([ \\t]*)((${unorderedGlyphMatcher})|((\\d+)|([a-z])|([A-Z]))[\\.\\)])( \\[[ x+\\-]?\\])? `
 )
 
 /**
@@ -54,7 +54,7 @@ export const listMatcher = new RegExp(
  */
 export const numericGlyphMatcher = /(\d+)|([a-z])|([A-Z])/
 
-export const checkboxMatcher = /\[([x\- ]?)\]/
+export const checkboxMatcher = /\[([x+\- ]?)\]/
 
 export enum ListForm {
 	Unordered,
@@ -124,7 +124,7 @@ export namespace ListDefinition {
 }
 
 function checkboxGlyphToTodoState(glyph: string): TodoState {
-	if (glyph.includes('x')) {
+	if (glyph.includes('x') || glyph.includes('+')) {
 		return 'checked'
 	}
 	else if (glyph.includes('-')) {

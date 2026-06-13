@@ -426,6 +426,24 @@ export default class Settings extends ObjectStore {
 		defaultValue: true
 	})
 
+	defaultCheckboxCompleteChar = new Setting<'x' | '+'>({
+		name: 'Default Todo Complete Glyph',
+		description: 'The character applied to a checkbox when you toggled it completed.',
+		validValues: [
+			{
+				value: 'x',
+				displayName: 'x',
+				description: 'The standard Markdown character used to indicate a completed task.'
+			},
+			{
+				value: '+',
+				displayName: '+',
+				description: 'An alternative that doesn\' cause issues with right-to-left (RTL) languages.'
+			}
+		],
+		defaultValue: 'x'
+	})
+
 	linkCursor: Setting<string> = new Setting<string>(linkCursorDefinition)
 
 	// Attachments
