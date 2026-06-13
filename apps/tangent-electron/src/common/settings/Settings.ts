@@ -489,6 +489,24 @@ export default class Settings extends ObjectStore {
 		defaultValue: false
 	})
 
+	startupBehavior = new Setting<'last' | 'ask'>({
+		name: 'Startup Behavior',
+		description: 'What windows Tangent opens on startup.',
+		validValues: [
+			{
+				value: 'last',
+				displayName: 'Last Opened',
+				description: 'Reopen last workspace(s).'
+			},
+			{
+				value: 'ask',
+				displayName: 'Select Workspace',
+				description: 'Ask which workspace to open.'
+			}
+		],
+		defaultValue: 'last'
+	})
+
 	rawLinksAutoEmbed = new Setting<boolean>({
 		name: 'Auto Embed Raw Links',
 		description: 'When enabled, raw links on their own line are automatically treated as embed links. (Requires restart.)',

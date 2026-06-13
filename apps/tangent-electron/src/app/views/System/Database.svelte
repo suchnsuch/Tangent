@@ -10,6 +10,9 @@ let settings = workspace.settings
 </script>
 
 <main>
+	<div class="settingsGroup">
+		<SettingView setting={settings.startupBehavior} />
+	</div>
 	<h2>Files</h2>
 	<div class="settingsGroup">
 		<SettingView setting={settings.dirtyIndicatorVisibility} />
