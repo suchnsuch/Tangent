@@ -155,7 +155,7 @@ export default class MarkdownEditor extends Editor {
 					linkFollowRequirement: workspace?.settings?.noteLinkFollowBehavior as any ?? 'mod'
 				}),
 				tCheckbox: editor => tCheckboxModule(editor, { 
-					defaultCheckboxCompleteChar: workspace?.settings?.defaultCheckboxCompleteChar as any ?? 'x'
+					defaultTodoCompleteChar: workspace?.settings?.defaultTodoCompleteChar as any ?? 'x'
 				 }),
 				autoWrap: autoWrapping,
 				// This goes before copy/paste to get priority over those events

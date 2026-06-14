@@ -7,7 +7,7 @@ import type { TodoState } from 'common/indexing/indexTypes'
 import type { ReadableStore } from 'common/stores';
 
 export default function tCheckboxModule(editor: Editor, config: { 
-	defaultCheckboxCompleteChar: string | ReadableStore<String> 
+	defaultTodoCompleteChar: string | ReadableStore<String> 
 }){
 	function onClick(event: MouseEvent) {
 		if (event.defaultPrevented) return
@@ -84,9 +84,9 @@ export default function tCheckboxModule(editor: Editor, config: {
 		const originalSelection = doc.selection
 		const change = editor.change.delete([editStart, editEnd])
 
-		const completeChar = typeof config.defaultCheckboxCompleteChar === 'string' ? 
-									config.defaultCheckboxCompleteChar : 
-									config.defaultCheckboxCompleteChar.value
+		const completeChar = typeof config.defaultTodoCompleteChar === 'string' ? 
+									config.defaultTodoCompleteChar : 
+									config.defaultTodoCompleteChar.value
 
 		switch (targetState) {
 			case 'toggle':
