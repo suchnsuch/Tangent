@@ -64,6 +64,8 @@ export class TangentLink extends HTMLElement {
 	}
 
 	updateState() {
+		if (!this.isConnected) return
+		
 		let link = this.getLinkInfo()
 		if (link) {
 			if (isExternalLink(link.href)) {
