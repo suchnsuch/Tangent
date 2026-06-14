@@ -1,5 +1,10 @@
 The database options for Tangent are found in the [[System Menu]].
 
+# Startup Behavior
+This lets you choose what workspaces are opened when Tangent starts.
+* __Restore__ will open the workspaces that were open the last time Tangent was running.
+* __Select__ will open the workspace selection screen, allowing you to choose the workspace to open each time Tangent starts.
+
 # Dirty File Indicators
 Tangent automatically saves your notes five seconds after you finish typing or as soon as your note loses focus. Because of this, it has no dirty file indicators by default; you should be able to work without worrying about when your file saves.
 

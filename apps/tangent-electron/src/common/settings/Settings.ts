@@ -507,22 +507,22 @@ export default class Settings extends ObjectStore {
 		defaultValue: false
 	})
 
-	startupBehavior = new Setting<'last' | 'ask'>({
+	startupBehavior = new Setting<'restore' | 'select'>({
 		name: 'Startup Behavior',
 		description: 'What windows Tangent opens on startup.',
 		validValues: [
 			{
-				value: 'last',
-				displayName: 'Last Opened',
-				description: 'Reopen last workspace(s).'
+				value: 'restore',
+				displayName: 'Restore',
+				description: 'Reopen the workspaces from the last session.'
 			},
 			{
-				value: 'ask',
-				displayName: 'Select Workspace',
-				description: 'Ask which workspace to open.'
+				value: 'select',
+				displayName: 'Select',
+				description: 'Show the workspace selection screen.'
 			}
 		],
-		defaultValue: 'last'
+		defaultValue: 'restore'
 	})
 
 	rawLinksAutoEmbed = new Setting<boolean>({
