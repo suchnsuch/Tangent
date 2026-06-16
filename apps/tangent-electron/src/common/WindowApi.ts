@@ -82,7 +82,7 @@ export default interface WindowAPI {
 	file: {
 		selectPath<T extends SelectPathOptions>(options: T): Promise<SelectPathResult<T>>
 		onTreeChange(handler: (change: TreeChange) => void)
-        
+
 		createFile(path: string, options?: IndexData): Promise<void>
 		createFolder(path: string): Promise<void>
 		move(filepath: string, newPath: string): Promise<void>
