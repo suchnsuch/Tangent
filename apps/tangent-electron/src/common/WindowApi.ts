@@ -82,7 +82,7 @@ export default interface WindowAPI {
 	file: {
 		selectPath<T extends SelectPathOptions>(options: T): Promise<SelectPathResult<T>>
 		onTreeChange(handler: (change: TreeChange) => void)
-		
+        
 		createFile(path: string, options?: IndexData): Promise<void>
 		createFolder(path: string): Promise<void>
 		move(filepath: string, newPath: string): Promise<void>
@@ -97,7 +97,7 @@ export default interface WindowAPI {
 		onReceiveFileContents(handler: (path: string , content: string | unknown) => void)
 		/** No longer watcha a file for changes. */
 		closeFile(filepath: string) // Stop receiving file changes
-
+		
 		/** Update a file with new contents. */
 		updateFile(filepath: string, content: string | unknown)
 		/** Show the file or folder in the native file browser. */
