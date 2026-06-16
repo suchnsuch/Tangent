@@ -187,13 +187,7 @@ window.addEventListener('keyup', (event:KeyboardEvent) => {
 
 // Try to load a default workspace
 
-api.getWorkspace().then((state) => {
-	if (state.globalSettings.askWorkspaceEveryTime){
-		setState(null)
-	}
-	else
-		setState(state)
-})
+api.getWorkspace().then(setState)
 .catch(e => {
 	console.error('Could not load default workspace.')
 	console.log(e)
