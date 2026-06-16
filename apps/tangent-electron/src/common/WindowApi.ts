@@ -82,13 +82,13 @@ export default interface WindowAPI {
 	file: {
 		selectPath<T extends SelectPathOptions>(options: T): Promise<SelectPathResult<T>>
 		onTreeChange(handler: (change: TreeChange) => void)
-        
+		
 		createFile(path: string, options?: IndexData): Promise<void>
 		createFolder(path: string): Promise<void>
 		move(filepath: string, newPath: string): Promise<void>
 		copy(filepath: string, newPath?: string): Promise<void>
 		delete(filepath: string): Promise<void>
-        
+		
 		/** Gets the contents of a file, but does not mark it as opened */
 		getFileContents(filepath): Promise<string>
 		/** Open a file and receive any changes via `onReceiveFileContents` */
