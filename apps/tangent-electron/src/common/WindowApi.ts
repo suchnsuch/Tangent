@@ -88,7 +88,7 @@ export default interface WindowAPI {
 		move(filepath: string, newPath: string): Promise<void>
 		copy(filepath: string, newPath?: string): Promise<void>
 		delete(filepath: string): Promise<void>
-		
+
 		/** Gets the contents of a file, but does not mark it as opened */
 		getFileContents(filepath): Promise<string>
 		/** Open a file and receive any changes via `onReceiveFileContents` */
@@ -97,14 +97,20 @@ export default interface WindowAPI {
 		onReceiveFileContents(handler: (path: string , content: string | unknown) => void)
 		/** No longer watcha a file for changes. */
 		closeFile(filepath: string) // Stop receiving file changes
-		
+
 		/** Update a file with new contents. */
 		updateFile(filepath: string, content: string | unknown)
 		/** Show the file or folder in the native file browser. */
 		showInFileBrowser(path: string)
 		/** Open a path in the default format */
 		openPath(path: string)
+
+		findFiles(dir: string, exts: string[]): Promise<string[]>
 	}
+
+	os: {
+		execCLI(cmd: string, args: string[]): Promise<string>
+	},
 
 	edit: {
 		nativeAction(action: 'cut' | 'copy' | 'paste' | 'pasteAndMatchStyle' | 'selectAll' | 'undo' | 'redo')

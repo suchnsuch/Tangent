@@ -188,6 +188,14 @@ const bridge: WindowApi = {
 		openPath(path) {
 			ipcRenderer.invoke('openPath', path)
 		},
+		findFiles(dir, exts) {
+			return ipcRenderer.invoke('findFiles', dir, exts)
+		},
+	},
+	os: {
+		execCLI(cmd, args) {
+			return ipcRenderer.invoke('execCLI', cmd, args)
+		},
 	},
 	edit: {
 		nativeAction(action) {
