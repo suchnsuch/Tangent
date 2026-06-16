@@ -98,6 +98,7 @@ class TangentEmbed extends TangentLink {
 	}
 
 	updateState() {
+		if (!this.isConnected) return
 		// Collect props
 		const link = this.getLinkInfo()
 		const block = this.getAttribute('block') === 'true'

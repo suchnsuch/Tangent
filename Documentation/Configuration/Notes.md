@@ -22,6 +22,8 @@ The **Cross Out Finished Todos** setting controls whether or not the text of com
 # Editing Options
 The **Default Bold/Italics Characters** settings let you choose which characters will be used when using the `Ctrl/Cmd+B` and `Ctrl/Cmd+I` shortcuts, respectively.
 
+The **Default Complete Todo Glyph** setting lets you configure what character is placed in the checkbox when marking it as complete. `[x]` is the default value for markdown. `[+]` is offered as an alternative that does not trip up automatic RTL language detection.
+
 Enabling **Change List Glyphs on Indent** will automatically change the glyph used for a list when you indent a list under a parent. See [[Lists]] for more information.
 
 Enabling **Inter-Text Underscore Emphasis** allows underscore characters to affect formatting when surrounded on both sides by text. See [[Bold and Italics#Inter-Text Underscores]] for more information.

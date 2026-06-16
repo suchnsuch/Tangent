@@ -63,6 +63,7 @@ async function getSpellCheckLanguages() {
 	<div class="settingsGroup">
 		<SettingView setting={settings.italicsCharacters} />
 		<SettingView setting={settings.boldCharacters} />
+		<SettingView setting={settings.defaultTodoCompleteChar} />
 		<SettingView setting={settings.autoSetChildListGlyphs} />
 		<SettingView setting={settings.allowInterTextUnderscoreFormatting} />
 		<SettingView setting={settings.smartParagraphBreaks} />

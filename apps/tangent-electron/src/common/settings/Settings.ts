@@ -426,18 +426,18 @@ export default class Settings extends ObjectStore {
 		defaultValue: true
 	})
 
-	defaultCheckboxCompleteChar = new Setting<'x' | '+'>({
-		name: 'Default Todo Complete Glyph',
+	defaultTodoCompleteChar = new Setting<'x' | '+'>({
+		name: 'Default Complete Todo Glyph',
 		description: 'The character applied to a checkbox when you toggled it completed.',
 		validValues: [
 			{
 				value: 'x',
-				displayName: 'x',
+				displayName: '[x]',
 				description: 'The standard Markdown character used to indicate a completed task.'
 			},
 			{
 				value: '+',
-				displayName: '+',
+				displayName: '[+]',
 				description: 'An alternative that doesn\' cause issues with right-to-left (RTL) languages.'
 			}
 		],
@@ -507,22 +507,22 @@ export default class Settings extends ObjectStore {
 		defaultValue: false
 	})
 
-	startupBehavior = new Setting<'last' | 'ask'>({
+	startupBehavior = new Setting<'restore' | 'select'>({
 		name: 'Startup Behavior',
 		description: 'What windows Tangent opens on startup.',
 		validValues: [
 			{
-				value: 'last',
-				displayName: 'Last Opened',
-				description: 'Reopen last workspace(s).'
+				value: 'restore',
+				displayName: 'Restore',
+				description: 'Reopen the workspaces from the last session.'
 			},
 			{
-				value: 'ask',
-				displayName: 'Select Workspace',
-				description: 'Ask which workspace to open.'
+				value: 'select',
+				displayName: 'Select',
+				description: 'Show the workspace selection screen.'
 			}
 		],
-		defaultValue: 'last'
+		defaultValue: 'restore'
 	})
 
 	rawLinksAutoEmbed = new Setting<boolean>({
