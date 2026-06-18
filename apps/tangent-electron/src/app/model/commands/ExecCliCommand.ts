@@ -12,7 +12,7 @@ function removeSuffix(str, suffix) {
 
 export default class ExecCliCommand extends WorkspaceCommand {
 	constructor(workspace: Workspace) {
-		super(workspace, {group: 'Notes'})
+		super(workspace, {group: 'Notes'}) // <---- this makes it available when editing notes
 	}
 	
 	execute() {

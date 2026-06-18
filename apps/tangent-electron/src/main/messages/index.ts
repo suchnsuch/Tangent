@@ -29,7 +29,7 @@ ipcMain.handle('execCLI', async (event, cmd, args) => {
 
 	const child = spawn(cmd, args, { 
 		stdio: 'inherit',
-		shell: true
+		// shell: true // <-- this has issues with file names that contain spaces
 	});
 	child.on('close', (code) => {
 		console.log(`Process exited with code ${code}`);
