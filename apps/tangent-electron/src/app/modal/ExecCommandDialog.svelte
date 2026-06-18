@@ -40,6 +40,7 @@ function selectOption(option: Script, event) {
 		'--workspace', workspaceRoot,
 	]
 	workspace.api.os.execCLI('bash', [option.path, ...args])
+	workspace.viewState.modal.close()
 }
 
 </script>

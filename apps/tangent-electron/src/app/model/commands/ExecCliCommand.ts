@@ -12,10 +12,12 @@ function removeSuffix(str, suffix) {
 
 export default class ExecCliCommand extends WorkspaceCommand {
 	constructor(workspace: Workspace) {
-		super(workspace)
+		super(workspace, {group: 'Notes'})
 	}
-
+	
 	execute() {
+		console.log('WTF')
+
 		const workspaceRoot = removeSuffix(this.workspace.workspaceFolder.path, '.tangent')
 		const exts = ['.sh', '.bat']
 		const subject = this.workspace.viewState.tangent.currentNode.value
@@ -35,6 +37,10 @@ export default class ExecCliCommand extends WorkspaceCommand {
 
 	getName() {
 		return 'Execute CLI'
+	}
+
+	getLabel(){
+		return '::Execute CLI::'
 	}
 
 	getDefaultPaletteName() {

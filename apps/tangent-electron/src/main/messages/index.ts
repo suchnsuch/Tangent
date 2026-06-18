@@ -25,7 +25,7 @@ const log = Logger.get('messages')
 
 
 ipcMain.handle('execCLI', async (event, cmd, args) => {
-	console.log(">>>>>> ", cmd, args)
+	console.log("Executing CLI command: ", cmd, args)
 
 	const child = spawn(cmd, args, { 
 		stdio: 'inherit',
