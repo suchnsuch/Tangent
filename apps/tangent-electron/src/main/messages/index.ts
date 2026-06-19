@@ -596,7 +596,7 @@ ipcMain.handle('saveImageFromClipboard', async (event, contextPath) => {
 		const workspace = validateWorkspaceForHandleFilepath(windowHandle, contextPath)
 
 		const filename = fillDateFormat('Pasted on %YYYY%-%MM%-%DD% at %HH%.%mm%.%ss%.png', new Date())
-		const attachmentPath = await workspace.getAttachmentPath(filename, contextPath).then()
+		const attachmentPath = await workspace.getAttachmentPath(filename, contextPath)
 		const directory = path.dirname(attachmentPath)
 		fs.promises.mkdir(directory, { recursive: true }).then(() => {
 			return fs.promises.writeFile(attachmentPath, image)
