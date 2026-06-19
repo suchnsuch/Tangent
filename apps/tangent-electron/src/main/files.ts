@@ -60,10 +60,10 @@ export async function loadTreeFromPath(
  * @example
  * findUpCandidates('/home/user/project', '/home/user/project/src/UI/components', '.git/313')
  * [
- *  '/home/user/project/src/UI/components/.git/313/',
- *  '/home/user/project/src/UI/.git/313/',
- *  '/home/user/project/src/.git/313/',
- *  '/home/user/project/.git/313/',
+ *  '/home/user/project/src/UI/components/.git/313',
+ *  '/home/user/project/src/UI/.git/313',
+ *  '/home/user/project/src/.git/313',
+ *  '/home/user/project/.git/313',
  * ]
  */
 export function findUpCandidates(rootAbsPath: string, startAbsPath: string, targetRelPath: string, maxIterations = 16): string[] {
