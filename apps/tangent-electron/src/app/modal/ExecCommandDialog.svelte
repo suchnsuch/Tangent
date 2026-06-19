@@ -3,6 +3,7 @@ import { getContext } from 'svelte'
 import type Workspace from '../model/Workspace'
 import ModalInputSelect from './ModalInputSelect.svelte'
     import type { TreeNode } from 'common/trees';
+    import type { NoteViewState } from 'app/model/nodeViewStates';
 
 let workspace = getContext('workspace') as Workspace
 let text: string = ''
@@ -35,10 +36,17 @@ function onAutocomplete(option: Script) {
 }
 
 function selectOption(option: Script, event) {
+	const vs = workspace.viewState.tangent.getCurrentViewState()
+	console.log(vs)
 	const args = [
-		'--file', workspace.viewState.tangent.getCurrentViewState().node.path, 
+		'--file', vs.node.path, 
 		'--workspace', workspace.viewState.directoryView.root.path,
 	]
+
+	if (vs.node.fileType == '.md'){
+		args.push("--cursor", (vs as NoteViewState).selection.value.join(','))
+	}
+
 	workspace.api.os.execCLI('bash', [option.path, ...args])
 	workspace.viewState.modal.close()
 }
