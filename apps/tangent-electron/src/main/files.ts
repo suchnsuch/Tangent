@@ -67,13 +67,13 @@ export async function loadTreeFromPath(
  * ]
  */
 export function findUpCandidates(rootAbsPath: string, startAbsPath: string, targetRelPath: string, maxIterations = 10): string[] {
-	const root = path.resolve(rootAbsPath)
+	const rootPath = path.resolve(rootAbsPath)
+	let currentPath = path.resolve(startAbsPath)
 	const pathsToCheck: string[] = []
 	
-	let currentPath = path.resolve(startAbsPath)
 	for (let i = 0; i < maxIterations; i++) {
 		pathsToCheck.push(path.join(currentPath, targetRelPath))
-		if (currentPath === root) break
+		if (currentPath === rootPath) break
 		currentPath = path.dirname(currentPath)
 	}
 
