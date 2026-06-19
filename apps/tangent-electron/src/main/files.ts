@@ -88,9 +88,6 @@ export function findUpCandidates(rootAbsPath: string, startAbsPath: string, targ
  * @param targetRelPath - The relative of the file or directory to search for. 
  * 
  * @returns The absolute path to the target if found, or `null` if not
- * 
- * @example
- * returns `null` if not found
  */
 export async function findUp(rootAbsPath: string, startAbsPath: string, targetRelPath: string): Promise<string | null> {
 	const candidateDirs = findUpCandidates(rootAbsPath, startAbsPath, targetRelPath)
