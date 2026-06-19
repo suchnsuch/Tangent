@@ -1088,25 +1088,56 @@ export default class Workspace {
 	}
 
 	getAttachmentPath(idealFilepath: string, contextPath: string): string {
-		const contextDir = path.dirname(contextPath) // TODO: Use this
-		let targetDirectory = getSettings().defaultPasteLocation.value
-		if (!targetDirectory) {
-			targetDirectory = this.rootPath
-		}
-		else {
-			const extension = path.extname(contextPath)
-			targetDirectory = targetDirectory.replace('$filename', path.basename(contextPath, extension))
+		// tries to find the closest local folder indicated by wildcard `./**/assets/dir`
+		// it also supports fallback
+		// for example:  ./**/figs/, global-assets/
 
-			if (targetDirectory.match(/^\.\.?[\\\/]/)) {
-				targetDirectory = path.resolve(path.join(contextDir, targetDirectory))
-				if (!targetDirectory.startsWith(this.rootPath)) {
-					log.info('Relative attachment path would have brought us outside the workspace. Will use the root instead. Original:', targetDirectory)
-					targetDirectory = this.rootPath
-				}
+		function findUp(startPath: string, target: string, rootPath: string) {
+			let currentPath = path.resolve(startPath)
+			const root = path.resolve(rootPath)
+			
+			while (true) {
+				const targetPath = path.join(currentPath, target)
+				if (fs.existsSync(targetPath)) return targetPath
+				if (currentPath === root) break
+				currentPath = path.dirname(currentPath)
+			}
+			
+			return null
+		}
+
+		const contextDir = path.dirname(contextPath) // TODO: Use this
+		const targetDirectories = getSettings().defaultPasteLocation.value.split(',').map(s => s.trim())
+		let	targetDirectory = null
+		const local_wild_card = "./**/"
+		
+		for (let candidateDirectory of targetDirectories) {
+			targetDirectory = candidateDirectory
+
+			if (!targetDirectory) {
+				targetDirectory = this.rootPath
+			}
+			else if (targetDirectory.startsWith(local_wild_card)){
+				targetDirectory = findUp(contextDir, targetDirectory.split(local_wild_card)[1], this.rootPath)
+				if (!targetDirectory) continue
 			}
 			else {
-				targetDirectory = path.join(this.rootPath, targetDirectory)
+				const extension = path.extname(contextPath)
+				targetDirectory = targetDirectory.replace('$filename', path.basename(contextPath, extension))
+
+				if (targetDirectory.match(/^\.\.?[\\\/]/)) {
+					targetDirectory = path.resolve(path.join(contextDir, targetDirectory))
+					if (!targetDirectory.startsWith(this.rootPath)) {
+						log.info('Relative attachment path would have brought us outside the workspace. Will use the root instead. Original:', targetDirectory)
+						targetDirectory = this.rootPath
+					}
+				}
+				else {
+					targetDirectory = path.join(this.rootPath, targetDirectory)
+				}
 			}
+
+			break
 		}
 
 		return this.contentsStore.getUniquePath(path.join(targetDirectory, idealFilepath))
