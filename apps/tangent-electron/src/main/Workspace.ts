@@ -1091,7 +1091,7 @@ export default class Workspace {
 		const contextDir = path.dirname(contextPath) // TODO: Use this
 		const targetDirectories = getSettings().defaultPasteLocation.value.split(',').map(s => s.trim())
 		let	targetDirectory = null
-		const localWildCard = "./**/"
+		const closestWildCardPrefix = "./**/"
 		
 		for (let candidateDirectory of targetDirectories) {
 			targetDirectory = candidateDirectory
@@ -1099,8 +1099,8 @@ export default class Workspace {
 			if (!targetDirectory) {
 				targetDirectory = this.rootPath
 			}
-			else if (targetDirectory.startsWith(localWildCard)){
-				targetDirectory = findUp(contextDir, targetDirectory.split(localWildCard)[1], this.rootPath)
+			else if (targetDirectory.startsWith(closestWildCardPrefix)){
+				targetDirectory = findUp(contextDir, targetDirectory.split(closestWildCardPrefix)[1], this.rootPath)
 			}
 			else {
 				const extension = path.extname(contextPath)
