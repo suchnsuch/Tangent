@@ -37,15 +37,15 @@ function onAutocomplete(option: Script) {
 
 function selectOption(option: Script, event) {
 	const vs = workspace.viewState.tangent.getCurrentViewState()
-	console.log(vs)
 	const args = [
 		'--file', vs.node.path, 
 		'--workspace', workspace.viewState.directoryView.root.path,
+		
+		...(
+			vs.node.fileType == '.md' 
+			? ["--cursor", (vs as NoteViewState).selection.value.join(',')]
+			: [])
 	]
-
-	if (vs.node.fileType == '.md'){
-		args.push("--cursor", (vs as NoteViewState).selection.value.join(','))
-	}
 
 	workspace.api.os.execCLI('bash', [option.path, ...args])
 	workspace.viewState.modal.close()
