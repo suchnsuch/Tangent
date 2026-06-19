@@ -66,7 +66,7 @@ export async function loadTreeFromPath(
  *  '/home/user/project/.git/313/',
  * ]
  */
-export function findUpCandidates(rootAbsPath: string, startAbsPath: string, targetRelPath: string, maxIterations = 10): string[] {
+export function findUpCandidates(rootAbsPath: string, startAbsPath: string, targetRelPath: string, maxIterations = 16): string[] {
 	const rootPath = path.resolve(rootAbsPath)
 	let currentPath = path.resolve(startAbsPath)
 	const pathsToCheck: string[] = []
