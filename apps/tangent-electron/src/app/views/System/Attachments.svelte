@@ -22,7 +22,7 @@ let settings = workspace.settings
 			The <code>$filename</code> token can be used to inject the name of the file that the attachment is being pasted into.
 		</p>
 		<p class="value-details explanation">
-			A closest path (e.g. <code>./**/assets/figs</code>) will recursively goes up untill finds <code>/assets/figs</code> folder.
+			A closest path (e.g. <code>./**/assets/figs</code>) will recursively goes up untill finds <code>assets/figs</code> folder.
 		</p>
 		<p class="value-details explanation">
 			paths can be separated by comma (,). this is mostly used as fallback for closest path. (e.g. <code>./**/assets/figs, ./**/figs, glob/</code>)
