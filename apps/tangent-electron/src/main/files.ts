@@ -58,7 +58,7 @@ export async function loadTreeFromPath(
  * @summary Build all possible paths
  * 
  * @example
- * findUp('/home/user/project', '/home/user/project/src/UI/components', '.git/313')
+ * findUpCandidates('/home/user/project', '/home/user/project/src/UI/components', '.git/313')
  * [
  *  '/home/user/project/src/UI/components/.git/313/',
  *  '/home/user/project/src/UI/.git/313/',
