@@ -1087,22 +1087,26 @@ export default class Workspace {
 		}
 	}
 
-	getAttachmentPath(idealFilepath: string, contextPath: string): string {
+	async getAttachmentPath(idealFilepath: string, contextPath: string): Promise<string> {
 		const contextDir = path.dirname(contextPath) // TODO: Use this
-		const targetDirectories = getSettings().defaultPasteLocation.value.split(',').map(s => s.trim())
-		let	targetDirectory = null
-		const closestWildCardPrefix = "./**/"
+		const targetDirectories = [
+			...getSettings().defaultPasteLocation.value.split(',').map(s => s.trim()), // paths are separated by comma (,)
+			'' // default fallback to root path
+		] 
+		const closestWildCardPrefix = "./**/" // e.g. "./**/my/loca/path/to/assets"
 		
-		for (let candidateDirectory of targetDirectories) {
-			targetDirectory = candidateDirectory
+		let	targetDirectory = null
+		for (let i = 0; i < targetDirectories.length; i++) {
+			targetDirectory = targetDirectories[i]
 
 			if (!targetDirectory) {
 				targetDirectory = this.rootPath
 			}
 			else if (targetDirectory.startsWith(closestWildCardPrefix)){
-				targetDirectory = findUp(contextDir, targetDirectory.split(closestWildCardPrefix)[1], this.rootPath)
+				const followingPart = targetDirectory.substr(closestWildCardPrefix.length)
+				targetDirectory = await findUp(this.rootPath, contextDir, followingPart)
 			}
-			else {
+			else{
 				const extension = path.extname(contextPath)
 				targetDirectory = targetDirectory.replace('$filename', path.basename(contextPath, extension))
 

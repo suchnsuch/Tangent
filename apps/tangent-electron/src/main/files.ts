@@ -55,6 +55,32 @@ export async function loadTreeFromPath(
 }
 
 /**
+ * @summary Build all possible paths
+ * 
+ * @example
+ * findUp('/home/user/project', '/home/user/project/src/UI/components', '.git/313')
+ * [
+ *  '/home/user/project/src/UI/components/.git/313/',
+ *  '/home/user/project/src/UI/.git/313/',
+ *  '/home/user/project/src/.git/313/',
+ *  '/home/user/project/.git/313/',
+ * ]
+ */
+export function findUpCandidates(rootAbsPath: string, startAbsPath: string, targetRelPath: string, maxIterations = 10): string[] {
+	const root = path.resolve(rootAbsPath)
+	const pathsToCheck: string[] = []
+	
+	let currentPath = path.resolve(startAbsPath)
+	for (let i = 0; i < maxIterations; i++) {
+		pathsToCheck.push(path.join(currentPath, targetRelPath))
+		if (currentPath === root) break
+		currentPath = path.dirname(currentPath)
+	}
+
+	return pathsToCheck
+}
+
+/**
  * Searches upward through the file system hierarchy for a target file or directory.
  * 
  * @param rootAbsPath - The absolute root directory path
@@ -64,26 +90,19 @@ export async function loadTreeFromPath(
  * @returns The absolute path to the target if found, or `null` if not
  * 
  * @example
- * findUp('/home/user/project', '/home/user/project/src/UI/components', '.git/313');
- * checks /home/user/project/src/UI/components/.git/313
- * checks /home/user/project/src/UI/.git/313
- * checks /home/user/project/src/.git/313
- * checks /home/user/project/.git/313
  * returns `null` if not found
- * 
- * @remarks
- * - it's not async
  */
-export function findUp(rootAbsPath: string, startAbsPath: string, targetRelPath: string) {
-	let currentPath = path.resolve(startAbsPath)
-	const root = path.resolve(rootAbsPath)
-	
-	while (true) {
-		const targetPath = path.join(currentPath, targetRelPath)
-		if (fs.existsSync(targetPath)) return targetPath
-		if (currentPath === root) break
-		currentPath = path.dirname(currentPath)
+export async function findUp(rootAbsPath: string, startAbsPath: string, targetRelPath: string): Promise<string | null> {
+	const candidateDirs = findUpCandidates(rootAbsPath, startAbsPath, targetRelPath)
+
+	for (let dir of candidateDirs) {
+		try {
+			await fs.promises.access(dir)
+			return dir
+		} catch {
+			// Continue to next candidate
+		}
 	}
-	
+
 	return null
 }
