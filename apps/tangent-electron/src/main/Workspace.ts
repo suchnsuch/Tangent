@@ -1102,15 +1102,15 @@ export default class Workspace {
 			if (!targetDirectory) {
 				targetDirectory = this.rootPath
 			}
-			else if (targetDirectory.startsWith(closestWildCardPrefix)){
-				const followingPart = targetDirectory.substr(closestWildCardPrefix.length)
-				targetDirectory = await findUp(this.rootPath, contextDir, followingPart)
-			}
 			else{
 				const extension = path.extname(contextPath)
 				targetDirectory = targetDirectory.replace('$filename', path.basename(contextPath, extension))
 
-				if (targetDirectory.match(/^\.\.?[\\\/]/)) {
+				if (targetDirectory.startsWith(closestWildCardPrefix)){
+					const followingPart = targetDirectory.substr(closestWildCardPrefix.length)
+					targetDirectory = await findUp(this.rootPath, contextDir, followingPart)
+				}
+				else if (targetDirectory.match(/^\.\.?[\\\/]/)) {
 					targetDirectory = path.resolve(path.join(contextDir, targetDirectory))
 					if (!targetDirectory.startsWith(this.rootPath)) {
 						log.info('Relative attachment path would have brought us outside the workspace. Will use the root instead. Original:', targetDirectory)
