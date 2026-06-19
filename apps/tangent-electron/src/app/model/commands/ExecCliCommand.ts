@@ -2,13 +2,8 @@ import type { Workspace } from "..";
 import type { CommandContext } from "./Command";
 import WorkspaceCommand from "./WorkspaceCommand";
 import ExecCommandDialog from '../../modal/ExecCommandDialog.svelte'
+import type { NoteViewState } from "../nodeViewStates";
 
-
-function removeSuffix(str, suffix) {
-    if (str.endsWith(suffix)) 
-        return str.slice(0, -suffix.length)
-    return str
-}
 
 export default class ExecCliCommand extends WorkspaceCommand {
 	constructor(workspace: Workspace) {
@@ -16,11 +11,11 @@ export default class ExecCliCommand extends WorkspaceCommand {
 	}
 	
 	execute() {
-		console.log('WTF')
-
-		const workspaceRoot = removeSuffix(this.workspace.workspaceFolder.path, '.tangent')
 		const exts = ['.sh', '.bat']
+		const workspaceRoot = this.workspace.viewState.directoryView.root.path
 		const subject = this.workspace.viewState.tangent.currentNode.value
+		let vw = this.workspace.viewState.tangent.getCurrentViewState() as NoteViewState
+		console.log(">>>>>>>>> ", vw.selection.value)
 
 		this.workspace.api.file.findFiles(workspaceRoot, exts).then(files => {
 			this.workspace.viewState.modal.push(ExecCommandDialog, {
@@ -40,7 +35,7 @@ export default class ExecCliCommand extends WorkspaceCommand {
 	}
 
 	getLabel(){
-		return '::Execute CLI::'
+		return 'Execute Commands'
 	}
 
 	getDefaultPaletteName() {
