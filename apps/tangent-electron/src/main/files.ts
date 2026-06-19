@@ -53,3 +53,37 @@ export async function loadTreeFromPath(
 
 	return item as TreeNode
 }
+
+/**
+ * Searches upward through the file system hierarchy for a target file or directory.
+ * 
+ * @param rootAbsPath - The absolute root directory path
+ * @param startAbsPath - The absolute directory starting point
+ * @param targetRelPath - The relative of the file or directory to search for. 
+ * 
+ * @returns The absolute path to the target if found, or `null` if not
+ * 
+ * @example
+ * findUp('/home/user/project', '/home/user/project/src/UI/components', '.git/313');
+ * checks /home/user/project/src/UI/components/.git/313
+ * checks /home/user/project/src/UI/.git/313
+ * checks /home/user/project/src/.git/313
+ * checks /home/user/project/.git/313
+ * returns `null` if not found
+ * 
+ * @remarks
+ * - it's not async
+ */
+export function findUp(rootAbsPath: string, startAbsPath: string, targetRelPath: string) {
+	let currentPath = path.resolve(startAbsPath)
+	const root = path.resolve(rootAbsPath)
+	
+	while (true) {
+		const targetPath = path.join(currentPath, targetRelPath)
+		if (fs.existsSync(targetPath)) return targetPath
+		if (currentPath === root) break
+		currentPath = path.dirname(currentPath)
+	}
+	
+	return null
+}

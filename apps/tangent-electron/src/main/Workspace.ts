@@ -9,7 +9,7 @@ import Watcher from 'watcher'
 
 import { mapIterator, type PromiseStarter } from '@such-n-such/core'
 
-import { loadTreeFromPath } from './files'
+import { findUp, loadTreeFromPath } from './files'
 import { DirectoryStoreAddResult, forAllNodes, mapTree, moveTree, shallowCopyTreeNodeWithoutChildren, type TreeChange, type TreeChangeMovedItem, type TreeNode, validatePath } from 'common/trees'
 import { type HrefFormedLink, IndexData, type IndexDataUpdate, StructureType } from '../common/indexing/indexTypes'
 import Folder from './Folder'
@@ -1088,28 +1088,10 @@ export default class Workspace {
 	}
 
 	getAttachmentPath(idealFilepath: string, contextPath: string): string {
-		// tries to find the closest local folder indicated by wildcard `./**/assets/dir`
-		// it also supports fallback
-		// for example:  ./**/figs/, global-assets/
-
-		function findUp(startPath: string, target: string, rootPath: string) {
-			let currentPath = path.resolve(startPath)
-			const root = path.resolve(rootPath)
-			
-			while (true) {
-				const targetPath = path.join(currentPath, target)
-				if (fs.existsSync(targetPath)) return targetPath
-				if (currentPath === root) break
-				currentPath = path.dirname(currentPath)
-			}
-			
-			return null
-		}
-
 		const contextDir = path.dirname(contextPath) // TODO: Use this
 		const targetDirectories = getSettings().defaultPasteLocation.value.split(',').map(s => s.trim())
 		let	targetDirectory = null
-		const local_wild_card = "./**/"
+		const localWildCard = "./**/"
 		
 		for (let candidateDirectory of targetDirectories) {
 			targetDirectory = candidateDirectory
@@ -1117,9 +1099,8 @@ export default class Workspace {
 			if (!targetDirectory) {
 				targetDirectory = this.rootPath
 			}
-			else if (targetDirectory.startsWith(local_wild_card)){
-				targetDirectory = findUp(contextDir, targetDirectory.split(local_wild_card)[1], this.rootPath)
-				if (!targetDirectory) continue
+			else if (targetDirectory.startsWith(localWildCard)){
+				targetDirectory = findUp(contextDir, targetDirectory.split(localWildCard)[1], this.rootPath)
 			}
 			else {
 				const extension = path.extname(contextPath)
@@ -1137,7 +1118,7 @@ export default class Workspace {
 				}
 			}
 
-			break
+			if (targetDirectory) break
 		}
 
 		return this.contentsStore.getUniquePath(path.join(targetDirectory, idealFilepath))
