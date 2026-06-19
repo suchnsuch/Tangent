@@ -14,8 +14,9 @@ export default class ExecCliCommand extends WorkspaceCommand {
 		const exts = ['.sh', '.bat']
 		const workspaceRoot = this.workspace.viewState.directoryView.root.path
 		const subject = this.workspace.viewState.tangent.currentNode.value
-		let vw = this.workspace.viewState.tangent.getCurrentViewState() as NoteViewState
-		console.log(">>>>>>>>> ", vw.selection.value)
+		
+		const vw = this.workspace.viewState.tangent.getCurrentViewState() as NoteViewState
+		// vw.selection.value <--- cursor position
 
 		this.workspace.api.file.findFiles(workspaceRoot, exts).then(files => {
 			this.workspace.viewState.modal.push(ExecCommandDialog, {
