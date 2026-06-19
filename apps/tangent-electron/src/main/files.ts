@@ -67,27 +67,27 @@ export async function loadTreeFromPath(
  * ]
  */
 export function findUpCandidates(rootAbsPath: string, startAbsPath: string, targetRelPath: string, maxIterations = 16): string[] {
+	const result: string[] = []
 	const rootPath = path.resolve(rootAbsPath)
 	let currentPath = path.resolve(startAbsPath)
-	const pathsToCheck: string[] = []
 	
 	for (let i = 0; i < maxIterations; i++) {
-		pathsToCheck.push(path.join(currentPath, targetRelPath))
+		result.push(path.join(currentPath, targetRelPath))
 		if (currentPath === rootPath) break
 		currentPath = path.dirname(currentPath)
 	}
 
-	return pathsToCheck
+	return result
 }
 
 /**
  * Searches upward through the file system hierarchy for a target file or directory.
  * 
- * @param rootAbsPath - The absolute root directory path
- * @param startAbsPath - The absolute directory starting point
- * @param targetRelPath - The relative of the file or directory to search for. 
+ * @param rootAbsPath - The absolute path of root directory
+ * @param startAbsPath - The absolute path of directory starting 
+ * @param targetRelPath - The relative path of the file or directory to search for 
  * 
- * @returns The absolute path to the target if found, or `null` if not
+ * @returns The absolute path to the target if found or `null`
  */
 export async function findUp(rootAbsPath: string, startAbsPath: string, targetRelPath: string): Promise<string | null> {
 	const candidateDirs = findUpCandidates(rootAbsPath, startAbsPath, targetRelPath)
