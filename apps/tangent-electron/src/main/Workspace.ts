@@ -1093,7 +1093,7 @@ export default class Workspace {
 			...getSettings().defaultPasteLocation.value.split(',').map(s => s.trim()), // paths are separated by comma (,)
 			'' // default fallback to root path
 		] 
-		const closestWildCardPrefix = "./**/" // e.g. "./**/my/loca/path/to/assets"
+		const closestWildCardPrefix = "./**/"
 		
 		let	targetDirectory = null
 		for (let i = 0; i < targetDirectories.length; i++) {
@@ -1106,7 +1106,7 @@ export default class Workspace {
 				const extension = path.extname(contextPath)
 				targetDirectory = targetDirectory.replace('$filename', path.basename(contextPath, extension))
 
-				if (targetDirectory.startsWith(closestWildCardPrefix)){
+				if (targetDirectory.startsWith(closestWildCardPrefix)){ // e.g. "./**/my/loca/path/to/assets"
 					const followingPart = targetDirectory.substr(closestWildCardPrefix.length)
 					targetDirectory = await findUp(this.rootPath, contextDir, followingPart)
 				}
