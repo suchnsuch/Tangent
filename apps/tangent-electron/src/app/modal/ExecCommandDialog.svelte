@@ -36,8 +36,8 @@ function onAutocomplete(option: Script) {
 
 function selectOption(option: Script, event) {
 	const args = [
-		'--file', subject.path, 
-		'--workspace', workspaceRoot,
+		'--file', workspace.viewState.tangent.getCurrentViewState().node.path, 
+		'--workspace', workspace.viewState.directoryView.root.path,
 	]
 	workspace.api.os.execCLI('bash', [option.path, ...args])
 	workspace.viewState.modal.close()
