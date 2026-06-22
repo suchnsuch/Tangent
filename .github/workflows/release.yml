@@ -25,7 +25,6 @@ jobs:
       # E2E tests require a built app; dev mode is sufficient here.
       - name: Build
         run: npm run build
-        working-directory: apps/tangent-electron
 
       - name: Test
         run: npm run test:no-build
@@ -47,7 +46,6 @@ jobs:
 
       - name: Build
         run: npm run build
-        working-directory: apps/tangent-electron
 
       - name: Publish (macOS)
         run: npm run publish:mac
@@ -87,7 +85,6 @@ jobs:
 
       - name: Build
         run: npm run build
-        working-directory: apps/tangent-electron
 
       - name: Publish (Windows)
         run: npm run publish:win
@@ -115,7 +112,6 @@ jobs:
 
       - name: Build
         run: npm run build
-        working-directory: apps/tangent-electron
 
       - name: Publish (Linux)
         run: npm run publish:linux
