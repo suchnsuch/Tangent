@@ -12,6 +12,10 @@ jobs:
   test:
     runs-on: macos-26
     steps:
+      - uses: actions/checkout@v5
+        with:
+          submodules: recursive
+          
       - uses: ./.github/actions/setup-and-build
 
       - name: Test

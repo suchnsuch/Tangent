@@ -4,10 +4,6 @@ description: Checks out the repo, sets up Node, installs dependencies, and build
 runs:
   using: composite
   steps:
-    - uses: actions/checkout@v5
-      with:
-        submodules: recursive
-
     - uses: actions/setup-node@v5
       with:
         node-version: 24
