@@ -1,0 +1,19 @@
+name: CI Test
+
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: macos-26
+    steps:
+      - uses: ./.github/actions/setup-and-build
+
+      - name: Test
+        run: npm run test:no-build
+        working-directory: apps/tangent-electron

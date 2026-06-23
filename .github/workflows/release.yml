@@ -12,19 +12,7 @@ jobs:
   test:
     runs-on: macos-26
     steps:
-      - uses: actions/checkout@v5
-
-      - uses: actions/setup-node@v5
-        with:
-          node-version: 24
-          cache: npm
-
-      - name: Install dependencies
-        run: npm ci
-
-      # E2E tests require a built app; dev mode is sufficient here.
-      - name: Build
-        run: npm run build
+      - uses: ./.github/actions/setup-and-build
 
       - name: Test
         run: npm run test:no-build
@@ -34,18 +22,7 @@ jobs:
     needs: test
     runs-on: macos-26
     steps:
-      - uses: actions/checkout@v5
-
-      - uses: actions/setup-node@v5
-        with:
-          node-version: 24
-          cache: npm
-
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Build
-        run: npm run build
+      - uses: ./.github/actions/setup-and-build
 
       - name: Publish (macOS)
         run: npm run publish:mac
@@ -68,23 +45,12 @@ jobs:
     needs: test
     runs-on: windows-latest
     steps:
-      - uses: actions/checkout@v5
-
-      - uses: actions/setup-node@v5
-        with:
-          node-version: 24
-          cache: npm
+      - uses: ./.github/actions/setup-and-build
 
       # AzureSignTool is used by build/jsign.js for Azure Trusted Signing.
       # .NET is pre-installed on windows-latest runners.
       - name: Install AzureSignTool
         run: dotnet tool install --global AzureSignTool
-
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Build
-        run: npm run build
 
       - name: Publish (Windows)
         run: npm run publish:win
@@ -100,18 +66,7 @@ jobs:
     needs: test
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v5
-
-      - uses: actions/setup-node@v5
-        with:
-          node-version: 24
-          cache: npm
-
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Build
-        run: npm run build
+      - uses: ./.github/actions/setup-and-build
 
       - name: Publish (Linux)
         run: npm run publish:linux

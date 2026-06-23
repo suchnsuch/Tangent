@@ -6,7 +6,8 @@
 	"type": "module",
 	"scripts": {
 		"test": "npm run test --workspaces --if-present",
-		"build": "npm run build --workspaces --if-present"
+		"build": "npm run build --workspaces --if-present",
+		"build:tangent-electron": "npm run build --workspace=lib/typewriter --workspace=packages/tangent-query-parser --workspace=packages/tangent-html-to-markdown --workspace=apps/tangent-electron"
 	},
 	"author": "Taylor Hadden",
 	"license": "Apache-2.0",
