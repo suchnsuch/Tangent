@@ -64,7 +64,7 @@ async function getSpellCheckLanguages() {
 		<SettingView setting={settings.boldCharacters} />
 		<SettingView setting={settings.defaultTodoCompleteChar} />
 		<SettingView setting={settings.autoSetChildListGlyphs} />
- 		<SettingView setting={settings.allowInterTextUnderscoreFormatting} />
+		<SettingView setting={settings.allowInterTextUnderscoreFormatting} />
 		<SettingView setting={settings.smartParagraphBreaks} />
 		<SettingView setting={settings.enableSpellCheck} />
 		<SettingView setting={settings.filenameSpellCheck} />
