@@ -1,0 +1,26 @@
+name: CI Test
+
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: macos-26
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          submodules: recursive
+          
+      - uses: ./.github/actions/setup-and-build
+
+      - name: Install Playwright Chromium
+        run: npx playwright install chromium --with-deps --only-shell
+
+      - name: Test
+        run: npm run test:no-build
+        working-directory: apps/tangent-electron

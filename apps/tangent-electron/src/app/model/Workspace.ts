@@ -508,6 +508,9 @@ export default class Workspace extends EventDispatcher {
 
 		return readable<HandleResult>(null, set => {
 
+			if (this.debug.nodeHandles) {
+				console.trace('Handle initialized via:', arg)
+			}
 			const handle = new NodeHandle(this, set, node, link)
 			this.activeHandles.push(handle)
 

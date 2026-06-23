@@ -75,9 +75,6 @@
 				"arch": ["x64", "arm64"]
 			}
 		],
-		"signtoolOptions": {
-			"sign": "./build/jsign.js"
-		},
 		"fileAssociations": [
 			{
 				"ext": ["md", "mdx"],
@@ -143,6 +140,12 @@
 	},
 
 	"publish": [
+		{
+			"provider": "github",
+			"owner": "suchnsuch",
+			"repo": "tangent-public",
+			"tagPrefix": "tangent-v"
+		},
 		{
 			"provider": "s3",
 			"bucket": "suchnsuch-public",

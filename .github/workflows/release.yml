@@ -1,0 +1,98 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'tangent-v*'
+
+permissions:
+  contents: write
+
+jobs:
+  test:
+    runs-on: macos-26
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          submodules: recursive
+
+      - uses: ./.github/actions/setup-and-build
+
+      - name: Install Playwright Chromium
+        run: npx playwright install chromium --with-deps --only-shell
+
+      - name: Test
+        run: npm run test:no-build
+        working-directory: apps/tangent-electron
+
+  build-mac:
+    needs: test
+    runs-on: macos-26
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          submodules: recursive
+
+      - uses: ./.github/actions/setup-and-build
+
+      - name: Publish (macOS)
+        run: npm run publish:mac
+        working-directory: apps/tangent-electron
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # Apple code signing — CSC_LINK should be a base64-encoded .p12 certificate
+          CSC_LINK: ${{ secrets.APPLE_CSC_LINK }}
+          CSC_KEY_PASSWORD: ${{ secrets.APPLE_CSC_KEY_PASSWORD }}
+          # Apple notarization
+          APPLE_ID: ${{ secrets.APPLE_ID }}
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+          APPLE_ID_PASSWORD: ${{ secrets.APPLE_ID_PASSWORD }}
+          # S3 publish
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
+
+  build-windows:
+    needs: test
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          submodules: recursive
+
+      - uses: ./.github/actions/setup-and-build
+
+      # AzureSignTool is used by build/jsign.js for Azure Trusted Signing.
+      # .NET is pre-installed on windows-latest runners.
+      - name: Install AzureSignTool
+        run: dotnet tool install --global AzureSignTool
+
+      - name: Publish (Windows)
+        run: npm run publish:win
+        working-directory: apps/tangent-electron
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # S3 publish
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
+
+  build-linux:
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          submodules: recursive
+          
+      - uses: ./.github/actions/setup-and-build
+
+      - name: Publish (Linux)
+        run: npm run publish:linux
+        working-directory: apps/tangent-electron
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # S3 publish
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
