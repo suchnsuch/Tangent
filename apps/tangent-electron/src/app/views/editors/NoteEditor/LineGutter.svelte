@@ -36,7 +36,8 @@ function positionOnLine(line: HTMLElement, container: HTMLElement) {
 		const containerRect = container.getBoundingClientRect()
 		const offset = (lineHeight - containerRect.height) / 2
 
-		container.style.left = result.x - marginLeft + 'px'
+		const alterX = side === 'left' ? 0 : 24 
+		container.style.left = result.x - marginLeft + alterX + 'px'
 		container.style.top = result.y + offset + 'px'
 	})
 }

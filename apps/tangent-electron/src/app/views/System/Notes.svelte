@@ -56,7 +56,6 @@ async function getSpellCheckLanguages() {
 		<SettingView setting={settings.hangingHeaders} />
 		<SettingView setting={settings.cardViewCardsHoldAltToScroll} name="Require Alt to Scroll Cards" />
 		<SettingView setting={settings.crossOutFinishedTodos} />
-		<SettingView setting={settings.defaultCheckboxCompleteChar} />
 	</div>
 
 	<h2>Editing</h2>
@@ -65,7 +64,7 @@ async function getSpellCheckLanguages() {
 		<SettingView setting={settings.boldCharacters} />
 		<SettingView setting={settings.defaultTodoCompleteChar} />
 		<SettingView setting={settings.autoSetChildListGlyphs} />
-		<SettingView setting={settings.allowInterTextUnderscoreFormatting} />
+ 		<SettingView setting={settings.allowInterTextUnderscoreFormatting} />
 		<SettingView setting={settings.smartParagraphBreaks} />
 		<SettingView setting={settings.enableSpellCheck} />
 		<SettingView setting={settings.filenameSpellCheck} />
