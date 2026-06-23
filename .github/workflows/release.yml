@@ -18,6 +18,10 @@ jobs:
 
       - uses: ./.github/actions/setup-and-build
 
+      - name: Prep Playwright
+        run: npx playwright install
+        working-directory: apps/tangent-electron
+
       - name: Test
         run: npm run test:no-build
         working-directory: apps/tangent-electron
