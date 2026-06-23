@@ -18,9 +18,8 @@ jobs:
 
       - uses: ./.github/actions/setup-and-build
 
-      - name: Prep Playwright
-        run: npx playwright install
-        working-directory: apps/tangent-electron
+      - name: Install Playwright Chromium
+        run: npx playwright install chromium --with-deps --only-shell
 
       - name: Test
         run: npm run test:no-build
