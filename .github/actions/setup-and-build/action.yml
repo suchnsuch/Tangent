@@ -13,6 +13,10 @@ runs:
       run: npm ci
       shell: bash
 
+    - name: Install Electron binary
+      run: npx electron --version
+      shell: bash
+
     - name: Build
       run: npm run build:tangent-electron
       shell: bash
