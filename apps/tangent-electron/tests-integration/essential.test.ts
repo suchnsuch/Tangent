@@ -116,6 +116,7 @@ test('Note Linking', async ({ tangent, workspace }) => {
 
 	await keyboard.type('Linking to [[New Note')
 	await keyboard.press('Enter')
+	await wait(100) // Slush for CI
 
 	expect(await window.getCurrentEditorText()).toEqual(`Linking to [[Link Note]]
 
