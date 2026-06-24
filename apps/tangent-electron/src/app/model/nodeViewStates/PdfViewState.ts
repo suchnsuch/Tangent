@@ -31,8 +31,6 @@ export default class PdfViewState implements NodeViewState, LensViewState {
 	readonly details = new DetailsViewStateStore<DetailsViewState>(null)
 
 	readonly zoom = new ZoomSetting(imageZoomDefinition)
-	readonly panX = new WritableStore<number>(0)
-	readonly panY = new WritableStore<number>(0)
 
 	readonly targetPage = new WritableStore(-1)
 
