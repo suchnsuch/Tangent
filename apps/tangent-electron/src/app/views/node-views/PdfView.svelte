@@ -29,6 +29,28 @@ let viewerElement: HTMLDivElement
 
 let viewer: pdfviewer.PDFViewer = null
 
+let zoom = state.zoom
+let panX = state.panX
+let panY = state.panY
+
+function onWheel(event: WheelEvent) {
+	container.focus()
+	if (event.ctrlKey) {
+		event.preventDefault()
+		zoom.applyWheelEvent(event)
+		
+		viewer.currentScale = $zoom
+	}
+	else if ($zoom !== 1) { // Helps when in tangent view
+		event.preventDefault()
+		$panX = $panX + event.deltaX * +1 * (1/$zoom)
+		$panY = $panY + event.deltaY * +1 * (1/$zoom)
+
+		container.scrollLeft = $panX; // horizontal pan
+  		container.scrollTop = $panY; // vertical pan
+	}
+}
+
 async function doPDF() {
 	let pdf = await pdfjs.getDocument(state.file.cacheBustPath).promise
 
@@ -120,6 +142,7 @@ function onClick(event: MouseEvent) {
 	style:--noteWidthMax={$maxWidth + 'px'}
 	style:padding-top={extraTop + 'px'}
 	style:padding-bottom={extraBottom + 'px'}
+	on:wheel={onWheel}
 >
 	<WorkspaceFileHeader
 		node={state.file}
