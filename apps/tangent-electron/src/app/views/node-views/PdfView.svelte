@@ -1,4 +1,5 @@
 <script lang="ts">
+import { fly } from 'svelte/transition'
 import { getContext, onDestroy } from 'svelte'
 import { Workspace } from 'app/model'
 import PdfViewState from 'app/model/nodeViewStates/PdfViewState'
@@ -30,26 +31,57 @@ let viewerElement: HTMLDivElement
 let viewer: pdfviewer.PDFViewer = null
 
 let zoom = state.zoom
-let panX = state.panX
-let panY = state.panY
+
+let isHoveringControls = false
+$: isTransformed = $zoom !== 1
 
 function onWheel(event: WheelEvent) {
 	container.focus()
 	if (event.ctrlKey) {
-		event.preventDefault()
-		zoom.applyWheelEvent(event)
-		
-		viewer.currentScale = $zoom
+		event.preventDefault();
+
+		let somePageElement = container.querySelector('.page');
+
+		// Get mouse position relative to element BEFORE zoom
+		const rectBefore = somePageElement.getBoundingClientRect();
+		const mouseX = event.clientX;
+		const mouseY = event.clientY;
+
+		// Calculate mouse position in page coordinates (before zoom)
+		const pageXBefore = (mouseX - rectBefore.left) / rectBefore.width;
+		const pageYBefore = (mouseY - rectBefore.top) / rectBefore.height;
+
+		// Apply zoom
+		zoom.applyWheelEvent(event);
+		viewer.currentScale = $zoom;
+
+		// Get element AFTER zoom
+		const rectAfter = somePageElement.getBoundingClientRect();
+
+		// Calculate where the mouse should be in page coordinates (same position)
+		const pageXAfter = pageXBefore;  // We want the same relative position!
+		const pageYAfter = pageYBefore;
+
+		// Calculate the target scroll position to keep mouse fixed
+		const targetScrollX = (pageXAfter * rectAfter.width) + rectAfter.left - mouseX;
+		const targetScrollY = (pageYAfter * rectAfter.height) + rectAfter.top - mouseY;
+
+		// Apply scroll to keep mouse position fixed
+		container.scrollLeft += targetScrollX;
+		container.scrollTop += targetScrollY;
 	}
 	else if ($zoom !== 1) { // Helps when in tangent view
 		event.preventDefault()
-		$panX = $panX + event.deltaX * +1 * (1/$zoom)
-		$panY = $panY + event.deltaY * +1 * (1/$zoom)
-
-		container.scrollLeft = $panX; // horizontal pan
-  		container.scrollTop = $panY; // vertical pan
+		container.scrollLeft += event.deltaX * +1 * (1/$zoom) // horizontal pan
+  		container.scrollTop += event.deltaY * +1 * (1/$zoom) // vertical pan
 	}
 }
+
+function resetTransform() {
+	$zoom = 1
+	viewer.currentScale = 1
+}
+
 
 async function doPDF() {
 	let pdf = await pdfjs.getDocument(state.file.cacheBustPath).promise
@@ -156,6 +188,15 @@ function onClick(event: MouseEvent) {
 			<div bind:this={viewerElement} on:click={onClick}></div>
 		</div>
 	</article>
+
+	{#if isTransformed || isHoveringControls}
+		<div class="controls" transition:fly={{ y: 100 }}
+			style:bottom={`calc(1em + ${extraBottom}px)`}
+		>
+			<button class="zoomText" on:click={resetTransform}>{Math.round($zoom * 100)}%</button>
+			<input class="zoomSlider" type="range" min="{zoom.range.min}" max={zoom.range.max} step="0.1" bind:value={$zoom}/>
+		</div>
+	{/if}
 </main>
 
 <style lang="scss">
@@ -188,6 +229,18 @@ article {
 		-webkit-user-select: text;
 		user-select: text;
 	}
+}
+
+
+.controls {
+	position: absolute;
+	z-index: 1;
+	left: 1em;
+	bottom: 1em;
+
+	display: flex;
+	flex-direction: row;
+	gap: .5em;
 }
 
 </style>
