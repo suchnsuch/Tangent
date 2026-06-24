@@ -6,7 +6,8 @@ runs:
   steps:
     - uses: actions/setup-node@v5
       with:
-        node-version: 24
+        # Version downgrade forced by https://github.com/nodejs/node/issues/63487
+        node-version: 22
         cache: npm
 
     - name: Install dependencies
