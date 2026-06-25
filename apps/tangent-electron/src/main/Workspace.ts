@@ -9,7 +9,7 @@ import Watcher from 'watcher'
 
 import { mapIterator, type PromiseStarter } from '@such-n-such/core'
 
-import { loadTreeFromPath } from './files'
+import { findUp, loadTreeFromPath } from './files'
 import { DirectoryStoreAddResult, forAllNodes, mapTree, moveTree, shallowCopyTreeNodeWithoutChildren, type TreeChange, type TreeChangeMovedItem, type TreeNode, validatePath } from 'common/trees'
 import { type HrefFormedLink, IndexData, type IndexDataUpdate, StructureType } from '../common/indexing/indexTypes'
 import Folder from './Folder'
@@ -1087,26 +1087,42 @@ export default class Workspace {
 		}
 	}
 
-	getAttachmentPath(idealFilepath: string, contextPath: string): string {
+	async getAttachmentPath(idealFilepath: string, contextPath: string): Promise<string> {
 		const contextDir = path.dirname(contextPath) // TODO: Use this
-		let targetDirectory = getSettings().defaultPasteLocation.value
-		if (!targetDirectory) {
-			targetDirectory = this.rootPath
-		}
-		else {
-			const extension = path.extname(contextPath)
-			targetDirectory = targetDirectory.replace('$filename', path.basename(contextPath, extension))
+		const targetDirectories = [
+			...getSettings().defaultPasteLocation.value.split(',').map(s => s.trim()), // paths are separated by comma (,)
+			'' // default fallback to root path
+		] 
+		const closestWildCardPrefix = "./**/"
+		
+		let	targetDirectory = null
+		for (let i = 0; i < targetDirectories.length; i++) {
+			targetDirectory = targetDirectories[i]
 
-			if (targetDirectory.match(/^\.\.?[\\\/]/)) {
-				targetDirectory = path.resolve(path.join(contextDir, targetDirectory))
-				if (!targetDirectory.startsWith(this.rootPath)) {
-					log.info('Relative attachment path would have brought us outside the workspace. Will use the root instead. Original:', targetDirectory)
-					targetDirectory = this.rootPath
+			if (!targetDirectory) {
+				targetDirectory = this.rootPath
+			}
+			else{
+				const extension = path.extname(contextPath)
+				targetDirectory = targetDirectory.replace('$filename', path.basename(contextPath, extension))
+
+				if (targetDirectory.startsWith(closestWildCardPrefix)){ // e.g. "./**/my/loca/path/to/assets"
+					const followingPart = targetDirectory.substr(closestWildCardPrefix.length)
+					targetDirectory = await findUp(this.rootPath, contextDir, followingPart)
+				}
+				else if (targetDirectory.match(/^\.\.?[\\\/]/)) {
+					targetDirectory = path.resolve(path.join(contextDir, targetDirectory))
+					if (!targetDirectory.startsWith(this.rootPath)) {
+						log.info('Relative attachment path would have brought us outside the workspace. Will use the root instead. Original:', targetDirectory)
+						targetDirectory = this.rootPath
+					}
+				}
+				else {
+					targetDirectory = path.join(this.rootPath, targetDirectory)
 				}
 			}
-			else {
-				targetDirectory = path.join(this.rootPath, targetDirectory)
-			}
+
+			if (targetDirectory) break
 		}
 
 		return this.contentsStore.getUniquePath(path.join(targetDirectory, idealFilepath))

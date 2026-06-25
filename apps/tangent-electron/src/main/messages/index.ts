@@ -544,7 +544,7 @@ ipcMain.handle('getAllLanguages', async (event) => {
 	}
 })
 
-ipcMain.handle('saveImageFromClipboard', (event, contextPath) => {
+ipcMain.handle('saveImageFromClipboard', async (event, contextPath) => {
 	try {
 		const nativeImage = clipboard.readImage()
 		const image = nativeImage.toPNG()
@@ -596,7 +596,7 @@ ipcMain.handle('saveImageFromClipboard', (event, contextPath) => {
 		const workspace = validateWorkspaceForHandleFilepath(windowHandle, contextPath)
 
 		const filename = fillDateFormat('Pasted on %YYYY%-%MM%-%DD% at %HH%.%mm%.%ss%.png', new Date())
-		const attachmentPath = workspace.getAttachmentPath(filename, contextPath)
+		const attachmentPath = await workspace.getAttachmentPath(filename, contextPath)
 		const directory = path.dirname(attachmentPath)
 		fs.promises.mkdir(directory, { recursive: true }).then(() => {
 			return fs.promises.writeFile(attachmentPath, image)
@@ -681,7 +681,7 @@ ipcMain.handle('saveFromUrl', async (event, href: string, contextPath: string) =
 				const windowHandle = getWindowHandle(event.sender)
 				const workspace = validateWorkspaceForHandleFilepath(windowHandle, contextPath)
 
-				const attachmentPath = workspace.getAttachmentPath(filename, contextPath)
+				const attachmentPath = await workspace.getAttachmentPath(filename, contextPath)
 				const directory = path.dirname(attachmentPath)
 
 				await fs.promises.mkdir(directory, { recursive: true }).then(() => {

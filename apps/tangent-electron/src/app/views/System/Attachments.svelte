@@ -9,9 +9,56 @@ let settings = workspace.settings
 
 </script>
 
-<main>
+<main style="display: flex; flex-direction: column;">
+	<div style=" display: inline-grid; margin: 0 auto;" class="container">
+		<table><tbody>
+			<tr>
+				<th>Resolve</th>
+				<th>Path</th>
+			</tr>
+			<tr>
+				<td>
+					<select>
+						<option>static</option>
+						<option>upward </option>
+					</select>
+				</td>
+				<td>
+					<input type="text" class="grow" />
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<select>
+						<option>static</option>
+						<option>upward </option>
+					</select>
+				</td>
+				<td>
+					<input type="text" class="grow" />
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<select>
+						<option>static</option>
+						<option>upward </option>
+					</select>
+				</td>
+				<td>
+					<input type="text" class="grow" />
+				</td>
+			</tr>
+		</tbody></table>
+
+		<button>
+			new path
+		</button>
+	</div>
+	
+	<SettingView setting={settings.defaultPasteLocation} />
+
 	<div class="settingsGroup">
-		<SettingView setting={settings.defaultPasteLocation} />
 		<p class="value-details explanation">
 			A direct path (e.g. "Some/Path") will be interpretted from the root of the workspace.
 		</p>
