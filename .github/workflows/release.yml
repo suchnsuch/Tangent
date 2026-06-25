@@ -1,3 +1,6 @@
+# This workflow is intended create build artifacts
+# on the native platforms. Will likely be mandatory
+# once Rosetta is fully deprecated.
 name: Release
 
 on:

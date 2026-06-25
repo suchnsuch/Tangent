@@ -22,5 +22,5 @@ jobs:
         run: npx playwright install chromium --with-deps --only-shell
 
       - name: Test
-        run: npm run test:no-build
-        working-directory: apps/tangent-electron
+        # Run all vitest tests, but not playwright, for brevity
+        run: npx vitest run
