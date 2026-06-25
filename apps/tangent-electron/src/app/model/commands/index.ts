@@ -11,6 +11,7 @@ import ToggleSidebarCommand from './ToggleSidebar'
 import ShowInFileBrowserCommand from './ShowInFileBrowser'
 import type WorkspaceCommand from './WorkspaceCommand'
 import MoveFileCommand from './MoveFileCommand'
+import ExecCliCommand from './ExecCliCommand'
 import DeleteNodeCommand from './DeleteNode'
 import SetFocusLevelCommand from './SetFocusLevel'
 import ToggleFocusModeCommand from './ToggleFocusMode'
@@ -114,6 +115,8 @@ function createAllCommands(workspace: Workspace) {
 		moveToLeftFile: new ChangeCurrentFileCommand(workspace, { mode: 'left', shortcut: 'Mod+Alt+Left' }),
 		moveToRightFile: new ChangeCurrentFileCommand(workspace, { mode: 'right', shortcut: 'Mod+Alt+Right' }),
 
+		execCommand: new ExecCliCommand(workspace),
+		
 		moveFile: new MoveFileCommand(workspace),
 		duplicateNode: new DuplicateNodeCommand(workspace),
 		deleteNode: new DeleteNodeCommand(workspace),

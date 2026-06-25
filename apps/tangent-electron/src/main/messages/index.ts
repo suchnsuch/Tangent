@@ -19,7 +19,30 @@ import './themes'
 import './urlData'
 import { FileSaveResult } from 'main/File'
 
+import { spawn } from 'child_process'
+
 const log = Logger.get('messages')
+
+
+ipcMain.handle('execCLI', async (event, cmd, args) => {
+	console.log("Executing CLI command: ", cmd, args)
+
+	const child = spawn(cmd, args, { 
+		stdio: 'inherit',
+		// shell: true // <-- this has issues with file names that contain spaces
+	});
+	child.on('close', (code) => {
+		console.log(`Process exited with code ${code}`);
+	});
+})
+
+ipcMain.handle('findFiles', async (event, dir, exts) => {
+	async function getFiles(dir) {
+		const allFiles = await fs.promises.readdir(dir)
+		return allFiles.filter(fname => exts.some(e => fname.endsWith(e)))
+	}
+	return getFiles(dir)
+})
 
 ipcMain.handle('getKnownWorkspaces', async (event) => {
 

@@ -104,7 +104,13 @@ export default interface WindowAPI {
 		showInFileBrowser(path: string)
 		/** Open a path in the default format */
 		openPath(path: string)
+
+		findFiles(dir: string, exts: string[]): Promise<string[]>
 	}
+
+	os: {
+		execCLI(cmd: string, args: string[]): Promise<string>
+	},
 
 	edit: {
 		nativeAction(action: 'cut' | 'copy' | 'paste' | 'pasteAndMatchStyle' | 'selectAll' | 'undo' | 'redo')
