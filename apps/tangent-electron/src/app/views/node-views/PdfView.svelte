@@ -38,37 +38,37 @@ $: isTransformed = $zoom !== 1
 function onWheel(event: WheelEvent) {
 	container.focus()
 	if (event.ctrlKey) {
-		event.preventDefault();
+		event.preventDefault()
 
-		let somePageElement = container.querySelector('.page');
+		let somePageElement = container.querySelector('.page')
 
 		// Get mouse position relative to element BEFORE zoom
-		const rectBefore = somePageElement.getBoundingClientRect();
-		const mouseX = event.clientX;
-		const mouseY = event.clientY;
+		const rectBefore = somePageElement.getBoundingClientRect()
+		const mouseX = event.clientX
+		const mouseY = event.clientY
 
 		// Calculate mouse position in page coordinates (before zoom)
-		const pageXBefore = (mouseX - rectBefore.left) / rectBefore.width;
-		const pageYBefore = (mouseY - rectBefore.top) / rectBefore.height;
+		const pageXBefore = (mouseX - rectBefore.left) / rectBefore.width
+		const pageYBefore = (mouseY - rectBefore.top) / rectBefore.height
 
 		// Apply zoom
-		zoom.applyWheelEvent(event);
-		viewer.currentScale = $zoom;
+		zoom.applyWheelEvent(event)
+		viewer.currentScale = $zoom
 
 		// Get element AFTER zoom
-		const rectAfter = somePageElement.getBoundingClientRect();
+		const rectAfter = somePageElement.getBoundingClientRect()
 
 		// Calculate where the mouse should be in page coordinates (same position)
-		const pageXAfter = pageXBefore;  // We want the same relative position!
-		const pageYAfter = pageYBefore;
+		const pageXAfter = pageXBefore  // We want the same relative position!
+		const pageYAfter = pageYBefore
 
 		// Calculate the target scroll position to keep mouse fixed
-		const targetScrollX = (pageXAfter * rectAfter.width) + rectAfter.left - mouseX;
-		const targetScrollY = (pageYAfter * rectAfter.height) + rectAfter.top - mouseY;
+		const targetScrollX = (pageXAfter * rectAfter.width) + rectAfter.left - mouseX
+		const targetScrollY = (pageYAfter * rectAfter.height) + rectAfter.top - mouseY
 
 		// Apply scroll to keep mouse position fixed
-		container.scrollLeft += targetScrollX;
-		container.scrollTop += targetScrollY;
+		container.scrollLeft += targetScrollX
+		container.scrollTop += targetScrollY
 	}
 	else {
 		event.preventDefault()
