@@ -70,7 +70,7 @@ function onWheel(event: WheelEvent) {
 		container.scrollLeft += targetScrollX;
 		container.scrollTop += targetScrollY;
 	}
-	else if ($zoom !== 1) { // Helps when in tangent view
+	else {
 		event.preventDefault()
 		container.scrollLeft += event.deltaX * +1 * (1/$zoom) // horizontal pan
   		container.scrollTop += event.deltaY * +1 * (1/$zoom) // vertical pan
@@ -78,8 +78,8 @@ function onWheel(event: WheelEvent) {
 }
 
 function resetTransform() {
-	$zoom = 1
-	viewer.currentScale = 1
+	viewer.currentScaleValue = 'auto'
+	$zoom = viewer.currentScale
 }
 
 
@@ -147,7 +147,7 @@ function pageTarget(target: number) {
 function onResize(resizeEntries: ResizeObserverEntry[]) {
 	if (viewer) {
 		viewer.firstPagePromise.then(() => {
-			viewer.currentScaleValue = 'auto'
+			resetTransform()
 		})
 	}
 }
