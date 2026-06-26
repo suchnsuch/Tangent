@@ -1,5 +1,4 @@
 <script lang="ts">
-import { fly } from 'svelte/transition'
 import { getContext, onDestroy } from 'svelte'
 import { Workspace } from 'app/model'
 import PdfViewState from 'app/model/nodeViewStates/PdfViewState'
@@ -10,6 +9,7 @@ import * as pdfviewer from 'pdfjs-dist/web/pdf_viewer.mjs'
 import { resizeObserver } from 'app/utils/resizeObserver'
 import { scrollTo } from 'app/utils'
 import { smoothScrollTime } from 'app/utils/style'
+import { FocusLevel } from 'common/dataTypes/TangentInfo'
 
 const workspace = getContext('workspace') as Workspace
 const {
@@ -32,11 +32,10 @@ let viewer: pdfviewer.PDFViewer = null
 
 let zoom = state.zoom
 
-let isHoveringControls = false
-$: isTransformed = $zoom !== 1
 
 function onWheel(event: WheelEvent) {
 	container.focus()
+	
 	if (event.ctrlKey) {
 		event.preventDefault()
 
@@ -77,11 +76,18 @@ function onWheel(event: WheelEvent) {
 	}
 }
 
-function resetTransform() {
-	viewer.currentScaleValue = 'auto'
+function resetZoom(val: number | 'auto') {
+	viewer.currentScaleValue = `${val}`
 	$zoom = viewer.currentScale
 }
 
+function setZoom(){
+	resetZoom(zoom.value)
+}
+
+function resetZoomEvent(val: Event) {
+	setZoom()
+}	
 
 async function doPDF() {
 	let pdf = await pdfjs.getDocument(state.file.cacheBustPath).promise
@@ -147,7 +153,7 @@ function pageTarget(target: number) {
 function onResize(resizeEntries: ResizeObserverEntry[]) {
 	if (viewer) {
 		viewer.firstPagePromise.then(() => {
-			resetTransform()
+			resetZoom('auto')
 		})
 	}
 }
@@ -189,14 +195,12 @@ function onClick(event: MouseEvent) {
 		</div>
 	</article>
 
-	{#if isTransformed || isHoveringControls}
-		<div class="controls" transition:fly={{ y: 100 }}
-			style:bottom={`calc(1em + ${extraBottom}px)`}
-		>
-			<button class="zoomText" on:click={resetTransform}>{Math.round($zoom * 100)}%</button>
-			<input class="zoomSlider" type="range" min="{zoom.range.min}" max={zoom.range.max} step="0.1" bind:value={$zoom}/>
-		</div>
-	{/if}
+	<div class="controls" // transition:fly={{ y: 100 }}
+		style:bottom={`calc(1em + ${extraBottom}px)`}
+	>
+		<button class="zoomText" on:click={resetZoomEvent}>{Math.round($zoom * 100)}%</button>
+		<input class="zoomSlider" type="range" min="{zoom.range.min}" max={zoom.range.max} step="0.1" bind:value={$zoom} on:change={setZoom}/>
+	</div>
 </main>
 
 <style lang="scss">
