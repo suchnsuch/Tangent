@@ -26,6 +26,7 @@ $: targetPage = state.targetPage
 
 let container: HTMLDivElement
 let viewerElement: HTMLDivElement
+
 let viewer: pdfviewer.PDFViewer = null
 let zoom = state.zoom
 
