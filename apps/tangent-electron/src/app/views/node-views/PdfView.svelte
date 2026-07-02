@@ -29,6 +29,7 @@ let viewerElement: HTMLDivElement
 let viewer: pdfviewer.PDFViewer = null
 let zoom = state.zoom
 
+const drawingDelay = 150
 
 function onWheel(event: WheelEvent) {
 	container.focus()
@@ -43,7 +44,7 @@ function onWheel(event: WheelEvent) {
 		const containerBB  = container.getBoundingClientRect()
 		const origin = [event.clientX - containerBB.left, event.clientY - containerBB.top]
 	
-		viewer.updateScale({ drawingDelay: 200, scaleFactor: z2/z1, origin})
+		viewer.updateScale({ drawingDelay, scaleFactor: z2/z1, origin})
 		$zoom = parseFloat(viewer._currentScaleValue)
 	}
 	else {
@@ -53,28 +54,19 @@ function onWheel(event: WheelEvent) {
 	}
 }
 
-function centerOfViewer() {
-	const bb = container.getBoundingClientRect()
-	return [bb.width / 2 , bb.height / 2]			
-}
-
-function manualZoomSet(z1: number, z2: number){
-	viewer.updateScale({
-		drawingDelay: 400, 
-		scaleFactor: z2/z1, 
-		origin: centerOfViewer(),
-	})
-	$zoom = viewer.currentScale
-}
-
 function resetZoom(val: number | 'auto') {
 	if (val == 'auto') {
 		viewer.currentScaleValue = `${val}`
-		$zoom = viewer.currentScale
 	}
 	else {
-		manualZoomSet(parseFloat(viewer.currentScaleValue), val)
+		const countainerBB = container.getBoundingClientRect()
+		viewer.updateScale({ 
+			drawingDelay, 
+			scaleFactor: val / parseFloat(viewer.currentScaleValue), 
+			origin: [countainerBB.width / 2 , countainerBB.height / 2]
+		})
 	}
+	$zoom = viewer.currentScale
 }
 
 function setZoom() {
