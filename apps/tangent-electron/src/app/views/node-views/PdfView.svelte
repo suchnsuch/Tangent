@@ -30,6 +30,7 @@ let viewerElement: HTMLDivElement
 let viewer: pdfviewer.PDFViewer = null
 let zoom = state.zoom
 
+
 const drawingDelay = 150
 
 function onWheel(event: WheelEvent) {
@@ -40,9 +41,9 @@ function onWheel(event: WheelEvent) {
 
 		const [z2, z1] = zoom.applyWheelEvent(event)
 		const containerBB  = container.getBoundingClientRect()
-		const origin = [event.clientX - containerBB.left, event.clientY - containerBB.top]
+		const relativeCursorPos = [event.clientX - containerBB.left, event.clientY - containerBB.top]
 	
-		viewer.updateScale({ drawingDelay, scaleFactor: z2/z1, origin})
+		viewer.updateScale({ drawingDelay, scaleFactor: z2/z1, origin: relativeCursorPos })
 		$zoom = parseFloat(viewer._currentScaleValue)
 	}
 	else {
@@ -52,7 +53,7 @@ function onWheel(event: WheelEvent) {
 	}
 }
 
-function resetZoom(val: number | 'auto') {
+function setZoom(val: number | 'auto') {
 	if (val == 'auto') {
 		viewer.currentScaleValue = `${val}`
 	}
@@ -61,18 +62,18 @@ function resetZoom(val: number | 'auto') {
 		viewer.updateScale({ 
 			drawingDelay, 
 			scaleFactor: val / parseFloat(viewer.currentScaleValue), 
-			origin: [countainerBB.width / 2 , countainerBB.height / 2]
+			origin:  [countainerBB.width / 2 , countainerBB.height / 2]
 		})
 	}
 	$zoom = viewer.currentScale
 }
 
-function setZoom() {
-	resetZoom($zoom)
+function setZoomInputEvent(evt) {
+	setZoom($zoom)
 }
 
-function resetZoomEvent(ev: Event) {
-	resetZoom('auto')
+function resetZoomEvent(evt: Event) {
+	setZoom('auto')
 }
 
 async function doPDF() {
@@ -139,7 +140,7 @@ function pageTarget(target: number) {
 function onResize(resizeEntries: ResizeObserverEntry[]) {
 	if (viewer) {
 		viewer.firstPagePromise.then(() => {
-			resetZoom('auto')
+			setZoom('auto')
 		})
 	}
 }
@@ -185,7 +186,7 @@ function onClick(event: MouseEvent) {
 		style:bottom={`calc(1em + ${extraBottom}px)`}
 	>
 		<button class="zoomText" on:click={resetZoomEvent}>{Math.round($zoom * 100)}%</button>
-		<input class="zoomSlider" type="range" min="{zoom.range.min}" max={zoom.range.max} step="0.1" bind:value={$zoom} on:input={setZoom}/>
+		<input class="zoomSlider" type="range" min="{zoom.range.min}" max={zoom.range.max} step="0.1" bind:value={$zoom} on:input={setZoomInputEvent}/>
 	</div>
 </main>
 

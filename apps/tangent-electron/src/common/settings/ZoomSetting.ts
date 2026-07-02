@@ -2,7 +2,7 @@ import Setting from "./Setting"
 
 export default class ZoomSetting extends Setting<number> {
 	applyWheelEvent(event: WheelEvent, sensitivity: number = .25) {
-		const oldValue = this.value
+		const oldScale = this.value
 
 		let change = event.deltaY
 		if (Math.abs(change) > 25) {
@@ -18,6 +18,6 @@ export default class ZoomSetting extends Setting<number> {
 		newScale -= (change * newScale) * sensitivity
 		this.set(newScale)
 
-		return [newScale, oldValue]
+		return [newScale, oldScale]
 	}
 }
