@@ -9,7 +9,6 @@ import * as pdfviewer from 'pdfjs-dist/web/pdf_viewer.mjs'
 import { resizeObserver } from 'app/utils/resizeObserver'
 import { scrollTo } from 'app/utils'
 import { smoothScrollTime } from 'app/utils/style'
-import { FocusLevel } from 'common/dataTypes/TangentInfo'
 
 const workspace = getContext('workspace') as Workspace
 const {
@@ -31,97 +30,20 @@ let viewer: pdfviewer.PDFViewer = null
 let zoom = state.zoom
 
 
-function OriginalPdfJsOnWheel(evt: WheelEvent) {
-	// stolen from https://mozilla.github.io/pdf.js/web/viewer.html at 2026-07-02
-
-	var _wheelUnusedTicks = 0
-	var _wheelUnusedFactor = 1
-
-	function normalizeWheelEventDirection(evt: WheelEvent) {
-		let delta = Math.hypot(evt.deltaX, evt.deltaY)
-		const angle = Math.atan2(evt.deltaY, evt.deltaX)
-		if (-0.25 * Math.PI < angle && angle < 0.75 * Math.PI) {
-			delta = -delta
-		}
-		return delta
-	}
-
-	function _accumulateFactor(previousScale: number, factor: number) {
-		if (factor === 1) {
-			return 1
-		}
-		if (_wheelUnusedFactor > 1 && factor < 1 || _wheelUnusedFactor < 1 && factor > 1) {
-			_wheelUnusedFactor = 1
-		}
-		const newFactor = Math.floor(previousScale * factor * _wheelUnusedFactor * 100) / (100 * previousScale)
-		_wheelUnusedFactor = factor / newFactor
-		return newFactor
-	}
-
-	function updateZoom(steps: number, scaleFactor: number, origin: [number, number]) {
-		if (viewer.isInPresentationMode) {
-			return
-		}
-		viewer.updateScale({
-			drawingDelay: 400,
-			steps,
-			scaleFactor,
-			origin
-		})
-
-		zoom.set(viewer._currentScaleValue)
-	}
-
-	function _accumulateTicks(ticks: number) {
-		if (_wheelUnusedTicks > 0 && ticks < 0 || _wheelUnusedTicks < 0 && ticks > 0) {
-			_wheelUnusedTicks = 0
-		}
-		_wheelUnusedTicks += ticks
-		const wholeTicks = Math.trunc(_wheelUnusedTicks)
-		_wheelUnusedTicks -= wholeTicks
-		return wholeTicks
-	}
-
-	// -------------------------------------------
-
-	const pdfViewer = viewer
-	const supportsMouseWheelZoomCtrlKey = true
-	const supportsMouseWheelZoomMetaKey = true
-	const supportsPinchToZoom = true
-
-	let scaleFactor = Math.exp(-evt.deltaY / 100)
-	const deltaMode = evt.deltaMode
-	const isBuiltInMac = false
-	const isPinchToZoom = evt.ctrlKey && deltaMode === WheelEvent.DOM_DELTA_PIXEL && evt.deltaX === 0 && (Math.abs(scaleFactor - 1) < 0.05 || isBuiltInMac) && evt.deltaZ === 0
-	
-	const containerBB  = container.getBoundingClientRect()
-	const origin = [evt.clientX - containerBB.left, evt.clientY - containerBB.top] as [number, number]
-	
-	if (isPinchToZoom || evt.ctrlKey && supportsMouseWheelZoomCtrlKey || evt.metaKey && supportsMouseWheelZoomMetaKey) {
-		evt.preventDefault()
-		if (isPinchToZoom && supportsPinchToZoom) {
-			scaleFactor = _accumulateFactor(pdfViewer.currentScale, scaleFactor)
-			updateZoom(null, scaleFactor, origin)
-		} else {
-			const delta = normalizeWheelEventDirection(evt)
-			let ticks = 0
-			if (deltaMode === WheelEvent.DOM_DELTA_LINE || deltaMode === WheelEvent.DOM_DELTA_PAGE) {
-				ticks = Math.abs(delta) >= 1 ? Math.sign(delta) : _accumulateTicks(delta)
-			} else {
-				const PIXELS_PER_LINE_SCALE = 30
-				ticks = _accumulateTicks(delta / PIXELS_PER_LINE_SCALE)
-			}
-			updateZoom(ticks, null, origin)
-		}
-	}
-}
-
 function onWheel(event: WheelEvent) {
 	container.focus()
 
 	if (event.ctrlKey) {
 		event.preventDefault()
-		OriginalPdfJsOnWheel(event)
+
+		const z1 = zoom.value
+		zoom.applyWheelEvent(event)
+		const z2 = zoom.value
+
+		const containerBB  = container.getBoundingClientRect()
+		const origin = [event.clientX - containerBB.left, event.clientY - containerBB.top]
+	
+		viewer.updateScale({ drawingDelay: 400, scaleFactor: z2/z1, origin})
 		$zoom = parseFloat(viewer._currentScaleValue)
 	}
 	else {
@@ -131,9 +53,28 @@ function onWheel(event: WheelEvent) {
 	}
 }
 
-function resetZoom(val: number | 'auto') {
-	viewer.currentScaleValue = `${val}`
+function centerOfViewer() {
+	const bb = container.getBoundingClientRect()
+	return [bb.width / 2 , bb.height / 2]			
+}
+
+function manualZoomSet(z1: number, z2: number){
+	viewer.updateScale({
+		drawingDelay: 400, 
+		scaleFactor: z2/z1, 
+		origin: centerOfViewer(),
+	})
 	$zoom = viewer.currentScale
+}
+
+function resetZoom(val: number | 'auto') {
+	if (val == 'auto') {
+		viewer.currentScaleValue = `${val}`
+		$zoom = viewer.currentScale
+	}
+	else {
+		manualZoomSet(parseFloat(viewer.currentScaleValue), val)
+	}
 }
 
 function setZoom() {
@@ -141,7 +82,7 @@ function setZoom() {
 }
 
 function resetZoomEvent(ev: Event) {
-	setZoom()
+	resetZoom('auto')
 }
 
 async function doPDF() {
@@ -254,7 +195,7 @@ function onClick(event: MouseEvent) {
 		style:bottom={`calc(1em + ${extraBottom}px)`}
 	>
 		<button class="zoomText" on:click={resetZoomEvent}>{Math.round($zoom * 100)}%</button>
-		<input class="zoomSlider" type="range" min="{zoom.range.min}" max={zoom.range.max} step="0.1" bind:value={$zoom} on:change={setZoom}/>
+		<input class="zoomSlider" type="range" min="{zoom.range.min}" max={zoom.range.max} step="0.1" bind:value={$zoom} on:input={setZoom}/>
 	</div>
 </main>
 
