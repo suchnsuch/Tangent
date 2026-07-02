@@ -38,9 +38,7 @@ function onWheel(event: WheelEvent) {
 	if (event.ctrlKey) {
 		event.preventDefault()
 
-		const z1 = zoom.value
-		zoom.applyWheelEvent(event)
-		const z2 = zoom.value
+		const [z2, z1] = zoom.applyWheelEvent(event)
 
 		const containerBB  = container.getBoundingClientRect()
 		const origin = [event.clientX - containerBB.left, event.clientY - containerBB.top]
