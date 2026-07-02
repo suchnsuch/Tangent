@@ -68,11 +68,11 @@ function setZoom(val: number | 'auto') {
 	$zoom = viewer.currentScale
 }
 
-function setZoomInputEvent(evt) {
+function onZoomSet(evt: Event) {
 	setZoom($zoom)
 }
 
-function resetZoomEvent(evt: Event) {
+function onZoomReset(evt: Event) {
 	setZoom('auto')
 }
 
@@ -185,8 +185,8 @@ function onClick(event: MouseEvent) {
 	<div class="controls" // transition:fly={{ y: 100 }}
 		style:bottom={`calc(1em + ${extraBottom}px)`}
 	>
-		<button class="zoomText" on:click={resetZoomEvent}>{Math.round($zoom * 100)}%</button>
-		<input class="zoomSlider" type="range" min="{zoom.range.min}" max={zoom.range.max} step="0.1" bind:value={$zoom} on:input={setZoomInputEvent}/>
+		<button class="zoomText" on:click={onZoomReset}>{Math.round($zoom * 100)}%</button>
+		<input class="zoomSlider" type="range" min="{zoom.range.min}" max={zoom.range.max} step="0.1" bind:value={$zoom} on:input={onZoomSet}/>
 	</div>
 </main>
 
