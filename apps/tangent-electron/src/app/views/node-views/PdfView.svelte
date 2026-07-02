@@ -27,9 +27,7 @@ $: targetPage = state.targetPage
 
 let container: HTMLDivElement
 let viewerElement: HTMLDivElement
-
 let viewer: pdfviewer.PDFViewer = null
-
 let zoom = state.zoom
 
 
@@ -84,19 +82,21 @@ function OriginalPdfJsOnWheel(evt: WheelEvent) {
 		return wholeTicks
 	}
 
+	// -------------------------------------------
 
 	const pdfViewer = viewer
 	const supportsMouseWheelZoomCtrlKey = true
 	const supportsMouseWheelZoomMetaKey = true
 	const supportsPinchToZoom = true
 
-	if (pdfViewer.isInPresentationMode) { return }
-
-	const deltaMode = evt.deltaMode
 	let scaleFactor = Math.exp(-evt.deltaY / 100)
+	const deltaMode = evt.deltaMode
 	const isBuiltInMac = false
 	const isPinchToZoom = evt.ctrlKey && deltaMode === WheelEvent.DOM_DELTA_PIXEL && evt.deltaX === 0 && (Math.abs(scaleFactor - 1) < 0.05 || isBuiltInMac) && evt.deltaZ === 0
-	const origin = [evt.clientX, evt.clientY] as [number, number]
+	
+	const containerBB  = container.getBoundingClientRect()
+	const origin = [evt.clientX - containerBB.left, evt.clientY - containerBB.top] as [number, number]
+	
 	if (isPinchToZoom || evt.ctrlKey && supportsMouseWheelZoomCtrlKey || evt.metaKey && supportsMouseWheelZoomMetaKey) {
 		evt.preventDefault()
 		if (isPinchToZoom && supportsPinchToZoom) {
@@ -137,7 +137,7 @@ function resetZoom(val: number | 'auto') {
 }
 
 function setZoom() {
-	resetZoom(1)
+	resetZoom($zoom)
 }
 
 function resetZoomEvent(ev: Event) {
@@ -290,6 +290,9 @@ article {
 	}
 }
 
+.zoomText{
+	width: 6ch; // make the text container not glitch when the zoom value changes from NN to NNN or vice versa
+}
 
 .controls {
 	position: absolute;
