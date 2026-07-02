@@ -28,6 +28,53 @@ let container: HTMLDivElement
 let viewerElement: HTMLDivElement
 
 let viewer: pdfviewer.PDFViewer = null
+let zoom = state.zoom
+
+
+const drawingDelay = 150
+
+function onWheel(event: WheelEvent) {
+	container.focus()
+
+	if (event.ctrlKey) {
+		event.preventDefault()
+
+		const [z2, z1] = zoom.applyWheelEvent(event)
+		const containerBB  = container.getBoundingClientRect()
+		const relativeCursorPos = [event.clientX - containerBB.left, event.clientY - containerBB.top]
+	
+		viewer.updateScale({ drawingDelay, scaleFactor: z2/z1, origin: relativeCursorPos })
+		$zoom = parseFloat(viewer._currentScaleValue)
+	}
+	else {
+		event.preventDefault()
+		container.scrollLeft += event.deltaX * +1 * (1 / $zoom)
+		container.scrollTop += event.deltaY * +1 * (1 / $zoom)
+	}
+}
+
+function setZoom(val: number | 'auto') {
+	if (val == 'auto') {
+		viewer.currentScaleValue = `${val}`
+	}
+	else {
+		const countainerBB = container.getBoundingClientRect()
+		viewer.updateScale({ 
+			drawingDelay, 
+			scaleFactor: val / parseFloat(viewer.currentScaleValue), 
+			origin:  [countainerBB.width / 2 , countainerBB.height / 2]
+		})
+	}
+	$zoom = viewer.currentScale
+}
+
+function onZoomSet(evt: Event) {
+	setZoom($zoom)
+}
+
+function onZoomReset(evt: Event) {
+	setZoom('auto')
+}
 
 async function doPDF() {
 	let pdf = await pdfjs.getDocument(state.file.cacheBustPath).promise
@@ -93,7 +140,7 @@ function pageTarget(target: number) {
 function onResize(resizeEntries: ResizeObserverEntry[]) {
 	if (viewer) {
 		viewer.firstPagePromise.then(() => {
-			viewer.currentScaleValue = 'auto'
+			setZoom('auto')
 		})
 	}
 }
@@ -120,6 +167,7 @@ function onClick(event: MouseEvent) {
 	style:--noteWidthMax={$maxWidth + 'px'}
 	style:padding-top={extraTop + 'px'}
 	style:padding-bottom={extraBottom + 'px'}
+	on:wheel={onWheel}
 >
 	<WorkspaceFileHeader
 		node={state.file}
@@ -133,6 +181,13 @@ function onClick(event: MouseEvent) {
 			<div bind:this={viewerElement} on:click={onClick}></div>
 		</div>
 	</article>
+
+	<div class="controls" // transition:fly={{ y: 100 }}
+		style:bottom={`calc(1em + ${extraBottom}px)`}
+	>
+		<button class="zoomText" on:click={onZoomReset}>{Math.round($zoom * 100)}%</button>
+		<input class="zoomSlider" type="range" min="{zoom.range.min}" max={zoom.range.max} step="0.1" bind:value={$zoom} on:input={onZoomSet}/>
+	</div>
 </main>
 
 <style lang="scss">
@@ -165,6 +220,21 @@ article {
 		-webkit-user-select: text;
 		user-select: text;
 	}
+}
+
+.zoomText{
+	width: 6ch; // make the text container not glitch when the zoom value changes from NN to NNN or vice versa
+}
+
+.controls {
+	position: absolute;
+	z-index: 1;
+	left: 1em;
+	bottom: 1em;
+
+	display: flex;
+	flex-direction: row;
+	gap: .5em;
 }
 
 </style>
