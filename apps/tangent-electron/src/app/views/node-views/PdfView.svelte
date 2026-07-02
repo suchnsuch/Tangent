@@ -48,8 +48,8 @@ function onWheel(event: WheelEvent) {
 	}
 	else {
 		event.preventDefault()
-		container.scrollLeft += event.deltaX * +1 * (1 / $zoom) // horizontal pan
-		container.scrollTop += event.deltaY * +1 * (1 / $zoom) // vertical pan
+		container.scrollLeft += event.deltaX * +1 * (1 / $zoom)
+		container.scrollTop += event.deltaY * +1 * (1 / $zoom)
 	}
 }
 
