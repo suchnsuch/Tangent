@@ -2,23 +2,18 @@ import { ObjectStore, type ObjectStoreOptions, WritableStore, ValidatingStore, r
 import Setting, { type SettingDefinition } from './Setting'
 import { isEmptyOrWhitespace } from 'common/stringUtils'
 
-export type ResolveMode = 'absolute' | 'relative' | 'upward'
+export type ResolveMode = 'default' | 'upward'
 
 export type AttachmentRulesDefinition = AttachmentRule | AttachmentRuleDefinition
 
 export interface AttachmentRuleDefinition {
-	name: string
 	resolveMode: ResolveMode
 	path: string
 	description: string
 }
 
 export function nameFromRule(rule: AttachmentRule | AttachmentRuleDefinition, defaultValue: string): string {
-	return (typeof rule.name == 'string' ? rule.name : rule.name.value) || defaultValue
-}
-
-export function willPromptForName(name: string) {
-	return isEmptyOrWhitespace(name)
+	return (typeof rule.path == 'string' ? rule.path : rule.path.value) || defaultValue
 }
 
 const pathDefinition: SettingDefinition<string> = {
@@ -33,21 +28,17 @@ const attachmentModeDefinition: SettingDefinition<ResolveMode> = {
 	description: 'Determines how the new note is created.',
 	validValues: [
 		{
-			value: 'absolute',
-			displayName: 'Absolute',
-			description: 'A new note will always be created. If necessary, numbers will be appended to the name to make a unique name.'
-		},
-		{
-			value: 'relative',
-			displayName: 'Relative',
-			description: 'Search the folder relative to the note'
+			value: 'default',
+			displayName: 'Default',
+			description: 'absolute or relative path to the current note.'
 		},
 		{
 			value: 'upward',
-			displayName: 'in ancesstors',
-			description: 'iteratively looks in the parent folder for the path'
+			displayName: 'Search in Anscestors',
+			description: 'iteratively looks in the parent folder for the path.'
 		}
-	]
+	],
+	defaultValue: 'default'
 }
 
 const descriptionDefinition: SettingDefinition<string> = {
@@ -68,7 +59,7 @@ const creationStoreOptions: ObjectStoreOptions = {
 
 export default class AttachmentRule extends ObjectStore {
 	id: number
-	name: ValidatingStore<string>
+
 	path: Setting<string>
 	resolveMode: Setting<ResolveMode>
 	description: Setting<string>
@@ -77,10 +68,6 @@ export default class AttachmentRule extends ObjectStore {
 		super(creationStoreOptions)
 
 		this.id = AttachmentRuleID++
-		this.name = new ValidatingStore('New Attachment Rule', name => {
-			if (!name) return 'New Attachment Rule'
-			return name
-		})
 		this.path = new Setting(pathDefinition)
 		this.resolveMode = new Setting(attachmentModeDefinition)
 		this.description = new Setting(descriptionDefinition)

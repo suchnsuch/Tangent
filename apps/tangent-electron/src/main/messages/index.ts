@@ -597,7 +597,6 @@ ipcMain.handle('saveImageFromClipboard', async (event, contextPath, attachmentRu
 		const workspace = validateWorkspaceForHandleFilepath(windowHandle, contextPath)
 
 		const filename = fillDateFormat('Pasted on %YYYY%-%MM%-%DD% at %HH%.%mm%.%ss%.png', new Date())
-		console.log('fuck log >>>>>>>>>>>>>>>>>>>>>>')
 		const attachmentPath = await workspace.getAttachmentPath(filename, contextPath, attachmentRules)
 		const directory = path.dirname(attachmentPath)
 		fs.promises.mkdir(directory, { recursive: true }).then(() => {

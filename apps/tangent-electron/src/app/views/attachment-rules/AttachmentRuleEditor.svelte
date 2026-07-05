@@ -2,22 +2,17 @@
 import { getContext, tick } from 'svelte'
 import { type PathValidationMessages, validatePath } from 'common/trees'
 import type AttachmentRule from 'common/settings/AttachmentRule'
-import { nameFromRule, willPromptForName } from 'common/settings/AttachmentRule'
+import { nameFromRule } from 'common/settings/AttachmentRule'
 import { Workspace } from 'app/model'
 import editable from 'app/utils/editable'
 import SettingView from '../System/SettingView.svelte'
 import { tooltip } from 'app/utils/tooltips'
 
-const workspace = getContext('workspace') as Workspace
-
 export let rule: AttachmentRule
-$: name = rule.name
+$: name = rule.path
 
 let exampleName = ''
 let exampleNameMessages: PathValidationMessages = []
-
-let templateInput: HTMLInputElement
-
 
 $: templateDependencies($name)
 function templateDependencies(template) {
@@ -46,12 +41,12 @@ function templateDependencies(template) {
 
 	if (!messages.find(m => m.level === 'error')) {
 
-		if (willPromptForName(template)) {
-			messages.unshift({
-				level: 'info',
-				message: 'Will prompt for a name on creation.'
-			})
-		}
+		// if (willPromptForName(template)) {
+		// 	messages.unshift({
+		// 		level: 'info',
+		// 		message: 'Will prompt for a name on creation.'
+		// 	})
+		// }
 
 		if (exampleName.includes('/')) {
 			messages.push({
@@ -80,10 +75,6 @@ function templateDependencies(template) {
 			use:tooltip={"Define the name of the rule. Set an emoji as the first character of the name to make an icon."}
 		></h2>
 	</header>
-	<label use:tooltip={"Defines how the note will be named. Refer to the Template Token list for available dynamic values."}>
-		<span>Name</span>
-		<input type="text" bind:value={$name} bind:this={templateInput}/>
-	</label>
 	{#if exampleNameMessages?.length}
 		{#each exampleNameMessages as message}
 			<p class={'explanation ' + message.level}>{@html message.message}</p>
@@ -110,17 +101,6 @@ header {
 
 h2 {
 	flex-grow: 1;
-}
-
-label {
-	display: flex;
-	align-items: center;
-	span {
-		margin-right: .5em;
-	}
-	input {
-		flex-grow: 1;
-	}
 }
 
 .explanation {

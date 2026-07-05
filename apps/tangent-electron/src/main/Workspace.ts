@@ -1098,7 +1098,7 @@ export default class Workspace {
 			if (atRule.resolveMode == 'upward') {
 				targetDirectory = await findUp(this.rootPath, contextDir, atRule.path)
 			}
-			else if (atRule.resolveMode == 'absolute' || atRule.resolveMode == 'relative') {
+			else if (atRule.resolveMode == 'default') {
 				targetDirectory = atRule.path.replace('$filename', path.basename(contextPath, extension))
 
 				if (targetDirectory.match(/^\.\.?[\\\/]/)) {
