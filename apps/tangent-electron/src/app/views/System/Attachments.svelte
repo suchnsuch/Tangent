@@ -1,72 +1,92 @@
 <script lang="ts">
-import { getContext } from 'svelte'
-import type Workspace from 'app/model/Workspace'
+import { dndzone, type DndEvent } from 'svelte-dnd-action'
+import type { Workspace } from 'app/model'
 
-import SettingView from './SettingView.svelte'
+import { getContext } from 'svelte';
 
-let workspace = getContext('workspace') as Workspace
-let settings = workspace.settings
+import AttachmentRule from 'common/settings/AttachmentRule'
+import AttachmentRuleEditor from '../attachment-rules/AttachmentRuleEditor.svelte'
+import AttachmentRuleItem from '../attachment-rules/AttachmentRuleItem.svelte'
+
+const workspace = getContext('workspace') as Workspace
+const settings = workspace.workspaceSettings
+const rules = $settings.attachmentRules
+$: tempRules = $rules
+
+let currentRule: AttachmentRule = null
+
+function addRule() {
+	let rule = new AttachmentRule()
+	rule.name.set('New Rule')
+	rules.add(rule)
+	currentRule = rule
+}
+
+async function deleteRule() {
+	const result = await workspace.api.system.messageDialog({
+		title: 'Confirm Deletion',
+		message: 'Are you sure you want to delete "' + currentRule.name.value + '"?',
+		buttons: ['Cancel', 'Delete']
+	})
+
+	if (result.response === 1) {
+		rules.remove(currentRule)
+		currentRule = null
+	}
+}
+
+function handleDnDConsider(event: CustomEvent<DndEvent>) {
+	tempRules = event.detail.items as AttachmentRule[]
+}
+
+function handleDnDFinalize(event: CustomEvent<DndEvent>) {
+	const newList: AttachmentRule[] = []
+	for (const item of event.detail.items) {
+		if (item === undefined) return
+
+		const realItem = rules.value.find(i => i.id === item.id)
+		if (realItem === undefined) return
+		newList.push(realItem)
+	}
+	rules.set(newList)
+}
 
 </script>
 
-<main style="display: flex; flex-direction: column;">
-	<div style=" display: inline-grid; margin: 0 auto;" class="container">
-		<table><tbody>
-			<tr>
-				<th>Resolve</th>
-				<th>Path</th>
-			</tr>
-			<tr>
-				<td>
-					<select>
-						<option>static</option>
-						<option>upward </option>
-					</select>
-				</td>
-				<td>
-					<input type="text" class="grow" />
-				</td>
-			</tr>
-			<tr>
-				<td>
-					<select>
-						<option>static</option>
-						<option>upward </option>
-					</select>
-				</td>
-				<td>
-					<input type="text" class="grow" />
-				</td>
-			</tr>
-			<tr>
-				<td>
-					<select>
-						<option>static</option>
-						<option>upward </option>
-					</select>
-				</td>
-				<td>
-					<input type="text" class="grow" />
-				</td>
-			</tr>
-		</tbody></table>
+<main>
+	{#if currentRule}
+		<div class="container">
+			<AttachmentRuleEditor rule={currentRule}>
+				<button slot="header-left" on:click={_ => currentRule = null}>Done</button>
+			</AttachmentRuleEditor>
 
-		<button>
-			new path
-		</button>
-	</div>
-	
-	<SettingView setting={settings.defaultPasteLocation} />
-
-	<div class="settingsGroup">
-		<p class="value-details explanation">
-			A direct path (e.g. "Some/Path") will be interpretted from the root of the workspace.
-		</p>
-		<p class="value-details explanation">
-			Relative paths (e.g. "./Path", "./", "../") will resolve based on the note the attachment is coming from.
-		</p>
-		<p class="value-details explanation">
-			The <code>$filename</code> token can be used to inject the name of the file that the attachment is being pasted into.
-		</p>
-	</div>
+			<button class="delete" on:click={deleteRule}>Delete</button>
+		</div>
+	{:else}
+		<div class="container">
+			<div use:dndzone={{
+					items: tempRules,
+					dropTargetStyle: {},
+					transformDraggedElement: element => {
+						element.style.zIndex = '100000000000000' // TODO: Good lord. A more sensible z-index thing.
+					}
+				}}
+				on:consider={handleDnDConsider}
+				on:finalize={handleDnDFinalize}
+			>
+				{#each tempRules as rule (rule.id)}
+					<div><AttachmentRuleItem {rule} on:click={ _ => currentRule = rule} /></div>
+				{/each}
+			</div>
+			<button on:click={addRule}>New Rule</button>
+		</div>
+	{/if}
 </main>
+
+<style lang="scss">
+.container {
+	background-color: var(--noteBackgroundColor);
+	padding: 1em;
+	border-radius: var(--borderRadius);
+}
+</style>
