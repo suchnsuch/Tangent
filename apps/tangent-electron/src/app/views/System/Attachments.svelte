@@ -2,7 +2,7 @@
 import { dndzone, type DndEvent } from 'svelte-dnd-action'
 import type { Workspace } from 'app/model'
 
-import { getContext } from 'svelte';
+import { getContext } from 'svelte'
 
 import AttachmentRule from 'common/settings/AttachmentRule'
 import AttachmentRuleEditor from '../attachment-rules/AttachmentRuleEditor.svelte'
@@ -17,7 +17,8 @@ let currentRule: AttachmentRule = null
 
 function addRule() {
 	let rule = new AttachmentRule()
-	rule.name.set('New Rule')
+	// rule.name.set('New Rule')
+	rule.path.set('')
 	rules.add(rule)
 	currentRule = rule
 }
@@ -25,7 +26,7 @@ function addRule() {
 async function deleteRule() {
 	const result = await workspace.api.system.messageDialog({
 		title: 'Confirm Deletion',
-		message: 'Are you sure you want to delete "' + currentRule.name.value + '"?',
+		message: 'Are you sure you want to delete "' + currentRule.path.value + '"?',
 		buttons: ['Cancel', 'Delete']
 	})
 
