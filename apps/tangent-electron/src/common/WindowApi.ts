@@ -6,6 +6,7 @@ import type { ContextMenuTemplate } from './menus'
 import type { QueryResult } from './indexing/queryResults'
 import type { QueryParseResult } from '@such-n-such/tangent-query-parser'
 import type { UrlData } from './urlData'
+import type { AttachmentRuleDefinition } from './settings/AttachmentRule'
 
 export interface SelectPathOptions {
 	title?: string
@@ -60,7 +61,7 @@ export default interface WindowAPI {
 	system: {
 		getAllFonts(): Promise<string[]>
 		getAllLanguages(): Promise<string[]>
-		saveImageFromClipboard(contextPath: string): Promise<string>
+		saveImageFromClipboard(contextPath: string, attachmentRules: AttachmentRuleDefinition[]): Promise<string>
 		copyImageToClipboard(path: string): Promise<void>
 		updateImageFromClipboard(path: string): Promise<void>
 		messageDialog(options: Electron.MessageBoxOptions): Promise<Electron.MessageBoxReturnValue>
@@ -114,7 +115,7 @@ export default interface WindowAPI {
 		/** Open a url in the default format */
 		openExternal(path: string)
 		getTitle(href: string): Promise<string>
-		saveFromUrl(href: string, contextPath: string): Promise<string>
+		saveFromUrl(href: string, contextPath: string, attachmentRules: AttachmentRuleDefinition[]): Promise<string>
 		getUrlData(url: string): Promise<UrlData>
 	}
 

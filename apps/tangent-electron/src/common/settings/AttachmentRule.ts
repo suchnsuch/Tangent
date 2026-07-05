@@ -4,7 +4,7 @@ import { isEmptyOrWhitespace } from 'common/stringUtils'
 
 export type ResolveMode = 'absolute' | 'relative' | 'upward'
 
-export type AttachmentRulerDefinition = AttachmentRule | AttachmentRuleDefinition
+export type AttachmentRulesDefinition = AttachmentRule | AttachmentRuleDefinition
 
 export interface AttachmentRuleDefinition {
 	name: string

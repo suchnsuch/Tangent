@@ -37,6 +37,7 @@ import type MarkdownEditor from './MarkdownEditor'
 import { appendContextTemplate, type ContextMenuConstructorOptions } from 'app/model/menus'
 import { eventHasSelectionRequest } from 'app/events'
 import { createCommandHandler } from 'app/model/commands/Command'
+import type { AttachmentRuleDefinition } from 'common/settings/AttachmentRule'
 
 function clampRange(range: EditorRange, clampingRange: EditorRange): EditorRange {
 	range = normalizeRange(range)
@@ -1004,7 +1005,7 @@ export default function editorModule(editor: Editor, options: {
 			if (item.type.startsWith('image')) {
 				event.preventDefault()
 
-				workspace.api.system.saveImageFromClipboard(filepath).then(path => {
+				workspace.api.system.saveImageFromClipboard(filepath, workspace.workspaceSettings.value.attachmentRules.getRawValues() as AttachmentRuleDefinition[]).then(path => {
 					if (!path) return 
 
 					subscribeUntil(workspace.getHandle(path), value => {

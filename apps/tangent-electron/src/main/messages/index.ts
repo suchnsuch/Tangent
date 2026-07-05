@@ -18,6 +18,7 @@ import './dictionary'
 import './themes'
 import './urlData'
 import { FileSaveResult } from 'main/File'
+import type { AttachmentRuleDefinition } from 'common/settings/AttachmentRule'
 
 const log = Logger.get('messages')
 
@@ -544,7 +545,7 @@ ipcMain.handle('getAllLanguages', async (event) => {
 	}
 })
 
-ipcMain.handle('saveImageFromClipboard', async (event, contextPath) => {
+ipcMain.handle('saveImageFromClipboard', async (event, contextPath, attachmentRules) => {
 	try {
 		const nativeImage = clipboard.readImage()
 		const image = nativeImage.toPNG()
@@ -596,7 +597,8 @@ ipcMain.handle('saveImageFromClipboard', async (event, contextPath) => {
 		const workspace = validateWorkspaceForHandleFilepath(windowHandle, contextPath)
 
 		const filename = fillDateFormat('Pasted on %YYYY%-%MM%-%DD% at %HH%.%mm%.%ss%.png', new Date())
-		const attachmentPath = await workspace.getAttachmentPath(filename, contextPath)
+		console.log('fuck log >>>>>>>>>>>>>>>>>>>>>>')
+		const attachmentPath = await workspace.getAttachmentPath(filename, contextPath, attachmentRules)
 		const directory = path.dirname(attachmentPath)
 		fs.promises.mkdir(directory, { recursive: true }).then(() => {
 			return fs.promises.writeFile(attachmentPath, image)
@@ -665,7 +667,7 @@ ipcMain.handle('getLinkTitle', async (event, href: string) => {
 	return ''
 })
 
-ipcMain.handle('saveFromUrl', async (event, href: string, contextPath: string) => {
+ipcMain.handle('saveFromUrl', async (event, href: string, contextPath: string, attachmentRules: AttachmentRuleDefinition[]) => {
 	try {
 		const response = await fetch(href)
 		if (response.status === 200) {
@@ -681,7 +683,7 @@ ipcMain.handle('saveFromUrl', async (event, href: string, contextPath: string) =
 				const windowHandle = getWindowHandle(event.sender)
 				const workspace = validateWorkspaceForHandleFilepath(windowHandle, contextPath)
 
-				const attachmentPath = await workspace.getAttachmentPath(filename, contextPath)
+				const attachmentPath = await workspace.getAttachmentPath(filename, contextPath, attachmentRules)
 				const directory = path.dirname(attachmentPath)
 
 				await fs.promises.mkdir(directory, { recursive: true }).then(() => {

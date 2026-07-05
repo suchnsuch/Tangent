@@ -7,7 +7,6 @@ import { Workspace } from 'app/model'
 import editable from 'app/utils/editable'
 import SettingView from '../System/SettingView.svelte'
 import { tooltip } from 'app/utils/tooltips'
-import AttachmentRuleTemplateButton from '../creation-rules/CreationRuleTemplateButton.svelte'
 
 const workspace = getContext('workspace') as Workspace
 
@@ -141,26 +140,6 @@ label {
 	:global(.demoName) {
 		white-space: pre;
 	}
-}
-
-details {
-	margin: 1em 2em;
-	margin-right: 1em;
-	font-size: 90%;
-
-	summary {
-		margin-left: -1em;
-	}
-
-	th {
-		text-align: left;
-		color: var(--accentTextColor);
-		padding-right: .5em;
-	}
-}
-
-figure {
-	margin: 1em 0;
 }
 
 </style>

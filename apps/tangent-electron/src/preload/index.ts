@@ -115,8 +115,8 @@ const bridge: WindowApi = {
 		getAllLanguages() {
 			return ipcRenderer.invoke('getAllLanguages')
 		},
-		saveImageFromClipboard(contextPath) {
-			return ipcRenderer.invoke('saveImageFromClipboard', contextPath)
+		saveImageFromClipboard(contextPath, attachmentRules) {
+			return ipcRenderer.invoke('saveImageFromClipboard', contextPath, attachmentRules)
 		},
 		copyImageToClipboard(path) {
 			return ipcRenderer.invoke('copyImageToClipboard', path)
@@ -201,8 +201,8 @@ const bridge: WindowApi = {
 		getTitle(href) {
 			return ipcRenderer.invoke('getLinkTitle', href)
 		},
-		saveFromUrl(href, contextPath) {
-			return ipcRenderer.invoke('saveFromUrl', href, contextPath)
+		saveFromUrl(href, contextPath, attachmentRules) {
+			return ipcRenderer.invoke('saveFromUrl', href, contextPath, attachmentRules)
 		},
 		getUrlData(url) {
 			return ipcRenderer.invoke('getUrlData', url)

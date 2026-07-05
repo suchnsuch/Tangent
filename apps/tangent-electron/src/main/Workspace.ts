@@ -34,6 +34,7 @@ import Tag from './Tag'
 import { isExternalLink } from 'common/links'
 import migrate from './migrations/workspaceMigrator'
 import { readFile } from './ioQueue'
+import type { AttachmentRuleDefinition } from 'common/settings/AttachmentRule'
 
 type WatcherEvent = 'add' | 'addDir' | 'change' | 'rename' | 'renameDir' | 'unlink' | 'unlinkDir'
 
@@ -138,7 +139,7 @@ export default class Workspace {
 
 					ioLog.info(chalk.yellow('removing virtual file:'), chalk.green(file.path))
 					const change: TreeChange = {
-						removed: [ virtualPath ]
+						removed: [virtualPath]
 					}
 
 					if (replacementPath) {
@@ -150,7 +151,7 @@ export default class Workspace {
 					}
 
 					this.sendTreeChange(change)
-				}	
+				}
 			},
 			registry: getRegistry()
 		})
@@ -175,7 +176,7 @@ export default class Workspace {
 
 	static async loadWorkspace(filepath: string, defaultsFolder?: string): Promise<Workspace> {
 		const userFacingErrors: string[] = []
-		
+
 		// Ensure the true path is being loaded
 		// This solves problems with situations like network drives
 		// e.g. the user loads `Z:\My Workspace` which is actually `\\Some\Network\Location`
@@ -322,7 +323,7 @@ export default class Workspace {
 		}
 	}
 
-	containsPath(filepath:string): boolean {
+	containsPath(filepath: string): boolean {
 		return filepath.startsWith(this.contentsStore.files.path)
 	}
 
@@ -360,7 +361,7 @@ export default class Workspace {
 		}
 	}
 
-	private getFile(filepath:string): File {
+	private getFile(filepath: string): File {
 		let node = this.contentsStore.get(filepath)
 		if (node) {
 			if (node instanceof File) {
@@ -479,7 +480,7 @@ export default class Workspace {
 		return null
 	}
 
-	async ensureFolderExists(handle: WindowHandle, folderPath: string, virtual=false) {
+	async ensureFolderExists(handle: WindowHandle, folderPath: string, virtual = false) {
 		const queue = [] as PromiseStarter<any>[]
 
 		this.contentsStore.ensureFolderExists(
@@ -497,7 +498,7 @@ export default class Workspace {
 		}
 	}
 
-	createFile(handle:WindowHandle, filepath: string, meta?: IndexData) {
+	createFile(handle: WindowHandle, filepath: string, meta?: IndexData) {
 		// Prepair directories for a new file, virtual or otherwise
 		const folderPath = path.dirname(filepath)
 
@@ -525,7 +526,7 @@ export default class Workspace {
 			}
 
 			this.sendTreeChangeExceptFor({
-				changed: [ shallowCopyTreeNodeWithoutChildren(existingFile) ]
+				changed: [shallowCopyTreeNodeWithoutChildren(existingFile)]
 			}, handle)
 
 			return existingFile
@@ -556,15 +557,15 @@ export default class Workspace {
 		else {
 			throw new Error('File could not be added. ' + DirectoryStoreAddResult.describe(addResult) + ' File: ' + filepath)
 		}
-		
+
 		if (!meta?.virtual) {
 			// HACK? This is relying on the fact that nothing is creating a virtual
 			// file except the indexer. Not amazing.
 			this.trackActivePromise(this.indexer.handleNodeRename(file))
 		}
-		
+
 		this.sendTreeChangeExceptFor({
-			added: [ shallowCopyTreeNodeWithoutChildren(file) ]
+			added: [shallowCopyTreeNodeWithoutChildren(file)]
 		}, handle)
 
 		return file
@@ -591,7 +592,7 @@ export default class Workspace {
 
 			if (!meta?.virtual) {
 				// Create the folder if it was virtual
-				existingFolder.meta.virtual = false 
+				existingFolder.meta.virtual = false
 				if (queue) {
 					queue.push(() => fs.promises.mkdir(folderPath, { recursive: true }))
 				}
@@ -600,10 +601,10 @@ export default class Workspace {
 				}
 
 				this.sendTreeChangeExceptFor({
-					changed: [ shallowCopyTreeNodeWithoutChildren(existingFolder) ]
+					changed: [shallowCopyTreeNodeWithoutChildren(existingFolder)]
 				}, handle)
 			}
-			
+
 			return existingFolder
 		}
 
@@ -637,7 +638,7 @@ export default class Workspace {
 		}
 
 		this.sendTreeChangeExceptFor({
-			added: [ shallowCopyTreeNodeWithoutChildren(folder) ]
+			added: [shallowCopyTreeNodeWithoutChildren(folder)]
 		}, handle)
 
 		return folder
@@ -667,7 +668,7 @@ export default class Workspace {
 		if (!node) {
 			throw new Error('Cannot move; file not found in the index: ' + filepath)
 		}
-		
+
 		const existingNode = this.contentsStore.get(newPath)
 		if (existingNode) {
 			if (existingNode.meta?.virtual) {
@@ -754,7 +755,7 @@ export default class Workspace {
 
 		newPath = newPath ?? nodeToCopy.path
 		newPath = this.contentsStore.getUniquePath(newPath)
-		
+
 		const newRawNode = shallowCopyTreeNodeWithoutChildren(nodeToCopy)
 		newRawNode.meta = IndexData.blank()
 		newRawNode.path = newPath
@@ -764,7 +765,7 @@ export default class Workspace {
 		const addResult = this.contentsStore.add(newNode)
 		if (addResult > 0) {
 			this.sendTreeChange({
-				added: [ newRawNode ]
+				added: [newRawNode]
 			})
 		}
 		else {
@@ -841,7 +842,7 @@ export default class Workspace {
 					node.meta = data.meta
 				}
 				else if (form === 'patch') {
-					applyPatch(node.meta, data.meta, { 
+					applyPatch(node.meta, data.meta, {
 						applyToRawValues: true
 					})
 				}
@@ -1014,7 +1015,7 @@ export default class Workspace {
 			// Prepare the change
 			const change: TreeChange = {
 				// Added nodes are integrated
-				added: [ mapTree(newNode, shallowCopyTreeNodeWithoutChildren) ]
+				added: [mapTree(newNode, shallowCopyTreeNodeWithoutChildren)]
 			}
 
 			if (moved) {
@@ -1029,7 +1030,7 @@ export default class Workspace {
 
 			for (const n of change.added) {
 				if (this.indexer.isParseableFile(n)) {
-					asyncHandles.push(this.getFileContents(n.path).then(c => 
+					asyncHandles.push(this.getFileContents(n.path).then(c =>
 						this.indexer.onFileContentChanged(n.path, c)))
 				}
 			}
@@ -1053,7 +1054,7 @@ export default class Workspace {
 			const extraRetain = extraRemovalCondition ? extraRemovalCondition(node) : true
 			return extraRetain && !node.meta?.inLinks?.length
 		}, null, removed)
-		
+
 		if (removalResult) {
 			// Can just send the removal of the parent node
 			removed = [target]
@@ -1087,30 +1088,20 @@ export default class Workspace {
 		}
 	}
 
-	async getAttachmentPath(idealFilepath: string, contextPath: string): Promise<string> {
-		const contextDir = path.dirname(contextPath) // TODO: Use this
-		const targetDirectories = [
-			...getSettings().defaultPasteLocation.value.split(',').map(s => s.trim()), // paths are separated by comma (,)
-			'' // default fallback to root path
-		] 
-		const closestWildCardPrefix = "./**/"
-		
-		let	targetDirectory = null
-		for (let i = 0; i < targetDirectories.length; i++) {
-			targetDirectory = targetDirectories[i]
+	async getAttachmentPath(idealFilepath: string, contextPath: string, attachmentRules: AttachmentRuleDefinition[]): Promise<string> {
+		const contextDir = path.dirname(contextPath)
+		const extension = path.extname(contextPath)
 
-			if (!targetDirectory) {
-				targetDirectory = this.rootPath
+		let targetDirectory = ''
+
+		for (let atRule of attachmentRules) {
+			if (atRule.resolveMode == 'upward') {
+				targetDirectory = await findUp(this.rootPath, contextDir, atRule.path)
 			}
-			else{
-				const extension = path.extname(contextPath)
-				targetDirectory = targetDirectory.replace('$filename', path.basename(contextPath, extension))
+			else if (atRule.resolveMode == 'absolute' || atRule.resolveMode == 'relative') {
+				targetDirectory = atRule.path.replace('$filename', path.basename(contextPath, extension))
 
-				if (targetDirectory.startsWith(closestWildCardPrefix)){ // e.g. "./**/my/loca/path/to/assets"
-					const followingPart = targetDirectory.substr(closestWildCardPrefix.length)
-					targetDirectory = await findUp(this.rootPath, contextDir, followingPart)
-				}
-				else if (targetDirectory.match(/^\.\.?[\\\/]/)) {
+				if (targetDirectory.match(/^\.\.?[\\\/]/)) {
 					targetDirectory = path.resolve(path.join(contextDir, targetDirectory))
 					if (!targetDirectory.startsWith(this.rootPath)) {
 						log.info('Relative attachment path would have brought us outside the workspace. Will use the root instead. Original:', targetDirectory)
@@ -1123,6 +1114,10 @@ export default class Workspace {
 			}
 
 			if (targetDirectory) break
+		}
+
+		if (!targetDirectory) {
+			targetDirectory = this.rootPath
 		}
 
 		return this.contentsStore.getUniquePath(path.join(targetDirectory, idealFilepath))

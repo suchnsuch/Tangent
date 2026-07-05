@@ -62,6 +62,7 @@ import YamlTooltip from './YamlTooltip.svelte';
 import TemplateTokenTooltip from './TemplateTokenTooltip.svelte';
 import TemplateTokenAutocompleter from '../autocomplete/TemplateTokenAutocompleter';
 import TemplateTokenAutocompleteMenu from '../autocomplete/TemplateTokenAutocompleteMenu.svelte';
+    import type { AttachmentRuleDefinition } from 'common/settings/AttachmentRule';
 
 // Technically, this just needs to exist _somewhere_. Putting it here because of the svelte dependency
 // Force the use of the variable so that it is included in the bundle
@@ -1211,7 +1212,8 @@ function onContextMenu(event: MouseEvent) {
 						editor.select(range)
 
 						// Request the save operation
-						workspace.api.links.saveFromUrl(linkInfo.href, note.path).then(path => {
+						let rr = workspace.workspaceSettings.value.attachmentRules.getRawValues() as AttachmentRuleDefinition[]
+						workspace.api.links.saveFromUrl(linkInfo.href, note.path, rr).then(path => {
 							if (!path) return
 
 							subscribeUntil(workspace.getHandle(path), value => {
