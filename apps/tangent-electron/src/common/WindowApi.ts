@@ -104,12 +104,10 @@ export default interface WindowAPI {
 		showInFileBrowser(path: string)
 		/** Open a path in the default format */
 		openPath(path: string)
-
-		findFiles(dir: string, exts: string[]): Promise<string[]>
 	}
 
 	os: {
-		execCLI(cmd: string, args: string[]): Promise<string>
+		execCLI(cmd: string): Promise<string>
 	},
 
 	edit: {

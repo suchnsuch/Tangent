@@ -24,24 +24,16 @@ import { spawn } from 'child_process'
 const log = Logger.get('messages')
 
 
-ipcMain.handle('execCLI', async (event, cmd, args) => {
-	console.log("Executing CLI command: ", cmd, args)
+ipcMain.handle('execCLI', async (event, cmd) => {
+	console.log("Executing CLI command: ", cmd)
 
-	const child = spawn(cmd, args, { 
-		stdio: 'inherit',
-		// shell: true // <-- this has issues with file names that contain spaces
-	});
+	const child = spawn(cmd, { 
+		stdio: 'pipe',
+		shell: true // TODO shell escape
+	})
 	child.on('close', (code) => {
-		console.log(`Process exited with code ${code}`);
-	});
-})
-
-ipcMain.handle('findFiles', async (event, dir, exts) => {
-	async function getFiles(dir) {
-		const allFiles = await fs.promises.readdir(dir)
-		return allFiles.filter(fname => exts.some(e => fname.endsWith(e)))
-	}
-	return getFiles(dir)
+		console.log(`Process exited with code ${code}`)
+	})
 })
 
 ipcMain.handle('getKnownWorkspaces', async (event) => {

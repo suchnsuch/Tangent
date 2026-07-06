@@ -11,17 +11,8 @@ export default class ExecCliCommand extends WorkspaceCommand {
 	}
 	
 	execute() {
-		const exts = ['.sh', '.bat']
-		const workspaceRoot = this.workspace.viewState.directoryView.root.path
-
-		this.workspace.api.file.findFiles(workspaceRoot, exts).then(files => {
-			this.workspace.viewState.modal.push(ExecCommandDialog, {
-				scripts: files.map(f => ({
-					name: f.split('.').slice(0, -1).join(''),
-					file: f,
-					path: `${workspaceRoot}/${f}`
-				}))
-			})
+		this.workspace.viewState.modal.push(ExecCommandDialog, {
+			commands: this.workspace.workspaceSettings.value.externalCommands.getRawValues()
 		})
 	}
 

@@ -4,22 +4,19 @@ import type Workspace from '../model/Workspace'
 import ModalInputSelect from './ModalInputSelect.svelte'
 import type { TreeNode } from 'common/trees'
 import type { NoteViewState } from 'app/model/nodeViewStates'
+    import type { ExternalCommandRuleDefinition } from 'common/settings/ExternalCommand'
 
 let workspace = getContext('workspace') as Workspace
 let text: string = ''
 
-type Script = {
-	name: string
-	file: string
-	path: string
-}
+// export let subject: TreeNode
+// export let workspaceRoot: string
+export let commands: ExternalCommandRuleDefinition[]
 
-export let subject: TreeNode
-export let workspaceRoot: string
-export let scripts: Script[]
+console.log(commands)
 
 function filterScripts(c){
-	return scripts.filter(s => s.name.includes(c))
+	return commands.filter(s => s.name.includes(c))
 }
 
 // ---------------------------------------
@@ -31,23 +28,20 @@ $: updateOptions(text)
 function updateOptions(text: string) {
 	options = filterScripts(text)
 }
-function onAutocomplete(option: Script) {
+function onAutocomplete(option: ExternalCommandRuleDefinition) {
 	return undefined
 }
 
-function selectOption(option: Script, event) {
-	const vs = workspace.viewState.tangent.getCurrentViewState()
-	const args = [
-		'--file', vs.node.path, 
-		'--workspace', workspace.viewState.directoryView.root.path,
-
-		...(
-			vs.node.fileType == '.md' 
-			? ["--cursor", (vs as NoteViewState).selection.value.join(',')]
-			: [])
-	]
-
-	workspace.api.os.execCLI('bash', [option.path, ...args])
+function selectOption(option: ExternalCommandRuleDefinition, event) {
+	const currentViewState = workspace.viewState.tangent.getCurrentViewState()
+	const ctx = {
+		'file': currentViewState.node.path, 
+		'workspace': workspace.viewState.directoryView.root.path,
+		'cursor': currentViewState.node.fileType == '.md' ? (currentViewState as NoteViewState).selection.value.join(',') : 'nan,nan',
+		'thread': '...'
+	}
+	let cmd = option.commandTemplate.replace(/%([^%]*?)%/g, (match, expr) => ctx[expr])
+	workspace.api.os.execCLI(cmd)
 	workspace.viewState.modal.close()
 }
 
@@ -57,7 +51,7 @@ function selectOption(option: Script, event) {
 	<h1>Run ... </h1>
 	<ModalInputSelect
 		{options}
-		placeholder="Type to filter scripts..."
+		placeholder="Type to filter commands..."
 		bind:selectedIndex
 		bind:text
 		{onAutocomplete}
