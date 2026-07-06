@@ -1,5 +1,6 @@
 <script lang="ts">
-import type ExternalCommandRule from 'common/settings/ExternalCommand';
+import type ExternalCommandRule from 'common/settings/ExternalCommand'
+
 export let rule: ExternalCommandRule
 </script>
 
