@@ -2,7 +2,6 @@
 import { getContext } from 'svelte'
 import type Workspace from '../model/Workspace'
 import ModalInputSelect from './ModalInputSelect.svelte'
-import type { TreeNode } from 'common/trees'
 import type { NoteViewState } from 'app/model/nodeViewStates'
 import type { ExternalCommandRuleDefinition } from 'common/settings/ExternalCommand'
     import { ShellEscape } from 'app/utils/shell';
@@ -37,7 +36,7 @@ function selectOption(option: ExternalCommandRuleDefinition, event) {
 		'cursor': currentViewState.node.fileType == '.md' ? (currentViewState as NoteViewState).selection.value.join(',') : 'nan,nan',
 		'thread': '...'
 	}
-	const shellEscaper = new ShellEscape({shell: 'bash', quote: true})
+	const shellEscaper = new ShellEscape({shell: 'bash', quote: true}) // TODO change this according to the OS
 	let cmd = option.commandTemplate.replace(/%([^%]*?)%/g, (match, expr) => shellEscaper.escape(ctx[expr]))
 	workspace.api.os.execCLI(cmd)
 	workspace.viewState.modal.close()
