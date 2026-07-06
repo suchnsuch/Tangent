@@ -6,7 +6,9 @@ export let rule: ExternalCommandRule
 <!-- svelte-ignore a11y_click_events_have_key_events -->
 <!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
 <main on:click>
-	{rule.name}
+	<span class="name">
+		{rule.name.value}
+	</span>
 	<span class="folder">
 		{rule.description.value}
 	</span>
@@ -29,10 +31,27 @@ main {
 		cursor: pointer;
 		border-color: var(--accentBackgroundColor);
 	}
+
+	display: flex;
+	align-items: center;
+	gap: 0.5em;
+	flex-wrap: nowrap;
+	max-width: 100%;
+	overflow: hidden;
+
 }
 
+.name {
+	flex-shrink: 0; /* keeps the first part from shrinking */
+	overflow: hidden;
+	white-space: nowrap;
+}
 .folder {
 	color: var(--deemphasizedTextColor);
-	margin-left: 1em;
+	flex: 0 1 auto;
+	min-width: 0;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
 }
 </style>
