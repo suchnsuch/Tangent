@@ -2,8 +2,9 @@
 import { getContext } from 'svelte'
 import type Workspace from '../model/Workspace'
 import ModalInputSelect from './ModalInputSelect.svelte'
-    import type { TreeNode } from 'common/trees';
-    import type { NoteViewState } from 'app/model/nodeViewStates';
+import type { TreeNode } from 'common/trees'
+import type { NoteViewState } from 'app/model/nodeViewStates'
+    import { getWorkspace } from 'main/workspaces';
 
 let workspace = getContext('workspace') as Workspace
 let text: string = ''
@@ -14,8 +15,8 @@ type Script = {
 	path: string
 }
 
-export let subject: TreeNode
-export let workspaceRoot: string
+// export let subject: TreeNode
+// export let workspaceRoot: string
 export let scripts: Script[]
 
 function filterScripts(c){
@@ -39,7 +40,7 @@ function selectOption(option: Script, event) {
 	const vs = workspace.viewState.tangent.getCurrentViewState()
 	const args = [
 		'--file', vs.node.path, 
-		'--workspace', workspace.viewState.directoryView.root.path,
+		'--workspace', workspace.,
 		
 		...(
 			vs.node.fileType == '.md' 

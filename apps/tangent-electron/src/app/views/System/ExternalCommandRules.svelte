@@ -1,0 +1,93 @@
+<script lang="ts">
+import { dndzone, type DndEvent } from 'svelte-dnd-action'
+import type { Workspace } from 'app/model'
+
+import { getContext } from 'svelte';
+import ExternalCommand from 'common/settings/ExternalCommand'
+
+import ExternalCommandEditor from '../external-commands/ExternalCommandRuleEditor.svelte'
+import ExternalCommandItem from '../external-commands/ExternalCommandItem.svelte'
+    import ExternalCommandRule from 'common/settings/ExternalCommand';
+
+const workspace = getContext('workspace') as Workspace
+const settings = workspace.workspaceSettings
+const rules = $settings.externalCommands
+$: tempRules = $rules
+
+let currentRule: ExternalCommandRule = null
+
+function addRule() {
+	let rule = new ExternalCommandRule()
+	rule.name.set('New Rule')
+	rules.add(rule)
+	currentRule = rule
+}
+
+async function deleteRule() {
+	const result = await workspace.api.system.messageDialog({
+		title: 'Confirm Deletion',
+		message: 'Are you sure you want to delete "' + currentRule.name.value + '"?',
+		buttons: ['Cancel', 'Delete']
+	})
+
+	if (result.response === 1) {
+		rules.remove(currentRule)
+		currentRule = null
+	}
+}
+
+function handleDnDConsider(event: CustomEvent<DndEvent>) {
+	tempRules = event.detail.items as ExternalCommand[]
+}
+
+function handleDnDFinalize(event: CustomEvent<DndEvent>) {
+	const newList: ExternalCommand[] = []
+	for (const item of event.detail.items) {
+		if (item === undefined) return
+
+		const realItem = rules.value.find(i => i.id === item.id)
+		if (realItem === undefined) return
+		newList.push(realItem)
+	}
+	rules.set(newList)
+}
+
+</script>
+
+<main>
+	{#if currentRule}
+		<div class="container">
+			<ExternalCommandEditor rule={currentRule}>
+				<button slot="header-left" on:click={_ => currentRule = null}>Done</button>
+			</ExternalCommandEditor>
+
+			<button class="delete" on:click={deleteRule}>Delete</button>
+		</div>
+	{:else}
+		<div class="container">
+			<div use:dndzone={{
+					items: tempRules,
+					dropTargetStyle: {},
+					transformDraggedElement: element => {
+						element.style.zIndex = '100000000000000' // TODO: Good lord. A more sensible z-index thing.
+					}
+				}}
+				on:consider={handleDnDConsider}
+				on:finalize={handleDnDFinalize}
+			>
+				{#each tempRules as rule (rule.id)}
+					<div><ExternalCommandItem {rule} on:click={ _ => currentRule = rule} /></div>
+				{/each}
+			</div>
+			<button on:click={addRule}>New Rule</button>
+		</div>
+	{/if}
+</main>
+
+<style lang="scss">
+.container {
+	background-color: var(--noteBackgroundColor);
+	padding: 1em;
+	border-radius: var(--borderRadius);
+}
+</style>

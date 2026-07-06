@@ -106,6 +106,24 @@ export const dateTemplates: TemplateDefinition[] = [
 	},
 ]
 
+export const commandTemplates: TemplateDefinition[] = [
+{
+		text: '%cursor%',
+		description: 'Cursor position in note. Line,Col'
+	},
+	{
+		text: '%workspace%',
+		description: 'Current workspace path.'
+	},
+	{
+		text: '%file%',
+		description: 'Current file path.'
+	},
+	{
+		text: '%thread%',
+		description: 'All files path in current thread view.'
+	},
+]
 export const templates: TemplateDefinition[] = [
 	...dateTemplates
 ]
