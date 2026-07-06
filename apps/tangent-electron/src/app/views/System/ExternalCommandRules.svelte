@@ -2,12 +2,12 @@
 import { dndzone, type DndEvent } from 'svelte-dnd-action'
 import type { Workspace } from 'app/model'
 
-import { getContext } from 'svelte';
+import { getContext } from 'svelte'
 import ExternalCommand from 'common/settings/ExternalCommand'
 
 import ExternalCommandEditor from '../external-commands/ExternalCommandRuleEditor.svelte'
 import ExternalCommandItem from '../external-commands/ExternalCommandItem.svelte'
-    import ExternalCommandRule from 'common/settings/ExternalCommand';
+import ExternalCommandRule from 'common/settings/ExternalCommand'
 
 const workspace = getContext('workspace') as Workspace
 const settings = workspace.workspaceSettings
