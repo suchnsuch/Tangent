@@ -1,22 +1,14 @@
 <script lang="ts">
-import type CreationRule from 'common/settings/CreationRule'
-import CreationRuleName from '../summaries/CreationRuleName.svelte'
-
-export let rule: CreationRule
-$: ruleFolder = rule.folder
+import type ExternalCommandRule from 'common/settings/ExternalCommand';
+export let rule: ExternalCommandRule
 </script>
 
 <!-- svelte-ignore a11y_click_events_have_key_events -->
 <!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
 <main on:click>
-	<CreationRuleName {rule}/>
+	{rule.name}
 	<span class="folder">
-		in
-		{#if $ruleFolder}
-			"{$ruleFolder}"
-		{:else}
-			Workspace Root
-		{/if}
+	{rule.description.value}
 	</span>
 </main>
 
@@ -37,10 +29,5 @@ main {
 		cursor: pointer;
 		border-color: var(--accentBackgroundColor);
 	}
-}
-
-.folder {
-	color: var(--deemphasizedTextColor);
-	margin-left: 1em;
 }
 </style>
