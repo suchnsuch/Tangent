@@ -793,6 +793,13 @@ export default class Workspace extends EventDispatcher {
 			}
 		}
 
+		for (const rule of this.workspaceSettings.value.externalCommands.value) {
+			if (rule === target) continue
+			if (rule.shortcut.value === shortcut) {
+				return 'This shortcut is used by the external command rule "' + rule.name.value + '"'
+			}
+		}
+
 		return null
 	}
 

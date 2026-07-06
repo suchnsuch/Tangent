@@ -214,8 +214,4 @@ details {
 	}
 }
 
-figure {
-	margin: 1em 0;
-}
-
 </style>

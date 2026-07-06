@@ -23,6 +23,12 @@ export interface UserMessage {
 	message: string
 }
 
+export interface CliStatus {
+	stdout: string,
+	stderr: string,
+	exitCode: number
+}
+
 type SelectPathResult<T extends SelectPathOptions> = T extends { selectMultiple: true } ? string[] : string
 
 export default interface WindowAPI {
@@ -107,7 +113,7 @@ export default interface WindowAPI {
 	}
 
 	os: {
-		execCLI(cmd: string): Promise<string>
+		execCLI(cmd: string): Promise<CliStatus>
 	},
 
 	edit: {

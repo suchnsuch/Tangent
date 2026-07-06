@@ -5,6 +5,7 @@ import ModalInputSelect from './ModalInputSelect.svelte'
 import type { NoteViewState } from 'app/model/nodeViewStates'
 import type { ExternalCommandRuleDefinition } from 'common/settings/ExternalCommand'
     import { ShellEscape } from 'app/utils/shell';
+    import { runExternalCommand } from 'app/model/commands/ExecCliCommand';
 
 let workspace = getContext('workspace') as Workspace
 let text: string = ''
@@ -29,16 +30,7 @@ function onAutocomplete(option: ExternalCommandRuleDefinition) {
 }
 
 function selectOption(option: ExternalCommandRuleDefinition, event) {
-	const currentViewState = workspace.viewState.tangent.getCurrentViewState()
-	const ctx = {
-		'file': currentViewState.node.path, 
-		'workspace': workspace.viewState.directoryView.root.path,
-		'cursor': currentViewState.node.fileType == '.md' ? (currentViewState as NoteViewState).selection.value.join(',') : 'nan,nan',
-		'thread': '...'
-	}
-	const shellEscaper = new ShellEscape({shell: 'bash', quote: true}) // TODO change this according to the OS
-	let cmd = option.commandTemplate.replace(/%([^%]*?)%/g, (match, expr) => shellEscaper.escape(ctx[expr]))
-	workspace.api.os.execCLI(cmd)
+	runExternalCommand(workspace, option)
 	workspace.viewState.modal.close()
 }
 
