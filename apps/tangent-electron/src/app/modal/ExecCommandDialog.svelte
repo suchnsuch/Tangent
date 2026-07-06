@@ -4,16 +4,13 @@ import type Workspace from '../model/Workspace'
 import ModalInputSelect from './ModalInputSelect.svelte'
 import type { TreeNode } from 'common/trees'
 import type { NoteViewState } from 'app/model/nodeViewStates'
-    import type { ExternalCommandRuleDefinition } from 'common/settings/ExternalCommand'
+import type { ExternalCommandRuleDefinition } from 'common/settings/ExternalCommand'
+    import { ShellEscape } from 'app/utils/shell';
 
 let workspace = getContext('workspace') as Workspace
 let text: string = ''
 
-// export let subject: TreeNode
-// export let workspaceRoot: string
 export let commands: ExternalCommandRuleDefinition[]
-
-console.log(commands)
 
 function filterScripts(c){
 	return commands.filter(s => s.name.includes(c))
@@ -40,7 +37,8 @@ function selectOption(option: ExternalCommandRuleDefinition, event) {
 		'cursor': currentViewState.node.fileType == '.md' ? (currentViewState as NoteViewState).selection.value.join(',') : 'nan,nan',
 		'thread': '...'
 	}
-	let cmd = option.commandTemplate.replace(/%([^%]*?)%/g, (match, expr) => ctx[expr])
+	const shellEscaper = new ShellEscape({shell: 'bash', quote: true})
+	let cmd = option.commandTemplate.replace(/%([^%]*?)%/g, (match, expr) => shellEscaper.escape(ctx[expr]))
 	workspace.api.os.execCLI(cmd)
 	workspace.viewState.modal.close()
 }
@@ -57,7 +55,12 @@ function selectOption(option: ExternalCommandRuleDefinition, event) {
 		{onAutocomplete}
 		onSelect={selectOption}>
 		<svelte:fragment slot="option" let:option>
-			{option.name}
+			<span>
+				{option.name}
+			</span>
+			<span style="opacity: 0.5;">
+				{option.description}
+			</span>
 		</svelte:fragment>
 	</ModalInputSelect>
 </main>
