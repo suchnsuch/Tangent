@@ -39,40 +39,40 @@ function onWheel(event: WheelEvent) {
 	if (event.ctrlKey) {
 		event.preventDefault()
 
-		const [z2, z1] = zoom.applyWheelEvent(event)
+		const [newZoom, oldZoom] = zoom.applyWheelEvent(event)
 		const containerBB  = container.getBoundingClientRect()
 		const relativeCursorPos = [event.clientX - containerBB.left, event.clientY - containerBB.top]
 	
-		viewer.updateScale({ drawingDelay, scaleFactor: z2/z1, origin: relativeCursorPos })
+		viewer.updateScale({ drawingDelay, scaleFactor: newZoom/oldZoom, origin: relativeCursorPos })
 		$zoom = parseFloat(viewer._currentScaleValue)
 	}
 	else {
 		event.preventDefault()
-		container.scrollLeft += event.deltaX * +1 * (1 / $zoom)
-		container.scrollTop += event.deltaY * +1 * (1 / $zoom)
+		container.scrollLeft += event.deltaX * (1 / $zoom)
+		container.scrollTop += event.deltaY * (1 / $zoom)
 	}
 }
 
-function setZoom(val: number | 'auto') {
-	if (val == 'auto') {
-		viewer.currentScaleValue = `${val}`
+function setZoom(zoomValue: number | 'auto') {
+	if (zoomValue == 'auto') {
+		viewer.currentScaleValue = zoomValue
 	}
 	else {
 		const countainerBB = container.getBoundingClientRect()
 		viewer.updateScale({ 
 			drawingDelay, 
-			scaleFactor: val / parseFloat(viewer.currentScaleValue), 
+			scaleFactor: zoomValue / parseFloat(viewer.currentScaleValue), 
 			origin:  [countainerBB.width / 2 , countainerBB.height / 2]
 		})
 	}
 	$zoom = viewer.currentScale
 }
 
-function onZoomSet(evt: Event) {
+function onZoomSet() {
 	setZoom($zoom)
 }
 
-function onZoomReset(evt: Event) {
+function onZoomReset() {
 	setZoom('auto')
 }
 
