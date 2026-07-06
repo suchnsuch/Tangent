@@ -8,7 +8,7 @@ export let rule: ExternalCommandRule
 <main on:click>
 	{rule.name}
 	<span class="folder">
-	{rule.description.value}
+		{rule.description.value}
 	</span>
 </main>
 
@@ -29,5 +29,10 @@ main {
 		cursor: pointer;
 		border-color: var(--accentBackgroundColor);
 	}
+}
+
+.folder {
+	color: var(--deemphasizedTextColor);
+	margin-left: 1em;
 }
 </style>
