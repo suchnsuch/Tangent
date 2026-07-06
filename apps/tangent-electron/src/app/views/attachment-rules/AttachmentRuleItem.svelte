@@ -1,5 +1,5 @@
 <script lang="ts">
-import type AttachmentRule from 'common/settings/AttachmentRule';
+import type AttachmentRule from 'common/settings/AttachmentRule'
 
 export let rule: AttachmentRule
 $: rulePath = rule.path
