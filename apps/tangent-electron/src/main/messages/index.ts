@@ -27,10 +27,10 @@ const log = Logger.get('messages')
 
 
 ipcMain.handle('execCLI', async (event, commandTemplate: string, context: {[key: string]: string}) => {
-	log.info("Executing CLI command: ", commandTemplate)
-
 	const shellEscaper = new Shescape({flagProtection: true})
 	const commandText = commandTemplate.replace(/%([^%]*?)%/g, (match, expr) => shellEscaper.escape(context[expr]))
+	
+	log.info("Executing CLI command: ", commandText)
 
 	const child = spawn(commandText, { 
 		stdio: 'pipe',

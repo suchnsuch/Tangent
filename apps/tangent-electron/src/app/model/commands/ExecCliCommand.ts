@@ -54,6 +54,29 @@ export default class ExecCliCommand extends WorkspaceCommand {
 		}
 	}
 
+	getPaletteActions() {
+		// TODO various pre-defined external commands
+		return null
+
+		// const actions: PaletteAction[] = [{
+		// 	name: 'Create New Note',
+		// 	command: this
+		// }]
+
+		// for (const rule of this.workspace.workspaceSettings.value.creationRules) {
+		// 	actions.push({
+		// 		name: 'Create ' + rule.name.value,
+		// 		command: this,
+		// 		context: {
+		// 			rule
+		// 		},
+		// 		shortcuts: rule.shortcut.value ? [rule.shortcut.value] : null
+		// 	})
+		// }
+
+		// return actions
+	}
+
 	getName() {
 		return 'Execute CLI'
 	}
