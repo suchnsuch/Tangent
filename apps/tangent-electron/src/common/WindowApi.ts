@@ -23,7 +23,7 @@ export interface UserMessage {
 	message: string
 }
 
-export interface CliStatus {
+export interface CliResult {
 	stdout: string,
 	stderr: string,
 	exitCode: number
@@ -113,7 +113,7 @@ export default interface WindowAPI {
 	}
 
 	os: {
-		execCLI(cmd: string): Promise<CliStatus>
+		execCLI(command: string): Promise<CliResult>
 	},
 
 	edit: {

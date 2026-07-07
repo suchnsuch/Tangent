@@ -4,40 +4,38 @@ import type { Workspace } from 'app/model'
 
 import { getContext } from 'svelte'
 import ExternalCommand from 'common/settings/ExternalCommand'
-
-import ExternalCommandEditor from '../external-commands/ExternalCommandRuleEditor.svelte'
+import ExternalCommandEditor from '../external-commands/ExternalCommandEditor.svelte'
 import ExternalCommandItem from '../external-commands/ExternalCommandItem.svelte'
-import ExternalCommandRule from 'common/settings/ExternalCommand'
 
 const workspace = getContext('workspace') as Workspace
 const settings = workspace.workspaceSettings
-const rules = $settings.externalCommands
-$: tempRules = $rules
+const commands = $settings.externalCommands
+$: tempCommands = $commands
 
-let currentRule: ExternalCommandRule = null
+let currentCommand: ExternalCommand = null
 
-function addRule() {
-	let rule = new ExternalCommandRule()
-	rule.name.set('New Rule')
-	rules.add(rule)
-	currentRule = rule
+function addCommand() {
+	let command = new ExternalCommand()
+	command.name.set('New Command')
+	commands.add(command)
+	currentCommand = command
 }
 
-async function deleteRule() {
+async function deleteCommand() {
 	const result = await workspace.api.system.messageDialog({
 		title: 'Confirm Deletion',
-		message: 'Are you sure you want to delete "' + currentRule.name.value + '"?',
+		message: 'Are you sure you want to delete "' + currentCommand.name.value + '"?',
 		buttons: ['Cancel', 'Delete']
 	})
 
 	if (result.response === 1) {
-		rules.remove(currentRule)
-		currentRule = null
+		commands.remove(currentCommand)
+		currentCommand = null
 	}
 }
 
 function handleDnDConsider(event: CustomEvent<DndEvent>) {
-	tempRules = event.detail.items as ExternalCommand[]
+	tempCommands = event.detail.items as ExternalCommand[]
 }
 
 function handleDnDFinalize(event: CustomEvent<DndEvent>) {
@@ -45,28 +43,28 @@ function handleDnDFinalize(event: CustomEvent<DndEvent>) {
 	for (const item of event.detail.items) {
 		if (item === undefined) return
 
-		const realItem = rules.value.find(i => i.id === item.id)
+		const realItem = commands.value.find(i => i.id === item.id)
 		if (realItem === undefined) return
 		newList.push(realItem)
 	}
-	rules.set(newList)
+	commands.set(newList)
 }
 
 </script>
 
 <main>
-	{#if currentRule}
+	{#if currentCommand}
 		<div class="container">
-			<ExternalCommandEditor rule={currentRule}>
-				<button slot="header-left" on:click={_ => currentRule = null}>Done</button>
+			<ExternalCommandEditor command={currentCommand}>
+				<button slot="header-left" on:click={_ => currentCommand = null}>Done</button>
 			</ExternalCommandEditor>
 
-			<button class="delete" on:click={deleteRule}>Delete</button>
+			<button class="delete" on:click={deleteCommand}>Delete</button>
 		</div>
 	{:else}
 		<div class="container">
 			<div use:dndzone={{
-					items: tempRules,
+					items: tempCommands,
 					dropTargetStyle: {},
 					transformDraggedElement: element => {
 						element.style.zIndex = '100000000000000' // TODO: Good lord. A more sensible z-index thing.
@@ -75,11 +73,11 @@ function handleDnDFinalize(event: CustomEvent<DndEvent>) {
 				on:consider={handleDnDConsider}
 				on:finalize={handleDnDFinalize}
 			>
-				{#each tempRules as rule (rule.id)}
-					<div><ExternalCommandItem {rule} on:click={ _ => currentRule = rule} /></div>
+				{#each tempCommands as command (command.id)}
+					<div><ExternalCommandItem command={command} on:click={ _ => currentCommand = command} /></div>
 				{/each}
 			</div>
-			<button on:click={addRule}>New Rule</button>
+			<button on:click={addCommand}>New Command</button>
 		</div>
 	{/if}
 </main>

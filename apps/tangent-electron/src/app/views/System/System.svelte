@@ -1,5 +1,5 @@
 <script lang="ts">
-import { getContext } from 'svelte';
+import { getContext } from 'svelte'
 import { isMac } from 'common/platform'
 import type Workspace from 'app/model/Workspace'
 import PopUpButton from 'app/utils/PopUpButton.svelte'
@@ -17,7 +17,7 @@ import Dictionary from './Dictionary.svelte'
 import Shortcuts from './Shortcuts.svelte'
 import Debug from './Debug.svelte'
 import DocumentationLink from 'app/utils/DocumentationLink.svelte'
-    import ExternalCommands from './ExternalCommandRules.svelte';
+import ExternalCommands from './ExternalCommands.svelte'
 
 export let detailsOpen = false
 

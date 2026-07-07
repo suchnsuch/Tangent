@@ -1,17 +1,17 @@
 <script lang="ts">
-import type ExternalCommandRule from 'common/settings/ExternalCommand'
+import type ExternalCommand from 'common/settings/ExternalCommand'
 
-export let rule: ExternalCommandRule
+export let command: ExternalCommand
 </script>
 
 <!-- svelte-ignore a11y_click_events_have_key_events -->
 <!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
 <main on:click>
 	<span class="name">
-		{rule.name.value}
+		{command.name.value}
 	</span>
 	<span class="folder">
-		{rule.description.value}
+		{command.description.value}
 	</span>
 </main>
 

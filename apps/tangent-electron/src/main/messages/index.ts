@@ -6,7 +6,7 @@ import { getDocumentationPath } from 'main/documentation'
 import { getWindowHandle, getWorkspace, validateWorkspaceForHandleFilepath, hasStartedWorkspaceShutdown, workspaceMap } from 'main/workspaces'
 
 import fetch from 'node-fetch'
-import type { CliStatus, SelectPathOptions } from 'common/WindowApi'
+import type { CliResult, SelectPathOptions } from 'common/WindowApi'
 
 import fontList from 'font-list'
 
@@ -24,18 +24,18 @@ import { spawn } from 'child_process'
 const log = Logger.get('messages')
 
 
-ipcMain.handle('execCLI', async (event, cmd) => {
-	console.log("Executing CLI command: ", cmd)
+ipcMain.handle('execCLI', async (event, command) => {
+	log.info("Executing CLI command: ", command)
 
-	const child = spawn(cmd, { 
+	const child = spawn(command, { 
 		stdio: 'pipe',
 		shell: true
 	})
  	child.on('close', (code) => {
-		console.log(`Process exited with code ${code}`)
+		log.info(`Process exited with code ${code}`)
 	})
 
-	const ctx: CliStatus = {
+	const ctx: CliResult = {
 		exitCode: 0,
 		stdout: '',
 		stderr: '',

@@ -3,7 +3,7 @@ import { makeRegexPathAgnostic } from '../paths'
 import CreationRule from '../settings/CreationRule'
 import type { DataType } from '.'
 import type { TreeNode, DirectoryStore } from 'common/trees'
-import ExternalCommandRule from 'common/settings/ExternalCommand'
+import ExternalCommand from 'common/settings/ExternalCommand'
 
 class CreationRuleList extends PatchableList<CreationRule, any> {
 
@@ -18,7 +18,7 @@ class CreationRuleList extends PatchableList<CreationRule, any> {
 	}
 }
 
-class ExternalCommandList extends PatchableList<ExternalCommandRule, any> {
+class ExternalCommandList extends PatchableList<ExternalCommand, any> {
 
 	constructor() {
 		super([], {
@@ -27,7 +27,7 @@ class ExternalCommandList extends PatchableList<ExternalCommandRule, any> {
 	}
 
 	protected convertFromPatchItem(patchItem: any) {
-		return new ExternalCommandRule(patchItem)
+		return new ExternalCommand(patchItem)
 	}
 }
 

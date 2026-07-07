@@ -1,20 +1,19 @@
 <script lang="ts">
 import { getContext, tick } from 'svelte'
 import { type PathValidationMessages, validatePath } from 'common/trees'
-import { nameFromRule, willPromptForName } from 'common/settings/ExternalCommand'
+import { commandTemplates, nameFromCommand, willPromptForName } from 'common/settings/ExternalCommand'
 import { Workspace } from 'app/model'
 import editable from 'app/utils/editable'
 import SettingView from '../System/SettingView.svelte'
 import { tooltip } from 'app/utils/tooltips'
-import ExternalCommandRuleTemplateButton from './ExternalCommandRuleTemplateButton.svelte'
-    import { commandTemplates } from 'common/markdownModel/templates'
-    import type ExternalCommandRule from 'common/settings/ExternalCommand'
+import ExternalCommandTemplateButton from '../creation-rules/CreationRuleTemplateButton.svelte'
+import type ExternalCommand from 'common/settings/ExternalCommand'
 
 const workspace = getContext('workspace') as Workspace
-export let rule: ExternalCommandRule
+export let command: ExternalCommand
 
-$: ruleName = rule.name
-$: commandTemplate = rule.commandTemplate
+$: commandName = command.name
+$: commandTemplate = command.commandTemplate
 
 let asksForName = false
 let exampleName = ''
@@ -25,7 +24,7 @@ let templateInput: HTMLInputElement
 $: templateDependencies($commandTemplate)
 function templateDependencies(template) {
 	asksForName = willPromptForName(template)
-	exampleName = nameFromRule(rule.getDefinition(), 'Example Name') as string
+	exampleName = nameFromCommand(command.getDefinition(), 'Example Name') as string
 
 	let messages: PathValidationMessages = []
 	const validation = validatePath(exampleName, messages)
@@ -113,7 +112,7 @@ function insertTextIntoTemplate(
 }
 
 function onValidateShortcut(shortcut: string) {
-	return workspace.validateShortcut(shortcut, rule)
+	return workspace.validateShortcut(shortcut, command)
 }
 
 </script>
@@ -123,13 +122,13 @@ function onValidateShortcut(shortcut: string) {
 		<slot name="header-left"></slot>
 		<!-- svelte-ignore a11y-missing-content -->
 		<h2 class="name"
-			use:editable={ruleName}
-			use:tooltip={"Define the name of the rule. Set an emoji as the first character of the name to make an icon."}
+			use:editable={commandName}
+			use:tooltip={"Define the name of the command. Set an emoji as the first character of the name to make an icon."}
 		></h2>
 	</header>
 	<label use:tooltip={"Defines how the note will be named. Refer to the Template Token list for available dynamic values."}>
 		<span>Name Template</span>
-		<input type="text" bind:value={$ruleName} bind:this={templateInput}/>
+		<input type="text" bind:value={$commandName} bind:this={templateInput}/>
 	</label>
 	{#if exampleNameMessages?.length}
 		{#each exampleNameMessages as message}
@@ -137,19 +136,19 @@ function onValidateShortcut(shortcut: string) {
 		{/each}
 	{/if}
 	<details>
-		<summary>Name Template Tokens</summary>
+		<summary>Command Template Tokens</summary>
 		<br>
 		<p>These tokens are replaced with the appropriate values when command is called.</p>
 		<table><tbody>
-			{#each commandTemplates as cmdTemplate}
-				<tr><th><ExternalCommandRuleTemplateButton templateText={cmdTemplate.text} insertTemplateText={insertTextIntoTemplate}/></th><td>{cmdTemplate.description}</td></tr>	
+			{#each commandTemplates as commandTemplate}
+				<tr><th><ExternalCommandTemplateButton templateText={commandTemplate.text} insertTemplateText={insertTextIntoTemplate}/></th><td>{commandTemplate.description}</td></tr>
 			{/each}
 		</tbody></table>
 	</details>
 	<div class="settingsGroup">
-		<SettingView setting={rule.shortcut} {onValidateShortcut} />
-		<SettingView setting={rule.commandTemplate} />
-		<SettingView setting={rule.description} />
+		<SettingView setting={command.shortcut} {onValidateShortcut} />
+		<SettingView setting={command.commandTemplate} />
+		<SettingView setting={command.description} />
 	</div>
 </main>
 

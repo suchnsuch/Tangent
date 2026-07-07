@@ -2,53 +2,53 @@ import type { Workspace } from ".."
 import type { CommandContext } from "./Command"
 import WorkspaceCommand from "./WorkspaceCommand"
 import ExecCommandDialog from '../../modal/ExecCommandDialog.svelte'
-import type ExternalCommandRule from "common/settings/ExternalCommand"
+import type ExternalCommand from "common/settings/ExternalCommand"
 import { ShellEscape } from "app/utils/shell"
-import type { ExternalCommandRuleDefinition } from "common/settings/ExternalCommand"
+import type { ExternalCommandDefinition } from "common/settings/ExternalCommand"
 import type { NoteViewState } from "../nodeViewStates"
 
 
-export function runExternalCommand(workspace: Workspace, rule: ExternalCommandRuleDefinition){
+export function runExternalCommand(workspace: Workspace, command: ExternalCommandDefinition){
 	const currentViewState = workspace.viewState.tangent.getCurrentViewState()
 	const ctx = {
 		'file': currentViewState.node.path, 
 		'workspace': workspace.viewState.directoryView.root.path,
-		'cursor': currentViewState.node.fileType == '.md' ? (currentViewState as NoteViewState).selection.value.join(',') : 'nan,nan',
-		'thread': '...'
+		'cursor': currentViewState.node.fileType == '.md' ? (currentViewState as NoteViewState).selection.value.join(',') : '-1,-1',
+		'thread': '...' // TODO
 	}
 	const shellEscaper = new ShellEscape({shell: 'bash', quote: true}) // TODO change this according to the OS
-	let cmd = rule.commandTemplate.replace(/%([^%]*?)%/g, (match, expr) => shellEscaper.escape(ctx[expr]))
-	workspace.api.os.execCLI(cmd)
+	const text = command.commandTemplate.replace(/%([^%]*?)%/g, (match, expr) => shellEscaper.escape(ctx[expr]))
+	workspace.api.os.execCLI(text)
 }
 
 interface ExecCliCommandContext extends CommandContext {
-	rule?: ExternalCommandRule
+	command?: ExternalCommand
 }
 
 export default class ExecCliCommand extends WorkspaceCommand {
 	constructor(workspace: Workspace) {
-		super(workspace, {group: 'Notes'}) // <---- this makes it available when editing notes
+		super(workspace, { group: 'Notes' }) // <---- this makes it available when editing notes
 	}
 	
 	canExecuteFromShortcut(shortcut: string, context?: ExecCliCommandContext): boolean {
 		if (!super.canExecuteFromShortcut(shortcut, context)) {
-			for (const rule of this.workspace.workspaceSettings.value.externalCommands.value) {
-				if (rule.shortcut.value === shortcut) {
-					if (context) context.rule = rule
+			for (const command of this.workspace.workspaceSettings.value.externalCommands.value) {
+				if (command.shortcut.value === shortcut) {
+					if (context) context.command = command
 					if (this.canExecute(context)) {
 						return true
 					}
 				}
 			}
-			if (context) delete context.rule
+			if (context) delete context.command
 			return false
 		}
 		return true
 	}
 
 	execute(context: ExecCliCommandContext) {
-		if (context.rule){
-			runExternalCommand(this.workspace, context.rule.getDefinition())
+		if (context.command){
+			runExternalCommand(this.workspace, context.command.getDefinition())
 		}
 		else {
 			this.workspace.viewState.modal.push(ExecCommandDialog, {

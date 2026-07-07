@@ -2,15 +2,13 @@
 import { getContext } from 'svelte'
 import type Workspace from '../model/Workspace'
 import ModalInputSelect from './ModalInputSelect.svelte'
-import type { NoteViewState } from 'app/model/nodeViewStates'
-import type { ExternalCommandRuleDefinition } from 'common/settings/ExternalCommand'
-    import { ShellEscape } from 'app/utils/shell';
-    import { runExternalCommand } from 'app/model/commands/ExecCliCommand';
+import type { ExternalCommandDefinition } from 'common/settings/ExternalCommand'
+import { runExternalCommand } from 'app/model/commands/ExecCliCommand'
 
 let workspace = getContext('workspace') as Workspace
 let text: string = ''
 
-export let commands: ExternalCommandRuleDefinition[]
+export let commands: ExternalCommandDefinition[]
 
 function filterScripts(c){
 	return commands.filter(s => s.name.includes(c))
@@ -25,11 +23,11 @@ $: updateOptions(text)
 function updateOptions(text: string) {
 	options = filterScripts(text)
 }
-function onAutocomplete(option: ExternalCommandRuleDefinition) {
+function onAutocomplete(option: ExternalCommandDefinition) {
 	return undefined
 }
 
-function selectOption(option: ExternalCommandRuleDefinition, event) {
+function selectOption(option: ExternalCommandDefinition, event) {
 	runExternalCommand(workspace, option)
 	workspace.viewState.modal.close()
 }
