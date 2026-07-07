@@ -15,62 +15,8 @@ export let command: ExternalCommand
 $: commandName = command.name
 $: commandTemplate = command.commandTemplate
 
-let asksForName = false
-let exampleName = ''
 let exampleNameMessages: PathValidationMessages = []
-
 let templateInput: HTMLInputElement
-
-$: templateDependencies($commandTemplate)
-function templateDependencies(template) {
-	asksForName = willPromptForName(template)
-	exampleName = nameFromCommand(command.getDefinition(), 'Example Name') as string
-
-	let messages: PathValidationMessages = []
-	const validation = validatePath(exampleName, messages)
-
-	if (validation === false) {
-		messages.unshift({
-			level: 'error',
-			message: 'This path cannot be used.'
-		})
-
-		messages.sort((a, b) => {
-			// This is a very simple, stupid sort, but it puts errors in front and that's what's needed
-			if (a.level === b.level) return 0
-			if (a.level === 'error') return -1
-			if (b.level === 'error') return 1
-			return 0
-		})
-	}
-	else if (validation !== exampleName) {
-		exampleName = validation
-	}
-
-	if (!messages.find(m => m.level === 'error')) {
-
-		// if (willPromptForName(template)) {
-		// 	messages.unshift({
-		// 		level: 'info',
-		// 		message: 'Will prompt for a name on creation.'
-		// 	})
-		// }
-		// if (exampleName.includes('/')) {
-		// 	messages.push({
-		// 		level: 'info',
-		// 		message: `Will create notes in folders named like: "<span class="demoName">${exampleName}</span>".`
-		// 	})
-		// }
-		// else {
-		// 	messages.push({
-		// 		level: 'info',
-		// 		message: `Will create notes named like: "<span class="demoName">${exampleName}</span>".`
-		// 	})
-		// }
-	}
-
-	exampleNameMessages = messages
-}
 
 /**
  * Insert the given insertionString into the template at the last-seen selection start position. If the lastSelectionEnd position
