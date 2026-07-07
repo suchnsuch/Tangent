@@ -54,9 +54,9 @@ export default class ExecCliCommand extends WorkspaceCommand {
 		}
 	}
 
-	getPaletteActions() {
+	// getPaletteActions() {
 		// TODO various pre-defined external commands
-		return null
+		// return null
 
 		// const actions: PaletteAction[] = [{
 		// 	name: 'Create New Note',
@@ -75,7 +75,7 @@ export default class ExecCliCommand extends WorkspaceCommand {
 		// }
 
 		// return actions
-	}
+	// }
 
 	getName() {
 		return 'Execute CLI'

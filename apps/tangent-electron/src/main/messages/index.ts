@@ -29,20 +29,22 @@ const log = Logger.get('messages')
 ipcMain.handle('execCLI', async (event, commandTemplate: string, context: {[key: string]: string}) => {
 	const shellEscaper = new Shescape({flagProtection: true})
 	const commandText = commandTemplate.replace(/%([^%]*?)%/g, (match, expr) => shellEscaper.escape(context[expr]))
+
+	const windowHandle = getWindowHandle(event.sender)
 	
 	return new Promise((resolve) => {
 		log.info("Executing CLI command: ", commandText)
-
+		
 		const child = spawn(commandText, { 
 			stdio: 'pipe',
 			shell: true
 		})
-
+		
 		const processTimeout = 5 * 1000
         let timedOut = false
         let stdout = ''
         let stderr = ''
-
+		
         const timer = setTimeout(() => {
             timedOut = true
             log.info('Process is taking too much')
@@ -58,24 +60,31 @@ ipcMain.handle('execCLI', async (event, commandTemplate: string, context: {[key:
 
         child.on('close', (code) => {
             clearTimeout(timer)
-            const ctx = {
+            const result = {
 				stdout: stdout,
                 stderr: stderr,
                 exitCode: code
             }
-			log.info(`Process exited with code ${code}`, ctx)
-            resolve(ctx)
+			
+			windowHandle.postUserMessage(
+				code === 0 ? 'info' : 'warning', 
+				code === 0 ? 'Command Completed' : 'Command Failed',
+				code === 0 ? stdout : stderr)
+			
+			log.info(`Process exited with code ${code}`, result)
+            resolve(result)
         })
-
+		
         child.on('error', (err) => {
-            clearTimeout(timer)
-            const ctx = {
-                stdout: stdout,
+			clearTimeout(timer)
+            const result = {
+				stdout: stdout,
                 stderr: err.message,
                 exitCode: 1
             }
-			log.error(`Command error: ${err.message}`, ctx)
-            resolve(ctx)
+			windowHandle.postUserMessage('error', 'Command Failed', stderr)
+			log.error(`Process error: ${err.message}`, result)
+            resolve(result)
         })
     })
 })
