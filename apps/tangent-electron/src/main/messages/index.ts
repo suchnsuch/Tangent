@@ -30,23 +30,56 @@ ipcMain.handle('execCLI', async (event, commandTemplate: string, context: {[key:
 	const shellEscaper = new Shescape({flagProtection: true})
 	const commandText = commandTemplate.replace(/%([^%]*?)%/g, (match, expr) => shellEscaper.escape(context[expr]))
 	
-	log.info("Executing CLI command: ", commandText)
+	return new Promise((resolve) => {
+		log.info("Executing CLI command: ", commandText)
 
-	const child = spawn(commandText, { 
-		stdio: 'pipe',
-		shell: true
-	})
- 	child.on('close', (code) => {
-		log.info(`Process exited with code ${code}`)
-	})
+		const child = spawn(commandText, { 
+			stdio: 'pipe',
+			shell: true
+		})
 
-	const ctx: CliResult = {
-		exitCode: 0,
-		stdout: '',
-		stderr: '',
-	}
-	return ctx
+		const processTimeout = 5 * 1000
+        let timedOut = false
+        let stdout = ''
+        let stderr = ''
+
+        const timer = setTimeout(() => {
+            timedOut = true
+            log.info('Process is taking too much')
+        }, processTimeout)
+
+        child.stdout.on('data', (data) => {
+            stdout += data.toString()
+        })
+
+        child.stderr.on('data', (data) => {
+            stderr += data.toString()
+        })
+
+        child.on('close', (code) => {
+            clearTimeout(timer)
+            const ctx = {
+				stdout: stdout,
+                stderr: stderr,
+                exitCode: code
+            }
+			log.info(`Process exited with code ${code}`, ctx)
+            resolve(ctx)
+        })
+
+        child.on('error', (err) => {
+            clearTimeout(timer)
+            const ctx = {
+                stdout: stdout,
+                stderr: err.message,
+                exitCode: 1
+            }
+			log.error(`Command error: ${err.message}`, ctx)
+            resolve(ctx)
+        })
+    })
 })
+
 
 ipcMain.handle('getKnownWorkspaces', async (event) => {
 
