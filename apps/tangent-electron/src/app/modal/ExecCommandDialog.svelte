@@ -4,25 +4,21 @@ import type Workspace from '../model/Workspace'
 import ModalInputSelect from './ModalInputSelect.svelte'
 import type { ExternalCommandDefinition } from 'common/settings/ExternalCommand'
 import { runExternalCommand } from 'app/model/commands/ExecCliCommand'
+import { buildFuzzySegementMatcher } from 'common/search'
 
 let workspace = getContext('workspace') as Workspace
 let text: string = ''
 
 export let commands: ExternalCommandDefinition[]
-
-function filterScripts(c){
-	return commands.filter(s => s.name.includes(c))
-}
-
-// ---------------------------------------
-
-let options = filterScripts("")
+let options = []
 let selectedIndex = 0
 
 $: updateOptions(text)
-function updateOptions(text: string) {
-	options = filterScripts(text)
+function updateOptions(textQuery: string) {
+	const searchMatcher = buildFuzzySegementMatcher(textQuery)
+	options = commands.filter(command => command.name.match(searchMatcher))
 }
+
 function onAutocomplete(option: ExternalCommandDefinition) {
 	return undefined
 }
