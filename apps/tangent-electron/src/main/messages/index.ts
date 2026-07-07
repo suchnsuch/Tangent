@@ -4,6 +4,7 @@ import { load } from 'cheerio'
 import { app, BrowserWindow, clipboard, dialog, ipcMain, nativeImage, shell } from 'electron'
 import { getDocumentationPath } from 'main/documentation'
 import { getWindowHandle, getWorkspace, validateWorkspaceForHandleFilepath, hasStartedWorkspaceShutdown, workspaceMap } from 'main/workspaces'
+import { spawn } from 'child_process'
 
 import fetch from 'node-fetch'
 import type { CliResult, SelectPathOptions } from 'common/WindowApi'
@@ -19,15 +20,19 @@ import './themes'
 import './urlData'
 import { FileSaveResult } from 'main/File'
 
-import { spawn } from 'child_process'
+import { Shescape } from "shescape"
+
 
 const log = Logger.get('messages')
 
 
-ipcMain.handle('execCLI', async (event, command) => {
-	log.info("Executing CLI command: ", command)
+ipcMain.handle('execCLI', async (event, commandTemplate: string, context: {[key: string]: string}) => {
+	log.info("Executing CLI command: ", commandTemplate)
 
-	const child = spawn(command, { 
+	const shellEscaper = new Shescape({flagProtection: true})
+	const commandText = commandTemplate.replace(/%([^%]*?)%/g, (match, expr) => shellEscaper.escape(context[expr]))
+
+	const child = spawn(commandText, { 
 		stdio: 'pipe',
 		shell: true
 	})

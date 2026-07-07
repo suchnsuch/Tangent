@@ -190,8 +190,8 @@ const bridge: WindowApi = {
 		},
 	},
 	os: {
-		execCLI(command) {
-			return ipcRenderer.invoke('execCLI', command)
+		execCLI(command, context) {
+			return ipcRenderer.invoke('execCLI', command, context)
 		},
 	},
 	edit: {

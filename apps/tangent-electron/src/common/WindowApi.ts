@@ -113,7 +113,7 @@ export default interface WindowAPI {
 	}
 
 	os: {
-		execCLI(command: string): Promise<CliResult>
+		execCLI(commandTemplate: string, context: {[key: string]: string}): Promise<CliResult>
 	},
 
 	edit: {

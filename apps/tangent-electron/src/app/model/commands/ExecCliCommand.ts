@@ -3,22 +3,19 @@ import type { CommandContext } from "./Command"
 import WorkspaceCommand from "./WorkspaceCommand"
 import ExecCommandDialog from '../../modal/ExecCommandDialog.svelte'
 import type ExternalCommand from "common/settings/ExternalCommand"
-import { ShellEscape } from "app/utils/shell"
 import type { ExternalCommandDefinition } from "common/settings/ExternalCommand"
 import type { NoteViewState } from "../nodeViewStates"
 
 
 export function runExternalCommand(workspace: Workspace, command: ExternalCommandDefinition){
 	const currentViewState = workspace.viewState.tangent.getCurrentViewState()
-	const ctx = {
+	const context = {
 		'file': currentViewState.node.path, 
 		'workspace': workspace.viewState.directoryView.root.path,
 		'cursor': currentViewState.node.fileType == '.md' ? (currentViewState as NoteViewState).selection.value.join(',') : '-1,-1',
 		'thread': '...' // TODO
 	}
-	const shellEscaper = new ShellEscape({shell: 'bash', quote: true}) // TODO change this according to the OS
-	const text = command.commandTemplate.replace(/%([^%]*?)%/g, (match, expr) => shellEscaper.escape(ctx[expr]))
-	workspace.api.os.execCLI(text)
+	workspace.api.os.execCLI(command.commandTemplate, context)
 }
 
 interface ExecCliCommandContext extends CommandContext {
