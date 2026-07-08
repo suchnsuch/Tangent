@@ -375,6 +375,18 @@ export default class Settings extends ObjectStore {
 		defaultValue: 'vscode-dark'
 	})
 
+	noteCodeTabWidth = new Setting<number>({
+		name: 'Code Tab Width',
+		description: 'The width of a tab in a code block.',
+		defaultValue: 4,
+		range: {
+			min: 1,
+			max: 24,
+			softMax: 8,
+			step: 1
+		}
+	})
+
 	noteWidthMax = new Setting<number>({
 		name: 'Max Note Width',
 		description: 'Determines the maximum width of a note.',
