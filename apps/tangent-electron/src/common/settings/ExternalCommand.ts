@@ -15,10 +15,10 @@ export const commandTemplates = [
 		text: '%file%',
 		description: 'Current file path.'
 	},
-	{
-		text: '%thread%',
-		description: 'All files path in current thread view.'
-	},
+	// TODO {
+	// 	text: '%thread%',
+	// 	description: 'All files path in current thread view.'
+	// },
 ]
 
 export type ExternalCommandOrDefinition = ExternalCommand | ExternalCommandDefinition

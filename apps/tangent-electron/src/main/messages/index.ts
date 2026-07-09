@@ -40,15 +40,16 @@ ipcMain.handle('execCLI', async (event, commandTemplate: string, context: {[key:
 			shell: true
 		})
 		
-		const processTimeout = 5 * 1000
+		const processTimeoutSec = 10
         let timedOut = false
         let stdout = ''
         let stderr = ''
 		
         const timer = setTimeout(() => {
             timedOut = true
-            log.info('Process is taking too much')
-        }, processTimeout)
+            log.info(`Command execution is taking too long (>${processTimeoutSec}s).`)
+			windowHandle.postUserMessage('warning', `Command execution is taking too long (>${processTimeoutSec}s).`)
+        }, processTimeoutSec * 1000)
 
         child.stdout.on('data', (data) => {
             stdout += data.toString()
@@ -69,7 +70,7 @@ ipcMain.handle('execCLI', async (event, commandTemplate: string, context: {[key:
 			windowHandle.postUserMessage(
 				code === 0 ? 'info' : 'warning', 
 				code === 0 ? 'Command Completed' : 'Command Failed',
-				code === 0 ? stdout : stderr)
+				code === 0 ? '' : '')
 			
 			log.info(`Process exited with code ${code}`, result)
             resolve(result)
@@ -88,7 +89,6 @@ ipcMain.handle('execCLI', async (event, commandTemplate: string, context: {[key:
         })
     })
 })
-
 
 ipcMain.handle('getKnownWorkspaces', async (event) => {
 

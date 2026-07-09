@@ -13,21 +13,21 @@ export function runExternalCommand(workspace: Workspace, command: ExternalComman
 		'file': currentViewState.node.path, 
 		'workspace': workspace.viewState.directoryView.root.path,
 		'cursor': currentViewState.node.fileType == '.md' ? (currentViewState as NoteViewState).selection.value.join(',') : '-1,-1',
-		'thread': '...' // TODO
+		// TODO add thread
 	}
 	workspace.api.os.execCLI(command.commandTemplate, context)
 }
 
-interface ExecCliCommandContext extends CommandContext {
+interface ExecuteExternalCommandContext extends CommandContext {
 	command?: ExternalCommand
 }
 
-export default class ExecCliCommand extends WorkspaceCommand {
+export default class ExecuteExternalCommand extends WorkspaceCommand {
 	constructor(workspace: Workspace) {
 		super(workspace, { group: 'Notes' }) // <---- this makes it available when editing notes
 	}
 	
-	canExecuteFromShortcut(shortcut: string, context?: ExecCliCommandContext): boolean {
+	canExecuteFromShortcut(shortcut: string, context?: ExecuteExternalCommandContext): boolean {
 		if (!super.canExecuteFromShortcut(shortcut, context)) {
 			for (const command of this.workspace.workspaceSettings.value.externalCommands.value) {
 				if (command.shortcut.value === shortcut) {
@@ -43,7 +43,7 @@ export default class ExecCliCommand extends WorkspaceCommand {
 		return true
 	}
 
-	execute(context: ExecCliCommandContext) {
+	execute(context: ExecuteExternalCommandContext) {
 		if (context.command){
 			runExternalCommand(this.workspace, context.command.getDefinition())
 		}
@@ -82,7 +82,7 @@ export default class ExecCliCommand extends WorkspaceCommand {
 	}
 
 	getLabel(){
-		return 'Execute Commands'
+		return 'Execute External Commands'
 	}
 
 	getDefaultPaletteName() {
