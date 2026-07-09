@@ -3,7 +3,7 @@ import { getContext } from 'svelte'
 import type Workspace from '../model/Workspace'
 import ModalInputSelect from './ModalInputSelect.svelte'
 import type { ExternalCommandDefinition } from 'common/settings/ExternalCommand'
-import { runExternalCommand } from 'app/model/commands/ExecCliCommand'
+import { runExternalCommand } from 'app/model/commands/ExecuteExternalCommand'
 import { buildFuzzySegementMatcher } from 'common/search'
 
 let workspace = getContext('workspace') as Workspace
