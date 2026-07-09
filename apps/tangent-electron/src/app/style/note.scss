@@ -388,7 +388,8 @@ article.note {
 	pre {
 		margin: 0;
 		padding: 0 .5em;
-		margin-left: -.5em;
+		margin-left: -.5em; // Counteract the padding so text starts at the same place
+		margin-right: -.5em;
 		overflow: auto;
 		border-radius: var(--borderRadius);
 
