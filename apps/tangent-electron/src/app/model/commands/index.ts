@@ -52,7 +52,7 @@ export type WorkspaceCommands = LiteralCommands & GenericCommands
 
 function createAllCommands(workspace: Workspace) {
 	return {
-
+		
 		openWorkspace: new OpenWorkspaceCommand(workspace),
 
 		toggleLeftSidebar: new ToggleSidebarCommand(workspace),
@@ -115,7 +115,7 @@ function createAllCommands(workspace: Workspace) {
 		moveToLeftFile: new ChangeCurrentFileCommand(workspace, { mode: 'left', shortcut: 'Mod+Alt+Left' }),
 		moveToRightFile: new ChangeCurrentFileCommand(workspace, { mode: 'right', shortcut: 'Mod+Alt+Right' }),
 
-		execCommand: new ExecuteExternalCommand(workspace),
+		executeExternalCommand: new ExecuteExternalCommand(workspace),
 		
 		moveFile: new MoveFileCommand(workspace),
 		duplicateNode: new DuplicateNodeCommand(workspace),

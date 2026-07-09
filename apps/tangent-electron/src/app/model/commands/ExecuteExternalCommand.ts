@@ -54,31 +54,23 @@ export default class ExecuteExternalCommand extends WorkspaceCommand {
 		}
 	}
 
-	// getPaletteActions() {
-		// TODO various pre-defined external commands
-		// return null
-
-		// const actions: PaletteAction[] = [{
-		// 	name: 'Create New Note',
-		// 	command: this
-		// }]
-
-		// for (const rule of this.workspace.workspaceSettings.value.creationRules) {
-		// 	actions.push({
-		// 		name: 'Create ' + rule.name.value,
-		// 		command: this,
-		// 		context: {
-		// 			rule
-		// 		},
-		// 		shortcuts: rule.shortcut.value ? [rule.shortcut.value] : null
-		// 	})
-		// }
-
-		// return actions
-	// }
+	getPaletteActions() {
+		const actions = [...super.getPaletteActions()]
+		for (const command of this.workspace.workspaceSettings.value.externalCommands) {
+			actions.push({
+				name: `Execute "${command.name.value}"`,
+				command: this,
+				context: {
+					command
+				},
+				shortcuts: command.shortcut.value ? [command.shortcut.value] : null
+			})
+		}
+		return actions
+	}
 
 	getName() {
-		return 'Execute CLI'
+		return 'Execute Commands'
 	}
 
 	getLabel(){
@@ -86,10 +78,10 @@ export default class ExecuteExternalCommand extends WorkspaceCommand {
 	}
 
 	getDefaultPaletteName() {
-		return 'Run/Execute external CLI command'
+		return 'Run/Execute External Commands'
 	}
 
 	getTooltip(context?: CommandContext) {
-		return 'Execute a external CLI command with context of current file'
+		return 'Execute a external command with context of current file and current workspace'
 	}
 }
