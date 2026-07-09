@@ -1293,8 +1293,8 @@ let resizeObserver = new ResizeObserver(elements => {
 	if (resizeTimeout) clearTimeout(resizeTimeout)
 	resizeTimeout = setTimeout(() => updateCodeBlockSizing(), 200)
 })
-$: if ($letCodeExpand && editorElement) {
-	resizeObserver.observe(editorElement)
+$: if ($letCodeExpand && container && editorElement) {
+	resizeObserver.observe(container)
 }
 else {
 	resizeObserver.disconnect()
