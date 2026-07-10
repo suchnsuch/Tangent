@@ -55,7 +55,7 @@ export default class ExecuteExternalCommand extends WorkspaceCommand {
 	}
 
 	getPaletteActions() {
-		const actions = [...super.getPaletteActions()]
+		const actions = []
 		for (const command of this.workspace.workspaceSettings.value.externalCommands) {
 			actions.push({
 				name: `Execute "${command.name.value}"`,
