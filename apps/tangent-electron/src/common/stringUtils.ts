@@ -83,3 +83,7 @@ export function numberOf(target: string, content: string) {
 	}
 	return count
 }
+
+export function isEmptyOrWhitespace(str: string){
+	return !str || str.trim().length === 0
+}

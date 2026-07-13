@@ -53,3 +53,50 @@ export async function loadTreeFromPath(
 
 	return item as TreeNode
 }
+
+/**
+ * @summary Build all possible paths
+ * 
+ * @example
+ * findUpCandidates('/home/user/project', '/home/user/project/src/UI/components', '.git/313')
+ * [
+ *  '/home/user/project/src/UI/components/.git/313',
+ *  '/home/user/project/src/UI/.git/313',
+ *  '/home/user/project/src/.git/313',
+ *  '/home/user/project/.git/313',
+ * ]
+ */
+export function* findUpCandidates(rootAbsPath: string, startAbsPath: string, targetRelPath: string, maxIterations = 16): Generator<string> {
+	const rootPath = path.resolve(rootAbsPath)
+	let currentPath = path.resolve(startAbsPath)
+	
+	for (let i = 0; i < maxIterations; i++) {
+		yield path.join(currentPath, targetRelPath)
+		if (currentPath === rootPath) break
+		currentPath = path.dirname(currentPath)
+	}
+}
+
+/**
+ * Searches upward through the file system hierarchy for a target file or directory.
+ * 
+ * @param rootAbsPath - The absolute path of root directory
+ * @param startAbsPath - The absolute path of directory starting 
+ * @param targetRelPath - The relative path of the file or directory to search for 
+ * 
+ * @returns The absolute path to the target if found or `null`
+ */
+export async function findUp(rootAbsPath: string, startAbsPath: string, targetRelPath: string): Promise<string | null> {
+	const candidateDirs = findUpCandidates(rootAbsPath, startAbsPath, targetRelPath)
+
+	for (let dir of candidateDirs) {
+		try {
+			await fs.promises.access(dir)
+			return dir
+		} catch {
+			// Continue to next candidate
+		}
+	}
+
+	return null
+}

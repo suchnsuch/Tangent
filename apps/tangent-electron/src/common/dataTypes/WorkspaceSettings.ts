@@ -1,6 +1,7 @@
 import { ObjectStore, PatchableList, RawPatchableList, WritableStore } from 'common/stores'
 import { makeRegexPathAgnostic } from '../paths'
 import CreationRule from '../settings/CreationRule'
+import AttachmentRule from 'common/settings/AttachmentRule'
 import type { DataType } from '.'
 import type { TreeNode, DirectoryStore } from 'common/trees'
 
@@ -17,6 +18,19 @@ class CreationRuleList extends PatchableList<CreationRule, any> {
 	}
 }
 
+class AttachmentRuleList extends PatchableList<AttachmentRule, any> {
+
+	constructor() {
+		super([], {
+			patchItems: true
+		})
+	}
+
+	protected convertFromPatchItem(patchItem: any) {
+		return new AttachmentRule(patchItem)
+	}
+}
+
 const pathMatcher = makeRegexPathAgnostic(/\.tangent\/workspace-settings\.json$/)
 
 export default class WorkspaceSettings extends ObjectStore {
@@ -26,6 +40,7 @@ export default class WorkspaceSettings extends ObjectStore {
 	version = new WritableStore(WorkspaceSettings.LATEST_VERSION)
 
 	creationRules = new CreationRuleList()
+	attachmentRules = new AttachmentRuleList()
 
 	styleFiles = new RawPatchableList<string>()
 
