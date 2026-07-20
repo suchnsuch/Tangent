@@ -538,7 +538,7 @@ export function shiftLines(editor: MarkdownEditor, event: Event, lines: Line[], 
 	if (!selection) return
 	const [at, to] = doc.selection
 
-	event.preventDefault()
+	event?.preventDefault()
 
 	const firstLine = lines[0]
 	const lastLine = lines[lines.length - 1]
