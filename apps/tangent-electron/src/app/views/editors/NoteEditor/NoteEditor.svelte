@@ -497,11 +497,18 @@ function centerOnEditorRange(range: EditorRange, scrollTime?: number) {
 function ensureRangeInView(range: EditorRange, buffer=50, scrollTime?: number) {
 	if (!container || !editor) return
 
+	function getMode(range: EditorRange) {
+		if (range[0] === range[1]) return 'show'
+		if (range[0] < range[1]) return 'show-end'
+		return 'show-start'
+	}
+
 	setScrollTo({
 		container,
 		target: editor.getBounds(range),
 		duration: scrollTime,
-		marginY: buffer
+		marginY: buffer,
+		modeY: getMode(range)
 	})
 }
 
