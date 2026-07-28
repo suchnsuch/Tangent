@@ -606,8 +606,8 @@ function onEditorChange(changeEvent: EditorChangeEvent) {
 			note.realizeFile()
 		}
 
-		if (selectionChanged) {
-			if (container && focusLevel >= FocusLevel.Typewriter && !isEditorMouseDown) {
+		if (selectionChanged && !isEditorMouseDown) {
+			if (container && focusLevel >= FocusLevel.Typewriter) {
 				if (changeEvent.doc.selection) {
 					// Microtask means that layout is finished and the scroll appears to happen seemlessly
 					queueMicrotask(() => centerOnEditorRange(changeEvent.doc.selection))
