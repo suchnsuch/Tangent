@@ -40,6 +40,7 @@ import { DeleteSidebarItem, RenameSidebarItem } from './SidebarCommands'
 import { CopyFileToClipboardCommand, UpdateFileFromClipboardCommand } from './CopyFileToClipboard'
 import { OpenDetailsCommand } from './DetailCommands'
 import { OpenPaneSettingsCommand } from './PaneSettingsCommands'
+import { CopyPathCommand } from './CopyPath'
 export { Command, CommandAction, type WorkspaceCommand }
 
 type LiteralCommands = ReturnType<typeof createAllCommands>
@@ -118,6 +119,7 @@ function createAllCommands(workspace: Workspace) {
 		duplicateNode: new DuplicateNodeCommand(workspace),
 		deleteNode: new DeleteNodeCommand(workspace),
 
+		copyPath: new CopyPathCommand(workspace, { shortcut: 'Mod+Shift+C' }),
 		copyFileToClipboard: new CopyFileToClipboardCommand(workspace),
 		updateFileFromClipboard: new UpdateFileFromClipboardCommand(workspace),
 
