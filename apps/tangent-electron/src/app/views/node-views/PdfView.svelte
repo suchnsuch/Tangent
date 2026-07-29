@@ -53,6 +53,28 @@ function onWheel(event: WheelEvent) {
 	}
 }
 
+$: isSpacePressed = false
+
+function onMouseMove(event: MouseEvent) {
+	if (isSpacePressed){
+		event.preventDefault()
+		container.scrollLeft -= event.movementX * (1 / $zoom)
+		container.scrollTop -= event.movementY * (1 / $zoom)
+	}
+}
+
+function onKeyDown(event: KeyboardEvent) {
+	if (event.code == "Space"){
+		event.preventDefault()
+		isSpacePressed = true
+		container.style.cursor = 'grab'
+	}
+}
+function onKeyUp(event: KeyboardEvent) {
+	isSpacePressed = false
+	container.style.cursor = 'auto'
+}
+
 function setZoom(zoomValue: number | 'auto') {
 	if (zoomValue == 'auto') {
 		viewer.currentScaleValue = zoomValue
@@ -162,12 +184,15 @@ function onClick(event: MouseEvent) {
 
 </script>
 
+<!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
 <main
 	class:layout-fill={layout === 'fill'}
 	style:--noteWidthMax={$maxWidth + 'px'}
 	style:padding-top={extraTop + 'px'}
 	style:padding-bottom={extraBottom + 'px'}
 	on:wheel={onWheel}
+	on:keydown={onKeyDown} 
+	on:keyup={onKeyUp}
 >
 	<WorkspaceFileHeader
 		node={state.file}
@@ -178,7 +203,7 @@ function onClick(event: MouseEvent) {
 		<div class="container pdfViewer" bind:this={container}>
 			<!-- svelte-ignore a11y-click-events-have-key-events -->
 			<!-- svelte-ignore a11y-no-static-element-interactions -->
-			<div bind:this={viewerElement} on:click={onClick}></div>
+			<div bind:this={viewerElement} on:mousemove={onMouseMove} on:click={onClick}></div>
 		</div>
 	</article>
 
