@@ -48,8 +48,12 @@ function onWheel(event: WheelEvent) {
 	}
 	else {
 		event.preventDefault()
-		container.scrollLeft += event.deltaX * (1 / $zoom)
-		container.scrollTop += event.deltaY * (1 / $zoom)
+		const dx = event.deltaX * (1 / $zoom)
+		const dy = event.deltaY * (1 / $zoom)
+
+		// shift key change direction of scroll
+		container.scrollLeft += event.shiftKey ? dy : dx 
+		container.scrollTop += event.shiftKey ? dx : dy
 	}
 }
 
@@ -64,7 +68,7 @@ function onMouseMove(event: MouseEvent) {
 }
 
 function onKeyDown(event: KeyboardEvent) {
-	if (event.code == "Space"){
+	if (event.key == "Space"){
 		event.preventDefault()
 		isSpacePressed = true
 		container.style.cursor = 'grab'
