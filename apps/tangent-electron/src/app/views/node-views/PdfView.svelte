@@ -57,10 +57,10 @@ function onWheel(event: WheelEvent) {
 	}
 }
 
-$: isSpacePressed = false
+$: isPanning = false
 
 function onMouseMove(event: MouseEvent) {
-	if (isSpacePressed){
+	if (isPanning){
 		event.preventDefault()
 		container.scrollLeft -= event.movementX * (1 / $zoom)
 		container.scrollTop -= event.movementY * (1 / $zoom)
@@ -68,15 +68,16 @@ function onMouseMove(event: MouseEvent) {
 }
 
 function onKeyDown(event: KeyboardEvent) {
-	if (event.key == "Space"){
+	if (event.key == " "){
 		event.preventDefault()
-		isSpacePressed = true
-		container.style.cursor = 'grab'
+		isPanning = true
 	}
 }
 function onKeyUp(event: KeyboardEvent) {
-	isSpacePressed = false
-	container.style.cursor = 'auto'
+	if (event.key == " "){
+		event.preventDefault()
+		isPanning = false
+	}
 }
 
 function setZoom(zoomValue: number | 'auto') {
@@ -195,7 +196,7 @@ function onClick(event: MouseEvent) {
 	style:padding-top={extraTop + 'px'}
 	style:padding-bottom={extraBottom + 'px'}
 	on:wheel={onWheel}
-	on:keydown={onKeyDown} 
+	on:keydown={onKeyDown}
 	on:keyup={onKeyUp}
 >
 	<WorkspaceFileHeader
@@ -206,8 +207,8 @@ function onClick(event: MouseEvent) {
 	<article use:resizeObserver={onResize}>
 		<div class="container pdfViewer" bind:this={container}>
 			<!-- svelte-ignore a11y-click-events-have-key-events -->
-			<!-- svelte-ignore a11y-no-static-element-interactions -->
-			<div bind:this={viewerElement} on:mousemove={onMouseMove} on:click={onClick}></div>
+			<!-- svelte-ignore a11y-no-static-element-interactions --> 
+			<div bind:this={viewerElement} class={{ 'panning': isPanning }} on:mousemove={onMouseMove} on:click={onClick}></div>
 		</div>
 	</article>
 
@@ -248,6 +249,10 @@ article {
 
 		-webkit-user-select: text;
 		user-select: text;
+
+		.panning {
+			cursor: grab;
+		}
 	}
 }
 
