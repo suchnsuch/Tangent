@@ -51,7 +51,7 @@ function onWheel(event: WheelEvent) {
 		const dx = event.deltaX * (1 / $zoom)
 		const dy = event.deltaY * (1 / $zoom)
 
-		// shift key change direction of scroll
+		// shift key changes direction of scroll
 		container.scrollLeft += event.shiftKey ? dy : dx 
 		container.scrollTop += event.shiftKey ? dx : dy
 	}
