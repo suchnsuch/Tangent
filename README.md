@@ -33,7 +33,7 @@ The `lib` directory contains externally-versioned libraries that have been added
 
 
 ## Building Locally
-1. Ensure that all submodules are synced (e.g. `git submodule update`).
+1. Initialize and sync git submodules (e.g. `git submodule init` && `git submodule update`).
 2. Run `npm ci` at the root level of the repository to install all dependencies across the monorepo.
 3. Run `npm run build` at the root level of the repository to build all dependencies.
 4. Run `npm run dev` (or `dev:win` on Windows) in `./apps/tangent-electron` to run tangent in development mode.
