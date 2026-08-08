@@ -175,7 +175,8 @@ describe('Wiki Links', () => {
 				start: 0,
 				end: 15,
 				form: 'wiki',
-				href: 'Unclosed Link'
+				href: 'Unclosed Link',
+				complete: false
 			})
 		})
 
@@ -185,7 +186,8 @@ describe('Wiki Links', () => {
 				start: 0,
 				end: 15,
 				form: 'wiki',
-				href: 'Unclosed link'
+				href: 'Unclosed link',
+				complete: false
 			})
 		})
 	})
