@@ -87,8 +87,10 @@ export function matchWikiLink(text: string, startIndex=0, options?: {
 		}
 	}
 
+	let complete = true
 	if (linkEnd < 0) {
 		if (options?.allowIncomplete) {
+			complete = false
 			linkEnd = index
 			if (contentIdStart > -1 && contentIdEnd == -1) contentIdEnd = index
 			if (textStart > -1 && textEnd == -1) textEnd = index
@@ -103,6 +105,10 @@ export function matchWikiLink(text: string, startIndex=0, options?: {
 		start: startIndex + linkStart,
 		end: startIndex + linkEnd,
 		href: text.substring(linkStart + 2, hrefEnd)
+	}
+
+	if (options?.allowIncomplete) {
+		details.complete = complete
 	}
 
 	const snipFormatCharacters = options?.snipFormatCharacters ?? true
