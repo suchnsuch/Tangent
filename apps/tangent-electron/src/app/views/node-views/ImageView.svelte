@@ -32,8 +32,13 @@ function onWheel(event: WheelEvent) {
 	}
 	else if ($zoom !== 1) { // Helps when in tangent view
 		event.preventDefault()
-		$panX = $panX + event.deltaX * -1 * (1/$zoom)
-		$panY = $panY + event.deltaY * -1 * (1/$zoom)
+		
+		// shift key changes direction
+		const dx = event.deltaX * -1 * (1/$zoom)
+		const dy = event.deltaY * -1 * (1/$zoom)
+
+		$panX = $panX + (event.shiftKey ? dy : dx)
+		$panY = $panY + (event.shiftKey ? dx : dy)
 	}
 }
 
