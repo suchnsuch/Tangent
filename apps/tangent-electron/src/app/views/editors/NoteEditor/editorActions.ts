@@ -550,12 +550,30 @@ export function shiftLines(editor: MarkdownEditor, event: Event, lines: Line[], 
 	]
 
 	let listLinesToValidate: number[] = []
+	function pushValidationIndex(lineIndex: number) {
+		for (let i = 0; i < listLinesToValidate.length; i++) {
+			const existing = listLinesToValidate[i]
+			if (existing == lineIndex || existing == lineIndex - 1) return
+			if (existing == lineIndex + 1) {
+				listLinesToValidate[i] = lineIndex
+				return
+			}
+		}
+		listLinesToValidate.push(lineIndex)
+	}
 
 	let originalShiftingFirstLineIndex = doc.lines.indexOf(lines[0])
 
+	let isInList = false // Use this to mark the beginning of each list block
 	for (let i = 0; i < lines.length; i++) {
 		if (lines[i].attributes.list) {
-			listLinesToValidate.push(originalShiftingFirstLineIndex + i + shift)
+			if (!isInList) {
+				isInList = true
+				pushValidationIndex(originalShiftingFirstLineIndex + i + shift)
+			}
+		}
+		else {
+			isInList = false
 		}
 	}
 
@@ -587,7 +605,7 @@ export function shiftLines(editor: MarkdownEditor, event: Event, lines: Line[], 
 		const jumpLength = insertionPoint - doc.getLineRange(jumpStartLine)[0]
 
 		if (jumpStartLine.attributes.list) {
-			listLinesToValidate.push(jumpStartIndex - lines.length)
+			pushValidationIndex(jumpStartIndex - lines.length)
 		}
 
 		let delta = new Delta()
@@ -614,7 +632,7 @@ export function shiftLines(editor: MarkdownEditor, event: Event, lines: Line[], 
 		// Ensure any ordered list being left behind is updated
 		const postShiftLineIndex = doc.lines.indexOf(lines.at(-1)) + 1
 		if (postShiftLineIndex < doc.lines.length && doc.lines[postShiftLineIndex].attributes.list) {
-			listLinesToValidate.push(postShiftLineIndex)
+			pushValidationIndex(postShiftLineIndex)
 		}
 
 		const jumpStartLine = doc.lines[jumpStartIndex]
@@ -636,17 +654,22 @@ export function shiftLines(editor: MarkdownEditor, event: Event, lines: Line[], 
 			]).apply()
 	}
 
+	let textChange: TextChange = null
+
 	for (const index of listLinesToValidate) {
 		let targetLine = editor.doc.lines[index]
 
-		verifyListContext({
+		textChange = verifyListContext({
 			id: targetLine.id,
 			editor: editor,
 			basis: 'rebasis',
 			normalizeUnorderedGlyphs: false,
-			targetIndent: targetLine.attributes.indent?.indent ?? ''
-		})?.apply()
+			targetIndent: targetLine.attributes.indent?.indent ?? '',
+			autoSetChildGlyphs: false
+		}, textChange)
 	}
+
+	textChange?.apply()
 }
 
 export function shiftGroup(editor: MarkdownEditor, selection: EditorRange, event: Event, mode: 'lines'|'section', direction: -1 | 1) {
@@ -727,6 +750,7 @@ interface VerifyListOptions {
 	basis: 'self' | 'rebasis'
 	// Whether to enforce that unordered glyphs are the same
 	normalizeUnorderedGlyphs: boolean
+	autoSetChildGlyphs?: boolean
 }
 
 export function verifyListContext(
@@ -783,7 +807,7 @@ export function verifyListContext(
 				break
 			}
 			else if (indent.length < intendedIndent.length) {
-				if (lineIndex === targetLineIndex - 1 && (editor.workspace?.settings.autoSetChildListGlyphs.value ?? true)) {
+				if (lineIndex === targetLineIndex - 1 && (options.autoSetChildGlyphs ?? editor.workspace?.settings.autoSetChildListGlyphs.value ?? true)) {
 					const listData = prevLine.attributes.list as ListDefinition
 					if (listData) {
 						const { form, glyph, basis } = getAutoChild(listData)
