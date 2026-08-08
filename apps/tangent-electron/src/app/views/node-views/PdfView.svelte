@@ -7,7 +7,7 @@ import WorkspaceFileHeader from 'app/utils/WorkspaceFileHeader.svelte'
 import * as pdfjs from 'pdfjs-dist'
 import * as pdfviewer from 'pdfjs-dist/web/pdf_viewer.mjs'
 import { resizeObserver } from 'app/utils/resizeObserver'
-import { scrollTo } from 'app/utils'
+import { scrollTo, startDrag } from 'app/utils'
 import { smoothScrollTime } from 'app/utils/style'
 
 const workspace = getContext('workspace') as Workspace
@@ -57,26 +57,37 @@ function onWheel(event: WheelEvent) {
 	}
 }
 
-$: isPanning = false
+let canPan = false
+let isPanning = false
 
-function onMouseMove(event: MouseEvent) {
-	if (isPanning){
+function onMouseDown(event: MouseEvent) {
+	if (canPan && event.button == 0) {
+		isPanning = true
 		event.preventDefault()
-		container.scrollLeft -= event.movementX * (1 / $zoom)
-		container.scrollTop -= event.movementY * (1 / $zoom)
+		startDrag({
+			move: (event: PointerEvent) => {
+				event.preventDefault()
+				container.scrollLeft -= event.movementX * (1 / $zoom)
+				container.scrollTop -= event.movementY * (1 / $zoom)
+			},
+			end: (event: PointerEvent) => {
+				event.preventDefault()
+				isPanning = false
+			}
+		})
 	}
 }
 
 function onKeyDown(event: KeyboardEvent) {
 	if (event.key == " "){
 		event.preventDefault()
-		isPanning = true
+		canPan = true
 	}
 }
 function onKeyUp(event: KeyboardEvent) {
 	if (event.key == " "){
 		event.preventDefault()
-		isPanning = false
+		canPan = false
 	}
 }
 
@@ -205,10 +216,13 @@ function onClick(event: MouseEvent) {
 	/>
 
 	<article use:resizeObserver={onResize}>
-		<div class="container pdfViewer" bind:this={container}>
+		<div class={["container pdfViewer", { canPan, 'panning': isPanning }]} bind:this={container}>
 			<!-- svelte-ignore a11y-click-events-have-key-events -->
 			<!-- svelte-ignore a11y-no-static-element-interactions -->
-			<div bind:this={viewerElement} class={{ 'panning': isPanning }} on:mousemove={onMouseMove} on:click={onClick}></div>
+			<div bind:this={viewerElement}
+				on:mousedown={onMouseDown}
+				on:click={onClick}
+			></div>
 		</div>
 	</article>
 
@@ -250,8 +264,18 @@ article {
 		-webkit-user-select: text;
 		user-select: text;
 
-		.panning {
+		&.canPan, &.panning {
+			:global(.page) {
+				// Defeat the cursor customizations of the text preview layer
+				pointer-events: none;
+			}
+		}
+
+		&.canPan {
 			cursor: grab;
+		}
+		&.panning {
+			cursor: grabbing;
 		}
 	}
 }
