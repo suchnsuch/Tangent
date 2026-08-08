@@ -48,8 +48,35 @@ function onWheel(event: WheelEvent) {
 	}
 	else {
 		event.preventDefault()
-		container.scrollLeft += event.deltaX * (1 / $zoom)
-		container.scrollTop += event.deltaY * (1 / $zoom)
+		const dx = event.deltaX * (1 / $zoom)
+		const dy = event.deltaY * (1 / $zoom)
+
+		// shift key changes direction of scroll
+		container.scrollLeft += event.shiftKey ? dy : dx 
+		container.scrollTop += event.shiftKey ? dx : dy
+	}
+}
+
+$: isPanning = false
+
+function onMouseMove(event: MouseEvent) {
+	if (isPanning){
+		event.preventDefault()
+		container.scrollLeft -= event.movementX * (1 / $zoom)
+		container.scrollTop -= event.movementY * (1 / $zoom)
+	}
+}
+
+function onKeyDown(event: KeyboardEvent) {
+	if (event.key == " "){
+		event.preventDefault()
+		isPanning = true
+	}
+}
+function onKeyUp(event: KeyboardEvent) {
+	if (event.key == " "){
+		event.preventDefault()
+		isPanning = false
 	}
 }
 
@@ -162,12 +189,15 @@ function onClick(event: MouseEvent) {
 
 </script>
 
+<!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
 <main
 	class:layout-fill={layout === 'fill'}
 	style:--noteWidthMax={$maxWidth + 'px'}
 	style:padding-top={extraTop + 'px'}
 	style:padding-bottom={extraBottom + 'px'}
 	on:wheel={onWheel}
+	on:keydown={onKeyDown}
+	on:keyup={onKeyUp}
 >
 	<WorkspaceFileHeader
 		node={state.file}
@@ -178,7 +208,7 @@ function onClick(event: MouseEvent) {
 		<div class="container pdfViewer" bind:this={container}>
 			<!-- svelte-ignore a11y-click-events-have-key-events -->
 			<!-- svelte-ignore a11y-no-static-element-interactions -->
-			<div bind:this={viewerElement} on:click={onClick}></div>
+			<div bind:this={viewerElement} class={{ 'panning': isPanning }} on:mousemove={onMouseMove} on:click={onClick}></div>
 		</div>
 	</article>
 
@@ -219,6 +249,10 @@ article {
 
 		-webkit-user-select: text;
 		user-select: text;
+
+		.panning {
+			cursor: grab;
+		}
 	}
 }
 
