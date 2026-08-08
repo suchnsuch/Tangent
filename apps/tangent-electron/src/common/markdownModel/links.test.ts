@@ -370,6 +370,14 @@ describe('Content ID Matching', () => {
 		expect('My Long Header'.match(createContentIdMatcher('my-long_header'))).toBeTruthy()
 	})
 
+	it('Ignores padding around wiki link header ids and headings', () => {
+		const link = matchWikiLink('[[note#My Header | label]]')
+		const matcher = createContentIdMatcher(link.content_id)
+
+		expect('My Header'.match(matcher)).toBeTruthy()
+		expect(' My Header '.match(matcher)).toBeTruthy()
+	})
+
 	it('Only hits entire names', () => {
 		expect('My Header'.match(createContentIdMatcher('My'))).toBeFalsy()
 		expect('My'.match(createContentIdMatcher('My-header'))).toBeFalsy()
