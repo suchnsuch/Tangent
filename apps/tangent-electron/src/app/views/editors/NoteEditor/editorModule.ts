@@ -263,8 +263,7 @@ export default function editorModule(editor: Editor, options: {
 					editor: markdownEditor,
 					targetIndent: newIndent,
 					basis: (isGlyphCreator && newList) ? 'self' : 'rebasis',
-					normalizeUnorderedGlyphs: true,
-					autoSetChildGlyphs: workspace?.settings.autoSetChildListGlyphs.value
+					normalizeUnorderedGlyphs: true
 				}
 			})
 			pushVerification({
@@ -274,8 +273,7 @@ export default function editorModule(editor: Editor, options: {
 					editor: markdownEditor,
 					targetIndent: oldIndent,
 					basis: 'rebasis',
-					normalizeUnorderedGlyphs: true,
-					autoSetChildGlyphs: workspace?.settings.autoSetChildListGlyphs.value
+					normalizeUnorderedGlyphs: true
 				}
 			})
 		} 
@@ -291,8 +289,7 @@ export default function editorModule(editor: Editor, options: {
 							editor: markdownEditor,
 							targetIndent: oldIndent,
 							basis: 'self',
-							normalizeUnorderedGlyphs: true,
-							autoSetChildGlyphs: workspace?.settings.autoSetChildListGlyphs.value
+							normalizeUnorderedGlyphs: true
 						}
 					})
 				}
@@ -307,8 +304,7 @@ export default function editorModule(editor: Editor, options: {
 					editor: markdownEditor,
 					targetIndent: oldIndent,
 					basis: 'rebasis',
-					normalizeUnorderedGlyphs: isListGlyphCreationChange(delta) !== '\n',
-					autoSetChildGlyphs: workspace?.settings.autoSetChildListGlyphs.value
+					normalizeUnorderedGlyphs: isListGlyphCreationChange(delta) !== '\n'
 				}
 			})
 		}
@@ -325,8 +321,7 @@ export default function editorModule(editor: Editor, options: {
 						editor: markdownEditor,
 						targetIndent: newIndent,
 						basis: isGlyphCreator ? 'self' : 'rebasis',
-						normalizeUnorderedGlyphs: true,
-						autoSetChildGlyphs: workspace?.settings.autoSetChildListGlyphs.value
+						normalizeUnorderedGlyphs: true
 					}
 				})
 			}

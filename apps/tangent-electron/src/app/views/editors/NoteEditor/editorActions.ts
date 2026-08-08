@@ -549,6 +549,16 @@ export function shiftLines(editor: MarkdownEditor, event: Event, lines: Line[], 
 		doc.getLineRange(lastLine)[1]
 	]
 
+	let listLinesToValidate: number[] = []
+
+	let originalShiftingFirstLineIndex = doc.lines.indexOf(lines[0])
+
+	for (let i = 0; i < lines.length; i++) {
+		if (lines[i].attributes.list) {
+			listLinesToValidate.push(originalShiftingFirstLineIndex + i + shift)
+		}
+	}
+
 	// This operation uses raw Delta as the TextChange object was doing some really strange things.
 	// Much easier to just place out exactly what I want to happen
 
@@ -576,6 +586,10 @@ export function shiftLines(editor: MarkdownEditor, event: Event, lines: Line[], 
 		const insertionPoint = doc.getLineRange(jumpEndLine)[1]
 		const jumpLength = insertionPoint - doc.getLineRange(jumpStartLine)[0]
 
+		if (jumpStartLine.attributes.list) {
+			listLinesToValidate.push(jumpStartIndex - lines.length)
+		}
+
 		let delta = new Delta()
 			.retain(movingRange[0])		// Everything prior
 			.delete(movingRangeSize)	// Where the content was
@@ -597,6 +611,12 @@ export function shiftLines(editor: MarkdownEditor, event: Event, lines: Line[], 
 		const jumpEndIndex = firstIndex - 1
 		if (jumpStartIndex < 0) return
 
+		// Ensure any ordered list being left behind is updated
+		const postShiftLineIndex = doc.lines.indexOf(lines.at(-1)) + 1
+		if (postShiftLineIndex < doc.lines.length && doc.lines[postShiftLineIndex].attributes.list) {
+			listLinesToValidate.push(postShiftLineIndex)
+		}
+
 		const jumpStartLine = doc.lines[jumpStartIndex]
 		const jumpEndLine = doc.lines[jumpEndIndex]
 		const insertionStart = doc.getLineRange(jumpStartLine)[0]
@@ -614,6 +634,18 @@ export function shiftLines(editor: MarkdownEditor, event: Event, lines: Line[], 
 				insertionStart + (at - movingRange[0]),
 				insertionStart + (to - movingRange[0])
 			]).apply()
+	}
+
+	for (const index of listLinesToValidate) {
+		let targetLine = editor.doc.lines[index]
+
+		verifyListContext({
+			id: targetLine.id,
+			editor: editor,
+			basis: 'rebasis',
+			normalizeUnorderedGlyphs: false,
+			targetIndent: targetLine.attributes.indent?.indent ?? ''
+		})?.apply()
 	}
 }
 
@@ -695,7 +727,6 @@ interface VerifyListOptions {
 	basis: 'self' | 'rebasis'
 	// Whether to enforce that unordered glyphs are the same
 	normalizeUnorderedGlyphs: boolean
-	autoSetChildGlyphs: boolean
 }
 
 export function verifyListContext(
@@ -752,7 +783,7 @@ export function verifyListContext(
 				break
 			}
 			else if (indent.length < intendedIndent.length) {
-				if (lineIndex === targetLineIndex - 1 && (options.autoSetChildGlyphs ?? true)) {
+				if (lineIndex === targetLineIndex - 1 && (editor.workspace?.settings.autoSetChildListGlyphs.value ?? true)) {
 					const listData = prevLine.attributes.list as ListDefinition
 					if (listData) {
 						const { form, glyph, basis } = getAutoChild(listData)
