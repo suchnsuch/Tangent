@@ -38,7 +38,7 @@ export function safeHeaderLine(text: string) {
 	text = text.replace(/[^\w\d-_ &%$!]+/g, '')
 
 	// Condense spaces
-	return text.replace(/ +/g, ' ')
+	return text.replace(/ +/g, ' ').trim()
 }
 
 export function parseHeader(char: string, parser: NoteParser): boolean {
