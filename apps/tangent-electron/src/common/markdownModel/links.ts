@@ -344,15 +344,16 @@ export function resolveLink(store: DefaultIndexStore, link: HrefFormedLink): Tre
 }
 
 export function createContentIdMatcher(contentId: string): RegExp {
-	if (!contentId) return null
-	if (contentId[0] === '^') {
+	const normalizedContentId = contentId?.trim()
+	if (!normalizedContentId) return null
+	if (normalizedContentId[0] === '^') {
 		// ID matches (technically not supported yet)
-		return new RegExp('\^' + contentId.substring(1), 'i')
+		return new RegExp('\^' + normalizedContentId.substring(1), 'i')
 	}
 
 	// Header matches
 	// We want "space-likes" to all be treated the same for cross-compatability & consistency
-	const segments = contentId.split(/[-_ ]+|%20/)
+	const segments = normalizedContentId.split(/[-_ ]+|%20/)
 	return new RegExp('^' + segments.join('([-_ ]|%20)') + '$', 'i')
 }
 

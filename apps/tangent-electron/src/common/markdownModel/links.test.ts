@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 
 import { StructureType } from 'common/indexing/indexTypes'
 import { createContentIdMatcher, matchMarkdownLink, matchWikiLink } from './links'
+import { safeHeaderLine } from './header'
 
 describe('Wiki Links', () => {
 	it('Should work for the basics', () => {
@@ -370,8 +371,16 @@ describe('Content ID Matching', () => {
 		expect('My Long Header'.match(createContentIdMatcher('my-long_header'))).toBeTruthy()
 	})
 
+	it('Trims padded wiki link header ids before matching safe header lines', () => {
+		const link = matchWikiLink('[[note#My Header | label]]')
+		const matcher = createContentIdMatcher(link.content_id)
+
+		expect(safeHeaderLine('## My Header').match(matcher)).toBeTruthy()
+	})
+
 	it('Only hits entire names', () => {
 		expect('My Header'.match(createContentIdMatcher('My'))).toBeFalsy()
 		expect('My'.match(createContentIdMatcher('My-header'))).toBeFalsy()
+		expect(' My Header '.match(createContentIdMatcher('My Header'))).toBeFalsy()
 	})
 })
