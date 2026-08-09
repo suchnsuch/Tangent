@@ -371,9 +371,9 @@ describe('Content ID Matching', () => {
 		expect('My Long Header'.match(createContentIdMatcher('my-long_header'))).toBeTruthy()
 	})
 
-	it('Matches padded wiki link header ids after header normalization', () => {
+	it('Trims padded wiki link header ids before matching safe header lines', () => {
 		const link = matchWikiLink('[[note#My Header | label]]')
-		const matcher = createContentIdMatcher(safeHeaderLine(link.content_id))
+		const matcher = createContentIdMatcher(link.content_id)
 
 		expect(safeHeaderLine('## My Header').match(matcher)).toBeTruthy()
 	})

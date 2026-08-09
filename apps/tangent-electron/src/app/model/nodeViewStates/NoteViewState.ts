@@ -270,10 +270,7 @@ export default class NoteViewState implements NodeViewState, LensViewState {
 			annotation.end = link.end
 		}
 		else if (link.content_id) {
-			const contentId = link.content_id[0] === '^'
-				? link.content_id
-				: safeHeaderLine(link.content_id)
-			const idMatch = createContentIdMatcher(contentId)
+			const idMatch = createContentIdMatcher(link.content_id)
 			if (idMatch) {
 				// Look for headers
 				let start = 0
