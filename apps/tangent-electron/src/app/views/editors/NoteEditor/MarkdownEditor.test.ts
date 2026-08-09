@@ -457,6 +457,7 @@ describe('List Handling', () => {
 			editor.doc = markdownToTextDocument(`
 1. Some line
 2. Some other line
+3. And another
 3. One more`)
 			editor.select(22)
 			
@@ -465,7 +466,8 @@ describe('List Handling', () => {
 			expect(editor.getText()).toEqual(`
 1. Some other line
 2. Some line
-3. One more`)
+3. And another
+4. One more`)
 		})
 
 		it('Should reorder numbered lists that are shifted down', async () => {

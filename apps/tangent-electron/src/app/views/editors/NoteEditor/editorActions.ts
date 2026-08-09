@@ -654,10 +654,14 @@ export function shiftLines(editor: MarkdownEditor, event: Event, lines: Line[], 
 			]).apply()
 	}
 
+	// Always start from the top
+	listLinesToValidate.sort((a, b) => a - b)
 	let textChange: TextChange = null
+	for (let i = 0; i < listLinesToValidate.length; i++) {
+		const targetIndex = listLinesToValidate[i]
+		const targetLine = editor.doc.lines[targetIndex]
 
-	for (const index of listLinesToValidate) {
-		let targetLine = editor.doc.lines[index]
+		let outTouchedLineIndices: number[] = []
 
 		textChange = verifyListContext({
 			id: targetLine.id,
@@ -665,8 +669,19 @@ export function shiftLines(editor: MarkdownEditor, event: Event, lines: Line[], 
 			basis: 'rebasis',
 			normalizeUnorderedGlyphs: false,
 			targetIndent: targetLine.attributes.indent?.indent ?? '',
-			autoSetChildGlyphs: false
+			autoSetChildGlyphs: false,
+
+			outTouchedLineIndices
 		}, textChange)
+
+		// Don't process the same line twice
+		for (const touchedIndex of outTouchedLineIndices) {
+			if (touchedIndex === targetIndex) continue
+			const pendingIndex = listLinesToValidate.indexOf(touchedIndex)
+			if (pendingIndex >= 0) {
+				listLinesToValidate.splice(pendingIndex, 1)
+			}
+		}
 	}
 
 	textChange?.apply()
@@ -751,6 +766,9 @@ interface VerifyListOptions {
 	// Whether to enforce that unordered glyphs are the same
 	normalizeUnorderedGlyphs: boolean
 	autoSetChildGlyphs?: boolean
+
+	// When present, the line indices touched by this operation are added to this list
+	outTouchedLineIndices?: number[]
 }
 
 export function verifyListContext(
@@ -924,6 +942,10 @@ export function verifyListContext(
 	if (targetListData && targetIndent === intendedIndent) {
 		enforceGlyphOnLine(targetListData, targetRange[0], lineText)
 		if (basisNumber) basisNumber++
+		
+		if (options.outTouchedLineIndices) {
+			options.outTouchedLineIndices.push(targetLineIndex)
+		}
 	}
 
 	// Propagate the target form & basis all following list lines on the indent level
@@ -938,6 +960,10 @@ export function verifyListContext(
 			const lineRange = doc.getLineRange(nextLine)
 			enforceGlyphOnLine(listData, lineRange[0], nextText)
 			if (basisNumber) basisNumber++
+
+			if (options.outTouchedLineIndices) {
+				options.outTouchedLineIndices.push(lineIndex)
+			}
 		}
 		else if (indent.length < intendedIndent.length) {
 			// We've reached the end of the current indentation.
