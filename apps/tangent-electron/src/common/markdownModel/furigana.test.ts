@@ -1,7 +1,10 @@
 import { describe, expect, test } from 'vitest'
+import type { AttributeMap } from '@typewriter/document'
+import type { FormatType } from 'typewriter-editor/typesetting'
 import { typewriterToText } from 'common/typewriterUtils'
 import { markdownToTextDocument, parseMarkdown } from './parser'
 import { scanFuriganaSpan } from './furigana'
+import noteTypeset from './typewriterTypes'
 
 describe('scanFuriganaSpan', () => {
 	test.each([
@@ -160,5 +163,50 @@ describe('furigana markdown parsing', () => {
 
 		const fenced = parseMarkdown('```\n{ fenced | inactive }\n```').lines[1]
 		expect(fenced.content.ops.some(op => op.attributes?.furigana)).toBe(false)
+	})
+})
+
+describe('furigana rendering', () => {
+	const furiganaFormat = noteTypeset.formats.find(
+		(format): format is FormatType => typeof format !== 'string' && format.name === 'furigana'
+	)
+	if (!furiganaFormat) {
+		throw new Error('Furigana format is not registered')
+	}
+
+	function render(attributes: AttributeMap) {
+		return furiganaFormat.render(attributes, ['source'], null, null) as any
+	}
+
+	test('renders a t-furigana element carrying base/reading', () => {
+		const rendered = render({ furigana: { base: '漢字', reading: 'かんじ' } })
+
+		expect(rendered.children[1]).toMatchObject({
+			type: 't-furigana',
+			props: {
+				base: '漢字',
+				reading: 'かんじ'
+			}
+		})
+	})
+
+	test('reveal state marks the source span and leaves the output alone', () => {
+		const furigana = { base: '字', reading: 'じ' }
+		const revealed = render({ furigana, revealed: true })
+		const hidden = render({ furigana })
+
+		expect(revealed.props.className).toContain('revealed')
+		expect(revealed.children[0].props.className).toContain('revealed')
+		expect(hidden.props.className).not.toContain('revealed')
+		expect(revealed.children[1]).toEqual(hidden.children[1])
+	})
+
+	test('focus decoration is carried onto the t-furigana element', () => {
+		const rendered = render({
+			furigana: { base: '字', reading: 'じ' },
+			decoration: { focus: { class: 'unfocused' } }
+		})
+
+		expect(rendered.children[1].props.className).toBe('unfocused')
 	})
 })

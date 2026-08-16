@@ -17,7 +17,7 @@ function render(delta: Delta) {
 	return root
 }
 
-describe('renderInline: adjacent inline math', () => {
+describe('renderInline: adjacent hidden-group embeds', () => {
 	test('Distinct instances with the same source render as two containers', () => {
 		const root = render(new Delta([
 			{ insert: '$a$', attributes: { math: { source: 'a' }, hiddenGroup: '0-3' } },
@@ -26,6 +26,16 @@ describe('renderInline: adjacent inline math', () => {
 
 		const containers = root.querySelectorAll('.inline-math-container')
 		expect([...containers].map(c => c.getAttribute('data-hidden-group'))).toEqual(['0-3', '3-6'])
+	})
+
+	test('Distinct furigana instances with the same content render as two containers', () => {
+		const editor = getEditor()
+		const delta = new Delta([
+			{ insert: '{a|b}', attributes: { furigana: { base: 'a', reading: 'b', instance: '0-5' }, hiddenGroup: true } },
+			{ insert: '{a|b}', attributes: { furigana: { base: 'a', reading: 'b', instance: '5-10' }, hiddenGroup: true } }
+		])
+
+		expect(render(delta).querySelectorAll('.inline-furigana-container')).toHaveLength(2)
 	})
 })
 

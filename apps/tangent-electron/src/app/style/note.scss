@@ -537,19 +537,32 @@ article.note {
 		}
 	}
 
-	.inline-math-container.revealed {
+	// Shared reveal styling for hidden-group inline embeds (see
+	// hiddenGroupEmbed.ts's `${name}-source` / `inline-${name}-container`
+	// naming convention); outline-offset stays per-format since math and
+	// furigana's output shapes sit differently against the outline.
+	.inline-math-container.revealed,
+	.inline-furigana-container.revealed {
 		outline: 2px solid var(--textColor);
-		outline-offset: 4px;
 		border-radius: var(--inputBorderRadius);
 	}
 
-	span.math-source {
+	.inline-math-container.revealed {
+		outline-offset: 4px;
+	}
+
+	.inline-furigana-container.revealed {
+		outline-offset: 3px;
+	}
+
+	span.math-source,
+	span.furigana-source {
 		font-family: var(--codeFontFamily);
 		color: var(--accentTextColor);
+	}
 
-		&.revealed {
-			padding-right: .5em;
-		}
+	span.math-source.revealed {
+		padding-right: .5em;
 	}
 
 	.mathLine {

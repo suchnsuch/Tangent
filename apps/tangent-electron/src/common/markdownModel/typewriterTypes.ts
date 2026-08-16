@@ -6,6 +6,7 @@ import { isLargeList, type ListDefinition } from './list'
 import type { TagSectionData } from './tag'
 import type { CodeData } from './code'
 import type { MathData } from './math'
+import type { FuriganaData } from './furigana'
 import { hiddenGroupEmbedFormat } from './hiddenGroupEmbed'
 import { hasCollapsedChildren, isCollapsed } from './sections'
 import { getMediaCustomizationsFromText, type LinkAttribute } from './links'
@@ -763,6 +764,20 @@ const noteTypeset:TypesetTypes = {
 				}
 
 				return h('t-math', tMathAttr, [])
+			}
+		}),
+
+		hiddenGroupEmbedFormat<FuriganaData>({
+			name: 'furigana',
+			renderOutput: (furigana, revealed, attributes) => {
+				const tFuriganaAttr = { base: furigana.base, reading: furigana.reading, instance: furigana.instance } as any
+
+				if (attributes.decoration?.focus) {
+					// Inject the focus decoration onto the shadow root, as math does.
+					tFuriganaAttr.className = attributes.decoration.focus.class
+				}
+
+				return h('t-furigana', tFuriganaAttr, [])
 			}
 		}),
 
