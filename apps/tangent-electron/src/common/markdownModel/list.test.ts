@@ -61,6 +61,11 @@ describe('Match List', () => {
 	})
 
 	it('Can find standard unicode bullets', () => {
+		expect(matchList('\u00b7 Hello')).toEqual<ListDefinition>({
+			indent: '',
+			form: ListForm.Unordered,
+			glyph: '\u00b7'
+		})
 		expect(matchList('\t\u2023 Hello')).toEqual<ListDefinition>({
 			indent: '\t',
 			form: ListForm.Unordered,
