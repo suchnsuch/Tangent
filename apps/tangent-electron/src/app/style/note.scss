@@ -617,6 +617,10 @@ article.note {
 		&.purple {
 			background-color: var(--highlightPurpleBGColor);
 		}
+
+		&.gray {
+			background-color: var(--highlightGrayBGColor);
+		}
 	}
 
 	.comment:not(.token) {

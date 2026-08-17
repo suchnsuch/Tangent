@@ -75,6 +75,7 @@
 	--highlightGreenBGColor: #94eb75;
 	--highlightBlueBGColor: #a3d2fc;
 	--highlightPurpleBGColor: #e7aaff;
+	--highlightGrayBGColor: #b7b7b7;
 	--highlightTextColor: var(--textColor);
 
 	--highlightBackgroundColor: var(--highlightYellowBGColor);
