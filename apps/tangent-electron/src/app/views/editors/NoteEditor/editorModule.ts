@@ -981,6 +981,7 @@ export default function editorModule(editor: Editor, options: {
 			label: `${marker} ${color} ${kind}`,
 			tooltip: 'colorful hightlight',
 			formattingCharacters: () => marker,
+			attributePredicate: attr => attr?.inline_code
 		})
 
 		menu.push({
