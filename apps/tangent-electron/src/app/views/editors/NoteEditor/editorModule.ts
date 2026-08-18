@@ -37,6 +37,7 @@ import type MarkdownEditor from './MarkdownEditor'
 import { appendContextTemplate, type ContextMenuConstructorOptions } from 'app/model/menus'
 import { eventHasSelectionRequest } from 'app/events'
 import { createCommandHandler } from 'app/model/commands/Command'
+import { InlineFormatCommand } from 'app/model/commands/NoteFormattingCommands'
 
 function clampRange(range: EditorRange, clampingRange: EditorRange): EditorRange {
 	range = normalizeRange(range)
@@ -964,7 +965,6 @@ export default function editorModule(editor: Editor, options: {
 			submenu: [
 				{ command: cmds.toggleBold, commandContext },
 				{ command: cmds.toggleItalics, commandContext },
-				{ command: cmds.toggleHighlight, commandContext },
 				{ command: cmds.toggleInlineCode, commandContext },
 				{ type: 'separator' },
 				{ command: cmds.setParagraph, commandContext },
@@ -974,6 +974,35 @@ export default function editorModule(editor: Editor, options: {
 				{ command: cmds.setHeader4, commandContext },
 				{ command: cmds.setHeader5, commandContext },
 				{ command: cmds.setHeader6, commandContext }
+			]
+		})
+
+		const hightlighter = (marker, color, kind) => new InlineFormatCommand(workspace, {
+			label: `${marker} ${color} ${kind}`,
+			tooltip: 'colorful hightlight',
+			formattingCharacters: () => marker,
+		})
+
+		menu.push({
+			label: 'Highlights',
+			submenu: [
+				{ command: cmds.toggleHighlight, commandContext },
+				{ type: 'separator' },
+				{ command: hightlighter('🔴', 'red', 'rounded'), commandContext },
+				{ command: hightlighter('🟡', 'yellow', 'rounded'), commandContext },
+				{ command: hightlighter('🔵', 'blue', 'rounded'), commandContext },
+				{ command: hightlighter('🟢', 'green', 'rounded'), commandContext },
+				{ command: hightlighter('🟣', 'purple', 'rounded'), commandContext },
+				{ command: hightlighter('🟠', 'orange', 'rounded'), commandContext },
+				{ command: hightlighter('⚪', 'gray', 'rounded'), commandContext },
+				{ type: 'separator' },
+				{ command: hightlighter('🟥', 'red', 'square'), commandContext },
+				{ command: hightlighter('🟨', 'yellow', 'square'), commandContext },
+				{ command: hightlighter('🟦', 'blue', 'square'), commandContext },
+				{ command: hightlighter('🟩', 'green', 'square'), commandContext },
+				{ command: hightlighter('🟪', 'purple', 'square'), commandContext },
+				{ command: hightlighter('🟧', 'orange', 'square'), commandContext },
+				{ command: hightlighter('⬜', 'gray', 'square'), commandContext },
 			]
 		}),
 
