@@ -87,6 +87,25 @@
   <update_contact>k8ie_AT_mcld.eu</update_contact>
 
   <releases>
+    <release version="0.12.8" date="2026-08-21">
+      <description>
+        <ul>
+          <li>Fixed an issue that caused errors in Mermaid Diagrams to add elements in the background, eventually breaking layout.</li>
+          <li>Fixed an issue where headers with adjacent space-like elements (e.g. My - Header) would not be matched properly.</li>
+          <li>Fixed an issue where the images of website previews were not horizontally centered.</li>
+        </ul>
+      </description>
+    </release>
+    <release version="0.12.7" date="2026-08-18">
+      <description>
+        <ul>
+          <li>Added "Open to the Right/Left/Replace" options to the context menu of files and folders in the sidebar.</li>
+          <li>Changed the "trash items on delete" default to false on Linux. This caused friction for many.</li>
+          <li>Added gray emoji-based highlight options.</li>
+          <li>Changed the configuration of "safe header" names to be much more lenient, allowing for non-latin headers.</li>
+        </ul>
+      </description>
+    </release>
     <release version="0.12.6" date="2026-08-11">
       <description>
         <ul>
