@@ -371,6 +371,12 @@ describe('Content ID Matching', () => {
 		expect('My Long Header'.match(createContentIdMatcher('my-long_header'))).toBeTruthy()
 	})
 
+	it('Can match to adjacent space-like items', () => {
+		expect('My - Separated Header'.match(createContentIdMatcher('My - Separated Header'))).toBeTruthy()
+		expect('My - Separated Header'.match(createContentIdMatcher('My-Separated-Header'))).toBeTruthy()
+		expect('My - Separated Header'.match(createContentIdMatcher('my_separated_header'))).toBeTruthy()
+	})
+
 	it('Trims padded wiki link header ids before matching safe header lines', () => {
 		const link = matchWikiLink('[[note#My Header | label]]')
 		const matcher = createContentIdMatcher(link.content_id)

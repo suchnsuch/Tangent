@@ -354,7 +354,7 @@ export function createContentIdMatcher(contentId: string): RegExp {
 	// Header matches
 	// We want "space-likes" to all be treated the same for cross-compatability & consistency
 	const segments = normalizedContentId.split(/[-_ ]+|%20/)
-	return new RegExp('^' + segments.join('([-_ ]|%20)') + '$', 'i')
+	return new RegExp('^' + segments.join('([-_ ]|%20)+') + '$', 'i')
 }
 
 export function linkTextFromLink(link: HrefFormedLink): string {
