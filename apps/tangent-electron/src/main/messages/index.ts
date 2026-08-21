@@ -4,9 +4,10 @@ import { load } from 'cheerio'
 import { app, BrowserWindow, clipboard, dialog, ipcMain, nativeImage, shell } from 'electron'
 import { getDocumentationPath } from 'main/documentation'
 import { getWindowHandle, getWorkspace, validateWorkspaceForHandleFilepath, hasStartedWorkspaceShutdown, workspaceMap } from 'main/workspaces'
+import { spawn } from 'child_process'
 
 import fetch from 'node-fetch'
-import type { SelectPathOptions } from 'common/WindowApi'
+import type { CliResult, SelectPathOptions } from 'common/WindowApi'
 
 import fontList from 'font-list'
 
@@ -19,7 +20,75 @@ import './themes'
 import './urlData'
 import { FileSaveResult } from 'main/File'
 
+import { Shescape } from "shescape"
+
+
 const log = Logger.get('messages')
+
+
+ipcMain.handle('execCLI', async (event, commandTemplate: string, context: {[key: string]: string}) => {
+	const shellEscaper = new Shescape({flagProtection: true})
+	const commandText = commandTemplate.replace(/%([^%]*?)%/g, (match, expr) => shellEscaper.escape(context[expr]))
+
+	const windowHandle = getWindowHandle(event.sender)
+	
+	return new Promise((resolve) => {
+		log.info("Executing CLI command: ", commandText)
+		
+		const child = spawn(commandText, { 
+			stdio: 'pipe',
+			shell: true
+		})
+		
+		const processTimeoutSec = 10
+        let timedOut = false
+        let stdout = ''
+        let stderr = ''
+		
+        const timer = setTimeout(() => {
+            timedOut = true
+            log.info(`Command execution is taking too long (>${processTimeoutSec}s).`)
+			windowHandle.postUserMessage('warning', `Command execution is taking too long (>${processTimeoutSec}s).`)
+        }, processTimeoutSec * 1000)
+
+        child.stdout.on('data', (data) => {
+            stdout += data.toString()
+        })
+
+        child.stderr.on('data', (data) => {
+            stderr += data.toString()
+        })
+
+        child.on('close', (code) => {
+            clearTimeout(timer)
+            const result = {
+				stdout: stdout,
+                stderr: stderr,
+                exitCode: code
+            }
+			
+			windowHandle.postUserMessage(
+				code === 0 ? 'info' : 'warning', 
+				code === 0 ? 'Command Completed' : 'Command Failed',
+				code === 0 ? '' : '')
+			
+			log.info(`Process exited with code ${code}`, result)
+            resolve(result)
+        })
+		
+        child.on('error', (err) => {
+			clearTimeout(timer)
+            const result = {
+				stdout: stdout,
+                stderr: err.message,
+                exitCode: 1
+            }
+			windowHandle.postUserMessage('error', 'Command Failed', stderr)
+			log.error(`Process error: ${err.message}`, result)
+            resolve(result)
+        })
+    })
+})
 
 ipcMain.handle('getKnownWorkspaces', async (event) => {
 

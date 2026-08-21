@@ -3,6 +3,7 @@ import { makeRegexPathAgnostic } from '../paths'
 import CreationRule from '../settings/CreationRule'
 import type { DataType } from '.'
 import type { TreeNode, DirectoryStore } from 'common/trees'
+import ExternalCommand from 'common/settings/ExternalCommand'
 
 class CreationRuleList extends PatchableList<CreationRule, any> {
 
@@ -17,6 +18,19 @@ class CreationRuleList extends PatchableList<CreationRule, any> {
 	}
 }
 
+class ExternalCommandList extends PatchableList<ExternalCommand, any> {
+
+	constructor() {
+		super([], {
+			patchItems: true
+		})
+	}
+
+	protected convertFromPatchItem(patchItem: any) {
+		return new ExternalCommand(patchItem)
+	}
+}
+
 const pathMatcher = makeRegexPathAgnostic(/\.tangent\/workspace-settings\.json$/)
 
 export default class WorkspaceSettings extends ObjectStore {
@@ -26,6 +40,7 @@ export default class WorkspaceSettings extends ObjectStore {
 	version = new WritableStore(WorkspaceSettings.LATEST_VERSION)
 
 	creationRules = new CreationRuleList()
+	externalCommands = new ExternalCommandList()
 
 	styleFiles = new RawPatchableList<string>()
 

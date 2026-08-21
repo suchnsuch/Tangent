@@ -41,6 +41,7 @@
     "email": "taylorhadden@icloud.com"
   },
   "dependencies": {
+    "@ericcornelissen/lregexp": "^1.0.13",
     "@such-n-such/tangent-query-parser": "^0.1.0",
     "@typewriter/delta": "^1.0.2",
     "@typewriter/document": "^0.9.4",
@@ -58,6 +59,7 @@
     "node-fetch": "^3.3.0",
     "prismjs": "^1.24.1",
     "semver": "^7.3.7",
+    "shescape": "^2.1.13",
     "source-map-support": "^0.5.19",
     "svelte": "^5.46.1",
     "typewriter-editor": "file:../../lib/typewriter",

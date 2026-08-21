@@ -23,6 +23,12 @@ export interface UserMessage {
 	message: string
 }
 
+export interface CliResult {
+	stdout: string,
+	stderr: string,
+	exitCode: number
+}
+
 type SelectPathResult<T extends SelectPathOptions> = T extends { selectMultiple: true } ? string[] : string
 
 export default interface WindowAPI {
@@ -105,6 +111,10 @@ export default interface WindowAPI {
 		/** Open a path in the default format */
 		openPath(path: string)
 	}
+
+	os: {
+		execCLI(commandTemplate: string, context: {[key: string]: string}): Promise<CliResult>
+	},
 
 	edit: {
 		nativeAction(action: 'cut' | 'copy' | 'paste' | 'pasteAndMatchStyle' | 'selectAll' | 'undo' | 'redo')
