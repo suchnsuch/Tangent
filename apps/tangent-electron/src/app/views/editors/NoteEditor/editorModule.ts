@@ -38,6 +38,7 @@ import { appendContextTemplate, type ContextMenuConstructorOptions } from 'app/m
 import { eventHasSelectionRequest } from 'app/events'
 import { createCommandHandler } from 'app/model/commands/Command'
 import { InlineFormatCommand } from 'app/model/commands/NoteFormattingCommands'
+import { highlightEmojiToClassDescriptor } from 'common/markdownModel/formatting'
 
 function clampRange(range: EditorRange, clampingRange: EditorRange): EditorRange {
 	range = normalizeRange(range)
@@ -977,33 +978,46 @@ export default function editorModule(editor: Editor, options: {
 			]
 		})
 
-		const hightlighter = (marker, color, kind) => new InlineFormatCommand(workspace, {
-			label: `${marker} ${color} ${kind}`,
-			tooltip: 'colorful hightlight',
-			formattingCharacters: () => marker,
-			attributePredicate: attr =>  attr?.highlight === `${color} ${kind}` || null
-		})
+		function toTitleCase(text) {
+			const words = text.split(/\s+/);
+			const titleCased = words
+				.map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+				.join(' ');
+			return titleCased;
+		}
+
+		const hightlighter = (marker) => {
+			let descriptor = highlightEmojiToClassDescriptor(marker) || ''
+			console.log(descriptor, marker)
+			let [color, kind] = descriptor.split(' ')
+			return new InlineFormatCommand(workspace, {
+				label: toTitleCase(`${marker} ${color} ${kind}`),
+				tooltip: 'colorful hightlight',
+				formattingCharacters: () => marker,
+				attributePredicate: attr =>  attr?.highlight === descriptor || null
+			})
+		}
 
 		menu.push({
 			label: 'Highlights',
 			submenu: [
 				{ command: cmds.toggleHighlight, commandContext },
 				{ type: 'separator' },
-				{ command: hightlighter('🔴', 'red', 'circle'), commandContext },
-				{ command: hightlighter('🟡', 'yellow', 'circle'), commandContext },
-				{ command: hightlighter('🔵', 'blue', 'circle'), commandContext },
-				{ command: hightlighter('🟢', 'green', 'circle'), commandContext },
-				{ command: hightlighter('🟣', 'purple', 'circle'), commandContext },
-				{ command: hightlighter('🟠', 'orange', 'circle'), commandContext },
-				{ command: hightlighter('⚪', 'gray', 'circle'), commandContext },
+				{ command: hightlighter('🔴'), commandContext },
+				{ command: hightlighter('🟡'), commandContext },
+				{ command: hightlighter('🔵'), commandContext },
+				{ command: hightlighter('🟢'), commandContext },
+				{ command: hightlighter('🟣'), commandContext },
+				{ command: hightlighter('🟠'), commandContext },
+				{ command: hightlighter('⚪'), commandContext },
 				{ type: 'separator' },
-				{ command: hightlighter('🟥', 'red', 'square'), commandContext },
-				{ command: hightlighter('🟨', 'yellow', 'square'), commandContext },
-				{ command: hightlighter('🟦', 'blue', 'square'), commandContext },
-				{ command: hightlighter('🟩', 'green', 'square'), commandContext },
-				{ command: hightlighter('🟪', 'purple', 'square'), commandContext },
-				{ command: hightlighter('🟧', 'orange', 'square'), commandContext },
-				{ command: hightlighter('⬜', 'gray', 'square'), commandContext },
+				{ command: hightlighter('🟥'), commandContext },
+				{ command: hightlighter('🟨'), commandContext },
+				{ command: hightlighter('🟦'), commandContext },
+				{ command: hightlighter('🟩'), commandContext },
+				{ command: hightlighter('🟪'), commandContext },
+				{ command: hightlighter('🟧'), commandContext },
+				{ command: hightlighter('⬜'), commandContext },
 			]
 		}),
 
