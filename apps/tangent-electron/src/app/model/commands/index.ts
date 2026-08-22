@@ -55,7 +55,6 @@ export type WorkspaceCommands = LiteralCommands & GenericCommands
 function createAllCommands(workspace: Workspace) {
 	const toggleColorfulHighlightGenerator = (marker) => {
 		let descriptor = highlightEmojiToClassDescriptor(marker) || ''
-		console.log(descriptor, marker)
 		let [color, kind] = descriptor.split(' ')
 		return new InlineFormatCommand(workspace, {
 			label: toTitleCase(`${marker} ${color} ${kind}`),
