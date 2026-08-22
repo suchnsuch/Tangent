@@ -266,8 +266,8 @@ function createAllCommands(workspace: Workspace) {
 			formattingCharacters: () => '==',
 			attributePredicate: attr => attr?.highlight
 		}),
-		// toggleCircleGrayHighlight: toggleColorfulHighlightGenerator('⚪'),
-		// toggleSquareGrayHighlight: toggleColorfulHighlightGenerator('⬜'),
+		toggleCircleGrayHighlight: toggleColorfulHighlightGenerator('⚪'),
+		toggleSquareGrayHighlight: toggleColorfulHighlightGenerator('⬜'),
 		toggleCircleYellowHighlight: toggleColorfulHighlightGenerator('🟡'),
 		toggleSquareYellowHighlight: toggleColorfulHighlightGenerator('🟨'),
 		toggleCircleRedHightlight: toggleColorfulHighlightGenerator('🔴'),
