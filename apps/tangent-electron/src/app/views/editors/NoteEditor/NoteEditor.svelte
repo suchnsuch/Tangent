@@ -1398,13 +1398,6 @@ function updateCodeBlockSizing(pre: HTMLElement, context: CodeBlockSizingContext
 		const preMarginLeft = getPixelValue(preStyle.marginLeft)
 		const preMarginRight = getPixelValue(preStyle.marginRight)
 
-		console.log({
-			preClientWidth: pre.clientWidth,
-			contentWidth: context.editorContentWidth,
-			preMarginLeft, preMarginRight
-		})
-		
-
 		// Need to revert the old margin
 		const baseWidth = pre.clientWidth + preMarginLeft + preMarginRight
 

@@ -703,7 +703,7 @@ export default class Settings extends ObjectStore {
 		name: 'Trash Deleted Items',
 		description: 'Whether or not deleted items should be sent to the OS trash/recycling bin.'
 			+ '\n\nIf deleting items causes issues, try disabling this setting.',
-		defaultValue: true
+		defaultValue: !isLinux
 	})
 
 	debug_ioQueue_enable = new Setting<boolean>({

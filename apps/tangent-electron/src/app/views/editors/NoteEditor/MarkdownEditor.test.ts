@@ -451,7 +451,150 @@ describe('List Handling', () => {
 1. Some other line
 2. One more`)
 	})
-	
+
+	describe('Shifting lists', () => {
+		it('Should reorder numbered lists that are shifted up to the top', async () => {
+			editor.doc = markdownToTextDocument(`
+1. Some line
+2. Some other line
+3. And another
+3. One more`)
+			editor.select(22)
+			
+			shiftLines(editor, null, [editor.doc.lines[2]], -1)
+			await wait(waitTime)
+			expect(editor.getText()).toEqual(`
+1. Some other line
+2. Some line
+3. And another
+4. One more`)
+		})
+
+		it('Should reorder numbered lists that are shifted down', async () => {
+			editor.doc = markdownToTextDocument(`
+1. Some line
+2. Some other line
+3. One more`)
+			editor.select(22)
+			
+			shiftLines(editor, null, [editor.doc.lines[2]], 1)
+			await wait(waitTime)
+			expect(editor.getText()).toEqual(`
+1. Some line
+2. One more
+3. Some other line`)
+		})
+
+		it('Should reorder multiple numbered lists that are shifted up', async () => {
+			editor.doc = markdownToTextDocument(`
+1. Some line
+2. Some other line
+3. Another
+4. One more`)
+			editor.select([17, 36])
+			
+			shiftGroup(editor, editor.doc.selection, null, 'lines', -1)
+			await wait(waitTime)
+			expect(editor.getText()).toEqual(`
+1. Some other line
+2. Another
+3. Some line
+4. One more`)
+		})
+
+		it('Should reorder multiple numbered lists that are shifted down', async () => {
+			editor.doc = markdownToTextDocument(`
+1. Some line
+2. Some other line
+3. Another
+4. One more`)
+			editor.select([17, 36])
+			
+			shiftGroup(editor, editor.doc.selection, null, 'lines', 1)
+			await wait(waitTime)
+			expect(editor.getText()).toEqual(`
+1. Some line
+2. One more
+3. Some other line
+4. Another`)
+		})
+
+		it('Should let a list item change type when shifted across down', async () => {
+			editor.doc = markdownToTextDocument(`
+1. Some line
+2. Some other line
+3. Another
+4. One more
+
+A. This too
+B. And this
+C. And this again`)
+			editor.select(47)
+			
+			shiftGroup(editor, editor.doc.selection, null, 'lines', 1)
+			await wait(waitTime)
+			expect(editor.getText()).toEqual(`
+1. Some line
+2. Some other line
+3. Another
+
+A. One more
+B. This too
+C. And this
+D. And this again`)
+		})
+
+		it('Should let a list item change type when shifted across up', async () => {
+			editor.doc = markdownToTextDocument(`
+1. Some line
+2. Some other line
+3. Another
+4. One more
+
+A. This too
+B. And this
+C. And this again`)
+			editor.select(60)
+			
+			shiftGroup(editor, editor.doc.selection, null, 'lines', -1)
+			await wait(waitTime)
+			expect(editor.getText()).toEqual(`
+1. Some line
+2. Some other line
+3. Another
+4. One more
+5. This too
+
+A. And this
+B. And this again`)
+		})
+
+		it('Should reorder unrelated lists that happen to intersect the shift', async () => {
+			editor.doc = markdownToTextDocument(`
+1. Some line
+2. Some other line
+3. Another
+4. One more
+
+A. This too
+B. And this
+C. And this again`)
+			editor.select([47, 60])
+			
+			shiftGroup(editor, editor.doc.selection, null, 'lines', 1)
+			await wait(waitTime)
+			expect(editor.getText()).toEqual(`
+1. Some line
+2. Some other line
+3. Another
+4. And this
+5. One more
+
+A. This too
+B. And this again`)
+		})
+	})
+
 	describe('Checkboxes', () => {
 
 		it('Should allow checkboxes to indent unmolested', async () => {

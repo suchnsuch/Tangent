@@ -87,8 +87,10 @@ export function matchWikiLink(text: string, startIndex=0, options?: {
 		}
 	}
 
+	let complete = true
 	if (linkEnd < 0) {
 		if (options?.allowIncomplete) {
+			complete = false
 			linkEnd = index
 			if (contentIdStart > -1 && contentIdEnd == -1) contentIdEnd = index
 			if (textStart > -1 && textEnd == -1) textEnd = index
@@ -103,6 +105,10 @@ export function matchWikiLink(text: string, startIndex=0, options?: {
 		start: startIndex + linkStart,
 		end: startIndex + linkEnd,
 		href: text.substring(linkStart + 2, hrefEnd)
+	}
+
+	if (options?.allowIncomplete) {
+		details.complete = complete
 	}
 
 	const snipFormatCharacters = options?.snipFormatCharacters ?? true
@@ -338,16 +344,17 @@ export function resolveLink(store: DefaultIndexStore, link: HrefFormedLink): Tre
 }
 
 export function createContentIdMatcher(contentId: string): RegExp {
-	if (!contentId) return null
-	if (contentId[0] === '^') {
+	const normalizedContentId = contentId?.trim()
+	if (!normalizedContentId) return null
+	if (normalizedContentId[0] === '^') {
 		// ID matches (technically not supported yet)
-		return new RegExp('\^' + contentId.substring(1), 'i')
+		return new RegExp('\^' + normalizedContentId.substring(1), 'i')
 	}
 
 	// Header matches
 	// We want "space-likes" to all be treated the same for cross-compatability & consistency
-	const segments = contentId.split(/[-_ ]+|%20/)
-	return new RegExp('^' + segments.join('([-_ ]|%20)') + '$', 'i')
+	const segments = normalizedContentId.split(/[-_ ]+|%20/)
+	return new RegExp('^' + segments.join('([-_ ]|%20)+') + '$', 'i')
 }
 
 export function linkTextFromLink(link: HrefFormedLink): string {

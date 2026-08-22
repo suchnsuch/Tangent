@@ -7,7 +7,7 @@ import WorkspaceFileHeader from 'app/utils/WorkspaceFileHeader.svelte'
 import * as pdfjs from 'pdfjs-dist'
 import * as pdfviewer from 'pdfjs-dist/web/pdf_viewer.mjs'
 import { resizeObserver } from 'app/utils/resizeObserver'
-import { scrollTo } from 'app/utils'
+import { scrollTo, startDrag } from 'app/utils'
 import { smoothScrollTime } from 'app/utils/style'
 
 const workspace = getContext('workspace') as Workspace
@@ -48,8 +48,46 @@ function onWheel(event: WheelEvent) {
 	}
 	else {
 		event.preventDefault()
-		container.scrollLeft += event.deltaX * (1 / $zoom)
-		container.scrollTop += event.deltaY * (1 / $zoom)
+		const dx = event.deltaX * (1 / $zoom)
+		const dy = event.deltaY * (1 / $zoom)
+
+		// shift key changes direction of scroll
+		container.scrollLeft += event.shiftKey ? dy : dx 
+		container.scrollTop += event.shiftKey ? dx : dy
+	}
+}
+
+let canPan = false
+let isPanning = false
+
+function onMouseDown(event: MouseEvent) {
+	if (canPan && event.button == 0) {
+		isPanning = true
+		event.preventDefault()
+		startDrag({
+			move: (event: PointerEvent) => {
+				event.preventDefault()
+				container.scrollLeft -= event.movementX * (1 / $zoom)
+				container.scrollTop -= event.movementY * (1 / $zoom)
+			},
+			end: (event: PointerEvent) => {
+				event.preventDefault()
+				isPanning = false
+			}
+		})
+	}
+}
+
+function onKeyDown(event: KeyboardEvent) {
+	if (event.key == " "){
+		event.preventDefault()
+		canPan = true
+	}
+}
+function onKeyUp(event: KeyboardEvent) {
+	if (event.key == " "){
+		event.preventDefault()
+		canPan = false
 	}
 }
 
@@ -162,12 +200,15 @@ function onClick(event: MouseEvent) {
 
 </script>
 
+<!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
 <main
 	class:layout-fill={layout === 'fill'}
 	style:--noteWidthMax={$maxWidth + 'px'}
 	style:padding-top={extraTop + 'px'}
 	style:padding-bottom={extraBottom + 'px'}
 	on:wheel={onWheel}
+	on:keydown={onKeyDown}
+	on:keyup={onKeyUp}
 >
 	<WorkspaceFileHeader
 		node={state.file}
@@ -175,10 +216,13 @@ function onClick(event: MouseEvent) {
 	/>
 
 	<article use:resizeObserver={onResize}>
-		<div class="container pdfViewer" bind:this={container}>
+		<div class={["container pdfViewer", { canPan, 'panning': isPanning }]} bind:this={container}>
 			<!-- svelte-ignore a11y-click-events-have-key-events -->
 			<!-- svelte-ignore a11y-no-static-element-interactions -->
-			<div bind:this={viewerElement} on:click={onClick}></div>
+			<div bind:this={viewerElement}
+				on:mousedown={onMouseDown}
+				on:click={onClick}
+			></div>
 		</div>
 	</article>
 
@@ -219,6 +263,20 @@ article {
 
 		-webkit-user-select: text;
 		user-select: text;
+
+		&.canPan, &.panning {
+			:global(.page) {
+				// Defeat the cursor customizations of the text preview layer
+				pointer-events: none;
+			}
+		}
+
+		&.canPan {
+			cursor: grab;
+		}
+		&.panning {
+			cursor: grabbing;
+		}
 	}
 }
 

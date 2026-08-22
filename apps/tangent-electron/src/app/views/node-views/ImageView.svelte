@@ -4,6 +4,7 @@ import type { ImageViewState } from 'app/model/nodeViewStates'
 import WorkspaceFileHeader from 'app/utils/WorkspaceFileHeader.svelte'
 import { clamp } from 'common/utils'
 import { appendContextTemplate, type ContextMenuConstructorOptions } from 'app/model/menus'
+import { startDrag } from 'app/utils'
 
 export let state: ImageViewState
 export let editable: boolean = true
@@ -32,8 +33,13 @@ function onWheel(event: WheelEvent) {
 	}
 	else if ($zoom !== 1) { // Helps when in tangent view
 		event.preventDefault()
-		$panX = $panX + event.deltaX * -1 * (1/$zoom)
-		$panY = $panY + event.deltaY * -1 * (1/$zoom)
+		
+		// shift key changes direction
+		const dx = event.deltaX * -1 * (1/$zoom)
+		const dy = event.deltaY * -1 * (1/$zoom)
+
+		$panX = $panX + (event.shiftKey ? dy : dx)
+		$panY = $panY + (event.shiftKey ? dx : dy)
 	}
 }
 
@@ -66,20 +72,19 @@ function mouseDown(event: MouseEvent) {
 	}
 	else {
 		dragging = true
-		const endDrag = () => {
-			dragging = false
-		}
-		document.addEventListener('mouseup', endDrag, { once: true })
-		document.addEventListener('mouseleave', endDrag, { once: true })
+		startDrag({
+			move: (event: PointerEvent) => {
+				$panX = $panX + event.movementX * (1/$zoom)
+				$panY = $panY + event.movementY * (1/$zoom)
+			},
+			end: () => {
+				dragging = false
+			}
+		})
 	}
 }
 
 function onMouseMove(event: MouseEvent) {
-	if (dragging) {
-		$panX = $panX + event.movementX * (1/$zoom)
-		$panY = $panY + event.movementY * (1/$zoom)
-	}
-
 	isHoveringControls = event.clientY > container.getBoundingClientRect().bottom - 100
 }
 
