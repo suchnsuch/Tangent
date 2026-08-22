@@ -763,7 +763,6 @@ export default function editorModule(editor: Editor, options: {
 			submenu: [
 				{ command: cmds.toggleBold, commandContext },
 				{ command: cmds.toggleItalics, commandContext },
-				{ command: cmds.toggleHighlight, commandContext },
 				{ command: cmds.toggleInlineCode, commandContext },
 				{ type: 'separator' },
 				{ command: cmds.setParagraph, commandContext },
@@ -773,6 +772,28 @@ export default function editorModule(editor: Editor, options: {
 				{ command: cmds.setHeader4, commandContext },
 				{ command: cmds.setHeader5, commandContext },
 				{ command: cmds.setHeader6, commandContext }
+			]
+		})
+
+		menu.push({
+			label: 'Highlights',
+			submenu: [
+				{ command: cmds.toggleHighlight, commandContext },
+				{ type: 'separator' },
+				{ command: cmds.toggleCircleGrayHighlight, commandContext },
+				{ command: cmds.toggleSquareGrayHighlight, commandContext },
+				{ command: cmds.toggleCircleYellowHighlight, commandContext },
+				{ command: cmds.toggleSquareYellowHighlight, commandContext },
+				{ command: cmds.toggleCircleOrangeHighlight, commandContext },
+				{ command: cmds.toggleSquareOrangeHighlight, commandContext },
+				{ command: cmds.toggleCircleRedHightlight, commandContext },
+				{ command: cmds.toggleSquareRedHightlight, commandContext },
+				{ command: cmds.toggleCircleGreenHighlight, commandContext },
+				{ command: cmds.toggleSquareGreenHighlight, commandContext },
+				{ command: cmds.toggleCircleBlueHighlight, commandContext },
+				{ command: cmds.toggleSquareBlueHighlight, commandContext },
+				{ command: cmds.toggleCirclePurpleHighlight, commandContext },
+				{ command: cmds.toggleSquarePurpleHighlight, commandContext },
 			]
 		}),
 
