@@ -978,46 +978,23 @@ export default function editorModule(editor: Editor, options: {
 			]
 		})
 
-		function toTitleCase(text) {
-			const words = text.split(/\s+/);
-			const titleCased = words
-				.map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
-				.join(' ');
-			return titleCased;
-		}
-
-		const hightlighter = (marker) => {
-			let descriptor = highlightEmojiToClassDescriptor(marker) || ''
-			console.log(descriptor, marker)
-			let [color, kind] = descriptor.split(' ')
-			return new InlineFormatCommand(workspace, {
-				label: toTitleCase(`${marker} ${color} ${kind}`),
-				tooltip: 'colorful hightlight',
-				formattingCharacters: () => marker,
-				attributePredicate: attr =>  attr?.highlight === descriptor || null
-			})
-		}
-
 		menu.push({
 			label: 'Highlights',
 			submenu: [
 				{ command: cmds.toggleHighlight, commandContext },
 				{ type: 'separator' },
-				{ command: hightlighter('🔴'), commandContext },
-				{ command: hightlighter('🟡'), commandContext },
-				{ command: hightlighter('🔵'), commandContext },
-				{ command: hightlighter('🟢'), commandContext },
-				{ command: hightlighter('🟣'), commandContext },
-				{ command: hightlighter('🟠'), commandContext },
-				{ command: hightlighter('⚪'), commandContext },
-				{ type: 'separator' },
-				{ command: hightlighter('🟥'), commandContext },
-				{ command: hightlighter('🟨'), commandContext },
-				{ command: hightlighter('🟦'), commandContext },
-				{ command: hightlighter('🟩'), commandContext },
-				{ command: hightlighter('🟪'), commandContext },
-				{ command: hightlighter('🟧'), commandContext },
-				{ command: hightlighter('⬜'), commandContext },
+				{ command: cmds.toggleCircleGrayHighlight, commandContext },
+				{ command: cmds.toggleSquareGrayHighlight, commandContext },
+				{ command: cmds.toggleCircleYellowHighlight, commandContext },
+				{ command: cmds.toggleSquareYellowHighlight, commandContext },
+				{ command: cmds.toggleCircleOrangeHighlight, commandContext },
+				{ command: cmds.toggleSquareOrangeHighlight, commandContext },
+				{ command: cmds.toggleCircleRedHightlight, commandContext },
+				{ command: cmds.toggleSquareRedHightlight, commandContext },
+				{ command: cmds.toggleCircleGreenHighlight, commandContext },
+				{ command: cmds.toggleSquareGreenHighlight, commandContext },
+				{ command: cmds.toggleCirclePurpleHighlight, commandContext },
+				{ command: cmds.toggleSquarePurpleHighlight, commandContext },
 			]
 		}),
 
