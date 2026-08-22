@@ -981,7 +981,7 @@ export default function editorModule(editor: Editor, options: {
 			label: `${marker} ${color} ${kind}`,
 			tooltip: 'colorful hightlight',
 			formattingCharacters: () => marker,
-			attributePredicate: attr => attr?.inline_code
+			attributePredicate: attr =>  attr?.highlight === `${color} ${kind}` || null
 		})
 
 		menu.push({
@@ -989,13 +989,13 @@ export default function editorModule(editor: Editor, options: {
 			submenu: [
 				{ command: cmds.toggleHighlight, commandContext },
 				{ type: 'separator' },
-				{ command: hightlighter('🔴', 'red', 'rounded'), commandContext },
-				{ command: hightlighter('🟡', 'yellow', 'rounded'), commandContext },
-				{ command: hightlighter('🔵', 'blue', 'rounded'), commandContext },
-				{ command: hightlighter('🟢', 'green', 'rounded'), commandContext },
-				{ command: hightlighter('🟣', 'purple', 'rounded'), commandContext },
-				{ command: hightlighter('🟠', 'orange', 'rounded'), commandContext },
-				{ command: hightlighter('⚪', 'gray', 'rounded'), commandContext },
+				{ command: hightlighter('🔴', 'red', 'circle'), commandContext },
+				{ command: hightlighter('🟡', 'yellow', 'circle'), commandContext },
+				{ command: hightlighter('🔵', 'blue', 'circle'), commandContext },
+				{ command: hightlighter('🟢', 'green', 'circle'), commandContext },
+				{ command: hightlighter('🟣', 'purple', 'circle'), commandContext },
+				{ command: hightlighter('🟠', 'orange', 'circle'), commandContext },
+				{ command: hightlighter('⚪', 'gray', 'circle'), commandContext },
 				{ type: 'separator' },
 				{ command: hightlighter('🟥', 'red', 'square'), commandContext },
 				{ command: hightlighter('🟨', 'yellow', 'square'), commandContext },
