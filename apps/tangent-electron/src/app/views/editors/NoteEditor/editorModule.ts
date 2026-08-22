@@ -37,10 +37,7 @@ import type MarkdownEditor from './MarkdownEditor'
 import { appendContextTemplate, type ContextMenuConstructorOptions } from 'app/model/menus'
 import { eventHasSelectionRequest } from 'app/events'
 import { createCommandHandler } from 'app/model/commands/Command'
-import { InlineFormatCommand } from 'app/model/commands/NoteFormattingCommands'
-import { highlightEmojiToClassDescriptor } from 'common/markdownModel/formatting'
 import { verifyListContext } from './editorActions'
-
 
 function clampRange(range: EditorRange, clampingRange: EditorRange): EditorRange {
 	range = normalizeRange(range)
@@ -793,6 +790,8 @@ export default function editorModule(editor: Editor, options: {
 				{ command: cmds.toggleSquareRedHightlight, commandContext },
 				{ command: cmds.toggleCircleGreenHighlight, commandContext },
 				{ command: cmds.toggleSquareGreenHighlight, commandContext },
+				{ command: cmds.toggleCircleBlueHighlight, commandContext },
+				{ command: cmds.toggleSquareBlueHighlight, commandContext },
 				{ command: cmds.toggleCirclePurpleHighlight, commandContext },
 				{ command: cmds.toggleSquarePurpleHighlight, commandContext },
 			]
