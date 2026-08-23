@@ -53,14 +53,20 @@ type GenericCommands = {
 export type WorkspaceCommands = LiteralCommands & GenericCommands
 
 function createAllCommands(workspace: Workspace) {
-	const toggleColorfulHighlightGenerator = (marker) => {
-		let descriptor = highlightEmojiToClassDescriptor(marker) || ''
-		let [color, kind] = descriptor.split(' ')
+	function massageKind(kind: string) {
+		if (kind === 'circle') return 'round'
+		return kind
+	}
+
+	function toggleColorfulHighlightGenerator(marker: string) {
+		const descriptor = highlightEmojiToClassDescriptor(marker) ?? ''
+		const [color, kind] = descriptor.split(' ')
+		const massagedKind = massageKind(kind)
 		return new InlineFormatCommand(workspace, {
-			label: toTitleCase(`${marker} ${color} ${kind}`),
-			tooltip: 'colorful hightlight',
+			label: toTitleCase(`${marker} ${massagedKind} ${color} Highlight`),
+			tooltip: `Toggle whether the selected text has a ${massagedKind} ${color} highlight.`,
 			formattingCharacters: () => marker,
-			attributePredicate: attr =>  attr?.highlight === descriptor || null
+			attributePredicate: attr => attr?.highlight === descriptor || null
 		})
 	}
 
@@ -269,8 +275,8 @@ function createAllCommands(workspace: Workspace) {
 		toggleSquareGrayHighlight: toggleColorfulHighlightGenerator('⬜'),
 		toggleCircleYellowHighlight: toggleColorfulHighlightGenerator('🟡'),
 		toggleSquareYellowHighlight: toggleColorfulHighlightGenerator('🟨'),
-		toggleCircleRedHightlight: toggleColorfulHighlightGenerator('🔴'),
-		toggleSquareRedHightlight: toggleColorfulHighlightGenerator('🟥'),
+		toggleCircleRedHighlight: toggleColorfulHighlightGenerator('🔴'),
+		toggleSquareRedHighlight: toggleColorfulHighlightGenerator('🟥'),
 		toggleCircleOrangeHighlight: toggleColorfulHighlightGenerator('🟠'),
 		toggleSquareOrangeHighlight: toggleColorfulHighlightGenerator('🟧'),
 		toggleCircleGreenHighlight: toggleColorfulHighlightGenerator('🟢'),

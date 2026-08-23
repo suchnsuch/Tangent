@@ -751,14 +751,6 @@ export default function editorModule(editor: Editor, options: {
 		}
 
 		menu.push({
-			label: 'Links',
-			submenu: [
-				{ command: cmds.toggleWikiLink, commandContext },
-				{ command: cmds.toggleMDLink, commandContext }
-			]
-		})
-
-		menu.push({
 			label: 'Formatting',
 			submenu: [
 				{ command: cmds.toggleBold, commandContext },
@@ -776,6 +768,14 @@ export default function editorModule(editor: Editor, options: {
 		})
 
 		menu.push({
+			label: 'Links',
+			submenu: [
+				{ command: cmds.toggleWikiLink, commandContext },
+				{ command: cmds.toggleMDLink, commandContext }
+			]
+		})
+
+		menu.push({
 			label: 'Highlights',
 			submenu: [
 				{ command: cmds.toggleHighlight, commandContext },
@@ -786,8 +786,8 @@ export default function editorModule(editor: Editor, options: {
 				{ command: cmds.toggleSquareYellowHighlight, commandContext },
 				{ command: cmds.toggleCircleOrangeHighlight, commandContext },
 				{ command: cmds.toggleSquareOrangeHighlight, commandContext },
-				{ command: cmds.toggleCircleRedHightlight, commandContext },
-				{ command: cmds.toggleSquareRedHightlight, commandContext },
+				{ command: cmds.toggleCircleRedHighlight, commandContext },
+				{ command: cmds.toggleSquareRedHighlight, commandContext },
 				{ command: cmds.toggleCircleGreenHighlight, commandContext },
 				{ command: cmds.toggleSquareGreenHighlight, commandContext },
 				{ command: cmds.toggleCircleBlueHighlight, commandContext },
