@@ -41,6 +41,8 @@ import { CopyFileToClipboardCommand, UpdateFileFromClipboardCommand } from './Co
 import { OpenDetailsCommand } from './DetailCommands'
 import { OpenPaneSettingsCommand } from './PaneSettingsCommands'
 import { CopyAbsolutePathCommand, CopyRelativePathCommand } from './CopyPath'
+import { toTitleCase } from 'common/stringUtils'
+import { highlightEmojiToClassDescriptor } from 'common/markdownModel/formatting'
 export { Command, CommandAction, type WorkspaceCommand }
 
 type LiteralCommands = ReturnType<typeof createAllCommands>
@@ -51,6 +53,17 @@ type GenericCommands = {
 export type WorkspaceCommands = LiteralCommands & GenericCommands
 
 function createAllCommands(workspace: Workspace) {
+	const toggleColorfulHighlightGenerator = (marker) => {
+		let descriptor = highlightEmojiToClassDescriptor(marker) || ''
+		let [color, kind] = descriptor.split(' ')
+		return new InlineFormatCommand(workspace, {
+			label: toTitleCase(`${marker} ${color} ${kind}`),
+			tooltip: 'colorful hightlight',
+			formattingCharacters: () => marker,
+			attributePredicate: attr =>  attr?.highlight === descriptor || null
+		})
+	}
+
 	return {
 
 		openWorkspace: new OpenWorkspaceCommand(workspace),
@@ -252,6 +265,21 @@ function createAllCommands(workspace: Workspace) {
 			formattingCharacters: () => '==',
 			attributePredicate: attr => attr?.highlight
 		}),
+		toggleCircleGrayHighlight: toggleColorfulHighlightGenerator('⚪'),
+		toggleSquareGrayHighlight: toggleColorfulHighlightGenerator('⬜'),
+		toggleCircleYellowHighlight: toggleColorfulHighlightGenerator('🟡'),
+		toggleSquareYellowHighlight: toggleColorfulHighlightGenerator('🟨'),
+		toggleCircleRedHightlight: toggleColorfulHighlightGenerator('🔴'),
+		toggleSquareRedHightlight: toggleColorfulHighlightGenerator('🟥'),
+		toggleCircleOrangeHighlight: toggleColorfulHighlightGenerator('🟠'),
+		toggleSquareOrangeHighlight: toggleColorfulHighlightGenerator('🟧'),
+		toggleCircleGreenHighlight: toggleColorfulHighlightGenerator('🟢'),
+		toggleSquareGreenHighlight: toggleColorfulHighlightGenerator('🟩'),
+		toggleCircleBlueHighlight: toggleColorfulHighlightGenerator('🔵'),
+		toggleSquareBlueHighlight: toggleColorfulHighlightGenerator('🟦'),
+		toggleCirclePurpleHighlight: toggleColorfulHighlightGenerator('🟣'),
+		toggleSquarePurpleHighlight: toggleColorfulHighlightGenerator('🟪'),
+		
 		toggleInlineCode: new InlineFormatCommand(workspace, {
 			label: 'Inline Code',
 			tooltip: 'Toggles whether the selected text is rendered as code.',

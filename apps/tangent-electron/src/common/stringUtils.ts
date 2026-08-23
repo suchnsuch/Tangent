@@ -83,3 +83,12 @@ export function numberOf(target: string, content: string) {
 	}
 	return count
 }
+
+export function toTitleCase(text) {
+	const words = text.split(/\s+/)
+	const titleCased = words
+		.map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+		.join(' ')
+	return titleCased
+}
+
