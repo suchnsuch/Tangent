@@ -156,16 +156,20 @@ main {
 	border-radius: var(--inputBorderRadius);
 
 	display: flex;
+	align-items: center;
 	gap: .5em;
+
+	input {
+		font-size: 75%;
+	}
 
 	span {
 		flex-grow: 1;
 	}
 
 	button {
-		width: 20px;
-		height: 20px;
-		padding: 0;
+		display: flex;
+		align-items: center;
 	}
 }
 

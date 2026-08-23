@@ -189,7 +189,6 @@ $: currentMenu = menus.find(m => m.name === $section) ?? menus[0]
 
 main {
 	display: flex;
-	padding: 4px;
 	background-color: var(--backgroundColor);
 
 	max-height: calc(100vh - var(--topBarHeight) - 8px);
@@ -200,6 +199,8 @@ nav {
 	padding: 4px 0px 4px 4px;
 
 	overflow: auto;
+	border: 4px solid var(--backgroundColor);
+	border-right: 0px solid transparent;
 
 	button {
 		display: block;
@@ -212,13 +213,17 @@ nav {
 		text-align: right;
 
 		&.current, &:active {
-			background-color: var(--backgroundColor);
+			background-color: var(--accentActiveBackgroundColor);
 		}
 	}
 }
 
 article {
 	padding: 4px 4px 8px 8px;
+
+	border-left: 4px solid var(--accentActiveBackgroundColor);
+	border-top-left-radius: 2px;
+	border-bottom-left-radius: 2px;
 
 	display: flex;
 	flex-direction: column;
