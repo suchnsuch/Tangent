@@ -501,7 +501,10 @@ export function toggleToDo(editor: Editor, selection: EditorRange, mark: string)
 					change.delete([head+1, tail-1])
 				}
 				change.insert(head+1, checkBoxInside == mark ? ' ' : mark)
-				change.select([head, tail]) // XXX: if I remove it the Tangent panics
+
+				// XXX: if I remove these lines, Tangent panics
+				change.select([head, tail]) 
+				change.select(cursor)
 			}
 
 			break
