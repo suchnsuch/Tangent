@@ -481,7 +481,8 @@ export function toggleCheckbox(editor: Editor, selection: EditorRange, mark: str
 
 	const { doc, change } = editor
 	const [selectionStart, selectionEnd] = normalizeRange(selection)
-	
+
+	// XXX use for loop version or while loop one
 	for (const lineRange of doc.getLineRanges([selectionStart, selectionEnd])) {
 		const [lineStart, lineEnd] = lineRange
 	
