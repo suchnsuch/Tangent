@@ -474,6 +474,43 @@ export function toggleLineComment(editor: MarkdownEditor, event?: ShortcutEvent)
 	change.apply()
 }
 
+export function toggleToDo(editor: Editor, selection: EditorRange, mark: string) {
+	const { doc } = editor
+	const target = normalizeRange(selection)
+	const [cursor, _] = target
+	const change = editor.change
+
+	for (const lineRange of doc.getLineRanges(target)) {
+		const [lineStart, lineEnd] = lineRange
+
+		if (lineStart <= cursor && cursor <= lineEnd){
+			const line = doc.getText(lineRange)
+			const match = line.match(listMatcher)
+
+			if (match) {
+				// Index of the first group (the checkbox state)
+				const checkBoxStr = match[8]
+				const checkBoxStart = match.index + match[0].indexOf(checkBoxStr)
+				const head = lineStart + checkBoxStart + 1 // the index of [
+				const tail = head + checkBoxStr.length - 1 // the index of ]
+				const checkBoxInside = doc.getText([head+1, tail-1])
+
+				// console.log([head, tail], checkBoxInside, doc.getText([head, tail]))
+
+				if (checkBoxInside != ''){ // e.g. a checkbox that does not have anything in it like [] 
+					change.delete([head+1, tail-1])
+				}
+				change.insert(head+1, checkBoxInside == mark ? ' ' : mark)
+				change.select([head, tail]) // XXX: if I remove it the Tangent panics
+			}
+
+			break
+		}
+	}
+
+	change.apply()
+}
+
 export function setLinePrefix(editor: MarkdownEditor, selection: EditorRange, newPrefix: string, event?: Event) {
 	const { doc } = editor
 	if (!selection) return

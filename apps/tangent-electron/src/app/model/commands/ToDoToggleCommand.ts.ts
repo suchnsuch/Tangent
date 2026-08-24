@@ -2,9 +2,9 @@ import { Tangent, Workspace } from '..'
 import { NoteViewState } from '../nodeViewStates'
 import type { CommandContext } from './Command'
 import WorkspaceCommand from './WorkspaceCommand'
-import { normalizeRange, type Editor, type EditorRange } from 'typewriter-editor'
+import { type EditorRange } from 'typewriter-editor'
 import MarkdownEditor from 'app/views/editors/NoteEditor/MarkdownEditor'
-import { listMatcher } from 'common/markdownModel/list'
+import { toggleToDo } from 'app/views/editors/NoteEditor/editorActions'
 
 
 function getNoteView(tangent: Tangent) {
@@ -19,46 +19,6 @@ interface ToDoToggleCommandContext extends CommandContext {
 	selection?: EditorRange
 
 }
-
-
-export function toggleToDo(editor: Editor, selection: EditorRange,  mark: string) {
-	const { doc } = editor
-	const target = normalizeRange(selection)
-	const [cursor, _] = target
-	const change = editor.change
-
-	for (const lineRange of doc.getLineRanges(target)) {
-		const [lineStart, lineEnd] = lineRange
-
-		if (lineStart <= cursor && cursor <= lineEnd){
-			const line = doc.getText(lineRange)
-			const match = line.match(listMatcher)
-
-			if (match) {
-				// Index of the first group (the checkbox state)
-				const checkBoxStr = match[8]
-				const checkBoxStart = match.index + match[0].indexOf(checkBoxStr)
-				const head = lineStart + checkBoxStart
-				const tail = head + checkBoxStr.length
-				const cursor = tail - 2
-				const checkBoxInside = doc.getText([cursor, cursor+1])
-
-				// console.log(match)
-				// console.log(cursor, [head, tail], checkBoxInside)
-
-				if (checkBoxInside != '['){ // e.g. a checkbox that does not have anything in it like [] 
-					change.delete([cursor, cursor+1])
-				}
-				change.insert(cursor+1, checkBoxInside == mark ? ' ' : mark)
-			}
-
-			break
-		}
-	}
-
-	change.apply()
-}
-
 
 export class ToggleToDoCheckbox extends WorkspaceCommand {
 
@@ -94,16 +54,16 @@ export class ToggleToDoCheckbox extends WorkspaceCommand {
 		const targets = this.getTargets(context)
 		if (!targets) return
 		const { editor, selection } = targets
-		const mark = this.workspace?.settings?.defaultTodoCompleteChar || 'x'
-		toggleToDo(editor, selection, 'x')
+		const mark = this.workspace?.settings?.defaultTodoCompleteChar.value
+		toggleToDo(editor, selection, mark)
 	}
 
 	getLabel(context?: ToDoToggleCommandContext) {
-		return "Label"
+		return "Switch Checkbox State"
 	}
 
 	getTooltip(context?: ToDoToggleCommandContext) {
-		return "Tooltip"
+		return "Switches checkbox state on <-> off"
 	}
 
 	getDefaultPaletteName() {
