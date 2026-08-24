@@ -4,7 +4,7 @@ import type { CommandContext } from './Command'
 import WorkspaceCommand from './WorkspaceCommand'
 import { type EditorRange } from 'typewriter-editor'
 import MarkdownEditor from 'app/views/editors/NoteEditor/MarkdownEditor'
-import { toggleToDo } from 'app/views/editors/NoteEditor/editorActions'
+import { toggleCheckbox } from 'app/views/editors/NoteEditor/editorActions'
 
 
 function getNoteView(tangent: Tangent) {
@@ -13,20 +13,20 @@ function getNoteView(tangent: Tangent) {
 	return view
 }
 
-interface ToDoToggleCommandContext extends CommandContext {
+interface ToggleCheckboxCommandContext extends CommandContext {
 	view?: NoteViewState
 	editor?: MarkdownEditor
 	selection?: EditorRange
 
 }
 
-export class ToggleToDoCheckbox extends WorkspaceCommand {
+export class ToggleCheckboxCommand extends WorkspaceCommand {
 
 	constructor(workspace: Workspace) {
 		super(workspace, { group: 'Notes' })
 	}
 
-	getTargets(context?: ToDoToggleCommandContext) {
+	getTargets(context?: ToggleCheckboxCommandContext) {
 		let editor = context?.editor
 		let selection = context?.selection
 		let view = context?.view
@@ -46,23 +46,23 @@ export class ToggleToDoCheckbox extends WorkspaceCommand {
 		return { view, editor, selection }
 	}
 
-	canExecute(context?: ToDoToggleCommandContext): boolean {
+	canExecute(context?: ToggleCheckboxCommandContext): boolean {
 		return this.getTargets(context) != null
 	}
 
-	execute(context?: ToDoToggleCommandContext): void {
+	execute(context?: ToggleCheckboxCommandContext): void {
 		const targets = this.getTargets(context)
 		if (!targets) return
 		const { editor, selection } = targets
 		const mark = this.workspace?.settings?.defaultTodoCompleteChar.value
-		toggleToDo(editor, selection, mark)
+		toggleCheckbox(editor, selection, mark)
 	}
 
-	getLabel(context?: ToDoToggleCommandContext) {
+	getLabel(context?: ToggleCheckboxCommandContext) {
 		return "Switch Checkbox State"
 	}
 
-	getTooltip(context?: ToDoToggleCommandContext) {
+	getTooltip(context?: ToggleCheckboxCommandContext) {
 		return "Switches checkbox state on <-> off"
 	}
 
@@ -71,6 +71,6 @@ export class ToggleToDoCheckbox extends WorkspaceCommand {
 	}
 
 	getName() {
-		return `toggle ToDo`
+		return `Toggle Checkbox`
 	}
 }

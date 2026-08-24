@@ -474,7 +474,7 @@ export function toggleLineComment(editor: MarkdownEditor, event?: ShortcutEvent)
 	change.apply()
 }
 
-export function toggleToDo(editor: Editor, selection: EditorRange, mark: string) {
+export function toggleCheckbox(editor: Editor, selection: EditorRange, mark: string) {
 	const { doc } = editor
 	const [cursorStart, cursorEnd] = normalizeRange(selection)
 	const change = editor.change
