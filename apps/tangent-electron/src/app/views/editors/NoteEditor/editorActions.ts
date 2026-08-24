@@ -475,8 +475,8 @@ export function toggleLineComment(editor: MarkdownEditor, event?: ShortcutEvent)
 }
 
 export function toggleCheckbox(editor: Editor, selection: EditorRange, mark: string, forceTurnToCheckbox = true) {
-	const EMPTY_LIST_CHECKBOX = "- [ ] "
 	const EMPTY_CHECKBOX = "[ ] "
+	const EMPTY_LIST_CHECKBOX = "- " + EMPTY_CHECKBOX
 	let addedCharactersCount = 0
 
 	const { doc, change } = editor
