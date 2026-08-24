@@ -475,17 +475,24 @@ export function toggleLineComment(editor: MarkdownEditor, event?: ShortcutEvent)
 }
 
 export function toggleCheckbox(editor: Editor, selection: EditorRange, mark: string, forceTurnToCheckbox = true) {
-	const EMPTY_LIST_CHECKBOX = "- [] "
-	const EMPTY_CHECKBOX = "[] "
+	const EMPTY_LIST_CHECKBOX = "- [ ] "
+	const EMPTY_CHECKBOX = "[ ] "
 	let addedCharactersCount = 0
 
-	const { doc } = editor
-	const change = editor.change
+	const { doc, change } = editor
 	const [selectionStart, selectionEnd] = normalizeRange(selection)
-
+	
 	for (const lineRange of doc.getLineRanges([selectionStart, selectionEnd])) {
 		const [lineStart, lineEnd] = lineRange
+	
+	// let i = selectionStart
+	// while (selectionStart <= selectionEnd) {
+		// 	const lineRange = doc.getLineRange(i)
+		// 	const [lineStart, lineEnd] = lineRange
+		// 	i += line.length
+
 		const line = doc.getText(lineRange)
+		console.log([lineRange, line.length, line])
 
 		if (line.trim().length){ // if the line was not empty
 			const match = line.match(listMatcher)
@@ -498,14 +505,16 @@ export function toggleCheckbox(editor: Editor, selection: EditorRange, mark: str
 					const head = lineStart + checkBoxStart + 1 // the index of [
 					const tail = head + checkBoxStr.length - 1 // the index of ]
 					const checkBoxInside = doc.getText([head+1, tail-1])
+					const replacement = checkBoxInside == mark ? ' ' : mark
 
-					if (checkBoxInside != ''){ // e.g. a checkbox that does not have anything in it like [] 
+					console.log([checkBoxInside, replacement])
+					if (checkBoxInside == ''){ // e.g. a checkbox that does not have anything in it like [] 
+						addedCharactersCount ++
+					}
+					else {
 						change.delete([head+1, tail-1])
 					}
-					change.insert(head+1, checkBoxInside == mark ? ' ' : mark)
-
-					// XXX: if I remove these lines, Tangent panics
-					change.select([head, tail]) 
+					change.insert(head+1, replacement)
 				}
 				else if (forceTurnToCheckbox) { // if there was already a list
 					const listIndicatorStr = match[2]
@@ -523,6 +532,7 @@ export function toggleCheckbox(editor: Editor, selection: EditorRange, mark: str
 				addedCharactersCount += EMPTY_LIST_CHECKBOX.length
 			}
 		}
+
 	}
 
 	change.select([selectionStart, selectionEnd + addedCharactersCount])
