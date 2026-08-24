@@ -477,7 +477,7 @@ export function toggleLineComment(editor: MarkdownEditor, event?: ShortcutEvent)
 /**
  * toggles checkbox state or turns the line to checkbox if `makeCheckbox` set
  */
-export function toggleCheckbox(editor: Editor, selection: EditorRange, mark: string, makeCheckbox = true) {
+export function toggleCheckbox(editor: Editor, selection: EditorRange, mark: string, forceTurnToCheckbox = true) {
 	const EMPTY_LIST_CHECKBOX = "- [] "
 	const EMPTY_CHECKBOX = "[] "
 	let addedCharactersCount = 0
@@ -510,7 +510,7 @@ export function toggleCheckbox(editor: Editor, selection: EditorRange, mark: str
 					// XXX: if I remove these lines, Tangent panics
 					change.select([head, tail]) 
 				}
-				else if (makeCheckbox) { // if there was already a list
+				else if (forceTurnToCheckbox) { // if there was already a list
 					console.log(match)
 					const listIndicatorStr = match[2]
 					const listStart = match.index + match[0].indexOf(listIndicatorStr)
@@ -520,7 +520,7 @@ export function toggleCheckbox(editor: Editor, selection: EditorRange, mark: str
 					addedCharactersCount += EMPTY_CHECKBOX.length
 				}
 			}
-			else if (makeCheckbox) { // if line was not checkbox and not empty, make it a checkbox
+			else if (forceTurnToCheckbox) { // if line was not checkbox and not empty, make it a checkbox
 				const trimmed = line.trimStart()
 				const firstNonSpaceIndex = line.length - trimmed.length
 				change.insert(lineStart + firstNonSpaceIndex, EMPTY_LIST_CHECKBOX)
