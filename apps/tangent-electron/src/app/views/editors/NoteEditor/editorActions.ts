@@ -508,7 +508,6 @@ export function toggleCheckbox(editor: Editor, selection: EditorRange, mark: str
 					change.select([head, tail]) 
 				}
 				else if (forceTurnToCheckbox) { // if there was already a list
-					console.log(match)
 					const listIndicatorStr = match[2]
 					const listStart = match.index + match[0].indexOf(listIndicatorStr)
 					const head = lineStart + listStart + 1 // start of list indicator
