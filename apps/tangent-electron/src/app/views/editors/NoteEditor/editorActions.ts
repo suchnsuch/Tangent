@@ -474,41 +474,62 @@ export function toggleLineComment(editor: MarkdownEditor, event?: ShortcutEvent)
 	change.apply()
 }
 
-export function toggleCheckbox(editor: Editor, selection: EditorRange, mark: string) {
+/**
+ * toggles checkbox state or turns the line to checkbox if `makeCheckbox` set
+ */
+export function toggleCheckbox(editor: Editor, selection: EditorRange, mark: string, makeCheckbox = true) {
+	const EMPTY_LIST_CHECKBOX = "- [] "
+	const EMPTY_CHECKBOX = "[] "
+	let addedCharactersCount = 0
+
 	const { doc } = editor
-	const [cursorStart, cursorEnd] = normalizeRange(selection)
 	const change = editor.change
+	const [selectionStart, selectionEnd] = normalizeRange(selection)
 
-	for (const lineRange of doc.getLineRanges([cursorStart, cursorEnd])) {
+	for (const lineRange of doc.getLineRanges([selectionStart, selectionEnd])) {
 		const [lineStart, lineEnd] = lineRange
-
 		const line = doc.getText(lineRange)
-		const match = line.match(listMatcher)
-		console.log(match)
 
-		if (match) { // if the line was checkbox, toggle the state
-			const checkBoxStr = match[8] // Index of the first group (the checkbox state)
-			const checkBoxStart = match.index + match[0].indexOf(checkBoxStr)
-			const head = lineStart + checkBoxStart + 1 // the index of [
-			const tail = head + checkBoxStr.length - 1 // the index of ]
-			const checkBoxInside = doc.getText([head+1, tail-1])
+		if (line.trim().length){ // if the line was not empty
+			const match = line.match(listMatcher)
 
-			// console.log([head, tail], checkBoxInside, doc.getText([head, tail]))
+			if (match) { // if the line was checkbox, toggle the state
+				const checkBoxStr = match[8] // Index of the first group (the checkbox state)
 
-			if (checkBoxInside != ''){ // e.g. a checkbox that does not have anything in it like [] 
-				change.delete([head+1, tail-1])
+				if (checkBoxStr){ // if there was already a checkbox
+					const checkBoxStart = match.index + match[0].indexOf(checkBoxStr)
+					const head = lineStart + checkBoxStart + 1 // the index of [
+					const tail = head + checkBoxStr.length - 1 // the index of ]
+					const checkBoxInside = doc.getText([head+1, tail-1])
+
+					if (checkBoxInside != ''){ // e.g. a checkbox that does not have anything in it like [] 
+						change.delete([head+1, tail-1])
+					}
+					change.insert(head+1, checkBoxInside == mark ? ' ' : mark)
+
+					// XXX: if I remove these lines, Tangent panics
+					change.select([head, tail]) 
+				}
+				else if (makeCheckbox) { // if there was already a list
+					console.log(match)
+					const listIndicatorStr = match[2]
+					const listStart = match.index + match[0].indexOf(listIndicatorStr)
+					const head = lineStart + listStart + 1 // start of list indicator
+					const tail = head + listIndicatorStr.length - 1 // end of list indicator
+					change.insert(tail + 1, EMPTY_CHECKBOX)
+					addedCharactersCount += EMPTY_CHECKBOX.length
+				}
 			}
-			change.insert(head+1, checkBoxInside == mark ? ' ' : mark)
-
-			// XXX: if I remove these lines, Tangent panics
-			change.select([head, tail]) 
-		}
-		else { // if line was not checkbox, make it a checkbox
-
+			else if (makeCheckbox) { // if line was not checkbox and not empty, make it a checkbox
+				const trimmed = line.trimStart()
+				const firstNonSpaceIndex = line.length - trimmed.length
+				change.insert(lineStart + firstNonSpaceIndex, EMPTY_LIST_CHECKBOX)
+				addedCharactersCount += EMPTY_LIST_CHECKBOX.length
+			}
 		}
 	}
 
-	change.select([cursorStart, cursorEnd])
+	change.select([selectionStart, selectionEnd + addedCharactersCount])
 	change.apply()
 }
 
