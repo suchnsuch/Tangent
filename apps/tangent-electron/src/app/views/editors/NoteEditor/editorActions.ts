@@ -474,9 +474,6 @@ export function toggleLineComment(editor: MarkdownEditor, event?: ShortcutEvent)
 	change.apply()
 }
 
-/**
- * toggles checkbox state or turns the line to checkbox if `makeCheckbox` set
- */
 export function toggleCheckbox(editor: Editor, selection: EditorRange, mark: string, forceTurnToCheckbox = true) {
 	const EMPTY_LIST_CHECKBOX = "- [] "
 	const EMPTY_CHECKBOX = "[] "
