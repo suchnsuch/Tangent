@@ -527,8 +527,7 @@ export function toggleCheckbox(editor: Editor, selection: EditorRange, mark: str
 				}
 			}
 			else if (forceTurnToCheckbox) { // if line was not checkbox and not empty, make it a checkbox
-				const trimmed = line.trimStart()
-				const firstNonSpaceIndex = line.length - trimmed.length
+				const firstNonSpaceIndex = line.length - line.trimStart().length
 				change.insert(lineStart + firstNonSpaceIndex, EMPTY_LIST_CHECKBOX)
 				addedCharactersCount += EMPTY_LIST_CHECKBOX.length
 			}
