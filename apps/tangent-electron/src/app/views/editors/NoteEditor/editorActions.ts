@@ -494,8 +494,7 @@ export function toggleCheckbox(editor: Editor, selection: EditorRange, mark: str
 			const match = line.match(listMatcher)
 
 			if (match) { // if the line was checkbox, toggle the state
-				const checkBoxStr = match[8] // Index of the first group (the checkbox state)
-
+				const checkBoxStr = match[8]
 				if (checkBoxStr){ // if there was already a checkbox
 					const checkBoxStart = match.index + match[0].indexOf(checkBoxStr)
 					const head = lineStart + checkBoxStart + 1 // the index of [
@@ -504,12 +503,8 @@ export function toggleCheckbox(editor: Editor, selection: EditorRange, mark: str
 					const replacement = checkBoxInside == mark ? ' ' : mark
 
 					console.log([checkBoxInside, replacement])
-					if (checkBoxInside == ''){ // e.g. a checkbox that does not have anything in it like [] 
-						addedCharactersCount ++
-					}
-					else {
-						change.delete([head+1, tail-1])
-					}
+					addedCharactersCount += replacement.length - checkBoxInside.length
+					change.delete([head+1, tail-1])
 					change.insert(head+1, replacement)
 				}
 				else if (forceTurnToCheckbox) { // if there was already a list
