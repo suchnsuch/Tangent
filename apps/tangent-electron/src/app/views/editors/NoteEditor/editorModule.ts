@@ -529,7 +529,10 @@ export default function editorModule(editor: Editor, options: {
 		let newLinePrefix = getLineFormattingPrefix(line, true)
 
 		// Check to see if this is blank line that should be breaking the prefix
-		if (newLinePrefix && line.length - 1 === newLinePrefix.length) {
+		if (newLinePrefix
+			&& line.length - 1 === newLinePrefix.length
+			&& lineToText(line).startsWith(newLinePrefix)
+		) {
 			const escapeMode = lineFormatEscapeMode(line)
 			switch (escapeMode) {
 				case 'single':
