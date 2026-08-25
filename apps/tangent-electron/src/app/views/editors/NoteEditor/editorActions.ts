@@ -503,7 +503,7 @@ export function toggleCheckbox(editor: Editor, selection: EditorRange, mark: str
 					const replacement = checkBoxInside == mark ? ' ' : mark
 
 					console.log([checkBoxInside, replacement])
-					addedCharactersCount += replacement.length - checkBoxInside.length
+					addedCharactersCount += replacement.length - checkBoxInside.length // current content of checkbox may be empty like []
 					change.delete([head+1, tail-1])
 					change.insert(head+1, replacement)
 				}
