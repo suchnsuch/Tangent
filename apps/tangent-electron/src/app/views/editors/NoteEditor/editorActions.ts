@@ -501,11 +501,10 @@ export function toggleCheckbox(editor: Editor, selection: EditorRange, mark: str
 					const tail = head + checkBoxStr.length - 1 // the index of ]
 					const checkBoxInside = doc.getText([head+1, tail-1])
 					const replacement = checkBoxInside == mark ? ' ' : mark
-
 					console.log([checkBoxInside, replacement])
-					addedCharactersCount += replacement.length - checkBoxInside.length // current content of checkbox may be empty like []
 					change.delete([head+1, tail-1])
 					change.insert(head+1, replacement)
+					addedCharactersCount += replacement.length - checkBoxInside.length // current content of checkbox may be empty like []
 				}
 				else if (forceTurnToCheckbox) { // if there was already a list
 					const listIndicatorStr = match[2]
