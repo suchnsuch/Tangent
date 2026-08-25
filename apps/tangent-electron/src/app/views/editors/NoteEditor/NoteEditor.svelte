@@ -665,16 +665,29 @@ function applyFocusDecorations(doc: TextDocument) {
 	if (selection) {
 		let lines = doc.getLinesAt(selection)
 
+		let isValidLine: (line: Line) => boolean = null
+
 		if (lines.length && focusLevel === FocusLevel.Paragraph) {
-			// Extend focus to adjacent qualifying lines
-			function isValidLine(line: Line) {
+			isValidLine = (line: Line) => {
 				const attr = line.attributes
 				return (!attr.empty && !attr.whitespace)
 					|| attr.code
 					|| attr.front_matter
 					|| attr.math
 			}
+		}
+		else if (lines.length && focusLevel > FocusLevel.Paragraph) {
+			// These are always extended when in focus
+			isValidLine = (line: Line) => {
+				const attr = line.attributes
+				return attr.code
+					|| attr.front_matter
+					|| attr.math
+			}
+		}
 
+		if (isValidLine) {
+			// Extend focus to adjacent qualifying lines
 			const first = lines[0]
 			if (isValidLine(first)) {
 				const linesToAdd: Line[] = []

@@ -39,6 +39,15 @@ article.note {
 			}
 		}
 	}
+	&.focusing {
+		figure:not(.revealed) {
+			opacity: .5;
+			transition: opacity .3s;
+		}
+		figure.revealed .line {
+			opacity: unset !important;
+		}
+	}
 
 	p {
 		line-height: rhythmUnit(1); // to defeat default styling

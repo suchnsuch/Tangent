@@ -761,6 +761,11 @@ const noteTypeset:TypesetTypes = {
 					tMathAttr.block = ''
 				}
 
+				if (attributes.decoration?.focus) {
+					// Inject the focus decoration onto the shadow root.
+					tMathAttr.className += ' ' + attributes.decoration.focus.class
+				}
+
 				return h('span', containerAttr, [
 					h('span', sourceAttr, children),
 					h('t-math', tMathAttr, [])
