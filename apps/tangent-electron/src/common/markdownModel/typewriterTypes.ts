@@ -28,6 +28,10 @@ function getHideableFormatClass(attributes, baseClass = '') {
 	if (attributes.revealed) {
 		className += ' revealed'
 	}
+	if (attributes.decoration?.focus) {
+		// Inject focus classes at the top so that opacity is applied in the right place
+		className += ' ' + attributes.decoration?.focus.class
+	}
 	
 	return className
 }

@@ -34,7 +34,7 @@ article.note {
 		&[data-focus="focused"] {
 			opacity: unset;
 
-			.unfocused {
+			.unfocused:not(.unfocused *) { // Don't double up unfocused opacity
 				opacity: .5;	
 			}
 		}
