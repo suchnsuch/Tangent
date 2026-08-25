@@ -59,11 +59,11 @@ export class ToggleCheckboxCommand extends WorkspaceCommand {
 	}
 
 	getLabel(context?: ToggleCheckboxCommandContext) {
-		return "Switch Checkbox State"
+		return "Toggle Checkbox State"
 	}
 
 	getTooltip(context?: ToggleCheckboxCommandContext) {
-		return "Switches checkbox state on <-> off"
+		return "Switches checkbox state between on and off"
 	}
 
 	getDefaultPaletteName() {

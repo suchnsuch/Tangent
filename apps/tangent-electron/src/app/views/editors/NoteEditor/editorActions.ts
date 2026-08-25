@@ -477,23 +477,18 @@ export function toggleLineComment(editor: MarkdownEditor, event?: ShortcutEvent)
 export function toggleCheckbox(editor: Editor, selection: EditorRange, mark: string, forceTurnToCheckbox = true) {
 	const EMPTY_CHECKBOX = "[ ] "
 	const EMPTY_LIST_CHECKBOX = "- " + EMPTY_CHECKBOX
-	let addedCharactersCount = 0
+	let addedCharactersCountEachLine: number[] = []
 
 	const { doc, change } = editor
 	const [selectionStart, selectionEnd] = normalizeRange(selection)
 
-	// XXX use for loop version or while loop one
 	for (const lineRange of doc.getLineRanges([selectionStart, selectionEnd])) {
 		const [lineStart, lineEnd] = lineRange
-	
-	// let i = selectionStart
-	// while (selectionStart <= selectionEnd) {
-		// 	const lineRange = doc.getLineRange(i)
-		// 	const [lineStart, lineEnd] = lineRange
-		// 	i += line.length
 
 		const line = doc.getText(lineRange)
 		console.log([lineRange, line.length, line])
+		
+		let addedCharactersCount = 0
 
 		if (line.trim().length){ // if the line was not empty
 			const match = line.match(listMatcher)
@@ -533,9 +528,13 @@ export function toggleCheckbox(editor: Editor, selection: EditorRange, mark: str
 			}
 		}
 
+		addedCharactersCountEachLine.push(addedCharactersCount)
 	}
 
-	change.select([selectionStart, selectionEnd + addedCharactersCount])
+	change.select([
+		selectionStart + addedCharactersCountEachLine[0],
+		selectionEnd + addedCharactersCountEachLine.reduce((a,b) => a+b, 0)
+	])
 	change.apply()
 }
 
