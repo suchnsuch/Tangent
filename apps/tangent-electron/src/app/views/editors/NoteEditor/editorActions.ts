@@ -495,7 +495,7 @@ export function toggleCheckbox(editor: Editor, selection: EditorRange, mark: str
 
 			if (match) { // if the line was checkbox, toggle the state
 				const checkBoxStr = match[8]
-				if (checkBoxStr){ // if there was already a checkbox
+				if (checkBoxStr) { // if there was already a checkbox
 					const checkBoxStart = match.index + match[0].indexOf(checkBoxStr)
 					const head = lineStart + checkBoxStart + 1 // the index of [
 					const tail = head + checkBoxStr.length - 1 // the index of ]
