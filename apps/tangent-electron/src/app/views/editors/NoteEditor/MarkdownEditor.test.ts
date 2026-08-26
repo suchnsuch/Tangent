@@ -8,7 +8,7 @@ import MarkdownEditor from './MarkdownEditor'
 import { Workspace } from 'app/model'
 import { getSelectedLines, lineToText } from 'common/typewriterUtils'
 import { ShortcutEvent } from 'typewriter-editor'
-import { shiftGroup, shiftLines, toggleBold, toggleItalic, toggleLineComment, toggleLink, toggleWikiLink } from './editorActions'
+import { shiftGroup, shiftLines, toggleBold, toggleCheckbox, toggleItalic, toggleLineComment, toggleLink, toggleWikiLink } from './editorActions'
 
 let editor: MarkdownEditor
 const waitTime = 10
@@ -596,6 +596,107 @@ B. And this again`)
 	})
 
 	describe('Checkboxes', () => {
+		describe('Toggle Checkboxes', () => {
+			it('should toggle spaced checkboxes', async () => {
+				editor.doc = markdownToTextDocument(`
+- [x] 1
+- [ ] 2
+- [x] 3
+- [ ] 4`)
+				toggleCheckbox(editor, [1, 7 * 4], 'x')
+				await wait(waitTime)
+				expect(editor.getText()).toEqual(`
+- [ ] 1
+- [x] 2
+- [ ] 3
+- [x] 4`)
+			})
+
+			it('should toggle empty checkboxes', async () => {
+				editor.doc = markdownToTextDocument(`
+- [] 1
+- [] 2
+- [] 3
+`)
+				toggleCheckbox(editor, [1, 7 * 3], 'x')
+				await wait(waitTime)
+				expect(editor.getText()).toEqual(`
+- [x] 1
+- [x] 2
+- [x] 3`)
+			})
+
+			it('should toggle space/empty checkboxes', async () => {
+				editor.doc = markdownToTextDocument(`
+- [x] 1
+- [] 2
+- [] 3
+- [ ] 4
+`)
+				toggleCheckbox(editor, [1, 7 * 4], 'x')
+				await wait(waitTime)
+				expect(editor.getText()).toEqual(`
+- [ ] 1
+- [x] 2
+- [x] 4
+- [x] 5`)
+			})
+
+			it('should toggle normal line checkboxes', async () => {
+				editor.doc = markdownToTextDocument(`
+1
+2
+3
+`)
+				toggleCheckbox(editor, [1, 7 * 7], 'x')
+				await wait(waitTime)
+				expect(editor.getText()).toEqual(`
+- [ ] 1
+- [ ] 2
+- [ ] 3
+`)
+			})
+
+			it('should toggle lists checkboxes', async () => {
+				editor.doc = markdownToTextDocument(`
+- 1
+- 2
+- 3
+`)
+				toggleCheckbox(editor, [1, 3 * 4], 'x')
+				await wait(waitTime)
+				expect(editor.getText()).toEqual(`
+- [ ] 1
+- [ ] 2
+- [ ] 3
+`)
+			})
+
+
+			it('should toggle mix style checkboxes', async () => {
+				editor.doc = markdownToTextDocument(`
+1
+- [] 2
+- [] 3
+4
+- [ ] 5
+- 6
+- 7
+`)
+				toggleCheckbox(editor, [1, 7 * 7], 'x')
+				await wait(waitTime)
+				expect(editor.getText()).toEqual(`
+- [ ] 1
+- [x] 2
+- [x] 3
+- [ ] 4
+- [x] 5
+- [ ] 6
+- [ ] 7
+`)
+			})
+
+		})
 
 		it('Should allow checkboxes to indent unmolested', async () => {
 			editor.doc = markdownToTextDocument(`
