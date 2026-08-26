@@ -486,8 +486,6 @@ export function toggleCheckbox(editor: Editor, selection: EditorRange, mark: str
 		const [lineStart, lineEnd] = lineRange
 
 		const line = doc.getText(lineRange)
-		console.log([lineRange, line.length, line])
-		
 		let addedCharactersCount = 0
 
 		if (line.trim().length){ // if the line was not empty
