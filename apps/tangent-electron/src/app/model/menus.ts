@@ -232,7 +232,6 @@ export function buildMainMenu(workspace: Workspace): MenuItemConstructorOptions[
 			submenu: [
 				{ command: cmds.toggleBold },
 				{ command: cmds.toggleItalics },
-				{ command: cmds.toggleHighlight },
 				{ command: cmds.toggleInlineCode },
 				{ type: 'separator' },
 				{ command: cmds.setParagraph },
@@ -249,6 +248,27 @@ export function buildMainMenu(workspace: Workspace): MenuItemConstructorOptions[
 			submenu: [
 				{ command: cmds.toggleWikiLink },
 				{ command: cmds.toggleMDLink }
+			]
+		},
+		{
+			label: 'Highlights',
+			submenu: [
+				{ command: cmds.toggleHighlight },
+				{ type: 'separator' },
+				{ command: cmds.toggleCircleGrayHighlight },
+				{ command: cmds.toggleSquareGrayHighlight },
+				{ command: cmds.toggleCircleYellowHighlight },
+				{ command: cmds.toggleSquareYellowHighlight },
+				{ command: cmds.toggleCircleOrangeHighlight },
+				{ command: cmds.toggleSquareOrangeHighlight },
+				{ command: cmds.toggleCircleRedHighlight },
+				{ command: cmds.toggleSquareRedHighlight },
+				{ command: cmds.toggleCircleGreenHighlight },
+				{ command: cmds.toggleSquareGreenHighlight },
+				{ command: cmds.toggleCircleBlueHighlight },
+				{ command: cmds.toggleSquareBlueHighlight },
+				{ command: cmds.toggleCirclePurpleHighlight },
+				{ command: cmds.toggleSquarePurpleHighlight },
 			]
 		},
 		{ type: 'separator' },

@@ -529,7 +529,10 @@ export default function editorModule(editor: Editor, options: {
 		let newLinePrefix = getLineFormattingPrefix(line, true)
 
 		// Check to see if this is blank line that should be breaking the prefix
-		if (newLinePrefix && line.length - 1 === newLinePrefix.length) {
+		if (newLinePrefix
+			&& line.length - 1 === newLinePrefix.length
+			&& lineToText(line).startsWith(newLinePrefix)
+		) {
 			const escapeMode = lineFormatEscapeMode(line)
 			switch (escapeMode) {
 				case 'single':
@@ -751,19 +754,10 @@ export default function editorModule(editor: Editor, options: {
 		}
 
 		menu.push({
-			label: 'Links',
-			submenu: [
-				{ command: cmds.toggleWikiLink, commandContext },
-				{ command: cmds.toggleMDLink, commandContext }
-			]
-		})
-
-		menu.push({
 			label: 'Formatting',
 			submenu: [
 				{ command: cmds.toggleBold, commandContext },
 				{ command: cmds.toggleItalics, commandContext },
-				{ command: cmds.toggleHighlight, commandContext },
 				{ command: cmds.toggleInlineCode, commandContext },
 				{ type: 'separator' },
 				{ command: cmds.setParagraph, commandContext },
@@ -773,6 +767,36 @@ export default function editorModule(editor: Editor, options: {
 				{ command: cmds.setHeader4, commandContext },
 				{ command: cmds.setHeader5, commandContext },
 				{ command: cmds.setHeader6, commandContext }
+			]
+		})
+
+		menu.push({
+			label: 'Links',
+			submenu: [
+				{ command: cmds.toggleWikiLink, commandContext },
+				{ command: cmds.toggleMDLink, commandContext }
+			]
+		})
+
+		menu.push({
+			label: 'Highlights',
+			submenu: [
+				{ command: cmds.toggleHighlight, commandContext },
+				{ type: 'separator' },
+				{ command: cmds.toggleCircleGrayHighlight, commandContext },
+				{ command: cmds.toggleSquareGrayHighlight, commandContext },
+				{ command: cmds.toggleCircleYellowHighlight, commandContext },
+				{ command: cmds.toggleSquareYellowHighlight, commandContext },
+				{ command: cmds.toggleCircleOrangeHighlight, commandContext },
+				{ command: cmds.toggleSquareOrangeHighlight, commandContext },
+				{ command: cmds.toggleCircleRedHighlight, commandContext },
+				{ command: cmds.toggleSquareRedHighlight, commandContext },
+				{ command: cmds.toggleCircleGreenHighlight, commandContext },
+				{ command: cmds.toggleSquareGreenHighlight, commandContext },
+				{ command: cmds.toggleCircleBlueHighlight, commandContext },
+				{ command: cmds.toggleSquareBlueHighlight, commandContext },
+				{ command: cmds.toggleCirclePurpleHighlight, commandContext },
+				{ command: cmds.toggleSquarePurpleHighlight, commandContext },
 			]
 		}),
 

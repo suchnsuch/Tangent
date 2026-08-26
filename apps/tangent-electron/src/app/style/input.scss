@@ -47,6 +47,85 @@ input[type="number"] {
 	box-shadow: -1px 1px 2px 1px rgba(0, 0, 0, .2) inset;
 }
 
+input {
+	--controlColor: white;
+}
+
+.dark input {
+	--controlColor: var(--textColor);
+}
+
+input[type="checkbox"] {
+	appearance: none;
+	width: 3.5em;
+	height: 2em;
+	padding: 0;
+	border-radius: 2em;
+	position: relative;
+
+	cursor: pointer;
+
+	transition: background-color .125s;
+	box-shadow: -1px 1px 1px 1px rgba(0, 0, 0, .1) inset;
+
+	&::after {
+		content: '';
+		width: 1.6em;
+		height: 1.6em;
+		border-radius: 1.6em;
+		background-color: var(--controlColor);
+		position: absolute;
+		top: .125em;
+		left: .125em;
+
+		transition: left .125s;
+		box-shadow: -1px 1px 1px 1px rgba(0, 0, 0, .1);
+	}
+	&:checked {
+		background-color: var(--accentActiveBackgroundColor);
+		&::after {
+			left: 1.6em;
+		}
+	}
+	&:hover {
+		background-color: var(--accentBackgroundColor);
+	}
+}
+
+input[type="range"] {
+	appearance: none;
+	position: relative;
+	border-radius: 1em;
+
+	cursor: pointer;
+	background-color: transparent;
+	border: none;
+
+	&::-webkit-slider-runnable-track {
+		height: 50%;
+		background-color: var(--buttonBackgroundColor);
+		border-radius: 1em;
+	}
+
+	&::-webkit-slider-thumb {
+		top: -50%;
+		appearance: none;
+		position: relative;
+		width: 1em;
+		height: 1em;
+		background-color: var(--controlColor);
+		border-radius: 1em;
+
+		&:hover {
+			background-color: var(--accentBackgroundColor);
+		}
+	}
+}
+
+.light input[type="range"] {
+	--controlColor: var(--accentActiveBackgroundColor);
+}
+
 textarea {
 	color: var(--textColor);
 	background-color: var(--buttonBackgroundColor);

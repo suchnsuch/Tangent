@@ -34,9 +34,18 @@ article.note {
 		&[data-focus="focused"] {
 			opacity: unset;
 
-			.unfocused {
+			.unfocused:not(.unfocused *) { // Don't double up unfocused opacity
 				opacity: .5;	
 			}
+		}
+	}
+	&.focusing {
+		figure:not(.revealed) {
+			opacity: .5;
+			transition: opacity .3s;
+		}
+		figure.revealed .line {
+			opacity: unset !important;
 		}
 	}
 
