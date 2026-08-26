@@ -616,8 +616,7 @@ B. And this again`)
 				editor.doc = markdownToTextDocument(`
 - [] 1
 - [] 2
-- [] 3
-`)
+- [] 3`)
 				toggleCheckbox(editor, [1, 7 * 3], 'x')
 				await wait(waitTime)
 				expect(editor.getText()).toEqual(`
@@ -631,15 +630,14 @@ B. And this again`)
 - [x] 1
 - [] 2
 - [] 3
-- [ ] 4
-`)
+- [ ] 4`)
 				toggleCheckbox(editor, [1, 7 * 4], 'x')
 				await wait(waitTime)
 				expect(editor.getText()).toEqual(`
 - [ ] 1
 - [x] 2
-- [x] 4
-- [x] 5`)
+- [x] 3
+- [x] 4`)
 			})
 
 			it('should toggle normal line checkboxes', async () => {
