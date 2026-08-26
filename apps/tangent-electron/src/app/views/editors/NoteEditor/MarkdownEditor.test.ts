@@ -694,6 +694,30 @@ B. And this again`)
 `)
 			})
 
+			it('should toggle checkboxes with indent', async () => {
+				editor.doc = markdownToTextDocument(`
+	1
+	- [] 2
+	- [] 3
+	4
+	- [ ] 5
+	- 6
+	- 7
+`)
+				toggleCheckbox(editor, [1, 7 * 8], 'x')
+				await wait(waitTime)
+				expect(editor.getText()).toEqual(`
+	- [ ] 1
+	- [x] 2
+	- [x] 3
+	- [ ] 4
+	- [x] 5
+	- [ ] 6
+	- [ ] 7
+`)
+			})
+
+
 		})
 
 		it('Should allow checkboxes to indent unmolested', async () => {
