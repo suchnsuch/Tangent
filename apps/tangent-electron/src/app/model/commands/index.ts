@@ -41,6 +41,7 @@ import { CopyFileToClipboardCommand, UpdateFileFromClipboardCommand } from './Co
 import { OpenDetailsCommand } from './DetailCommands'
 import { OpenPaneSettingsCommand } from './PaneSettingsCommands'
 import { CopyAbsolutePathCommand, CopyRelativePathCommand } from './CopyPath'
+import { ToggleCheckboxCommand } from './ToggleCheckboxCommand.ts'
 import { toTitleCase } from 'common/stringUtils'
 import { highlightEmojiToClassDescriptor } from 'common/markdownModel/formatting'
 export { Command, CommandAction, type WorkspaceCommand }
@@ -304,6 +305,7 @@ function createAllCommands(workspace: Workspace) {
 		toggleMDLink: new ToggleMarkdownLinkCommand(workspace, {
 			shortcut: 'Mod+K'
 		}),
+		toggleCheckbox: new ToggleCheckboxCommand(workspace),
 
 		setHeader1: new NoteLinePrefixCommand(workspace, {
 			shortcut: 'Mod+1',

@@ -474,6 +474,61 @@ export function toggleLineComment(editor: MarkdownEditor, event?: ShortcutEvent)
 	change.apply()
 }
 
+export function toggleCheckbox(editor: Editor, selection: EditorRange, mark: string, forceTurnToCheckbox = true, listSymbol = '-') {
+	const EMPTY_CHECKBOX = "[ ] "
+	const EMPTY_LIST_CHECKBOX = listSymbol + " " + EMPTY_CHECKBOX
+	let addedCharactersCountEachLine: number[] = []
+
+	const { doc, change } = editor
+	const [selectionStart, selectionEnd] = normalizeRange(selection)
+
+	for (const lineRange of doc.getLineRanges([selectionStart, selectionEnd])) {
+		const [lineStart, lineEnd] = lineRange
+
+		const line = doc.getText(lineRange)
+		let addedCharactersCount = 0
+
+		if (line.trim().length){ // if the line was not empty
+			const match = line.match(listMatcher)
+
+			if (match) { // if the line was checkbox, toggle the state
+				const checkBoxStr = match[8]
+				if (checkBoxStr) { // if there was already a checkbox
+					const checkBoxStart = match.index + match[0].indexOf(checkBoxStr)
+					const head = lineStart + checkBoxStart + 1 // the index of [
+					const tail = head + checkBoxStr.length - 1 // the index of ]
+					const checkBoxInside = doc.getText([head+1, tail-1])
+					const replacement = checkBoxInside == mark ? ' ' : mark
+					change.insert(head+1, replacement)
+					change.delete([head+1, tail-1])
+					addedCharactersCount += replacement.length - checkBoxInside.length // current content of checkbox may be empty like []
+				}
+				else if (forceTurnToCheckbox) { // if there was already a list
+					const listIndicatorStr = match[2]
+					const listStart = match.index + match[0].indexOf(listIndicatorStr)
+					const head = lineStart + listStart + 1 // start of list indicator
+					const tail = head + listIndicatorStr.length - 1 // end of list indicator
+					change.insert(tail + 1, EMPTY_CHECKBOX)
+					addedCharactersCount += EMPTY_CHECKBOX.length
+				}
+			}
+			else if (forceTurnToCheckbox) { // if line was not checkbox and not empty, make it a checkbox
+				const firstNonSpaceIndex = line.length - line.trimStart().length
+				change.insert(lineStart + firstNonSpaceIndex, EMPTY_LIST_CHECKBOX)
+				addedCharactersCount += EMPTY_LIST_CHECKBOX.length
+			}
+		}
+
+		addedCharactersCountEachLine.push(addedCharactersCount)
+	}
+
+	change.select([
+		selectionStart + addedCharactersCountEachLine[0],
+		selectionEnd + addedCharactersCountEachLine.reduce((a,b) => a+b, 0)
+	])
+	change.apply()
+}
+
 export function setLinePrefix(editor: MarkdownEditor, selection: EditorRange, newPrefix: string, event?: Event) {
 	const { doc } = editor
 	if (!selection) return
