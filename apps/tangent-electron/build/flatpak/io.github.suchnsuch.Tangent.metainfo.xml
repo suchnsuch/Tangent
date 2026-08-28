@@ -87,6 +87,19 @@
   <update_contact>k8ie_AT_mcld.eu</update_contact>
 
   <releases>
+    <release version="0.12.9" date="2026-08-28">
+      <description>
+        <ul>
+          <li>Added commands for activating color highlights. They are now accessible from the application and context menus and can have keyboard shortcuts bound to them.</li>
+          <li>Added a command for toggling checkboxes on and off (Ctrl+[).</li>
+          <li>Added custom styling for checkboxes and range sliders that correctly invoke the configured accent color.</li>
+          <li>Fixed an issue where automatic word finding (e.g. for inline formatting toggles) did not detect non-Latin words.</li>
+          <li>Fixed an issue where Math, Mermaid Diagrams, and Highlights did not correctly fade out in focus mode.</li>
+          <li>Fixed an issue where the currently selected settings tab wasn't obvious in light mode.</li>
+          <li>Fixed an issue where hitting enter after "- [] 1" removed that line.</li>
+        </ul>
+      </description>
+    </release>
     <release version="0.12.8" date="2026-08-21">
       <description>
         <ul>
