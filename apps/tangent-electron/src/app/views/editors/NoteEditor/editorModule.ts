@@ -766,7 +766,9 @@ export default function editorModule(editor: Editor, options: {
 				{ command: cmds.setHeader3, commandContext },
 				{ command: cmds.setHeader4, commandContext },
 				{ command: cmds.setHeader5, commandContext },
-				{ command: cmds.setHeader6, commandContext }
+				{ command: cmds.setHeader6, commandContext },
+				{ type: 'separator' },
+				{ command: cmds.toggleCheckbox, commandContext }
 			]
 		})
 

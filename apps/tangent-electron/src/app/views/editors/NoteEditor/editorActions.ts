@@ -7,7 +7,7 @@ import { getLineFormattingPrefix } from 'common/markdownModel/line'
 import { repeatString } from '@such-n-such/core'
 import { findSectionLines } from 'common/markdownModel/sections'
 import { numberOf } from 'common/stringUtils'
-import { getAutoChild, getDelimiterForGlyph, getGlyphForNumber, ListForm, listMatcher, splitCheckboxGlyphs, type ListDefinition } from 'common/markdownModel/list'
+import { getAutoChild, getDelimiterForGlyph, getGlyphForNumber, ListForm, listMatcher, matchList, splitCheckboxGlyphs, type ListDefinition } from 'common/markdownModel/list'
 import { indentMatcher } from 'common/markdownModel/matches'
 
 export function toggleInlineFormat(editor: Editor, selection: EditorRange, formattingCharacters: string, predicate: AttributePredicate, event?: Event) {
@@ -474,49 +474,110 @@ export function toggleLineComment(editor: MarkdownEditor, event?: ShortcutEvent)
 	change.apply()
 }
 
-export function toggleCheckbox(editor: Editor, selection: EditorRange, mark: string, forceTurnToCheckbox = true, listSymbol = '-') {
-	const EMPTY_CHECKBOX = "[ ] "
-	const EMPTY_LIST_CHECKBOX = listSymbol + " " + EMPTY_CHECKBOX
+type ToggleCheckboxTarget = 'create'|'apply'|'clear' | 'toggle'|'unify'
+type ToggleCheckboxOptions = {
+	targetMark?: string
+	convertNonCheckbox?: boolean
+	convertNonList?: boolean
+	defaultListDelimiter?: string
+	target?: ToggleCheckboxTarget
+}
+
+export function toggleCheckbox(editor: Editor, selection: EditorRange, options?: ToggleCheckboxOptions) {
 	let addedCharactersCountEachLine: number[] = []
+
+	const markToApply = options?.targetMark ?? 'x'
+	const convertNonCheckbox = options?.convertNonCheckbox ?? true
+	const convertNonList = options?.convertNonList ?? true
+	const defaultListDelimiter = options?.defaultListDelimiter ?? '-'
+	let target = options?.target ?? 'unify'
 
 	const { doc, change } = editor
 	const [selectionStart, selectionEnd] = normalizeRange(selection)
 
-	for (const lineRange of doc.getLineRanges([selectionStart, selectionEnd])) {
+	const lineRanges = doc.getLineRanges([selectionStart, selectionEnd])
+
+	if (target === 'unify') {
+		const markToApplyInBox = ` [${markToApply}]`
+		// Check all lines to determine what the actual action should be
+		for (const lineRange of lineRanges) {
+			const line = doc.getText(lineRange)
+			if (!line.trim().length) continue // Skip empty lines
+
+			const match = line.match(listMatcher)
+			if (match) { // if the line was checkbox, toggle the state
+				const checkBoxStr = match[8]
+				if (checkBoxStr) {
+					if (checkBoxStr !== markToApplyInBox) {
+						target = 'apply'
+					}
+				}
+				else if (convertNonCheckbox) {
+					target = 'create'
+					break
+				}
+			}
+			else if (convertNonList) {
+				target = 'create'
+				break
+			}
+		}
+
+		if (target === 'unify') target = 'clear' // All lines were checked, so we will uncheck them
+	}
+
+	function getTargetMark(currentMark: string|undefined): string {
+		if (target === 'toggle') {
+			if (currentMark == undefined) return ' '
+			return currentMark === markToApply ? ' ' : markToApply
+		}
+		if (target === 'create') {
+			if (!currentMark) return ' ' // Normalize non-checkboxes and `[]` checkboxes
+			return currentMark // A call for creation does nothing to existing marks
+		}
+		if (target === 'clear') return ' '
+		return markToApply
+	}
+
+	for (const lineRange of lineRanges) {
 		const [lineStart, lineEnd] = lineRange
 
 		const line = doc.getText(lineRange)
+		if (!line.trim().length) continue // Skip empty lines
+
 		let addedCharactersCount = 0
 
-		if (line.trim().length){ // if the line was not empty
-			const match = line.match(listMatcher)
-
-			if (match) { // if the line was checkbox, toggle the state
-				const checkBoxStr = match[8]
-				if (checkBoxStr) { // if there was already a checkbox
-					const checkBoxStart = match.index + match[0].indexOf(checkBoxStr)
-					const head = lineStart + checkBoxStart + 1 // the index of [
-					const tail = head + checkBoxStr.length - 1 // the index of ]
-					const checkBoxInside = doc.getText([head+1, tail-1])
-					const replacement = checkBoxInside == mark ? ' ' : mark
-					change.insert(head+1, replacement)
-					change.delete([head+1, tail-1])
-					addedCharactersCount += replacement.length - checkBoxInside.length // current content of checkbox may be empty like []
-				}
-				else if (forceTurnToCheckbox) { // if there was already a list
-					const listIndicatorStr = match[2]
-					const listStart = match.index + match[0].indexOf(listIndicatorStr)
-					const head = lineStart + listStart + 1 // start of list indicator
-					const tail = head + listIndicatorStr.length - 1 // end of list indicator
-					change.insert(tail + 1, EMPTY_CHECKBOX)
-					addedCharactersCount += EMPTY_CHECKBOX.length
+		const match = line.match(listMatcher)
+		if (match) { // if the line was checkbox, toggle the state
+			const checkBoxStr = match[8]
+			if (checkBoxStr) { // if there was already a checkbox
+				const checkBoxStart = match.index + match[0].indexOf(checkBoxStr)
+				const head = lineStart + checkBoxStart + 1 // the index of [
+				const tail = head + checkBoxStr.length - 1 // the index of ]
+				const currentMark = doc.getText([head + 1, tail - 1])
+				const targetMark = getTargetMark(currentMark)
+				if (targetMark != currentMark) {
+					const replacement = currentMark == targetMark ? ' ' : targetMark
+					change.insert(head + 1, replacement)
+					change.delete([head + 1, tail - 1])
+					addedCharactersCount += replacement.length - currentMark.length // current content of checkbox may be empty like []
 				}
 			}
-			else if (forceTurnToCheckbox) { // if line was not checkbox and not empty, make it a checkbox
-				const firstNonSpaceIndex = line.length - line.trimStart().length
-				change.insert(lineStart + firstNonSpaceIndex, EMPTY_LIST_CHECKBOX)
-				addedCharactersCount += EMPTY_LIST_CHECKBOX.length
+			else if (convertNonCheckbox) { // if there was already a list
+				const listIndicatorStr = match[2]
+				const listStart = match.index + match[0].indexOf(listIndicatorStr)
+				const head = lineStart + listStart + 1 // start of list indicator
+				const tail = head + listIndicatorStr.length - 1 // end of list indicator
+				const glyph = `[${getTargetMark(undefined)}] `
+				change.insert(tail + 1, glyph)
+				addedCharactersCount += glyph.length
 			}
+		}
+		else if (convertNonList) { // if line was not checkbox and not empty, make it a checkbox
+			const firstNonSpaceIndex = line.length - line.trimStart().length
+			const glyph = `${defaultListDelimiter} [${getTargetMark(undefined)}] `
+			change.insert(lineStart + firstNonSpaceIndex, glyph)
+			addedCharactersCount += glyph.length
 		}
 
 		addedCharactersCountEachLine.push(addedCharactersCount)

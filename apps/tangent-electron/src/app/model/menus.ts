@@ -240,7 +240,9 @@ export function buildMainMenu(workspace: Workspace): MenuItemConstructorOptions[
 				{ command: cmds.setHeader3 },
 				{ command: cmds.setHeader4 },
 				{ command: cmds.setHeader5 },
-				{ command: cmds.setHeader6 }
+				{ command: cmds.setHeader6 },
+				{ type: 'separator' },
+				{ command: cmds.toggleCheckbox }
 			]
 		},
 		{

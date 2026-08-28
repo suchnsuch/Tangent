@@ -23,7 +23,7 @@ interface ToggleCheckboxCommandContext extends CommandContext {
 export class ToggleCheckboxCommand extends WorkspaceCommand {
 
 	constructor(workspace: Workspace) {
-		super(workspace, { group: 'Notes' })
+		super(workspace, { group: 'Notes', shortcut: 'Mod+[' })
 	}
 
 	getTargets(context?: ToggleCheckboxCommandContext) {
@@ -54,16 +54,17 @@ export class ToggleCheckboxCommand extends WorkspaceCommand {
 		const targets = this.getTargets(context)
 		if (!targets) return
 		const { editor, selection } = targets
-		const mark = this.workspace?.settings?.defaultTodoCompleteChar.value
-		toggleCheckbox(editor, selection, mark)
+		toggleCheckbox(editor, selection, {
+			targetMark: this.workspace?.settings?.defaultTodoCompleteChar.value
+		})
 	}
 
 	getLabel(context?: ToggleCheckboxCommandContext) {
-		return "Toggle Checkbox State"
+		return "Toggle Checkbox"
 	}
 
 	getTooltip(context?: ToggleCheckboxCommandContext) {
-		return "Switches checkbox state between on and off"
+		return "Turns lines into a checkbox and switches checkbox state between on and off."
 	}
 
 	getDefaultPaletteName() {
