@@ -743,6 +743,9 @@ export default class Workspace extends EventDispatcher {
 		if (tangent.focusLevel.value === FocusLevel.Map) {
 			this.commands.setThreadFocusLevel.execute({})
 		}
+
+		viewState.focusing.set(false)
+		
 		if (!viewState.directoryView.selection.includes(targetNode)) {
 			viewState.directoryView.selection.set([targetNode])
 		}
