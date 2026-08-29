@@ -3,7 +3,6 @@ import {
 	EditorChangeEvent,
 	type EditorRange,
 	normalizeRange,
-	deltaToText, 
 	Op,
 	Line,
 	Delta,
@@ -17,17 +16,16 @@ import {
 	TextDocument
 } from 'typewriter-editor'
 
-import { requestCallbackOnIdle, wait } from '@such-n-such/core'
+import { wait } from '@such-n-such/core'
 import { parseMarkdown } from 'common/markdownModel'
 import { getLineFormatData, getLineFormattingPrefix, type IndentDefinition, lineFormatEscapeMode } from 'common/markdownModel/line'
 import { TangentLink } from './t-link'
 import TangentCheckbox from './t-checkbox'
 import TangentCodePreview from './t-code-preview' // No deletey
 import TangentMath from './t-math' // No deletey
-import { indentMatcher } from 'common/markdownModel/matches'
-import { checkboxMatcher, getAutoChild, getDelimiterForGlyph, getGlyphForNumber, ListDefinition, ListForm, listMatcher, splitCheckboxGlyphs } from 'common/markdownModel/list'
+import { ListDefinition, listMatcher } from 'common/markdownModel/list'
 import type { Workspace } from 'app/model'
-import { deltaHasTextChanges, getEditInfo, getLineRangeWhile, getRangeWhile, getRangesIntersecting, getSelectedLines, intersectRanges, lineToText } from 'common/typewriterUtils'
+import { deltaHasTextChanges, getEditInfo, getLineRangeWhile, getRangeWhile, lineToText } from 'common/typewriterUtils'
 import { isLeftClick, startDrag } from 'app/utils'
 import { subscribeUntil } from 'common/stores'
 import { handleIsNode } from 'app/model/NodeHandle'
@@ -514,6 +512,20 @@ export default function editorModule(editor: Editor, options: {
 		}
 	}) : null
 
+	function considerLineEmpty(newPrefix: string, line: Line) {
+		if (!newPrefix) return false
+		const lineText = lineToText(line)
+
+		const listMatch = lineText.match(listMatcher)
+		if (listMatch) {
+			return listMatch[0].length === lineText.length
+		}
+		else {
+			return line.length - 1 === newPrefix.length
+				&& lineText.startsWith(newPrefix)
+		}
+	}
+
 	function onEnter(event: ShortcutEvent) {
 		const { doc } = editor
     	let { selection } = doc
@@ -529,10 +541,7 @@ export default function editorModule(editor: Editor, options: {
 		let newLinePrefix = getLineFormattingPrefix(line, true)
 
 		// Check to see if this is blank line that should be breaking the prefix
-		if (newLinePrefix
-			&& line.length - 1 === newLinePrefix.length
-			&& lineToText(line).startsWith(newLinePrefix)
-		) {
+		if (considerLineEmpty(newLinePrefix, line)) {
 			const escapeMode = lineFormatEscapeMode(line)
 			switch (escapeMode) {
 				case 'single':
