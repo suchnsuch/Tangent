@@ -50,6 +50,7 @@ input[type="number"] {
 textarea {
 	color: var(--textColor);
 	background-color: var(--buttonBackgroundColor);
+	resize: vertical;
 }
 
 .dark {
