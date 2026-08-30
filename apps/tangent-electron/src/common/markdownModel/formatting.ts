@@ -103,12 +103,12 @@ export function parseHighlight(char: string, parser: NoteParser): boolean {
 	return false
 }
 
-const highlight = [
+export const highlightCharacters = [
 	'🔴', '🟥', '🟠', '🟧', '🟡', '🟨', '🟢', '🟩', '🔵', '🟦', '🟣', '🟪', '⚪', '⬜'
 ]
 
 // See https://stackoverflow.com/questions/37089427/javascript-find-emoji-in-string-and-parse
-export const highlightEmojiMatch = new RegExp(highlight.join('|'))
+export const highlightEmojiMatch = new RegExp(highlightCharacters.join('|'))
 
 export function highlightEmojiToClassDescriptor(emoji: string) {
 	switch (emoji) {
@@ -145,7 +145,7 @@ export function highlightEmojiToClassDescriptor(emoji: string) {
 
 const highlightFormatting: { [key: string]: AttributeMap } = {}
 
-for (const h of highlight) {
+for (const h of highlightCharacters) {
 	highlightFormatting[h] = {
 		highlight: highlightEmojiToClassDescriptor(h)
 	}

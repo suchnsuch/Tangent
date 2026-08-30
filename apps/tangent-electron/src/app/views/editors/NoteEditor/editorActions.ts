@@ -45,9 +45,15 @@ export function toggleInlineFormat(editor: Editor, selection: EditorRange, forma
 
 		for (const range of ranges) {
 			const [start, end] = range
+
+			const head = [start, start + formatLength] as [number, number]
+			const tail = [end - formatLength, end] as [number, number]
+
+			console.log(editor.doc.getText(head), editor.doc.getText(tail))
+
 			change
-				.delete([start, start + formatLength])
-				.delete([end - formatLength, end ])
+				.delete(head)
+				.delete(tail)
 			
 			const atNormal = at - start
 			const toNormal = to - start
