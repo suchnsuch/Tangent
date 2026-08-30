@@ -87,6 +87,155 @@
   <update_contact>k8ie_AT_mcld.eu</update_contact>
 
   <releases>
+    <release version="0.12.9" date="2026-08-28">
+      <description>
+        <ul>
+          <li>Added commands for activating color highlights. They are now accessible from the application and context menus and can have keyboard shortcuts bound to them.</li>
+          <li>Added a command for toggling checkboxes on and off (Ctrl+[).</li>
+          <li>Added custom styling for checkboxes and range sliders that correctly invoke the configured accent color.</li>
+          <li>Fixed an issue where automatic word finding (e.g. for inline formatting toggles) did not detect non-Latin words.</li>
+          <li>Fixed an issue where Math, Mermaid Diagrams, and Highlights did not correctly fade out in focus mode.</li>
+          <li>Fixed an issue where the currently selected settings tab wasn't obvious in light mode.</li>
+          <li>Fixed an issue where hitting enter after "- [] 1" removed that line.</li>
+        </ul>
+      </description>
+    </release>
+    <release version="0.12.8" date="2026-08-21">
+      <description>
+        <ul>
+          <li>Fixed an issue that caused errors in Mermaid Diagrams to add elements in the background, eventually breaking layout.</li>
+          <li>Fixed an issue where headers with adjacent space-like elements (e.g. My - Header) would not be matched properly.</li>
+          <li>Fixed an issue where the images of website previews were not horizontally centered.</li>
+        </ul>
+      </description>
+    </release>
+    <release version="0.12.7" date="2026-08-18">
+      <description>
+        <ul>
+          <li>Added "Open to the Right/Left/Replace" options to the context menu of files and folders in the sidebar.</li>
+          <li>Changed the "trash items on delete" default to false on Linux. This caused friction for many.</li>
+          <li>Added gray emoji-based highlight options.</li>
+          <li>Changed the configuration of "safe header" names to be much more lenient, allowing for non-latin headers.</li>
+        </ul>
+      </description>
+    </release>
+    <release version="0.12.6" date="2026-08-11">
+      <description>
+        <ul>
+          <li>Fixed an issue where Wiki Links to headers that had extra whitespace around them couldn't match their target header.</li>
+        </ul>
+      </description>
+    </release>
+    <release version="0.12.5" date="2026-08-09">
+      <description>
+        <ul>
+          <li>Fixed an issue where shifting list items up with more than two other list items below it garbled the state of the list.</li>
+        </ul>
+      </description>
+    </release>
+    <release version="0.12.4" date="2026-08-08">
+      <description>
+        <ul>
+          <li>Added a "Copy Relative Path" command.</li>
+          <li>Added support for panning in PDFs by holding space while clicking and dragging.</li>
+          <li>Added support for shifting scroll direction in images and PDFs by holding shift while dragging.</li>
+          <li>Fixed an issue where shifting ordered lists with keyboard shortcuts didn't re-order the list glyphs.</li>
+          <li>Fixed an issue where completing a wiki link by typing didn't correctly exit autocomplete.</li>
+          <li>Added an exploratory fix for an issue related to duplicate session keys.</li>
+        </ul>
+      </description>
+    </release>
+    <release version="0.12.3" date="2026-07-28">
+      <description>
+        <ul>
+          <li>Added a command for copying the full path of a file or folder with Cmd/Ctrl+Shift+C.</li>
+          <li>Fixed a bug where attempting to drag-select a range that was larger than the editor would cause the editor to constantly scroll to the top of the selection.</li>
+          <li>Fixed a bug where selecting a range larger than the editor with cursor keys did not show the leading edge of selection.</li>
+        </ul>
+      </description>
+    </release>
+    <release version="0.12.2" date="2026-07-10">
+      <description>
+        <ul>
+          <li>Embed links on their own line now collapse the text, removing the empty gap. This can be disabled in settings.</li>
+          <li>Added support for floating embedded images, videos, etc. to the left or right.</li>
+          <li>Added support for controlling the width and height of all embedded content.</li>
+          <li>Added support for zooming on PDF views.</li>
+          <li>Added support for treating + as the equivalent to x for completing Todos, allowing RTL language detection to not get tripped up.</li>
+          <li>Added unicode replacement support for double arrows (⟹, ⇒, ⇐, ⟸).</li>
+          <li>Added a Startup Behavior option that lets you choose between restoring old windows or always showing the workspace selector.</li>
+          <li>Added a setting for code tab size.</li>
+          <li>Fixed an issue where headers in RTL languages did not work correctly.</li>
+          <li>Fixed an issue where the Cards Lens did not correctly render RTL languages.</li>
+          <li>Fixed a leak where links in closed notes retained node handles on their target files and folders.</li>
+          <li>Fixed an embedded PDF scaling issue unique to Windows 10.</li>
+          <li>Fixed an issue where Wiki Links could not link to notes with brackets in their name.</li>
+          <li>Fixed an issue where raw links auto-embedded in sub-lists but not in top-level lists.</li>
+          <li>Fixed an issue where the scroll position of the Map View wasn't correctly cached.</li>
+          <li>Fixed an issue where code tab size was a non-integer value.</li>
+          <li>Fixed an issue where right-gutter elements could be misaligned.</li>
+          <li>Fixed an issue where code blocks did not respond to panes resizing and did not shrink back down.</li>
+        </ul>
+      </description>
+    </release>
+    <release version="0.12.1" date="2026-06-02">
+      <description>
+        <ul>
+          <li>Fixed a regression where the first character of $math$ notation was not rendered.</li>
+        </ul>
+      </description>
+    </release>
+    <release version="0.12.0" date="2026-06-02">
+      <description>
+        <ul>
+          <li>The Details Panel is universal across all views, making backlinks accessible anywhere.</li>
+          <li>Creation Rules now support Content Templates. Template tokens are highlighted within notes, and include explanatory tooltips and autocomplete.</li>
+          <li>Creation Rules of parent folders now show up in the creation rule list of sub-folders that would be affected.</li>
+          <li>ISO week numbers are now supported in Creation Rule name and content templates.</li>
+          <li>Cmd/Ctrl+Alt+Up opens the settings panel in the current pane. Pane settings can be navigated by the keyboard.</li>
+          <li>The Feed, Cards, and List Lenses can be navigated with the keyboard.</li>
+          <li>Added the "Move to Left Note" Cmd/Ctrl+Alt+Left shortcut to move keyboard focus to the Sidebar. Pressing Cmd/Ctrl+Alt+Right while focus is in the sidebar returns focus to the leftmost pane.</li>
+          <li>The - and * list characters are now treated as different kinds. Swapping between them in a list will propagate that change to all lower siblings.</li>
+          <li>List glyphs automatically change as you indent, progressing from alpha to numeric and * to -. This can be disabled in the note settings.</li>
+          <li>Added support for 1) and A) style ordered lists. These count as "large lists" in the same way as * unordered lists.</li>
+          <li>Added support for using several unicode bullet characters (e.g. •, ◦, ⁍, ‣, ❧) as list glyphs.</li>
+          <li>Added the ability to link to specific PDF page numbers and to times in audio and video files.</li>
+          <li>Embedded PDF files now show the entire linked page.</li>
+          <li>Added the option in the context menu to update an image from the clipboard.</li>
+          <li>Added .webp image files to the image allow list.</li>
+          <li>Added display of link context on the Map View when available.</li>
+          <li>Sentence focus will highlight the previous sentence if the cursor is within trailing whitespace of a line. This leaves the last sentence highlighted when you haven't yet started a new one.</li>
+          <li>Changed the word count mechanism, improving non-latin word counts.</li>
+          <li>Added support for drag-dropping files in the sidebar to root.</li>
+          <li>Made the floating "Create" button universal across the Folder, Feed, and List Lenses.</li>
+          <li>Added an option to base keyboard shortcuts on keycode values, keeping them in the same physical location as locales change.</li>
+          <li>Added support for unbalanced parentheses in markdown links when urls are wrapped in angle brackets.</li>
+          <li>Added a setting to disable auto-updates.</li>
+          <li>Added support for updating links to folders when folders are renamed.</li>
+          <li>Added support for only showing spell check in filenames and note content when that note or filename has editing focus. Enabled by default.</li>
+          <li>Changed the default font to the more modern system-ui.</li>
+          <li>Updated to Electron 42.1 and Svelte 5.</li>
+          <li>Fixed an issue where thousands of in-note-search results could cause dramatic performance issues by limiting the number of rendered annotations.</li>
+          <li>Fixed a bug where queries that had wiki references after text filters did not correctly filter data.</li>
+          <li>Fixed a bug where $math$ required whitespace to the left of the opening character.</li>
+          <li>Fixed a bug where wiki link autocomplete with aliases and headers was broken.</li>
+          <li>Fixed a bug with Emoji Highlights that incorrectly hid the last character.</li>
+          <li>Fixed a long-standing bug where a window's "maximized" state was not recorded and restored.</li>
+          <li>Fixed an issue where extra Referer header data present for embedding YouTube videos caused remote images to not load successfully.</li>
+          <li>Fixed an issue where content_id (e.g. #Header) information on a link would be lost when that link was updated while renaming the target file.</li>
+          <li>Fixed an issue where inline formatting could activate incorrectly. e.g. === will no longer trigger highlights.</li>
+          <li>Fixed an issue where the text carat was hard to read in highlighted text.</li>
+          <li>Fixed an issue where trying to toggle on an inline style with a collapsed selection somewhat before an existing inline range of the same style could toggle off that second style rather than adding a new inline range.</li>
+          <li>Fixed an issue where clicking on the gutter of a note would select the bottom of the note rather than the beginning or end of the closest paragraph.</li>
+          <li>Removed tooltips when hovering over embedded content to reduce obnoxious distraction.</li>
+          <li>Fixed several issues that resulted in maps responding to the delete key when they shouldn't.</li>
+          <li>Fixed an issue where editing a filename responded to shortcuts for bold, italic, etc.</li>
+          <li>Fixed several issues with searching for diacritics with latin characters, and added support for finding ł with l.</li>
+          <li>Fixed an issue where adding new lines around lists could mangle the list formatting.</li>
+          <li>Fixed an issue where lone $ characters could break immediately-following inline formatting.</li>
+        </ul>
+      </description>
+    </release>
     <release version="0.11.6" date="2026-01-10">
       <description>
         <ul>

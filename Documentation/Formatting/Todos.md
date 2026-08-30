@@ -4,7 +4,7 @@ Todo items are a sub-type of [[Lists]]. A list item appended with ` [ ]` will be
 - [x] Closed todo item
 - [-] Canceled todo item
 
-You can click directly on the checkbox to toggle the state of the todo item from open to done. You can right-click on the checkbox to choose from all options.
+You can click directly on the checkbox to toggle the state of the todo item from open to done. You can right-click on the checkbox to choose from all options. The `Cmd/Ctrl+[` shortcut will turn lines into checkboxes and toggle existing checkboxes on and off.
 
 # Querying Todos
 You can write [[Queries]] for todos using the `todo` or `todos` keyword with modifiers.

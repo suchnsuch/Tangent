@@ -48,7 +48,7 @@ export function searchWhileCharacterMatches(text: string, match: RegExp, start: 
 }
 
 export function findWordAround(text: string, position: number) {
-	const match = /[\w\d_-]/
+	const match = /[^\s \[\]\(\){}<>\|\\\/"'`~:;,\.\?=\+!@#$%^&\*]/
 	const behindSearch = searchWhileCharacterMatches(text, match, position, -1)
 	const wordStart = behindSearch.foundAnyMatches ? behindSearch.index : position
 	const aheadSearch = searchWhileCharacterMatches(text, match, position - 1, 1)
@@ -83,3 +83,12 @@ export function numberOf(target: string, content: string) {
 	}
 	return count
 }
+
+export function toTitleCase(text) {
+	const words = text.split(/\s+/)
+	const titleCased = words
+		.map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+		.join(' ')
+	return titleCased
+}
+

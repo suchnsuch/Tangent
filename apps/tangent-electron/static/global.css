@@ -8,6 +8,7 @@
 	--codeFontFamily: 'FiraCode-Retina', FiraCode, Consolas, Menlo, Monaco, 'Courier New', monospace;
 	--spaceWidth: .25em;
 	--indentSize: 8;
+	--codeTabSize: 4;
 	--indentWidth: calc(var(--indentSize) * var(--spaceWidth));
 	tab-size: var(--indentWidth);
 
@@ -74,6 +75,7 @@
 	--highlightGreenBGColor: #94eb75;
 	--highlightBlueBGColor: #a3d2fc;
 	--highlightPurpleBGColor: #e7aaff;
+	--highlightGrayBGColor: #b7b7b7;
 	--highlightTextColor: var(--textColor);
 
 	--highlightBackgroundColor: var(--highlightYellowBGColor);
@@ -252,4 +254,8 @@ p:not(:last-child) {
 
 .spacer {
 	flex-grow: 1;
+}
+
+pre code {
+	tab-size: var(--codeTabSize);
 }

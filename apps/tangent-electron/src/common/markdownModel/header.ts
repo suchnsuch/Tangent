@@ -35,10 +35,10 @@ export function safeHeaderLine(text: string) {
 	}
 
 	// Remove bad characters
-	text = text.replace(/[^\w\d-_ &%$!]+/g, '')
+	text = text.replace(/[+=?/\\#%<>[\]{}\|^]/g, '')
 
 	// Condense spaces
-	return text.replace(/ +/g, ' ')
+	return text.replace(/ +/g, ' ').trim()
 }
 
 export function parseHeader(char: string, parser: NoteParser): boolean {

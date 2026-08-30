@@ -130,6 +130,47 @@ function itemContext(event: MouseEvent, item: TreeNode) {
 		})
 	}
 
+	menu.push(
+		{ type: 'separator' },
+		{
+			label: 'Open to the Right',
+			accelerator: 'CommandOrControl+Enter',
+			toolTip: `Opens "${item.name}" in a new pane to the right of the current pane.`,
+			click() {
+				workspace.navigateTo({
+					target: item,
+					origin: 'current',
+					direction: 'out'
+				})
+			}
+		},
+		{
+			label: 'Open to the Left',
+			accelerator: 'CommandOrControl+Alt+Enter',
+			toolTip: `Opens "${item.name}" in a new pane to the left of the current pane.`,
+			click: () => {
+				workspace.navigateTo({
+					target: item,
+					origin: 'current',
+					direction: 'in'
+				})
+			}
+		},
+		{
+			label: 'Open as Current',
+			accelerator: 'CommandOrControl+Shift+Enter',
+			toolTip: `Replaces the current pane with "${item.name}."`,
+			click: () => {
+				workspace.navigateTo({
+					target: item,
+					origin: 'current',
+					direction: 'replace'
+				})
+			}
+		},
+		{ type: 'separator' }
+	)
+
 	if (item.fileType !== 'tag') {
 
 		menu.push({

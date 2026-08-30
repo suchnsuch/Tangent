@@ -34,9 +34,18 @@ article.note {
 		&[data-focus="focused"] {
 			opacity: unset;
 
-			.unfocused {
+			.unfocused:not(.unfocused *) { // Don't double up unfocused opacity
 				opacity: .5;	
 			}
+		}
+	}
+	&.focusing {
+		figure:not(.revealed) {
+			opacity: .5;
+			transition: opacity .3s;
+		}
+		figure.revealed .line {
+			opacity: unset !important;
 		}
 	}
 
@@ -388,7 +397,8 @@ article.note {
 	pre {
 		margin: 0;
 		padding: 0 .5em;
-		margin-left: -.5em;
+		margin-left: -.5em; // Counteract the padding so text starts at the same place
+		margin-right: -.5em;
 		overflow: auto;
 		border-radius: var(--borderRadius);
 
@@ -615,6 +625,10 @@ article.note {
 
 		&.purple {
 			background-color: var(--highlightPurpleBGColor);
+		}
+
+		&.gray {
+			background-color: var(--highlightGrayBGColor);
 		}
 	}
 

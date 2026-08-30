@@ -103,7 +103,9 @@ async function getSpellCheckLanguages() {
 		<SettingView setting={settings.noteCodeBlockDarkTheme}
 			getValues={workspace.api.theme.getCodeThemes}
 			includeDefault={false}/>
-		</div>
+		<SettingView setting={settings.noteCodeTabWidth}
+			name="Tab Width"/>
+	</div>
 	<div class="settingsGroup">
 		<SettingView setting={settings.letCodeExpand} />
 		<SettingView setting={settings.allowUnknownHTMLTags} />

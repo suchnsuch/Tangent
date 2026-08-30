@@ -5,12 +5,14 @@ export function rawOrStoreValue<T>(value: T | ReadableStore<T>) {
 	return value
 }
 
+export type ObserverFunc<T> = (value: T, oldValue?: T) => void
+
 /**
  * A base class for stores that want to have .value field
  * and observers
  */
 export class ReadableStore<T> {
-	protected observers: ((value: T, oldValue?: T) => void)[]
+	protected observers: ObserverFunc<T>[]
 	protected _value: T
 
 	constructor(value: T) {
@@ -28,12 +30,14 @@ export class ReadableStore<T> {
 		}
 	}
 
-	subscribe(observerFunc: (value: T, oldValue?: T) => void): () => void {
+	subscribe(observerFunc: ObserverFunc<T>): () => void {
 		this.observers.push(observerFunc)
 		observerFunc(this.value)
-		return () => {
-			swapRemove(this.observers, observerFunc)
-		}
+		return () => this.onUnsubscribe(observerFunc)
+	}
+
+	protected onUnsubscribe(observerFunc: ObserverFunc<T>) {
+		swapRemove(this.observers, observerFunc)
 	}
 
 	ifHasValue<R, D>(valueUser: (value: T) => R, otherwise?: D): R | D {

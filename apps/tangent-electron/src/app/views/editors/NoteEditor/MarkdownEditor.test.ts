@@ -8,7 +8,7 @@ import MarkdownEditor from './MarkdownEditor'
 import { Workspace } from 'app/model'
 import { getSelectedLines, lineToText } from 'common/typewriterUtils'
 import { ShortcutEvent } from 'typewriter-editor'
-import { shiftGroup, shiftLines, toggleBold, toggleItalic, toggleLineComment, toggleLink, toggleWikiLink } from './editorActions'
+import { shiftGroup, shiftLines, toggleBold, toggleCheckbox, toggleItalic, toggleLineComment, toggleLink, toggleWikiLink } from './editorActions'
 
 let editor: MarkdownEditor
 const waitTime = 10
@@ -451,8 +451,411 @@ describe('List Handling', () => {
 1. Some other line
 2. One more`)
 	})
-	
+
+	describe('Shifting lists', () => {
+		it('Should reorder numbered lists that are shifted up to the top', async () => {
+			editor.doc = markdownToTextDocument(`
+1. Some line
+2. Some other line
+3. And another
+3. One more`)
+			editor.select(22)
+			
+			shiftLines(editor, null, [editor.doc.lines[2]], -1)
+			await wait(waitTime)
+			expect(editor.getText()).toEqual(`
+1. Some other line
+2. Some line
+3. And another
+4. One more`)
+		})
+
+		it('Should reorder numbered lists that are shifted down', async () => {
+			editor.doc = markdownToTextDocument(`
+1. Some line
+2. Some other line
+3. One more`)
+			editor.select(22)
+			
+			shiftLines(editor, null, [editor.doc.lines[2]], 1)
+			await wait(waitTime)
+			expect(editor.getText()).toEqual(`
+1. Some line
+2. One more
+3. Some other line`)
+		})
+
+		it('Should reorder multiple numbered lists that are shifted up', async () => {
+			editor.doc = markdownToTextDocument(`
+1. Some line
+2. Some other line
+3. Another
+4. One more`)
+			editor.select([17, 36])
+			
+			shiftGroup(editor, editor.doc.selection, null, 'lines', -1)
+			await wait(waitTime)
+			expect(editor.getText()).toEqual(`
+1. Some other line
+2. Another
+3. Some line
+4. One more`)
+		})
+
+		it('Should reorder multiple numbered lists that are shifted down', async () => {
+			editor.doc = markdownToTextDocument(`
+1. Some line
+2. Some other line
+3. Another
+4. One more`)
+			editor.select([17, 36])
+			
+			shiftGroup(editor, editor.doc.selection, null, 'lines', 1)
+			await wait(waitTime)
+			expect(editor.getText()).toEqual(`
+1. Some line
+2. One more
+3. Some other line
+4. Another`)
+		})
+
+		it('Should let a list item change type when shifted across down', async () => {
+			editor.doc = markdownToTextDocument(`
+1. Some line
+2. Some other line
+3. Another
+4. One more
+
+A. This too
+B. And this
+C. And this again`)
+			editor.select(47)
+			
+			shiftGroup(editor, editor.doc.selection, null, 'lines', 1)
+			await wait(waitTime)
+			expect(editor.getText()).toEqual(`
+1. Some line
+2. Some other line
+3. Another
+
+A. One more
+B. This too
+C. And this
+D. And this again`)
+		})
+
+		it('Should let a list item change type when shifted across up', async () => {
+			editor.doc = markdownToTextDocument(`
+1. Some line
+2. Some other line
+3. Another
+4. One more
+
+A. This too
+B. And this
+C. And this again`)
+			editor.select(60)
+			
+			shiftGroup(editor, editor.doc.selection, null, 'lines', -1)
+			await wait(waitTime)
+			expect(editor.getText()).toEqual(`
+1. Some line
+2. Some other line
+3. Another
+4. One more
+5. This too
+
+A. And this
+B. And this again`)
+		})
+
+		it('Should reorder unrelated lists that happen to intersect the shift', async () => {
+			editor.doc = markdownToTextDocument(`
+1. Some line
+2. Some other line
+3. Another
+4. One more
+
+A. This too
+B. And this
+C. And this again`)
+			editor.select([47, 60])
+			
+			shiftGroup(editor, editor.doc.selection, null, 'lines', 1)
+			await wait(waitTime)
+			expect(editor.getText()).toEqual(`
+1. Some line
+2. Some other line
+3. Another
+4. And this
+5. One more
+
+A. This too
+B. And this again`)
+		})
+	})
+
 	describe('Checkboxes', () => {
+		describe('Toggle Checkboxes', () => {
+			const options = {
+				target: 'toggle'
+			} as const
+
+			it('should toggle spaced checkboxes', async () => {
+				editor.doc = markdownToTextDocument(`
+- [x] 1
+- [ ] 2
+- [x] 3
+- [ ] 4`)
+				toggleCheckbox(editor, [1, 7 * 4], options)
+				await wait(waitTime)
+				expect(editor.getText()).toEqual(`
+- [ ] 1
+- [x] 2
+- [ ] 3
+- [x] 4`)
+			})
+
+			it('should toggle empty checkboxes', async () => {
+				editor.doc = markdownToTextDocument(`
+- [] 1
+- [] 2
+- [] 3`)
+				toggleCheckbox(editor, [1, 7 * 3], options)
+				await wait(waitTime)
+				expect(editor.getText()).toEqual(`
+- [x] 1
+- [x] 2
+- [x] 3`)
+			})
+
+			it('should toggle space/empty checkboxes', async () => {
+				editor.doc = markdownToTextDocument(`
+- [x] 1
+- [] 2
+- [] 3
+- [ ] 4`)
+				toggleCheckbox(editor, [1, 7 * 4], options)
+				await wait(waitTime)
+				expect(editor.getText()).toEqual(`
+- [ ] 1
+- [x] 2
+- [x] 3
+- [x] 4`)
+			})
+
+			it('should toggle normal line checkboxes', async () => {
+				editor.doc = markdownToTextDocument(`
+1
+2
+3
+`)
+				toggleCheckbox(editor, [1, 7 * 7], options)
+				await wait(waitTime)
+				expect(editor.getText()).toEqual(`
+- [ ] 1
+- [ ] 2
+- [ ] 3
+`)
+			})
+
+			it('should toggle lists checkboxes', async () => {
+				editor.doc = markdownToTextDocument(`
+- 1
+- 2
+- 3
+`)
+				toggleCheckbox(editor, [1, 3 * 4], options)
+				await wait(waitTime)
+				expect(editor.getText()).toEqual(`
+- [ ] 1
+- [ ] 2
+- [ ] 3
+`)
+			})
+
+
+			it('should toggle mix style checkboxes', async () => {
+				editor.doc = markdownToTextDocument(`
+1
+- [] 2
+- [] 3
+4
+- [ ] 5
+- 6
+- 7
+`)
+				toggleCheckbox(editor, [1, 7 * 7], options)
+				await wait(waitTime)
+				expect(editor.getText()).toEqual(`
+- [ ] 1
+- [x] 2
+- [x] 3
+- [ ] 4
+- [x] 5
+- [ ] 6
+- [ ] 7
+`)
+			})
+
+			it('should toggle checkboxes with indent', async () => {
+				editor.doc = markdownToTextDocument(`
+	1
+	- [] 2
+	- [] 3
+	4
+	- [ ] 5
+	- 6
+	- 7
+`)
+				toggleCheckbox(editor, [1, 7 * 8], options)
+				await wait(waitTime)
+				expect(editor.getText()).toEqual(`
+	- [ ] 1
+	- [x] 2
+	- [x] 3
+	- [ ] 4
+	- [x] 5
+	- [ ] 6
+	- [ ] 7
+`)
+			})
+		})
+
+		describe('Unify Checkboxes', () => {
+			it('Should turn on unchecked boxes and leave checked boxes alone', async () => {
+				editor.doc = markdownToTextDocument(`
+- [x] 1
+- [ ] 2
+- [x] 3
+- [ ] 4`)
+				toggleCheckbox(editor, [1, 7 * 4])
+				await wait(waitTime)
+				expect(editor.getText()).toEqual(`
+- [x] 1
+- [x] 2
+- [x] 3
+- [x] 4`)
+			})
+
+			it('should toggle on empty checkboxes', async () => {
+				editor.doc = markdownToTextDocument(`
+- [] 1
+- [] 2
+- [] 3`)
+				toggleCheckbox(editor, [1, 7 * 3])
+				await wait(waitTime)
+				expect(editor.getText()).toEqual(`
+- [x] 1
+- [x] 2
+- [x] 3`)
+			})
+
+			it('should toggle off checked checkboxes', async () => {
+				editor.doc = markdownToTextDocument(`
+- [x] 1
+- [x] 2
+- [x] 3`)
+				toggleCheckbox(editor, [1, 7 * 3])
+				await wait(waitTime)
+				expect(editor.getText()).toEqual(`
+- [ ] 1
+- [ ] 2
+- [ ] 3`)
+			})
+
+			it('Should toggle on space/empty checkboxes and still leave checked boxes alone', async () => {
+				editor.doc = markdownToTextDocument(`
+- [x] 1
+- [] 2
+- [] 3
+- [ ] 4`)
+				toggleCheckbox(editor, [1, 7 * 4])
+				await wait(waitTime)
+				expect(editor.getText()).toEqual(`
+- [x] 1
+- [x] 2
+- [x] 3
+- [x] 4`)
+			})
+
+			it('Should create checkboxes from blank lines', async () => {
+				editor.doc = markdownToTextDocument(`
+1
+2
+3
+`)
+				toggleCheckbox(editor, [1, 7 * 7])
+				await wait(waitTime)
+				expect(editor.getText()).toEqual(`
+- [ ] 1
+- [ ] 2
+- [ ] 3
+`)
+			})
+
+			it('Should create checkboxes from plain lists', async () => {
+				editor.doc = markdownToTextDocument(`
+- 1
+- 2
+- 3
+`)
+				toggleCheckbox(editor, [1, 3 * 4])
+				await wait(waitTime)
+				expect(editor.getText()).toEqual(`
+- [ ] 1
+- [ ] 2
+- [ ] 3
+`)
+			})
+
+
+			it('Should create checkboxes when not present in mixed lists', async () => {
+				editor.doc = markdownToTextDocument(`
+1
+- [] 2
+- [] 3
+4
+- [ ] 5
+- 6
+- 7
+`)
+				toggleCheckbox(editor, [1, 7 * 7])
+				await wait(waitTime)
+				expect(editor.getText()).toEqual(`
+- [ ] 1
+- [ ] 2
+- [ ] 3
+- [ ] 4
+- [ ] 5
+- [ ] 6
+- [ ] 7
+`)
+			})
+
+			it('Should create checkboxes when not present in mixed lists with indent', async () => {
+				editor.doc = markdownToTextDocument(`
+	1
+	- [] 2
+	- [] 3
+	4
+	- [ ] 5
+	- 6
+	- 7
+`)
+				toggleCheckbox(editor, [1, 7 * 8])
+				await wait(waitTime)
+				expect(editor.getText()).toEqual(`
+	- [ ] 1
+	- [ ] 2
+	- [ ] 3
+	- [ ] 4
+	- [ ] 5
+	- [ ] 6
+	- [ ] 7
+`)
+			})
+		})
 
 		it('Should allow checkboxes to indent unmolested', async () => {
 			editor.doc = markdownToTextDocument(`

@@ -3,7 +3,6 @@ import {
 	EditorChangeEvent,
 	type EditorRange,
 	normalizeRange,
-	deltaToText, 
 	Op,
 	Line,
 	Delta,
@@ -17,17 +16,16 @@ import {
 	TextDocument
 } from 'typewriter-editor'
 
-import { requestCallbackOnIdle, wait } from '@such-n-such/core'
+import { wait } from '@such-n-such/core'
 import { parseMarkdown } from 'common/markdownModel'
 import { getLineFormatData, getLineFormattingPrefix, type IndentDefinition, lineFormatEscapeMode } from 'common/markdownModel/line'
 import { TangentLink } from './t-link'
 import TangentCheckbox from './t-checkbox'
 import TangentCodePreview from './t-code-preview' // No deletey
 import TangentMath from './t-math' // No deletey
-import { indentMatcher } from 'common/markdownModel/matches'
-import { checkboxMatcher, getAutoChild, getDelimiterForGlyph, getGlyphForNumber, ListDefinition, ListForm, listMatcher, splitCheckboxGlyphs } from 'common/markdownModel/list'
+import { ListDefinition, listMatcher } from 'common/markdownModel/list'
 import type { Workspace } from 'app/model'
-import { deltaHasTextChanges, getEditInfo, getLineRangeWhile, getRangeWhile, getRangesIntersecting, getSelectedLines, intersectRanges, lineToText } from 'common/typewriterUtils'
+import { deltaHasTextChanges, getEditInfo, getLineRangeWhile, getRangeWhile, lineToText } from 'common/typewriterUtils'
 import { isLeftClick, startDrag } from 'app/utils'
 import { subscribeUntil } from 'common/stores'
 import { handleIsNode } from 'app/model/NodeHandle'
@@ -37,6 +35,7 @@ import type MarkdownEditor from './MarkdownEditor'
 import { appendContextTemplate, type ContextMenuConstructorOptions } from 'app/model/menus'
 import { eventHasSelectionRequest } from 'app/events'
 import { createCommandHandler } from 'app/model/commands/Command'
+import { verifyListContext } from './editorActions'
 
 function clampRange(range: EditorRange, clampingRange: EditorRange): EditorRange {
 	range = normalizeRange(range)
@@ -50,15 +49,6 @@ function clampRange(range: EditorRange, clampingRange: EditorRange): EditorRange
 interface VerificationInstruction<T> {
 	func: (options: T, change: TextChange) => TextChange,
 	options: T
-}
-
-interface VerifyListOptions {
-	id: string,
-	targetIndent: string,
-	// Whether to apply the line's list format or incorporate into siblings'
-	basis: 'self' | 'rebasis'
-	// Whether to enforce that unordered glyphs are the same
-	normalizeUnorderedGlyphs: boolean
 }
 
 // Force the inclusion of elements so it is included in the module
@@ -268,6 +258,7 @@ export default function editorModule(editor: Editor, options: {
 				func: verifyListContext,
 				options: {
 					id,
+					editor: markdownEditor,
 					targetIndent: newIndent,
 					basis: (isGlyphCreator && newList) ? 'self' : 'rebasis',
 					normalizeUnorderedGlyphs: true
@@ -277,6 +268,7 @@ export default function editorModule(editor: Editor, options: {
 				func: verifyListContext,
 				options: {
 					id,
+					editor: markdownEditor,
 					targetIndent: oldIndent,
 					basis: 'rebasis',
 					normalizeUnorderedGlyphs: true
@@ -286,12 +278,13 @@ export default function editorModule(editor: Editor, options: {
 		else if (oldList && newList) {
 			if (!ListDefinition.areEqualExceptForActiveTodoState(oldList, newList)) {
 				// Only do anything if there is a difference
-				if (oldList.indent === newList.indent) {
+				if (oldIndent === newIndent) {
 					// Any change to form should propegate down
 					pushVerification({
 						func: verifyListContext,
 						options: {
 							id,
+							editor: markdownEditor,
 							targetIndent: oldIndent,
 							basis: 'self',
 							normalizeUnorderedGlyphs: true
@@ -306,6 +299,7 @@ export default function editorModule(editor: Editor, options: {
 				func: verifyListContext,
 				options: {
 					id,
+					editor: markdownEditor,
 					targetIndent: oldIndent,
 					basis: 'rebasis',
 					normalizeUnorderedGlyphs: isListGlyphCreationChange(delta) !== '\n'
@@ -322,6 +316,7 @@ export default function editorModule(editor: Editor, options: {
 					func: verifyListContext,
 					options: {
 						id,
+						editor: markdownEditor,
 						targetIndent: newIndent,
 						basis: isGlyphCreator ? 'self' : 'rebasis',
 						normalizeUnorderedGlyphs: true
@@ -329,204 +324,6 @@ export default function editorModule(editor: Editor, options: {
 				})
 			}
 		}
-	}
-
-	function verifyListContext(
-		options: VerifyListOptions,
-		change?: TextChange // An existing change to work with 
-	): TextChange {
-		const { doc } = editor
-		let selection = doc.selection?.slice()
-		let targetLine = doc.getLineBy(options.id)
-
-		if (!targetLine) return change
-
-		let lineText = deltaToText(targetLine.content)
-		let intendedIndent = options.targetIndent
-		
-		let targetRange = doc.getLineRange(targetLine)
-		let targetLineIndex = doc.lines.indexOf(targetLine)
-		
-		let targetListData = targetLine.attributes.list as ListDefinition
-		let targetIndent = targetLine.attributes.indent?.indent || ''
-
-		let targetForm: ListForm = undefined
-		let targetGlyph: string = undefined
-		let basisNumber: number = undefined
-
-		if (options.basis === 'self') {
-			if (!targetListData) {
-				console.error('Was told to verify a basis of "self", but the target line had no list data')
-				return change
-			}
-
-			targetForm = targetListData.form
-			targetGlyph = targetListData.glyph
-			basisNumber = targetListData.index
-		}
-		else if (!targetListData || targetIndent === intendedIndent || targetIndent.length > intendedIndent.length) {
-			// Find the basis for this indent level
-			for (let lineIndex = targetLineIndex - 1; lineIndex >= 0; lineIndex--) {
-				let prevLine = doc.lines[lineIndex]
-				let prevText = deltaToText(prevLine.content)
-				let indent = prevText.match(indentMatcher)[0]
-
-				if (indent === intendedIndent) {
-					// This is what we're looking for
-					const listData = prevLine.attributes.list as ListDefinition
-					if (listData) {
-						targetForm = listData.form
-						targetGlyph = listData.glyph
-						basisNumber = listData.index
-
-						if (basisNumber) basisNumber++
-					}
-					break
-				}
-				else if (indent.length < intendedIndent.length) {
-					if (lineIndex === targetLineIndex - 1 && (workspace?.settings.autoSetChildListGlyphs.value ?? true)) {
-						const listData = prevLine.attributes.list as ListDefinition
-						if (listData) {
-							const { form, glyph, basis } = getAutoChild(listData)
-							targetForm = form
-							targetGlyph = glyph
-							basisNumber = basis
-						}
-					}
-					break
-				}
-			}
-		}
-
-		if (targetForm === undefined || targetIndent.length < intendedIndent.length || (targetIndent === intendedIndent && !targetListData)) {
-			// Still don't have a target form. Look forward to find one
-			for (let lineIndex = targetLineIndex + 1; lineIndex < doc.lines.length; lineIndex++) {
-				let nextLine = doc.lines[lineIndex]
-				let nextText = deltaToText(nextLine.content)
-				let indent = nextText.match(indentMatcher)[0]
-	
-				if (indent === intendedIndent) {
-					const listData = nextLine.attributes.list as ListDefinition
-					if (!listData) break // End of the road
-	
-					// We might have removed the top out
-					targetForm = listData.form
-					targetGlyph = listData.glyph
-					basisNumber = listData.index
-
-					if (basisNumber) {
-						// Reset the basis number
-						basisNumber = 1
-					}
-					break
-				}
-				else if (indent.length < intendedIndent.length) {
-					break
-				}
-			}
-		}
-
-		if (targetForm === undefined && targetListData) {
-			// Still no target form. Take the list's current form
-			targetForm = targetListData.form
-			targetGlyph = targetListData.glyph
-		}
-
-		const split = splitCheckboxGlyphs(targetGlyph)
-		targetGlyph = split.base
-		const hasCheckbox = split.box !== undefined
-
-		function getTargetGlyph() {
-			const targetDelimiter: string = getDelimiterForGlyph(targetGlyph)
-			return getGlyphForNumber(targetForm, basisNumber, targetDelimiter) ?? targetGlyph
-		}
-
-		let offset = 0
-		function offsetSelection(position: number, addition: number) {
-			if (selection) {
-				if (selection[0] + offset > position) {
-					selection[0] += addition
-				}
-				if (selection[1] + offset > position) {
-					selection[1] += addition
-				}
-			}
-
-			offset += addition
-		}
-
-		let didSomething = false
-
-		function enforceGlyphOnLine(listData: ListDefinition, lineStart: number, lineText: string) {
-			const { base, box } = splitCheckboxGlyphs(listData.glyph)
-			const targetBase = getTargetGlyph()
-
-			let applyChange = false
-			if (base !== targetBase) {
-				if (options.normalizeUnorderedGlyphs) {
-					applyChange = true
-				}
-				else if (targetForm !== listData.form || !(targetForm === ListForm.Unordered || targetForm === ListForm.UnorderedLarge)) {
-					applyChange = true
-				}
-			}
-			else if (!box && hasCheckbox) {
-				applyChange = true
-			}
-
-			if (applyChange) {
-				change = change || editor.change
-
-				let finalTarget = targetBase
-				if (box) finalTarget += ' ' + box
-				else if (hasCheckbox) finalTarget += ' [ ]'
-
-				const listMatch = lineText.match(listMatcher)
-				const insertedText = listMatch[1] + finalTarget + ' '
-				const sizeDiff = insertedText.length - listMatch[0].length
-				const deleteEnd = lineStart + listMatch[0].length
-				change
-					.delete([lineStart, deleteEnd])
-					.insert(deleteEnd, insertedText)
-
-				didSomething = true
-				
-				offsetSelection(lineStart, sizeDiff)
-				return true
-			}
-			return false
-		}
-
-		// Propagate the target form & basis to the indicated line
-		if (targetListData && targetIndent === intendedIndent) {
-			enforceGlyphOnLine(targetListData, targetRange[0], lineText)
-			if (basisNumber) basisNumber++
-		}
-
-		// Propagate the target form & basis all following list lines on the indent level
-		for (let lineIndex = targetLineIndex + 1; lineIndex < doc.lines.length; lineIndex++) {
-			let nextLine = doc.lines[lineIndex]
-			let nextText = deltaToText(nextLine.content)
-			let indent = nextText.match(indentMatcher)[0]
-
-			if (indent === intendedIndent) {
-				const listData = nextLine.attributes.list as ListDefinition
-				if (!listData) break // End of the road
-				const lineRange = doc.getLineRange(nextLine)
-				enforceGlyphOnLine(listData, lineRange[0], nextText)
-				if (basisNumber) basisNumber++
-			}
-			else if (indent.length < intendedIndent.length) {
-				// We've reached the end of the current indentation.
-				break
-			}
-		}
-
-		if (didSomething && selection && change) {
-			change.select(selection as EditorRange)
-		}
-
-		return change
 	}
 
 	function onChanging(event: EditorChangeEvent) {
@@ -715,6 +512,20 @@ export default function editorModule(editor: Editor, options: {
 		}
 	}) : null
 
+	function considerLineEmpty(newPrefix: string, line: Line) {
+		if (!newPrefix) return false
+		const lineText = lineToText(line)
+
+		const listMatch = lineText.match(listMatcher)
+		if (listMatch) {
+			return listMatch[0].length === lineText.length
+		}
+		else {
+			return line.length - 1 === newPrefix.length
+				&& lineText.startsWith(newPrefix)
+		}
+	}
+
 	function onEnter(event: ShortcutEvent) {
 		const { doc } = editor
     	let { selection } = doc
@@ -730,7 +541,7 @@ export default function editorModule(editor: Editor, options: {
 		let newLinePrefix = getLineFormattingPrefix(line, true)
 
 		// Check to see if this is blank line that should be breaking the prefix
-		if (newLinePrefix && line.length - 1 === newLinePrefix.length) {
+		if (considerLineEmpty(newLinePrefix, line)) {
 			const escapeMode = lineFormatEscapeMode(line)
 			switch (escapeMode) {
 				case 'single':
@@ -952,19 +763,10 @@ export default function editorModule(editor: Editor, options: {
 		}
 
 		menu.push({
-			label: 'Links',
-			submenu: [
-				{ command: cmds.toggleWikiLink, commandContext },
-				{ command: cmds.toggleMDLink, commandContext }
-			]
-		})
-
-		menu.push({
 			label: 'Formatting',
 			submenu: [
 				{ command: cmds.toggleBold, commandContext },
 				{ command: cmds.toggleItalics, commandContext },
-				{ command: cmds.toggleHighlight, commandContext },
 				{ command: cmds.toggleInlineCode, commandContext },
 				{ type: 'separator' },
 				{ command: cmds.setParagraph, commandContext },
@@ -973,7 +775,39 @@ export default function editorModule(editor: Editor, options: {
 				{ command: cmds.setHeader3, commandContext },
 				{ command: cmds.setHeader4, commandContext },
 				{ command: cmds.setHeader5, commandContext },
-				{ command: cmds.setHeader6, commandContext }
+				{ command: cmds.setHeader6, commandContext },
+				{ type: 'separator' },
+				{ command: cmds.toggleCheckbox, commandContext }
+			]
+		})
+
+		menu.push({
+			label: 'Links',
+			submenu: [
+				{ command: cmds.toggleWikiLink, commandContext },
+				{ command: cmds.toggleMDLink, commandContext }
+			]
+		})
+
+		menu.push({
+			label: 'Highlights',
+			submenu: [
+				{ command: cmds.toggleHighlight, commandContext },
+				{ type: 'separator' },
+				{ command: cmds.toggleCircleGrayHighlight, commandContext },
+				{ command: cmds.toggleSquareGrayHighlight, commandContext },
+				{ command: cmds.toggleCircleYellowHighlight, commandContext },
+				{ command: cmds.toggleSquareYellowHighlight, commandContext },
+				{ command: cmds.toggleCircleOrangeHighlight, commandContext },
+				{ command: cmds.toggleSquareOrangeHighlight, commandContext },
+				{ command: cmds.toggleCircleRedHighlight, commandContext },
+				{ command: cmds.toggleSquareRedHighlight, commandContext },
+				{ command: cmds.toggleCircleGreenHighlight, commandContext },
+				{ command: cmds.toggleSquareGreenHighlight, commandContext },
+				{ command: cmds.toggleCircleBlueHighlight, commandContext },
+				{ command: cmds.toggleSquareBlueHighlight, commandContext },
+				{ command: cmds.toggleCirclePurpleHighlight, commandContext },
+				{ command: cmds.toggleSquarePurpleHighlight, commandContext },
 			]
 		}),
 

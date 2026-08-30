@@ -48,6 +48,9 @@
 		min-height: 10em;
 		border-top-right-radius: var(--borderRadius);
 		border-bottom-right-radius: var(--borderRadius);
+
+		background-position-x: center;
+		background-position-y: top;
 	}
 
 	.link {

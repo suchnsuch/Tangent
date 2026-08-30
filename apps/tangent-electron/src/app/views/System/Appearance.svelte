@@ -19,8 +19,8 @@ let settings = workspace.settings
 		<SettingView setting={settings.accentHue} />
 		<SettingView setting={settings.accentSaturation} />
 		<span class="value-details">
-			<span style="background: var(--accentBackgroundColor)">Accent Background</span>
-			<span style="color: var(--accentTextColor)">Accent Text</span>
+			<span class="background">Accent Background</span>
+			<span class="text">Accent Text</span>
 		</span>
 		<SettingView setting={settings.uiFontSize} />
 		<SettingView setting={settings.panelWidthMin} />
@@ -44,5 +44,18 @@ let settings = workspace.settings
 }
 .value-details > span {
 	padding: .2em 1em;
+	border-radius: var(--inputBorderRadius);
+}
+.background {
+	background: var(--accentActiveBackgroundColor);
+	cursor: pointer;
+	&:hover {
+		background: var(--accentBackgroundColor);
+	}
+}
+.text {
+	user-select: text;
+	background: var(--noteBackgroundColor);
+	color: var(--accentTextColor);
 }
 </style>

@@ -1,5 +1,6 @@
-import type { Readable, Writable } from 'svelte/store'
+import { get, type Readable, type Writable } from 'svelte/store'
 import { WritableStore } from './WritableStore'
+import { ReadableStore, type ObserverFunc } from './ReadableStore'
 
 /**
  * This provides a simple way of forwarding the value of stores from other stores.
@@ -24,11 +25,22 @@ export class ForwardingStore<T> extends WritableStore<T> {
 	// Bind this store to another store
 	forwardFrom(store: Readable<T> | Writable<T>) {
 		if (store !== this._store) {
-			if (this._unsub) this._unsub()
+			this.unbind()
 			this._store = store
 
 			if (store) {
-				this._unsub = store.subscribe(v => this.value = v)
+				// Pull and cache the current value
+				this.bind()
+				
+				// If we're still unbound after this frame, drop
+				// This prevents thrashing when forwarding & subscribing in the same frame
+				if (this.observers.length === 0) {
+					setTimeout(() => {
+						if (this.observers.length === 0) {
+							this.unbind()
+						}
+					})
+				}
 			}
 			else {
 				this._unsub = undefined
@@ -42,17 +54,66 @@ export class ForwardingStore<T> extends WritableStore<T> {
 			const currentValue = this.value
 			this.forwardFrom(store)
 			if (currentValue !== undefined) {
-				this.value = currentValue
+				super.value = currentValue
 			}
 		}
+	}
+
+	protected bind() {
+		if (this._store && !this._unsub) {
+			this._unsub = this._store.subscribe(v => super.value = v)
+		}
+	}
+
+	protected unbind() {
+		if (this._unsub) {
+			this._unsub()
+			this._unsub = undefined
+		}
+	}
+
+	subscribe(observerFunc: ObserverFunc<T>): () => void {
+
+		if (this.observers.length === 0) {
+			// We will have observers after this. Bind to the store.
+			this.bind()
+		}
+
+		return super.subscribe(observerFunc)
+	}
+
+	protected onUnsubscribe(observerFunc: ObserverFunc<T>): void {
+		super.onUnsubscribe(observerFunc)
+		if (this.observers.length === 0) {
+			// With no observers, we can disconnect from the parent store
+			this.unbind()
+		}
+	}
+
+	get value(): T {
+		if (this._store && this.observers.length === 0) {
+			// fallback re-cache
+			if (this._store instanceof ReadableStore) {
+				super.value = this._store.value
+			}
+			else {
+				super.value = get(this._store)
+			}
+		}
+		return super.value
 	}
 
 	set(value: T) {
 		if (this._store && 'set' in this._store) {
 			this._store.set(value)
+
+			if (this.observers.length === 0) {
+				// If there are no active observers, set our cache as well
+				super.value = value
+			}
 		}
 		else {
-			super.set(value)
+			super.value = value
 		}
 	}
 }

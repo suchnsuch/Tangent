@@ -278,7 +278,7 @@ export default class Settings extends ObjectStore {
 
 	mapZoomSensitivity = new Setting<number>({
 		name: 'Zoom Sensitivity',
-		description: 'Affects how quickly the map zooms in response to input',
+		description: 'Affects how quickly the map zooms in response to input.',
 		defaultValue: .25,
 		range: {
 			min: .01,
@@ -308,7 +308,7 @@ export default class Settings extends ObjectStore {
 	// Sets
 	cardViewCardsHoldAltToScroll = new Setting<boolean>({
 		name: 'Cards Scroll With Alt',
-		description: 'When enabled, the content of cards in a card lens will not scroll unless you hold alt. When disabled, cards will always be scrollable',
+		description: 'When enabled, the content of cards in a card lens will not scroll unless you hold alt. When disabled, cards will always be scrollable.',
 		defaultValue: true
 	})
 
@@ -373,6 +373,18 @@ export default class Settings extends ObjectStore {
 		description: 'The code theme used for code in its own block while in dark mode.',
 		form: 'select',
 		defaultValue: 'vscode-dark'
+	})
+
+	noteCodeTabWidth = new Setting<number>({
+		name: 'Code Tab Width',
+		description: 'The width of a tab in a code block.',
+		defaultValue: 4,
+		range: {
+			min: 1,
+			max: 24,
+			softMax: 8,
+			step: 1
+		}
 	})
 
 	noteWidthMax = new Setting<number>({
@@ -485,7 +497,7 @@ export default class Settings extends ObjectStore {
 	// Links
 	linkAutocompleteForm = new Setting<'short' | 'full'>({
 		name: 'Link Autocomplete',
-		description: 'How wikilinks will autocomplete',
+		description: 'How wikilinks will autocomplete.',
 		defaultValue: 'short',
 		validValues: [
 			{
@@ -641,7 +653,7 @@ export default class Settings extends ObjectStore {
 	
 	spellCheckLanguages = new Setting<string, string[]>({
 		name: 'Additional Spell Check\nLanguages',
-		description: 'Languages that will be added to the spellchecker',
+		description: 'Languages that will be added to the spellchecker.',
 		defaultValue: []
 	})
 
@@ -691,7 +703,7 @@ export default class Settings extends ObjectStore {
 		name: 'Trash Deleted Items',
 		description: 'Whether or not deleted items should be sent to the OS trash/recycling bin.'
 			+ '\n\nIf deleting items causes issues, try disabling this setting.',
-		defaultValue: true
+		defaultValue: !isLinux
 	})
 
 	debug_ioQueue_enable = new Setting<boolean>({

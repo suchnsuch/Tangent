@@ -6,7 +6,7 @@ interface AxisDimensions {
 	end: number
 }
 
-type ScrollMode = 'show' | 'center'
+type ScrollMode = 'show' | 'show-start' | 'show-end' | 'center'
 export type ScrollMargin = number | AxisDimensions
 
 export interface ScrollToOptions {
@@ -16,9 +16,13 @@ export interface ScrollToOptions {
 	target?: number | HTMLElement | DOMRect
 	/**
 	 * 'show' ensures the target is in view (including margin)
+	 * 'show-start' prefers that the start of the target is in view
+	 * 'show-end' prefers that the end of the target is in view
 	 * 'center' places the center of the target in the center of the view
 	 */
 	mode?: ScrollMode
+	modeX?: ScrollMode
+	modeY?: ScrollMode
 	marginX?: ScrollMargin
 	marginY?: ScrollMargin
 	// Whether to scroll horizontally (false)
@@ -74,11 +78,13 @@ function positionForAxis(mode: ScrollMode, scrollPosition: number, container: Ax
 	const startToStart = (target.start - margin.start) - container.start
 	const endToEnd = (target.end + margin.end) - container.end
 
-	if (startToStart < 0 && endToEnd > 0) {
-		// Do nothing, target is too big and is in view
-		return scrollPosition
-	}
+	const largerThanScreen = target.end - target.start > container.end - container.start
+
 	if (mode === 'show') {
+		if (largerThanScreen) {
+			// Do nothing, target is too big and is in view
+			return scrollPosition
+		}
 		// Place the start at the start edge (with margin)
 		if (startToStart < 0) {
 			return scrollPosition + startToStart
@@ -87,6 +93,22 @@ function positionForAxis(mode: ScrollMode, scrollPosition: number, container: Ax
 		// Since an overlarge target is checked for, this will never push the start out of range
 		if (endToEnd > 0) {
 			return scrollPosition + endToEnd
+		}
+	}
+	else if (mode === 'show-start') {
+		if (startToStart < 0 || largerThanScreen) {
+			return scrollPosition + startToStart
+		}
+		if (endToEnd > 0) {
+			return scrollPosition + endToEnd
+		}
+	}
+	else if (mode === 'show-end') {
+		if (endToEnd > 0 || largerThanScreen) {
+			return scrollPosition + endToEnd
+		}
+		if (startToStart < 0) {
+			return scrollPosition + startToStart
 		}
 	}
 	else if (mode === 'center') {
@@ -156,9 +178,8 @@ export default function scrollTo(options: ScrollToOptions) {
 		
 		const containerBox = container.getBoundingClientRect()
 
-		const mode = options.mode ?? 'show'
-
 		if (options.scrollY ?? true) {
+			const mode = options.modeY ?? options.mode ?? 'show'
 			targetY = positionForAxis(
 				mode,
 				initialY,
@@ -169,6 +190,7 @@ export default function scrollTo(options: ScrollToOptions) {
 		}
 		
 		if (options.scrollX ?? false) {
+			const mode = options.modeX ?? options.mode ?? 'show'
 			targetX = positionForAxis(
 				mode,
 				initialX,

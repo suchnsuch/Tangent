@@ -211,6 +211,22 @@ export default class Tangent {
 			tangentInfo.openSessions.add(tangentInfo.activeSession.value)
 		}
 
+		// check for duplicates
+		{
+			const set = new Set<TreeNode>()
+			for (let index = 0; index < tangentInfo.openSessions.length; index++) {
+				const item = tangentInfo.openSessions.get(index) 
+				if (set.has(item)) {
+					console.warn('Removing duplicate session:', item.path)
+					tangentInfo.openSessions.splice(index, 1)
+					index--
+				}
+				else {
+					set.add(item)
+				}
+			}
+		}
+
 		if (startupTasks.length == 0) {
 			console.error('Tangent did not initialize session startup correctly!')
 		}

@@ -1,17 +1,20 @@
 # Tangent
-This is the monorepo for the [Tangent](https://www.tangentnotes.com) project.
+![](./apps/tangent-electron/build/icon.png)
 
-Pre-built binaries can be found [on the downloads page](https://www.tangentnotes.com/Download) and [on Flathub](https://flathub.org/apps/io.github.suchnsuch.Tangent). Pre-release versions are also available on [Flathub Beta](https://docs.flathub.org/docs/for-users/installation#flathub-beta-repository).
+This is the monorepo for the [Tangent](https://www.tangentnotes.com) project.
 
 Tangent is a local note writing / personal knowledge management tool. It was heavily inspired by Obsidian, and has drifted in its own direction. It uses `[[Wiki Links]]` and a slightly customized markdown syntax. Notes are fully styled as you write. Markdown syntax is hidden and revealed as needed.
 
 Other key features:
-* An innovative, two-dimensional connected map of your navigation and linking history.
-* "Sliding Panel" UX inspired by [Andy Matuschak's notes](https://notes.andymatuschak.org/About_these_notes).
-* Writing focus mode: highlight your current paragraph, line, or sentence.
+* An innovative, two-dimensional connected map of your navigation and linking history. ![](./apps/tangent-website/static/shots/blades-map-dark.jpeg)
+* "Sliding Panel" UX inspired by [Andy Matuschak's notes](https://notes.andymatuschak.org/About_these_notes). 
+![](./apps/tangent-website/static/shots/thread-short-dark.jpeg)
+* Writing focus mode: highlight your current paragraph, line, or sentence. ![](./apps/tangent-website/static/shots/focus-mode-dark.jpeg)
 * Customizable note views: view your collections of notes as cards or an infinite, dynamically loaded feed.
-* A custom query language (with autocomplete!) for custom complex searches.
+* A custom [query language](./Documentation/Features/Query%20Syntax.md) (with autocomplete!) for custom complex searches.
 * Support for embedded images, link previews, pdfs, audio, and video—including YouTube links!
+
+Pre-built binaries can be found [on the downloads page](https://www.tangentnotes.com/Download) and [on Flathub](https://flathub.org/apps/io.github.suchnsuch.Tangent). Pre-release versions are also available on [Flathub Beta](https://docs.flathub.org/docs/for-users/installation#flathub-beta-repository).
 
 ## Modules
 There are multiple modules contained within this repo.
@@ -33,7 +36,7 @@ The `lib` directory contains externally-versioned libraries that have been added
 
 
 ## Building Locally
-1. Ensure that all submodules are synced (e.g. `git submodule update`).
+1. Initialize and sync git submodules (e.g. `git submodule init` && `git submodule update`).
 2. Run `npm ci` at the root level of the repository to install all dependencies across the monorepo.
 3. Run `npm run build` at the root level of the repository to build all dependencies.
 4. Run `npm run dev` (or `dev:win` on Windows) in `./apps/tangent-electron` to run tangent in development mode.

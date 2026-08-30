@@ -252,7 +252,7 @@ let containerStyle = $derived.by(() => {
 
 function websiteImageStyle(form: WebsiteData) {
 	if (form.images?.length) {
-		return `background: url("${form.images[0]}"); background-size: cover;`
+		return `background-image: url("${form.images[0]}"); background-size: cover;`
 	}
 	return ''
 }
