@@ -72,10 +72,6 @@ function onValidateShortcut(shortcut: string) {
 			use:tooltip={"Define the name of the command. Set an emoji as the first character of the name to make an icon."}
 		></h2>
 	</header>
-	<label use:tooltip={"Defines how the note will be named. Refer to the Template Token list for available dynamic values."}>
-		<span>Name Template</span>
-		<input type="text" bind:value={$commandName} bind:this={templateInput}/>
-	</label>
 	{#if exampleNameMessages?.length}
 		{#each exampleNameMessages as message}
 			<p class={'explanation ' + message.level}>{@html message.message}</p>
