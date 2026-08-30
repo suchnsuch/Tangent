@@ -24,7 +24,7 @@ interface ExecuteExternalCommandContext extends CommandContext {
 
 export default class ExecuteExternalCommand extends WorkspaceCommand {
 	constructor(workspace: Workspace) {
-		super(workspace, { group: 'Notes' }) // <---- this makes it available when editing notes
+		super(workspace, { })
 	}
 	
 	canExecuteFromShortcut(shortcut: string, context?: ExecuteExternalCommandContext): boolean {

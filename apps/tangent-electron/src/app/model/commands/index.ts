@@ -52,7 +52,7 @@ export type WorkspaceCommands = LiteralCommands & GenericCommands
 
 function createAllCommands(workspace: Workspace) {
 	return {
-		
+
 		openWorkspace: new OpenWorkspaceCommand(workspace),
 
 		toggleLeftSidebar: new ToggleSidebarCommand(workspace),
