@@ -28,9 +28,8 @@ const log = Logger.get('messages')
 
 ipcMain.handle('execCLI', async (event, commandTemplate: string, context: {[key: string]: string}) => {
 	const shellEscaper = new Shescape({flagProtection: true})
-	const commandText = commandTemplate.replace(/%([^%]*?)%/g, (match, expr) => shellEscaper.escape(context[expr]))
-
 	const windowHandle = getWindowHandle(event.sender)
+	const commandText = commandTemplate.replace(/%([^%]*?)%/g, (match, expr) => shellEscaper.escape(context[expr]))
 	
 	return new Promise((resolve) => {
 		log.info("Executing CLI command: ", commandText)
@@ -67,10 +66,12 @@ ipcMain.handle('execCLI', async (event, commandTemplate: string, context: {[key:
                 exitCode: code
             }
 			
-			windowHandle.postUserMessage(
-				code === 0 ? 'info' : 'warning', 
-				code === 0 ? 'Command Completed' : 'Command Failed',
-				code === 0 ? '' : '')
+			const commandType =  code === 0 ? 'info' : 'warning'
+			const commandTitle = code === 0 ? 'Command Completed' : 'Command Failed'
+			const commandMsg  = code === 0 ? 'Successfully' : `With error code ${code}. See logs`
+			// console.log({commandType, commandTitle, commandMsg})
+			
+			windowHandle.postUserMessage(commandType, commandTitle, commandMsg)
 			
 			log.info(`Process exited with code ${code}`, result)
             resolve(result)
