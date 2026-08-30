@@ -43,7 +43,7 @@ import { OpenPaneSettingsCommand } from './PaneSettingsCommands'
 import { CopyAbsolutePathCommand, CopyRelativePathCommand } from './CopyPath'
 import { ToggleCheckboxCommand } from './ToggleCheckboxCommand.ts'
 import { toTitleCase } from 'common/stringUtils'
-import { highlightEmojiToClassDescriptor } from 'common/markdownModel/formatting'
+import { highlightCharacters, highlightEmojiMatch, highlightEmojiToClassDescriptor } from 'common/markdownModel/formatting'
 export { Command, CommandAction, type WorkspaceCommand }
 
 type LiteralCommands = ReturnType<typeof createAllCommands>
@@ -63,11 +63,16 @@ function createAllCommands(workspace: Workspace) {
 		const descriptor = highlightEmojiToClassDescriptor(marker) ?? ''
 		const [color, kind] = descriptor.split(' ')
 		const massagedKind = massageKind(kind)
+
 		return new InlineFormatCommand(workspace, {
 			label: toTitleCase(`${marker} ${massagedKind} ${color} Highlight`),
 			tooltip: `Toggle whether the selected text has a ${massagedKind} ${color} highlight.`,
 			formattingCharacters: () => marker,
-			attributePredicate: attr => attr?.highlight === descriptor || null
+			attributePredicate: attr => {
+				let all = highlightCharacters.map(highlightEmojiToClassDescriptor)
+				let m = all.indexOf(attr?.highlight) !== -1
+				// console.log(m, attr?.highlight, all)
+				return m || null}
 		})
 	}
 
