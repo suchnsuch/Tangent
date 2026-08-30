@@ -497,11 +497,18 @@ function centerOnEditorRange(range: EditorRange, scrollTime?: number) {
 function ensureRangeInView(range: EditorRange, buffer=50, scrollTime?: number) {
 	if (!container || !editor) return
 
+	function getMode(range: EditorRange) {
+		if (range[0] === range[1]) return 'show'
+		if (range[0] < range[1]) return 'show-end'
+		return 'show-start'
+	}
+
 	setScrollTo({
 		container,
 		target: editor.getBounds(range),
 		duration: scrollTime,
-		marginY: buffer
+		marginY: buffer,
+		modeY: getMode(range)
 	})
 }
 
@@ -606,8 +613,8 @@ function onEditorChange(changeEvent: EditorChangeEvent) {
 			note.realizeFile()
 		}
 
-		if (selectionChanged) {
-			if (container && focusLevel >= FocusLevel.Typewriter && !isEditorMouseDown) {
+		if (selectionChanged && !isEditorMouseDown) {
+			if (container && focusLevel >= FocusLevel.Typewriter) {
 				if (changeEvent.doc.selection) {
 					// Microtask means that layout is finished and the scroll appears to happen seemlessly
 					queueMicrotask(() => centerOnEditorRange(changeEvent.doc.selection))
@@ -646,7 +653,7 @@ function onEditorDecorate(event: DecorateEvent) {
 
 	if ($letCodeExpand) {
 		tick().then(() => {
-			updateCodeBlockSizing()
+			updateAllCodeBlockSizing()
 		})
 	}
 }
@@ -658,16 +665,29 @@ function applyFocusDecorations(doc: TextDocument) {
 	if (selection) {
 		let lines = doc.getLinesAt(selection)
 
+		let isValidLine: (line: Line) => boolean = null
+
 		if (lines.length && focusLevel === FocusLevel.Paragraph) {
-			// Extend focus to adjacent qualifying lines
-			function isValidLine(line: Line) {
+			isValidLine = (line: Line) => {
 				const attr = line.attributes
 				return (!attr.empty && !attr.whitespace)
 					|| attr.code
 					|| attr.front_matter
 					|| attr.math
 			}
+		}
+		else if (lines.length && focusLevel > FocusLevel.Paragraph) {
+			// These are always extended when in focus
+			isValidLine = (line: Line) => {
+				const attr = line.attributes
+				return attr.code
+					|| attr.front_matter
+					|| attr.math
+			}
+		}
 
+		if (isValidLine) {
+			// Extend focus to adjacent qualifying lines
 			const first = lines[0]
 			if (isValidLine(first)) {
 				const linesToAdd: Line[] = []
@@ -1291,10 +1311,10 @@ function selectFromVerticalPosition(event?: MouseEvent) {
 let resizeTimeout = null
 let resizeObserver = new ResizeObserver(elements => {
 	if (resizeTimeout) clearTimeout(resizeTimeout)
-	resizeTimeout = setTimeout(() => updateCodeBlockSizing(), 200)
+	resizeTimeout = setTimeout(() => updateAllCodeBlockSizing(), 200)
 })
-$: if ($letCodeExpand && editorElement) {
-	resizeObserver.observe(editorElement)
+$: if ($letCodeExpand && container && editorElement) {
+	resizeObserver.observe(container)
 }
 else {
 	resizeObserver.disconnect()
@@ -1309,37 +1329,101 @@ else {
 	}
 }
 
-function updateCodeBlockSizing() {
-	// Do code funkery
+
+type CodeBlockSizingContext = {
+	containerRect: DOMRect
+	editorContentWidth: number
+}
+
+function getCodeBlockSizingContext(): CodeBlockSizingContext {
+	if (!editorElement) return
+
+	const editorStyle = getComputedStyle(editorElement)
+	const editorContentWidth = editorElement.clientWidth - parseFloat(editorStyle.paddingLeft) - parseFloat(editorStyle.paddingRight)
+
+	return {
+		containerRect: container.getBoundingClientRect(),
+		editorContentWidth
+	}
+}
+
+// For the moment, this is unused, as the vdom nukes the margin every time it is applied
+function updateSelectedCodeBlockSizing() {
+	if (!editorElement) return
+	const selectedCodeLine = editorElement.querySelector('pre:not(.indented) .line[data-focus="focused"]')
+	if (!selectedCodeLine) return
+
+	const preElement = selectedCodeLine.closest('pre')
+	if (!preElement) return
+
+	const context = getCodeBlockSizingContext()
+	if (!context) return
+
+	updateCodeBlockSizing(preElement, context)
+}
+
+function updateAllCodeBlockSizing() {
 	const codeWrappers = editorElement?.querySelectorAll('pre:not(.indented)')
-	if (codeWrappers?.length) {
-		const containerRect = container.getBoundingClientRect()
+	if (!codeWrappers?.length) return
 
-		for (let i = 0; i < codeWrappers.length; i++) {
-			const pre = codeWrappers[i] as HTMLElement
-			if (pre.scrollWidth > pre.clientWidth || pre.clientWidth > editorElement.clientWidth || pre.clientWidth > containerRect.width) {
-				// I attempted multiple versions of caching here, but even a map of elements wasn't working correctly with the vdom malarky
-				// This is probably slower than all of those, but it's working.
-				// It may be that style hasn't recomputed even when properties have changed and so value are cached effectively?
-				const preStyle = getComputedStyle(pre)
-				const preMarginLeft = getPixelValue(preStyle.marginLeft)
-				const preMarginRight = getPixelValue(preStyle.marginRight)
+	const context = getCodeBlockSizingContext()
+	if (!context) return
 
-				// Need to revert the old margin
-				const baseWidth = pre.clientWidth + preMarginLeft + preMarginRight
+	for (let i = 0; i < codeWrappers.length; i++) {
+		updateCodeBlockSizing(codeWrappers[i] as HTMLElement, context)
+	}
+}
 
-				const maxWidth = containerRect.width - $noteFontSize * 2
+function updateCodeBlockSizing(pre: HTMLElement, context: CodeBlockSizingContext) {
+	if (pre.scrollWidth == pre.clientWidth && pre.clientWidth > context.editorContentWidth) {
+		if (pre.querySelector('.line[data-focus="focused"]')) {
+			const lines = pre.querySelectorAll('.line')
+			let largestWidth = 0
+			for (let lineIndex = 0; lineIndex < lines.length; lineIndex++) {
+				const line = lines[lineIndex]
+				const lineRect = line.getBoundingClientRect()
+				const lastChild = line.lastElementChild
+				if (lastChild) {
+					const lastChildRect = lastChild.getBoundingClientRect()
+					const lineWidth = lastChildRect.right - lineRect.left
+					if (lineWidth > largestWidth) {
+						largestWidth = lineWidth
+					}
+				}
+			}
 
-				const finalWidth = Math.min(pre.scrollWidth, maxWidth)
-				const difference = finalWidth - baseWidth
-				if (difference <= 0) continue
-
-				const offset = difference * .5
-				const margin = '-' + offset + 'px'
-				pre.style.marginLeft = margin
-				pre.style.marginRight = margin
+			if (largestWidth > 0 && largestWidth < context.editorContentWidth) {
+				pre.style.marginLeft = ''
+				pre.style.marginRight = ''
+				return
 			}
 		}
+	}
+	
+	if (pre.scrollWidth > pre.clientWidth || pre.clientWidth > context.editorContentWidth || pre.clientWidth > context.containerRect.width) {
+		
+		// I attempted multiple versions of caching here, but even a map of elements wasn't working correctly with the vdom malarky
+		// This is probably slower than all of those, but it's working.
+		// It may be that style hasn't recomputed even when properties have changed and so value are cached effectively?
+		const preStyle = getComputedStyle(pre)
+		// In the standard style, pre blocks have existing negative margin so that there is a border and text lines up
+		// This needs to be taken into account
+		const preMarginLeft = getPixelValue(preStyle.marginLeft)
+		const preMarginRight = getPixelValue(preStyle.marginRight)
+
+		// Need to revert the old margin
+		const baseWidth = pre.clientWidth + preMarginLeft + preMarginRight
+
+		const maxWidth = context.containerRect.width - $noteFontSize * 2
+
+		const finalWidth = Math.min(pre.scrollWidth, maxWidth)
+		const difference = finalWidth - baseWidth
+		if (difference <= 0) return
+
+		const offset = difference * .5
+		const margin = '-' + offset + 'px'
+		pre.style.marginLeft = margin
+		pre.style.marginRight = margin
 	}
 }
 

@@ -8,6 +8,11 @@ describe('Safe characters', () => {
 		expect(header.safeHeaderLine('Header & Stuff')).toEqual('Header & Stuff')
 	})
 
+	it('Should trim surrounding whitespace', () => {
+		expect(header.safeHeaderLine('  My Great Header  ')).toEqual('My Great Header')
+		expect(header.safeHeaderLine('## This Header Rocks!  ')).toEqual('This Header Rocks!')
+	})
+
 	it('Should Remove header formatting', () => {
 		expect(header.safeHeaderLine('## This Header Rocks!')).toEqual('This Header Rocks!')
 	})
@@ -50,4 +55,3 @@ describe('Format stripping', () => {
 	})
 	
 })
-

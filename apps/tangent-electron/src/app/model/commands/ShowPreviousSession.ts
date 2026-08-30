@@ -28,6 +28,8 @@ export default class ShowPreviousSessionCommand extends WorkspaceCommand {
 		const tangentInfo = this.workspace.viewState.tangent.tangentInfo.value
 		if (!tangentInfo) return
 
+		if (tangentInfo.openSessions.includes(previousSessionFile)) return
+
 		tangentInfo.openSessions.insert(0, previousSessionFile)
 	}
 

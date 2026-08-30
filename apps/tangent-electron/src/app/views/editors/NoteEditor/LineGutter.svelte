@@ -30,14 +30,21 @@ function positionOnLine(line: HTMLElement, container: HTMLElement) {
 		placement: side === 'left' ? 'left-start' : 'right-start'
 	}).then(result => {
 		const lineStyle = getComputedStyle(line)
-		const marginLeft = parseFloat(lineStyle.marginLeft)
 		const lineHeight = parseFloat(lineStyle.lineHeight)
 
 		const containerRect = container.getBoundingClientRect()
 		const offset = (lineHeight - containerRect.height) / 2
 
-		container.style.left = result.x - marginLeft + 'px'
 		container.style.top = result.y + offset + 'px'
+
+		if (side === 'left'){
+			const marginLeft = parseFloat(lineStyle.marginLeft)
+			container.style.left = result.x - marginLeft + 'px'
+		}
+		else {
+			const marginRight = parseFloat(lineStyle.marginRight)
+			container.style.left = result.x + marginRight + 'px'
+		}
 	})
 }
 

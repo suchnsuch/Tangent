@@ -104,7 +104,7 @@ export function parseHighlight(char: string, parser: NoteParser): boolean {
 }
 
 const highlight = [
-	'🔴', '🟥', '🟠', '🟧', '🟡', '🟨', '🟢', '🟩', '🔵', '🟦', '🟣', '🟪'
+	'🔴', '🟥', '🟠', '🟧', '🟡', '🟨', '🟢', '🟩', '🔵', '🟦', '🟣', '🟪', '⚪', '⬜'
 ]
 
 // See https://stackoverflow.com/questions/37089427/javascript-find-emoji-in-string-and-parse
@@ -136,6 +136,10 @@ export function highlightEmojiToClassDescriptor(emoji: string) {
 			return 'purple circle'
 		case '🟪':
 			return 'purple square'
+		case '⚪':
+			return 'gray circle'
+		case '⬜':
+			return 'gray square'
 	}
 }
 

@@ -62,12 +62,6 @@ onMount(() => {
 			nextContainMode = 'buffer'
 		})
 	}
-	return () => {
-		if (view && $tangentInfo) {
-			$tangentInfo.scrollX.set(view.scrollLeft)
-			$tangentInfo.scrollY.set(view.scrollTop)
-		}
-	}
 })
 
 $: $currentNode ? onCurrentNodeChange() : null
@@ -264,6 +258,14 @@ function onPointerDown(event: PointerEvent) {
 	})
 }
 
+function onScroll(event: Event) {
+	if (event.defaultPrevented) return
+	if (view && $tangentInfo) {
+		$tangentInfo.scrollX.value = view.scrollLeft
+		$tangentInfo.scrollY.value = view.scrollTop
+	}
+}
+
 function updateMapThread(session: Session, options: UpdateThreadOptions) {
 	tangent.updateThread(options)
 	if (session !== activeSession.value) {
@@ -306,6 +308,7 @@ $: if ($openSessions) {
 	on:focus={onFocus}
 	on:keydown={onKeydown}
 	on:pointerdown={onPointerDown}
+	on:scroll={onScroll}
 	tabindex="0"
 >
 	<div

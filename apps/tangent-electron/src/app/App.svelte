@@ -104,6 +104,7 @@ $: accentSaturation = workspace?.settings.accentSaturation
 $: noteFont = workspace?.settings.noteFont
 $: noteCodeFont = workspace?.settings.noteCodeFont
 $: noteFontSize = workspace?.settings.noteFontSize
+$: noteCodeTabWidth = workspace?.settings.noteCodeTabWidth
 $: uiFontSize = workspace?.settings.uiFontSize
 $: lineHeight = workspace?.settings.lineHeight
 $: scrollBarWidth = workspace?.settings.scrollBarWidth
@@ -123,6 +124,9 @@ $: {
 	}
 	if (noteFontSize) {
 		style += `--fontSize: ${$noteFontSize}px;`
+	}
+	if (noteCodeTabWidth) {
+		style += `--codeTabSize: ${$noteCodeTabWidth};`
 	}
 	if (uiFontSize) {
 		style += `font-size: ${$uiFontSize}px;`
