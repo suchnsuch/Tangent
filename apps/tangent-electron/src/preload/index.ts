@@ -189,6 +189,11 @@ const bridge: WindowApi = {
 			ipcRenderer.invoke('openPath', path)
 		},
 	},
+	os: {
+		execCLI(command, context) {
+			return ipcRenderer.invoke('execCLI', command, context)
+		},
+	},
 	edit: {
 		nativeAction(action) {
 			ipcRenderer.send('edit-native', action)
