@@ -375,12 +375,63 @@ export default class CreateNewFileCommand extends WorkspaceCommand {
 		return 'Create New Note'
 	}
 
-	getTooltip(context: CreateNewFileCommandContext) {
-		const rule = context?.rule
+	private resolveTooltipFolder(context?: CreateNewFileCommandContext) {
+		let { rule, path, relativePath, folder, name } = context || {}
+		const { directoryStore, viewState } = this.workspace
+		let folderPath = folder ? directoryStore.pathToRelativePath(folder.path) : false
+
 		if (rule) {
-			const description = rawOrStoreValue(rule.description)
-			return description || 'Creates a new ' + rawOrStoreValue(rule.name)
+			const ruleFolder = rawOrStoreValue(rule.folder)
+			if (name) {
+				relativePath = paths.join(folderPath || ruleFolder, name + '.md')
+			}
+			else {
+				folderPath = folderPath || ruleFolder
+				relativePath = undefined
+			}
 		}
-		return 'Creates a new note'
+
+		if (path && !relativePath && !rule) {
+			const result = directoryStore.pathToRelativePath(path)
+			if (result !== false) relativePath = result
+		}
+		if (relativePath) {
+			const validatedPath = validatePath(relativePath)
+			if (!validatedPath) return undefined
+			folderPath = paths.dirname(validatedPath)
+		}
+
+		if (folderPath === false) {
+			let deepestFolder: TreeNode = null
+			for (const item of viewState?.directoryView?.selection?.value ?? []) {
+				if (item.path.includes('.tangent')) continue
+				const selectedFolder = item.fileType === 'folder' ? item : directoryStore.getParent(item)
+				if (selectedFolder && (!deepestFolder || deepestFolder.depth > selectedFolder.depth)) {
+					deepestFolder = selectedFolder
+				}
+			}
+			folderPath = directoryStore.pathToRelativePath((deepestFolder || directoryStore.files).path)
+		}
+
+		if (!rule && !path && !relativePath && name) {
+			folderPath = paths.dirname(paths.join(folderPath || '', name))
+		}
+		return folderPath
+	}
+
+	getTooltip(context?: CreateNewFileCommandContext) {
+		const rule = context?.rule
+		let description: string
+		if (rule) {
+			description = rawOrStoreValue(rule.description) || 'Creates a new ' + rawOrStoreValue(rule.name)
+		}
+		else {
+			description = 'Creates a new note'
+		}
+
+		const folder = this.resolveTooltipFolder(context)
+		if (folder === undefined || folder === false) return description
+		const destination = !folder || folder === '.' ? 'Workspace Root' : folder
+		return `${description}\nDestination: ${destination}`
 	}
 }
