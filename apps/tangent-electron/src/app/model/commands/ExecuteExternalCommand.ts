@@ -82,6 +82,6 @@ export default class ExecuteExternalCommand extends WorkspaceCommand {
 	}
 
 	getTooltip(context?: ExecuteExternalCommandContext) {
-		return `Execute the external command '${context?.command?.name.value}' with context of current file and workspace`
+		return context?.command?.description.value
 	}
 }
