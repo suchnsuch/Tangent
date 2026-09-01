@@ -74,7 +74,7 @@ export default class ExecuteExternalCommand extends WorkspaceCommand {
 	}
 
 	getLabel(context?: ExecuteExternalCommandContext){
-		return `Execute '${context.command.name}'`
+		return `Execute '${context?.command?.name.value}'`
 	}
 
 	getDefaultPaletteName() {
@@ -82,6 +82,6 @@ export default class ExecuteExternalCommand extends WorkspaceCommand {
 	}
 
 	getTooltip(context?: ExecuteExternalCommandContext) {
-		return `Execute the external command '${context.command.name}' with context of current file and workspace'
+		return `Execute the external command '${context?.command?.name.value}' with context of current file and workspace`
 	}
 }
