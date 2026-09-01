@@ -33,6 +33,7 @@ The `packages` directory contains modules that provide libraries of Tangent-rela
 ### Lib
 The `lib` directory contains externally-versioned libraries that have been added as a git submodule for various reasons.
 * [typewriter](./lib/typewriter/README.md) – A tangent-specific fork of the [Typewriter](https://github.com/typewriter-editor/typewriter) project.
+* [typewriter-document](./lib/typewriter-document/README.md) – A tangent-specific fork of [Typewriter's document model](https://github.com/typewriter-editor/typewriter-document).
 
 
 ## Building Locally
