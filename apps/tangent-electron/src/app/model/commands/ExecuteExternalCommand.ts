@@ -73,15 +73,15 @@ export default class ExecuteExternalCommand extends WorkspaceCommand {
 		return 'Execute Commands'
 	}
 
-	getLabel(){
-		return 'Execute External Commands'
+	getLabel(context?: ExecuteExternalCommandContext){
+		return `Execute '${context.command.name}'`
 	}
 
 	getDefaultPaletteName() {
 		return 'Run/Execute External Commands'
 	}
 
-	getTooltip(context?: CommandContext) {
-		return 'Execute a external command with context of current file and current workspace'
+	getTooltip(context?: ExecuteExternalCommandContext) {
+		return `Execute the external command '${context.command.name}' with context of current file and workspace'
 	}
 }

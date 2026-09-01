@@ -69,7 +69,6 @@ ipcMain.handle('execCLI', async (event, commandTemplate: string, context: {[key:
 			const commandType =  code === 0 ? 'info' : 'warning'
 			const commandTitle = code === 0 ? 'Command Completed' : 'Command Failed'
 			const commandMsg  = code === 0 ? 'Successfully' : `With error code ${code}. See logs`
-			// console.log({commandType, commandTitle, commandMsg})
 			
 			windowHandle.postUserMessage(commandType, commandTitle, commandMsg)
 			
