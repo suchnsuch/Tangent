@@ -25,7 +25,7 @@ import TangentCodePreview from './t-code-preview' // No deletey
 import TangentMath from './t-math' // No deletey
 import { ListDefinition, listMatcher } from 'common/markdownModel/list'
 import type { Workspace } from 'app/model'
-import { deltaHasTextChanges, getEditInfo, getLineRangeWhile, getRangeWhile, lineToText } from 'common/typewriterUtils'
+import { getEditInfo, getLineRangeWhile, getRangeWhile, lineToText } from 'common/typewriterUtils'
 import { isLeftClick, startDrag } from 'app/utils'
 import { subscribeUntil } from 'common/stores'
 import { handleIsNode } from 'app/model/NodeHandle'
@@ -334,13 +334,6 @@ export default function editorModule(editor: Editor, options: {
 		}
 
 		if (event.change && event.changedLines && event.changedLines.length) {
-			const changeEvent = event.change
-			if (changeEvent.selectionChanged && changeEvent.selection === null && !deltaHasTextChanges(changeEvent.delta)) {
-				// TODO: This is a patch around an issue fixed by https://github.com/typewriter-editor/typewriter-document/pull/5
-				// Once this is fixed, remove this path.
-				return
-			}
-
 			let doc = event.doc
 			let change = doc.change
 
