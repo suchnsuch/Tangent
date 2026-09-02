@@ -58,7 +58,7 @@ export default class ExecuteExternalCommand extends WorkspaceCommand {
 		const actions = []
 		for (const command of this.workspace.workspaceSettings.value.externalCommands) {
 			actions.push({
-				name: `Execute "${command.name.value}"`,
+				name: `Execute '${command.name.value}'`,
 				command: this,
 				context: {
 					command
