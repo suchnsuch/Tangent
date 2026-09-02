@@ -6,6 +6,10 @@ interface CopyPathCommandContext extends CommandContext {
 	node: TreeNode
 }
 
+function copyPathTooltip(path: string): string {
+	return `Copies "${path}" to the clipboard`
+}
+
 export class CopyAbsolutePathCommand extends WorkspaceCommand {
 
 	resolveNode(context?: CopyPathCommandContext) {
@@ -34,7 +38,7 @@ export class CopyAbsolutePathCommand extends WorkspaceCommand {
 	getTooltip(context?: CopyPathCommandContext) {
 		const node = this.resolveNode(context)
 		if (node) {
-			return this.getPath(node)
+			return copyPathTooltip(this.getPath(node))
 		}
 	}
 }
@@ -70,7 +74,7 @@ export class CopyRelativePathCommand extends WorkspaceCommand {
 	getTooltip(context?: CopyPathCommandContext) {
 		const node = this.resolveNode(context)
 		if (node) {
-			return this.getPath(node)
+			return copyPathTooltip(this.getPath(node))
 		}
 	}
 }
