@@ -16,15 +16,26 @@ export class CopyAbsolutePathCommand extends WorkspaceCommand {
 		return this.resolveNode(context) != null
 	}
 
+	getPath(node: TreeNode): string {
+		return node.path
+	}
+
 	execute(context?: CopyPathCommandContext): void {
 		const node = this.resolveNode(context)
 		if (node) {
-			navigator.clipboard.writeText(node.path)
+			navigator.clipboard.writeText(this.getPath(node))
 		}
 	}
 
 	getLabel(context?: CopyPathCommandContext) {
 		return 'Copy Full Path'
+	}
+
+	getTooltip(context?: CopyPathCommandContext) {
+		const node = this.resolveNode(context)
+		if (node) {
+			return this.getPath(node)
+		}
 	}
 }
 
@@ -38,17 +49,28 @@ export class CopyRelativePathCommand extends WorkspaceCommand {
 		return this.resolveNode(context) != null
 	}
 
+	getPath(node: TreeNode): string {
+		const workspaceAbsolutePath = this.workspace.viewState.directoryView.root.path
+		const nodeAbsolutePath = node.path
+		const nodeRelativePath = nodeAbsolutePath.substring(workspaceAbsolutePath.length)
+		return nodeRelativePath
+	}
+
 	execute(context?: CopyPathCommandContext): void {
 		const node = this.resolveNode(context)
 		if (node) {
-			const workspaceAbsolutePath = this.workspace.viewState.directoryView.root.path
-			const nodeAbsolutePath = node.path
-			const nodeRelativePath = nodeAbsolutePath.substring(workspaceAbsolutePath.length)
-			navigator.clipboard.writeText(nodeRelativePath)
+			navigator.clipboard.writeText(this.getPath(node))
 		}
 	}
 
 	getLabel(context?: CopyPathCommandContext) {
 		return 'Copy Relative Path'
+	}
+	
+	getTooltip(context?: CopyPathCommandContext) {
+		const node = this.resolveNode(context)
+		if (node) {
+			return this.getPath(node)
+		}
 	}
 }
