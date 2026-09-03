@@ -18,6 +18,7 @@ import './dictionary'
 import './themes'
 import './urlData'
 import { FileSaveResult } from 'main/File'
+import { ClipboardItem } from 'electron'
 
 const log = Logger.get('messages')
 
@@ -544,9 +545,40 @@ ipcMain.handle('getAllLanguages', async (event) => {
 	}
 })
 
-ipcMain.handle('saveImageFromClipboard', (event, contextPath) => {
+
+const PNG_MIME_TYPE = 'image/png'
+const JPEG_MIME_TYPE = 'image/jpeg'
+
+async function readClipboardImage() {
+	const items = await clipboard.read()
+
+	async function getTarget() {
+		for (const item of items) {
+			for (const type of item.types) {
+				if (type === PNG_MIME_TYPE ||
+					type === JPEG_MIME_TYPE
+				) {
+					return {
+						mime: type,
+						blob: await item.getType(type) as Blob
+					}
+				}
+			}
+		}
+		return null
+	}
+
+	const target = await getTarget()
+	if (target) {
+		const buffer = Buffer.from(await target.blob.arrayBuffer())
+		return nativeImage.createFromBuffer(buffer)
+	}
+	return null
+}
+
+ipcMain.handle('saveImageFromClipboard', async (event, contextPath) => {
 	try {
-		const nativeImage = clipboard.readImage()
+		const nativeImage = await readClipboardImage()
 		const image = nativeImage.toPNG()
 
 		// This chunk of code heralds from https://stackoverflow.com/questions/31468395/image-dpi-in-javascript-nodejs-and-electron
@@ -614,7 +646,14 @@ ipcMain.handle('saveImageFromClipboard', (event, contextPath) => {
 ipcMain.handle('copyImageToClipboard', async (event, path: string) => {
 	const image = nativeImage.createFromPath(path)
 	if (!image.isEmpty()) {
-		clipboard.writeImage(image)
+		return clipboard.write([
+			new ClipboardItem({
+				PNG_MIME_TYPE: new Blob(
+					[new Uint8Array(image.toPNG())],
+					{ type: PNG_MIME_TYPE }
+				)
+			})
+		])
 	}
 })
 
@@ -625,7 +664,7 @@ ipcMain.handle('updateImageFromClipboard', async (event, path: string) => {
 	const file = windowHandle.workspace.contentsStore.get(path)
 	if (!file) return
 
-	const image = clipboard.readImage()
+	const image = await readClipboardImage()
 	if (!image || image.isEmpty()) {
 		windowHandle.postUserMessage(
 			'warning',

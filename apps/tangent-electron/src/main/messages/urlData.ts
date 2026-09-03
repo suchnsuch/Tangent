@@ -5,7 +5,6 @@ import type { UrlData } from 'common/urlData'
 import { getWindowHandle } from 'main/workspaces'
 import chalk from 'chalk'
 import { isExternalLink } from 'common/links'
-import type { CheerioAPI } from 'cheerio'
 
 const log = Logger.get('url-data')
 
@@ -19,7 +18,8 @@ const oneDayInMs = 24 * 60 * 60 * 1000;
 
 function getResponseHandlerURL(url: string) {
 	if (url.match(/wikipedia.org\/wiki/)) {
-		return (response, doc: CheerioAPI) => {
+		// Doc should be CheerioAPI, but link-preview-js is pinned to an old version
+		return (response, doc) => {
 			if (!response.description) {
 				response.description = doc('#mw-content-text p:not(.mw-empty-elt, table *)').first().text()
 			}
