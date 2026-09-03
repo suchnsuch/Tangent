@@ -188,8 +188,8 @@ export default class CreateNewFileCommand extends WorkspaceCommand {
 
 				// When looking at a folder, create items within the folder
 				let folder = item.fileType === 'folder' ? item : directoryStore.getParent(item)
-				// A parentless item cannot contribute a folder. execute() has always thrown
-				// on this; only the side-effect-free path skips it.
+				// A parentless item cannot contribute a folder. Only the side-effect-free
+				// path skips it; execute() keeps whatever it does with one today.
 				if (!interactive && !folder) continue
 
 				if (!deepestFolder || deepestFolder.depth > folder.depth) {
