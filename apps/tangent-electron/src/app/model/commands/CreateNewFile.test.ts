@@ -4,30 +4,33 @@ import type { Workspace } from '..'
 import IndexTreeStore from 'common/indexing/IndexTreeStore'
 import { knownExtensions } from 'common/fileExtensions'
 import type { TreeNode } from 'common/trees'
+import type { CreationRuleDefinition } from 'common/settings/CreationRule'
 
 describe('Extension auto inclusion', () => {
 
-	const unicodeFolder: TreeNode = {
-		name: '研究',
-		path: 'some/root/Ideas/研究',
-		depth: 3,
-		fileType: 'folder',
-		children: []
-	}
-	const ideasFolder: TreeNode = {
-		name: 'Ideas',
-		path: 'some/root/Ideas',
-		depth: 2,
-		fileType: 'folder',
-		children: [unicodeFolder]
-	}
 	const directoryStore = new IndexTreeStore({
 		files: {
 			name: 'root',
 			path: 'some/root',
 			depth: 1,
 			fileType: 'folder',
-			children: [ideasFolder]
+			children: [
+				{
+					name: 'Ideas',
+					path: 'some/root/Ideas',
+					depth: 2,
+					fileType: 'folder',
+					children: [
+						{
+							name: '研究',
+							path: 'some/root/Ideas/研究',
+							depth: 3,
+							fileType: 'folder',
+							children: []
+						}
+					]
+				}
+			]
 		},
 		tags: {
 			path: '',
@@ -36,20 +39,23 @@ describe('Extension auto inclusion', () => {
 			fileType: ''
 		}
 	})
-	const effects = { navigation: 0, modal: 0 }
+	const ideasFolder = directoryStore.files.children[0]
+	const unicodeFolder = ideasFolder.children[0]
 
-	const workspace: Workspace = Object.assign(Object.create(null), {
+	// Counts the side effects a tooltip must never cause
+	const effects = { modal: 0 }
+	// `unknown` first: the stub only implements the members these tests reach
+	const workspace = {
 		directoryStore,
-		navigateTo: () => effects.navigation++,
 		viewState: {
 			modal: { push: () => effects.modal++ },
 			directoryView: {
 				selection: {
-					value: []
+					value: [] as TreeNode[]
 				}
 			}
 		}
-	})
+	} as unknown as Workspace
 
 	const command = new CreateNewFileCommand(workspace)
 	// Expose the private function type-safely
@@ -131,26 +137,36 @@ describe('Extension auto inclusion', () => {
 	it('Describes the default, selected, nested, and Unicode destinations', () => {
 		const selection = workspace.viewState.directoryView.selection
 		selection.value = []
-		expect(command.getTooltip()).toContain('Destination: Workspace Root')
+		expect(command.getTooltip()).toBe('Creates a new note in the root of the workspace.')
 
 		selection.value = [unicodeFolder]
-		expect(command.getTooltip()).toContain('Destination: Ideas/研究')
+		expect(command.getTooltip()).toBe('Creates a new note in Ideas/研究.')
 	})
 
 	it('Does not claim invalid destinations from reserved or invalid inputs', () => {
 		workspace.viewState.directoryView.selection.value = [{
 			name: 'private', path: 'some/root/.tangent/private', depth: 3, fileType: 'folder'
 		}]
-		expect(command.getTooltip()).toContain('Destination: Workspace Root')
+		expect(command.getTooltip()).toBe('Creates a new note in the root of the workspace.')
 		expect(command.getTooltip({ relativePath: 'CON/New Note.md' })).toBe('Creates a new note')
 	})
 
 	it('Updates the destination for path and explicit-folder contexts', () => {
 		workspace.viewState.directoryView.selection.value = [unicodeFolder]
 		expect(command.getTooltip({ relativePath: 'Projects/Long Term/New Note.md' }))
-			.toContain('Destination: Projects/Long Term')
+			.toBe('Creates a new note in Projects/Long Term.')
 		expect(command.getTooltip({ folder: ideasFolder }))
-			.toContain('Destination: Ideas')
+			.toBe('Creates a new note in Ideas.')
+	})
+
+	it('Names the rule when it has no description of its own', () => {
+		workspace.viewState.directoryView.selection.value = []
+		expect(command.getTooltip({
+			rule: {
+				name: 'Journal', nameTemplate: 'Daily', folder: 'Journal', contentTemplate: '',
+				mode: 'create', description: ''
+			}
+		})).toBe('Creates a new Journal in Journal.')
 	})
 
 	it('Preserves rule descriptions and resolves rule destination precedence', () => {
@@ -171,6 +187,33 @@ describe('Extension auto inclusion', () => {
 		expect(command.getTooltip(context)).toBe(tooltip)
 		expect(context).toEqual(before)
 		expect(workspace.viewState.directoryView.selection.value).toBe(beforeSelection)
+		expect(effects).toEqual(beforeEffects)
+	})
+
+	it('Never prompts for a name while building a tooltip', () => {
+		workspace.viewState.directoryView.selection.value = []
+		const rule: CreationRuleDefinition = {
+			name: 'Meeting', nameTemplate: 'Meetings/%name%', folder: 'Notes',
+			contentTemplate: '', mode: 'create', description: ''
+		}
+		const beforeEffects = { ...effects }
+		expect(command.getTooltip({ rule })).toBe('Creates a new Meeting in Notes/Meetings.')
+		expect(effects).toEqual(beforeEffects)
+
+		// The same rule through the interactive path still asks for the name
+		resolveContext({ rule })
+		expect(effects.modal).toBe(beforeEffects.modal + 1)
+	})
+
+	it('Claims no destination when the typed name would choose the folder', () => {
+		workspace.viewState.directoryView.selection.value = []
+		const beforeEffects = { ...effects }
+		expect(command.getTooltip({
+			rule: {
+				name: 'Entry', nameTemplate: '%name%/Entry', folder: 'Notes',
+				contentTemplate: '', mode: 'create', description: ''
+			}
+		})).toBe('Creates a new Entry')
 		expect(effects).toEqual(beforeEffects)
 	})
 })
