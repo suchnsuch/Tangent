@@ -115,7 +115,9 @@ function onZoomReset() {
 }
 
 async function doPDF() {
-	let pdf = await pdfjs.getDocument(state.file.cacheBustPath).promise
+	const pdf = await pdfjs.getDocument({
+		url: state.file.cacheBustPath
+	}).promise
 
 	viewer = new pdfviewer.PDFViewer({
 		container,

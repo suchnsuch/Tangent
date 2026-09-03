@@ -92,7 +92,7 @@
     "lorem-ipsum": "^2.0.8",
     "mermaid": "^11.11.0",
     "mini-css-extract-plugin": "^2.9.2",
-    "pdfjs-dist": "^5.4.54",
+    "pdfjs-dist": "^6.3.289",
     "playwright": "^1.61.0",
     "prism-svelte": "^0.5.0",
     "sass": "^1.32.10",
