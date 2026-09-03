@@ -12,6 +12,7 @@
 	"author": "Taylor Hadden",
 	"license": "Apache-2.0",
 	"workspaces": [
+		"lib/typewriter-document",
 		"lib/typewriter",
 		"packages/tangent-query-parser",
 		"packages/tangent-html-to-markdown",

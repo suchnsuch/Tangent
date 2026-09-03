@@ -1,3 +1,6 @@
 [submodule "lib/typewriter"]
 	path = lib/typewriter
 	url = https://github.com/taylorhadden/typewriter.git
+[submodule "lib/typewriter-document"]
+	path = lib/typewriter-document
+	url = https://github.com/taylorhadden/typewriter-document.git

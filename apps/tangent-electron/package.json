@@ -43,7 +43,7 @@
   "dependencies": {
     "@such-n-such/tangent-query-parser": "^0.1.0",
     "@typewriter/delta": "^1.0.2",
-    "@typewriter/document": "^0.9.4",
+    "@typewriter/document": "file:../../lib/typewriter-document",
     "adm-zip": "^0.5.9",
     "chalk": "^5.4.1",
     "cheerio": "^1.2.0",

@@ -729,7 +729,6 @@ export function shiftLines(editor: MarkdownEditor, event: Event, lines: Line[], 
 			.delete(movingRangeSize)	// Where the content was
 			.retain(jumpLength)	// The line we're swapping with
 			.concat(movingOps)			// Where the content is now
-			.retain(doc.length)			// I could be more accurate here, this is easier
 
 		editor.change
 			.setDelta(delta)
@@ -761,7 +760,6 @@ export function shiftLines(editor: MarkdownEditor, event: Event, lines: Line[], 
 			.concat(movingOps)			// Where the content is now
 			.retain(jumpLength)			// The line we're swapping with
 			.delete(movingRangeSize)	// Where the content was
-			.retain(doc.length)			// I could be more accurate here, this is easier
 
 		editor.change.setDelta(delta)
 			.select([
