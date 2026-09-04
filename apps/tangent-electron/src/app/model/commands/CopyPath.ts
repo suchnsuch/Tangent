@@ -7,7 +7,7 @@ interface CopyPathCommandContext extends CommandContext {
 }
 
 function copyTooltip(what: string): string {
-	return `Copies "${what}" to the clipboard`
+	return `Copies "${what}" to the clipboard.`
 }
 
 export class CopyAbsolutePathCommand extends WorkspaceCommand {
