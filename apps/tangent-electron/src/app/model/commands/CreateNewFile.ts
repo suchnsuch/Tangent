@@ -77,7 +77,14 @@ export default class CreateNewFileCommand extends WorkspaceCommand {
 		return existingNode instanceof File
 	}
 
-	private resolveContext(context: CreateNewFileCommandContext): CreationValues {
+	/**
+	 * Resolves the values a context would create a file with.
+	 * Pass `interactive: false` to resolve without side effects: the naming dialog is
+	 * never pushed and an unresolvable context returns `undefined` instead of throwing.
+	 */
+	private resolveContext(context: CreateNewFileCommandContext, options?: { interactive?: boolean }): CreationValues {
+
+		const interactive = options?.interactive ?? true
 
 		let { rule, path, relativePath, folder, name, extension, updateSelection, creationMode } = context || {}
 		const { directoryStore, viewState } = this.workspace
@@ -99,16 +106,26 @@ export default class CreateNewFileCommand extends WorkspaceCommand {
 					name = nameResult
 				}
 				else if (nameResult !== null) {
-					const { preName, postName } = nameResult
+					if (!interactive) {
+						// Resolving for a preview, so the typed name is unknown. Anything
+						// after the token would turn that name into a folder, and no
+						// destination can be claimed; otherwise the folder is fixed by the
+						// template and a placeholder name resolves it.
+						if (/[\\/]/.test(nameResult.postName)) return
+						name = nameFromRule(rule, 'New Note') as string
+					}
+					else {
+						const { preName, postName } = nameResult
 
-					this.workspace.viewState.modal.push(CreateFileDialog, {
-						title: 'Create New ' + rule.name,
-						preName,
-						postName,
-						context
-					})
-					// The dialog will handle the rest
-					return
+						this.workspace.viewState.modal.push(CreateFileDialog, {
+							title: 'Create New ' + rule.name,
+							preName,
+							postName,
+							context
+						})
+						// The dialog will handle the rest
+						return
+					}
 				}
 				else {
 					// Fall back to the default naming flow
@@ -138,6 +155,7 @@ export default class CreateNewFileCommand extends WorkspaceCommand {
 		if (relativePath) {
 			const validatedPath = validatePath(relativePath)
 			if (!validatedPath) {
+				if (!interactive) return
 				throw new Error(`Could not create file. "${relativePath}" is invalid and could not be made valid.`)
 			}
 			relativePath = validatedPath
@@ -170,6 +188,9 @@ export default class CreateNewFileCommand extends WorkspaceCommand {
 
 				// When looking at a folder, create items within the folder
 				let folder = item.fileType === 'folder' ? item : directoryStore.getParent(item)
+				// A parentless item cannot contribute a folder. Only the side-effect-free
+				// path skips it; execute() keeps whatever it does with one today.
+				if (!interactive && !folder) continue
 
 				if (!deepestFolder || deepestFolder.depth > folder.depth) {
 					deepestFolder = folder
@@ -182,6 +203,7 @@ export default class CreateNewFileCommand extends WorkspaceCommand {
 
 			folderPath = directoryStore.pathToRelativePath(deepestFolder.path)
 			if (folderPath === false) {
+				if (!interactive) return
 				throw new Error('A relative folder path could not be determined! This should not happen by this point.')
 			}
 		}
@@ -375,12 +397,22 @@ export default class CreateNewFileCommand extends WorkspaceCommand {
 		return 'Create New Note'
 	}
 
-	getTooltip(context: CreateNewFileCommandContext) {
+	getTooltip(context?: CreateNewFileCommandContext) {
 		const rule = context?.rule
-		if (rule) {
-			const description = rawOrStoreValue(rule.description)
-			return description || 'Creates a new ' + rawOrStoreValue(rule.name)
+		const description = rule ? rawOrStoreValue(rule.description) : undefined
+		const subject = rule ? 'a new ' + rawOrStoreValue(rule.name) : 'a new note'
+
+		const values = this.resolveContext(context ?? {}, { interactive: false })
+		if (!values) return description || 'Creates ' + subject
+
+		const { folderPath } = values
+		const destination = !folderPath || folderPath === '.'
+			? 'the root of the workspace'
+			: folderPath
+
+		if (description) {
+			return `${description}\nDestination: ${destination}`
 		}
-		return 'Creates a new note'
+		return `Creates ${subject} in ${destination}.`
 	}
 }
