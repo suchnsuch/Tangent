@@ -22,7 +22,9 @@ let canvas: HTMLCanvasElement
 let pagePromise = $derived.by(() => {
 	let page = pageFromContentId(content_id) || 1
 
-	return pdfjs.getDocument(path).promise.then(async pdf => {
+	return pdfjs.getDocument({
+		url: path
+	}).promise.then(async pdf => {
 		page = clamp(page, 1, pdf.numPages)
 		return pdf.getPage(page)
 	})
