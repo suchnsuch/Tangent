@@ -59,7 +59,7 @@ main {
 }
 
 .logo {
-	background-image: url('tangent-icon.svg');
+	background-image: url("/tangent-icon.svg");
 	background-repeat: no-repeat;
 	background-position: center;
 	height: 8em;
