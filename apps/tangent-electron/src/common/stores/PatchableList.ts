@@ -5,6 +5,9 @@ import type { RawValueMode } from './ObjectStore'
 import { Patchable, type PatchObserver } from './Patchable'
 import { PatchableStore } from './PatchableStore'
 
+import Logger from 'js-logger'
+const log = Logger.get('PatchableList')
+
 export enum PatchableListPatchType {
 	Splice,
 	Update
@@ -324,6 +327,7 @@ export abstract class PatchableList<V, P> extends PatchableStore<V[], PatchableL
 					resultList.push(value)
 				}
 				else {
+					log.debug('Patch item cleaned out: ', patchItem)
 					cleaned = true
 				}
 			}
@@ -343,7 +347,7 @@ export abstract class PatchableList<V, P> extends PatchableStore<V[], PatchableL
 		return (item as any).getRawValues(typeof mode === 'string' ? mode : 'patch') as P
 	}
 
-	protected abstract convertFromPatchItem(patchItem: P)
+	protected abstract convertFromPatchItem(patchItem: P): V
 }
 
 /**
