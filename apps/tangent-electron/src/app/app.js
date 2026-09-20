@@ -12,6 +12,10 @@ import './style/note.scss'
 // See: https://github.com/mdn/interactive-examples/issues/887#issuecomment-470703209
 import 'katex/dist/katex.min.css'
 
+import Logger from 'js-logger'
+Logger.setHandler(Logger.createDefaultHandler())
+Logger.setLevel(process.env.NODE_ENV === 'development' ? Logger.DEBUG : Logger.INFO)
+
 const app = mount(App, {
 	target: document.body,
 })
