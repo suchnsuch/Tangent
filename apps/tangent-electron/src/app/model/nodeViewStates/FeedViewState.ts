@@ -20,7 +20,7 @@ class FeedViewStateContext extends ViewStateContext {
 			state.detailMode = NoteDetailMode.None
 		}
 		else if (state instanceof BaseSetViewState) {
-			state.lensOverride = 'List'
+			state.lensTypeOverride = 'List'
 		}
 
 		return state

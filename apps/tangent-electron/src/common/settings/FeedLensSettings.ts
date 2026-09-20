@@ -1,7 +1,7 @@
-import { ObjectStore } from 'common/stores'
 import type { SettingDefinition } from './Setting'
 import Setting from './Setting'
 import { NodeSortStore } from './Sorting'
+import { LensSettings, type LensSettingsType } from './LensSettings'
 
 const startAtDefinition: SettingDefinition<string> = {
 	name: 'Start At',
@@ -21,13 +21,20 @@ const startAtDefinition: SettingDefinition<string> = {
 	defaultValue: 'beginning'
 }
 
-export default class FeedLensSettings extends ObjectStore {
+export default class FeedLensSettings extends LensSettings {
 
 	sorting = new NodeSortStore()
 	startAt = new Setting(startAtDefinition)
 
-	constructor() {
-		super()
+	constructor(patch?: any) {
+		super({ name: FeedLensSettings.staticName })
+		if (patch) this.applyPatch(patch)
 		this.setupObservables()
 	}
+
+	get type() { return FeedLensSettings.staticType }
+	static get staticType() { return 'FeedLensSettings' }
+	static get staticName() { return 'Feed' }
 }
+
+FeedLensSettings satisfies LensSettingsType

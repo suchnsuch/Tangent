@@ -7,6 +7,7 @@ import type { NodeViewState } from './NodeViewState'
 import type { Tangent } from '..'
 import UnhandledViewState from './UnhandledViewState'
 import File from '../File'
+import { IndexData } from 'common/indexing/indexTypes'
 
 export type ViewStateContextCreator = (workspace: Workspace, tangent: Tangent, parent: ViewStateContext) => ViewStateContext
 export type ViewStateCreator = (context: ViewStateContext, node: TreeNode, reference: TreeNodeReference) => NodeViewState
