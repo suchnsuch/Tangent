@@ -30,6 +30,13 @@ export namespace Point {
 		return (a.x - b.x) * (a.x -b.x) + (a.y - b.y) * (a.y - b.y)
 	}
 
+	/**
+	 * The distance if you cannot move diagonally
+	*/
+	export function manhattanDistance(a: Point, b: Point) {
+		return Math.abs(a.x - b.x) + Math.abs(a.y - b.y)
+	}
+
 	export function add(a: Point, b: Point) {
 		return make(a.x + b.x, a.y + b.y)
 	}
@@ -53,6 +60,14 @@ export namespace Point {
 
 	export function slope(point: Point) {
 		return point.x / point.y
+	}
+
+	export function min(a: Point, b: Point) {
+		return make(Math.min(a.x, b.x), Math.min(a.y, b.y))
+	}
+
+	export function max(a: Point, b: Point) {
+		return make(Math.max(a.x, b.x), Math.max(a.y, b.y))
 	}
 }
 

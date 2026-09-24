@@ -20,8 +20,7 @@ function elementCenter(node: HTMLElement): Point {
 	return rectCenter(node.getBoundingClientRect())
 }
 
-function closestEdgePoint(node: HTMLElement, point: Point): Point {
-	const rect = node.getBoundingClientRect()
+function closestEdgePoint(rect: DOMRect, point: Point): Point {
 	const result = Point.make(0, 0)
 
 	if (point.x < rect.left) result.x = rect.left
@@ -35,7 +34,7 @@ function closestEdgePoint(node: HTMLElement, point: Point): Point {
 	return result
 }
 
-function directionFromKey(event: KeyboardEvent) {
+function directionFromInput(event: KeyboardEvent) {
 	switch (event.key) {
 		case 'ArrowLeft':
 			return Point.Left
@@ -61,13 +60,108 @@ function allowArrowNavigate(event: Event) {
 	return !event.defaultPrevented && !(event as any)._preventArrowNavigate
 }
 
+type DebugDrawConfig = {
+	/** The css color of the rectangle */
+	color?: string
+	/** The time for the debug to show up in ms */
+	time?: number
+}
+
+function debugDrawRect(rect: DOMRect, config?: DebugDrawConfig) {
+	if (!rect) return
+	const time = config?.time ?? 1000
+	const element = document.createElement('div')
+
+	element.style.border = '1px solid ' + (config?.color ?? 'lime')
+	element.style.color = 'transparent'
+	element.style.position = 'fixed'
+	element.style.zIndex = '100000'
+	element.style.left = rect.left + 'px'
+	element.style.top = rect.top + 'px'
+	element.style.width = rect.width + 'px'
+	element.style.height = rect.height + 'px'
+
+	document.body.appendChild(element)
+
+	setTimeout(() => {
+		document.body.removeChild(element)
+	}, time)
+}
+
+function debugDrawPoint(point: Point, config?: DebugDrawConfig & {
+	/** The radius of the point */
+	radius?: number
+}) {
+	if (!point) return
+	const time = config?.time ?? 1000
+	const element = document.createElement('div')
+
+	const radius = config?.radius ?? 2
+
+	element.style.backgroundColor = config?.color ?? 'lime'
+	element.style.borderRadius = `${radius}`
+	element.style.position = 'fixed'
+	element.style.zIndex = '100000'
+	element.style.left = (point.x - radius) + 'px'
+	element.style.top = (point.y - radius) + 'px'
+	element.style.width = (radius * 2) + 'px'
+	element.style.height = (radius * 2) + 'px'
+
+	document.body.appendChild(element)
+
+	setTimeout(() => {
+		document.body.removeChild(element)
+	}, time)
+}
+
+function debugDrawLine(a: Point, b: Point, config?: DebugDrawConfig & {
+	/** The width of the line */
+	width?: number
+}) {
+	if (!a || !b) return
+	const time = config?.time ?? 1000
+	const element = document.createElement('div')
+
+	const min = Point.min(a, b)
+	const max = Point.max(a, b)	
+	const size = Point.subtract(max, min)
+
+	const width = Math.max(size.x, 10)
+	const height = Math.max(size.y, 10)
+
+	element.innerHTML=`
+		<svg viewBox="0 0 ${width} ${height}" width="${width}" height="${height}">
+			<line
+				x1="${a.x - min.x}"
+				y1="${a.y - min.y}"
+				x2="${b.x - min.x}"
+				y2="${b.y - min.y}"
+				style="stroke:${config?.color ?? 'lime'};stroke-width:${config?.width ?? 1};"
+			/>
+		</svg>
+	`
+
+	element.style.position = 'fixed'
+	element.style.zIndex = '100000'
+	element.style.left = min.x + 'px'
+	element.style.top = min.y + 'px'
+	element.style.width = width + 'px'
+	element.style.height = height + 'px'
+
+	document.body.appendChild(element)
+
+	setTimeout(() => {
+		document.body.removeChild(element)
+	}, time)
+}
+
 export interface ArrowNavigateOptions {
-	// Selects a container of children to move between
+	/** Selects a container of children to move between */
 	containerSelector?: string
-	// Selects a set of elements to move between. If containerSelector is set, this target will be relative to that selector
+	/** Selects a set of elements to move between. If containerSelector is set, this target will be relative to that selector */
 	targetSelector?: string
 
-	// When set, focused elements will have this class automatically added and removed
+	/** When set, focused elements will have this class automatically added and removed */
 	focusClass?: string|string[]
 	
 	scrollTime?: number
@@ -163,10 +257,22 @@ export default function arrowNavigate(node: HTMLElement, options?: ArrowNavigate
 			if (event.key === 'ArrowRight' && input.selectionEnd < input.value.length) return
 		}
 
-		const direction = directionFromKey(event)
+		const direction = directionFromInput(event)
 		if (!direction) return
 
+		// Technically, this is always true, since it's derived from keyboard events.
+		// This is me unnecessarily making it more complicated for future-proofing.
+		// Couldn't resist.
+		const isCardinal = (() => {
+			const dot = Point.dot(direction, Point.Up)
+			function isNearly(value: number, target: number) {
+				return Math.abs(value - target) < 0.1
+			}
+			return isNearly(dot, 1) || isNearly(dot, 0) || isNearly(dot, -1)
+		})()
+
 		let best: HTMLElement = null
+		let bestPoint: Point = null
 		let fallback: HTMLElement = null
 		let bestDot = 0
 		let bestDistance = Number.MAX_VALUE
@@ -199,17 +305,32 @@ export default function arrowNavigate(node: HTMLElement, options?: ArrowNavigate
 			if (!(target instanceof HTMLElement)) continue
 			if (!fallback) fallback = target
 
-			const itemPoint = closestEdgePoint(target, currentPoint)
-			const dirToItem = Point.normalize(Point.subtract(itemPoint, currentPoint))
+			const targetRect = target.getBoundingClientRect()
+			const itemPoint = closestEdgePoint(targetRect, currentPoint)
+			const delta = Point.subtract(itemPoint, currentPoint)
+			const dirToItem = Point.normalize(delta)
 			const dot = Point.dot(direction, dirToItem)
 			
 			if (dot <= 0) continue
 
-			const distance = Point.squareDistance(currentPoint, itemPoint) / dot
+			if ((window as any).__debugArrowNavigate) {
+				debugDrawRect(targetRect)
+				debugDrawPoint(itemPoint)
+			}
 
+			// When the desire is directly up/down/left/right,
+			// heavily emphasize moving along those directions.
+			const distance = isCardinal
+				? Point.manhattanDistance(currentPoint, itemPoint)
+				: Point.distance(currentPoint, itemPoint)
+
+			// Things not aligned with desire should count as "further away"
+			const attenuatedDistance = distance / dot
+			
 			if (isBetter(distance, dot)) {
 				best = target
-				bestDistance = distance
+				bestPoint = itemPoint
+				bestDistance = attenuatedDistance
 				bestDot = dot
 			}
 		}
@@ -223,6 +344,10 @@ export default function arrowNavigate(node: HTMLElement, options?: ArrowNavigate
 		if (focusClasses) {
 			clearFocusedClasses()
 			addFocusClasses(best)
+		}
+
+		if ((window as any).__debugArrowNavigate) {
+			debugDrawLine(currentPoint, bestPoint)
 		}
 
 		best.focus({ preventScroll: true })
