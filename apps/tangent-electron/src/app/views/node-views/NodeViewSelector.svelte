@@ -1,5 +1,6 @@
 <script lang="ts">
 import { getContext, tick } from 'svelte'
+import { writable } from 'svelte/store'
 import { fly, fade } from 'svelte/transition'
 import { FocusLevel } from 'common/dataTypes/TangentInfo'
 import paths from 'common/paths'
@@ -19,6 +20,7 @@ import { createCommandHandler } from 'app/model/commands/Command'
 import { selectDetailsPane } from 'app/utils/selection'
 import arrowNavigate, { isArrowNavigateEvent } from 'app/utils/arrowNavigate'
 import type { NodeViewSettingsVisibility } from 'app/model/nodeViewStates/NodeViewState'
+import { countPopUps } from 'app/utils/popUpButton'
 
 const workspace = getContext('workspace') as Workspace
 
@@ -49,12 +51,14 @@ $: viewComponent = $lensState?.viewComponent
 $: canShowSettings = state.settingsComponent != null ||
 	$lensState?.settingsComponent != null
 
+let settingsPopups = writable(0)
+$: console.log({ popups: $settingsPopups })
 let hintSettings = false
 let showSettingsFromMouse = false
 let showSettingsFromHover = false
 $: showSettingsState = state.showSettings
 $: willShowSettings = (showSettingsState && $showSettingsState !== false)
-$: showSettings = showSettingsFromMouse || showSettingsFromHover || willShowSettings
+$: showSettings = showSettingsFromMouse || showSettingsFromHover || willShowSettings || $settingsPopups > 0
 
 let container: HTMLElement
 let settingsContainer: HTMLElement
@@ -307,6 +311,7 @@ function onDetailsResized(entries: ResizeObserverEntry[]) {
 					targetSelector: settingsFocusSelector,
 					focusClass: 'focusable'
 				}}
+				use:countPopUps={settingsPopups}
 				tabindex="-1"
 				class="settings-container"
 				style:padding-top={extraTop + 4 + 'px'}

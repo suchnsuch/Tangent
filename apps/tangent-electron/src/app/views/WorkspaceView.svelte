@@ -1,5 +1,7 @@
 <script lang="ts">
 import { setContext } from 'svelte'
+import { writable } from 'svelte/store'
+import { wait } from '@such-n-such/core'
 
 import type Workspace from 'app/model/Workspace'
 import { FocusLevel } from 'common/dataTypes/TangentInfo'
@@ -15,6 +17,7 @@ import { appendContextTemplate, buildMainMenu, type ExtendedContextEvent, extrac
 import { isMac } from 'common/platform'
 import CreationRuleName from './summaries/CreationRuleName.svelte'
 import PopUpButton from 'app/utils/PopUpButton.svelte'
+import { countPopUps } from 'app/utils/popUpButton'
 import ModalStateView from 'app/modal/ModalStateView.svelte'
 import LeftSidebar from './LeftSidebar.svelte'
 import SvgIcon from './smart-icons/SVGIcon.svelte'
@@ -43,11 +46,7 @@ $: topCommandHandler = createCommandHandler(Object.values(workspace.commands).fi
 // Top bar
 let hoveringForTopBar = false
 let topBarShouldBeVisible = false
-
-let focusMenuIsOpen = false
-let newNoteMenuIsOpen = false
-let backMenuIsOpen = false
-let forwardMenuIsOpen = false
+let topBarPopupCount = writable(0)
 let systemMenuIsOpen = workspace.viewState.system.showMenu
 workspace.on('editing', () => {
 	// This is cheeky, but it works!
@@ -61,10 +60,7 @@ $: {
 		|| $focusLevel <= FocusLevel.Thread
 		|| hoveringForTopBar
 		|| leftSidebarVisible
-		|| focusMenuIsOpen
-		|| newNoteMenuIsOpen
-		|| backMenuIsOpen
-		|| forwardMenuIsOpen
+		|| $topBarPopupCount > 0
 }
 
 // Sidebar
@@ -127,7 +123,7 @@ $: {
 		}
 	}
 
-	topBarShouldBeVisible = topBarShouldBeVisible || $focusLevel <= FocusLevel.Thread || hoveringForTopBar || leftSidebarVisible || focusMenuIsOpen
+	topBarShouldBeVisible = topBarShouldBeVisible || $focusLevel <= FocusLevel.Thread || hoveringForTopBar || leftSidebarVisible || $topBarPopupCount > 0
 }
 
 function onMainMouseMove(event: MouseEvent) {
@@ -196,12 +192,13 @@ function onContextMenu(event: ExtendedContextEvent) {
 }
 
 function openCreationRules(event: Event) {
-	event.preventDefault()
-	// Otherwise, the pop up menu closes itself immediately
-	event.stopPropagation()
-	newNoteMenuIsOpen = false
-	$systemMenuIsOpen = true
-	workspace.viewState.system.section.set('Creation Rules')
+	// Delay the opening of a new popup
+	// Otherwise, the new pop up menu closes itself immediately
+	// Strangely, `tick()` does not work here
+	wait().then(() => {
+		$systemMenuIsOpen = true
+		workspace.viewState.system.section.set('Creation Rules')
+	})
 }
 
 function onViewContextMenu(event: MouseEvent) {
@@ -235,7 +232,7 @@ function onViewContextMenu(event: MouseEvent) {
 <svelte:body on:mousemove={onMainMouseMove} on:contextmenu={onContextMenu}/>
 
 <WindowBar showBorder={true} visible={topBarShouldBeVisible}>
-	<nav class="buttonBar" slot="left">
+	<nav class="buttonBar" slot="left" use:countPopUps={topBarPopupCount}>
 
 		{#if !isMac || process.env.NODE_ENV === 'development'}
 			<PopUpButton
@@ -271,7 +268,6 @@ function onViewContextMenu(event: MouseEvent) {
 			placement="bottom-start"
 			menuMode="low-profile"
 			tooltip="Create New Note"
-			bind:showMenu={newNoteMenuIsOpen}
 			closeMenuOnClick
 		>
 			<svelte:fragment slot="button"><svg style={`width: 24px; height: 24px;`}>
@@ -313,7 +309,6 @@ function onViewContextMenu(event: MouseEvent) {
 				placement="bottom-start"
 				hidePopUpIndicator
 				closeMenuOnClick
-				bind:showMenu={backMenuIsOpen}
 			>
 				<SvgIcon slot="button" ref="arrows.svg#back"></SvgIcon>	
 				<ThreadHistoryListView
@@ -329,7 +324,6 @@ function onViewContextMenu(event: MouseEvent) {
 				placement="bottom-start"
 				hidePopUpIndicator
 				closeMenuOnClick
-				bind:showMenu={forwardMenuIsOpen}
 			>
 				<SvgIcon slot="button" ref="arrows.svg#forward"></SvgIcon>	
 				<ThreadHistoryListView
@@ -369,7 +363,6 @@ function onViewContextMenu(event: MouseEvent) {
 				commandContext = {{ toggle: false }}
 				placement={'bottom-start'}
 				menuMode="low-profile"
-				bind:showMenu={focusMenuIsOpen}
 				closeMenuOnClick
 			>
 				<svelte:fragment slot="button">
@@ -397,7 +390,7 @@ function onViewContextMenu(event: MouseEvent) {
 			</PopUpButton>
 		</span>
 	</nav>
-	<nav class="buttonBar" slot="right">
+	<nav class="buttonBar" slot="right" use:countPopUps={topBarPopupCount}>
 
 		<PopUpButton
 			buttonClass="subtle"

@@ -17,6 +17,7 @@ import { onMount, tick } from 'svelte';
 import type { ContextMenuConstructorOptions } from 'app/model/menus';
 import Menu from './Menu.svelte'
 import { tooltip as tooltipHelper, type TooltipDefOrConfig, dropTooltip } from './tooltips';
+    import { PopupEvent } from './popUpButton';
 	
 export let name = ''
 export let placement: Placement = 'bottom'
@@ -50,6 +51,12 @@ onMount(() => {
 		if (popper) {
 			popper.destroy()
 			popper = null
+			if (buttonElement) {
+				buttonElement.dispatchEvent(new PopupEvent('popup-close', {
+					isOpen: false,
+					bubbles: true,
+				}))
+			}
 		}
 
 		if (menuElement && menuElement.isConnected) {
@@ -91,6 +98,11 @@ function update(button, menu: HTMLElement, show) {
 			window.addEventListener('click', windowClick)
 			window.addEventListener('contextmenu', windowClick)
 			window.addEventListener('keydown', windowKey)
+
+			buttonElement.dispatchEvent(new PopupEvent('popup-open', {
+				isOpen: true,
+				bubbles: true,
+			}))
 		}
 
 		tick().then(() => {
@@ -105,8 +117,9 @@ function update(button, menu: HTMLElement, show) {
 		window.removeEventListener('contextmenu', windowClick)
 		window.removeEventListener('keydown', windowKey)
 
-		buttonElement.dispatchEvent(new Event('popup-close', {
-			bubbles: true
+		buttonElement.dispatchEvent(new PopupEvent('popup-close', {
+			isOpen: false,
+			bubbles: true,
 		}))
 	}
 }
