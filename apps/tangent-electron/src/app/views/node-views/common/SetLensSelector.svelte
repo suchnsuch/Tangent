@@ -29,7 +29,7 @@ function createNewLens(type: LensSettingsType) {
 	const newLens: LensSettings = new type()
 
 	function hasName(name: string) {
-		return settingsList.value.find(i => i.name.value === name) !== null
+		return settingsList.value.find(i => i.name.value === name) != undefined
 	}
 
 	let newName = newLens.name.value?.trim() || 'New Lens'
