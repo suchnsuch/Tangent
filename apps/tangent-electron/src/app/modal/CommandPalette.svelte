@@ -289,7 +289,7 @@ function updateOptions(input: string) {
 							[h.start, h.end],
 						],
 						type: 'header',
-						input: paths.basename(viewState.node.path) + "#" + h.text
+						input: "#".repeat(h.level) + ' '  + h.text
 					} as unknown as SearchMatchResult
 				 }
 				))
