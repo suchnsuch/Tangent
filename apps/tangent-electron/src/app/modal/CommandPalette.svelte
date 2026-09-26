@@ -16,6 +16,7 @@ import { getNode, getPreview, sortReferences, type TreeNodeReference } from 'com
 import QueryResultItemSummary from 'app/views/summaries/QueryResultItemSummary.svelte'
 import { shortcutFromEvent, shortcutHtmlString, shortcutsDisplayString, shortcutsHtmlString } from 'app/utils/shortcuts'
 import ShowCommandPaletteCommand from 'app/model/commands/ShowCommandPalette'
+import paths from 'common/paths'
 
 let workspace = getContext('workspace') as Workspace
 
@@ -40,8 +41,9 @@ function getPlaceholder(text: string) {
 	}
 	switch (text) {
 		case '#':
-		case '# ':
 			return 'Search for a tag'
+		case '# ':
+			return 'Skim Outline'
 		case '>':
 		case '> ':
 			return 'Run a command'
@@ -88,7 +90,7 @@ function tagNodeFilter(node: TreeNode) {
 }
 
 function getInputMode(text: string) {
-	let mode: 'file' | 'command' | 'search' | 'tag' = 'file'
+	let mode: 'file' | 'command' | 'search' | 'tag' | 'outline' = 'file'
 
 	if (text.startsWith('>')) {
 		text = text.substring(1)
@@ -97,6 +99,11 @@ function getInputMode(text: string) {
 	else if (text.startsWith('?')) {
 		text = text.substring(1)
 		mode = 'search'
+	}
+	else if (text.startsWith('# ')) {
+		// Drop the tag leader
+		text = text.substring(1)
+		mode = 'outline'
 	}
 	else if (text.startsWith('#')) {
 		// Drop the tag leader
@@ -262,6 +269,36 @@ function updateOptions(input: string) {
 
 			options = annotatedActions
 		break
+
+		case 'outline':
+			const viewState = workspace.viewState.tangent.getCurrentViewState()
+
+			if (viewState.node) {
+				const headers = viewState.node.meta.structure.filter(it => it.type == 2)
+				const searchMatcher = buildFuzzySegementMatcher(text)
+				
+				options = headers.filter(h => h.text.match(searchMatcher)).map(h => ({ 
+					node: viewState.node,
+					match: {
+						0: text,
+						1: text,
+						groups: undefined,
+						index: 8,
+						indices: [
+							[h.start, h.end],
+							[h.start, h.end],
+						],
+						type: 'header',
+						input: paths.basename(viewState.node.path) + "#" + h.text
+					} as unknown as SearchMatchResult
+				 }
+				))
+			}
+			else {
+				options = []
+			}
+
+		break
 	}
 
 	if (options.length === 0) {
@@ -386,7 +423,7 @@ function optionID(option: Option) {
 		return option.ref
 	}
 	else {
-		return option.node
+		return option.match?.input ?? option.node
 	}
 }
 
