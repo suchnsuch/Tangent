@@ -17,6 +17,8 @@ import QueryResultItemSummary from 'app/views/summaries/QueryResultItemSummary.s
 import { shortcutFromEvent, shortcutHtmlString, shortcutsDisplayString, shortcutsHtmlString } from 'app/utils/shortcuts'
 import ShowCommandPaletteCommand from 'app/model/commands/ShowCommandPalette'
 import paths from 'common/paths'
+    import { safeHeaderLine } from 'common/markdownModel/header';
+    import { IndexData } from 'common/indexing/indexTypes';
 
 let workspace = getContext('workspace') as Workspace
 
@@ -43,7 +45,7 @@ function getPlaceholder(text: string) {
 		case '#':
 			return 'Search for a tag'
 		case '# ':
-			return 'Skim Outline'
+			return 'Search outline'
 		case '>':
 		case '> ':
 			return 'Run a command'
@@ -271,33 +273,24 @@ function updateOptions(input: string) {
 		break
 
 		case 'outline':
+			options = []
 			const viewState = workspace.viewState.tangent.getCurrentViewState()
 
-			if (viewState.node) {
-				const headers = viewState.node.meta.structure.filter(it => it.type == 2)
+			if (viewState.node && viewState.node.meta) {
 				const searchMatcher = buildFuzzySegementMatcher(text)
-				
-				options = headers.filter(h => h.text.match(searchMatcher)).map(h => ({ 
-					node: viewState.node,
-					match: {
-						0: text,
-						1: text,
-						groups: undefined,
-						index: 8,
-						indices: [
-							[h.start, h.end],
-							[h.start, h.end],
-						],
-						type: 'header',
-						input: "#".repeat(h.level) + ' '  + h.text
-					} as unknown as SearchMatchResult
-				 }
-				))
-			}
-			else {
-				options = []
-			}
 
+				for (const h of IndexData.headers(viewState.node.meta)) {
+					const match = h.text.match(searchMatcher)
+					options.push({
+						node: viewState.node,
+						match: {
+							...match,
+							type: 'header',
+							input: "#".repeat(h.level) + ' ' + safeHeaderLine(h.text)
+						}
+					})
+				}
+			}
 		break
 	}
 
