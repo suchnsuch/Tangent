@@ -281,14 +281,16 @@ function updateOptions(input: string) {
 
 				for (const h of IndexData.headers(viewState.node.meta)) {
 					const match = h.text.match(searchMatcher)
-					options.push({
-						node: viewState.node,
-						match: {
-							...match,
-							type: 'header',
-							input: "#".repeat(h.level) + ' ' + safeHeaderLine(h.text)
-						}
-					})
+					if (match) {
+						options.push({
+							node: viewState.node,
+							match: {
+								...match,
+								type: 'header',
+								input: "#".repeat(h.level) + ' ' + safeHeaderLine(h.text)
+							}
+						})
+					}
 				}
 			}
 		break
