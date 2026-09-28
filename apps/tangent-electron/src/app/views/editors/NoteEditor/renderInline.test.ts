@@ -3,6 +3,7 @@ import { describe, test, expect } from 'vitest'
 import { Editor, inlineToHTML } from 'typewriter-editor'
 import { Delta } from '@typewriter/delta'
 import noteTypeset from 'common/markdownModel/typewriterTypes'
+import { parseMarkdown } from 'common/markdownModel/parser'
 
 function getEditor() {
 	const editor = new Editor({ types: noteTypeset })
@@ -23,5 +24,15 @@ describe('renderInline: adjacent inline math', () => {
 		])
 
 		expect(containerCount(inlineToHTML(editor, delta))).toBe(2)
+	})
+})
+
+describe('renderInline: adjacent embeds', () => {
+	test('Distinct embed instances render as distinct outputs', () => {
+		const editor = getEditor()
+		const delta = parseMarkdown('![[a.png]]![[b.png]]').lines[0].content
+		const html = inlineToHTML(editor, delta)
+
+		expect(html.match(/<t-embed/g)).toHaveLength(2)
 	})
 })

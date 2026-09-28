@@ -552,7 +552,7 @@ const noteTypeset:TypesetTypes = {
 					className += ' revealed'
 				}
 
-				let link = attributes.t_link as HrefFormedLink
+				let link = attributes.t_link as HrefFormedLink & { instance?: string }
 
 				let embedClassname = 'output'
 				const customizations = getMediaCustomizationsFromText(link.text)
@@ -571,6 +571,9 @@ const noteTypeset:TypesetTypes = {
 					'span',
 					{
 						class: className,
+						// Keep adjacent embed instances from being fused before
+						// postProcess appends their rendered outputs.
+						'data-instance': link.instance
 					},
 					children
 				) as any
