@@ -748,6 +748,7 @@ const noteTypeset:TypesetTypes = {
 				
 				let tMathAttr = {
 					'math-source': attributes.math.source,
+					'math-instance': attributes.math.instance
 				} as any
 
 				if (attributes.revealed) {

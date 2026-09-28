@@ -149,9 +149,9 @@ class TangentEmbed extends TangentLink {
 		super.onClick(event)
 
 		if (!event.defaultPrevented) {
-			const href = this.getCleanedHref()
+			const instance = this.getAttribute('instance')
 			markAsSelectionRequest(event, { inline: attr => {
-				return attr?.t_link?.href === href
+				return attr?.t_link?.instance === instance
 			}})
 		}
 	}

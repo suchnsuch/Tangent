@@ -100,9 +100,10 @@ class TangentMath extends HTMLElement {
 			})
 		}
 		else {
+			const instance = this.getAttribute('math-instance')
 			markAsSelectionRequest(event, {
 				inline: attr => {
-					return attr?.math?.source == source
+					return attr?.math?.instance == instance
 				}
 			})
 		}
