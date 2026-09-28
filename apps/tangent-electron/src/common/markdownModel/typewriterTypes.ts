@@ -6,6 +6,7 @@ import { isLargeList, type ListDefinition } from './list'
 import type { TagSectionData } from './tag'
 import type { CodeData } from './code'
 import type { MathData } from './math'
+import { hiddenGroupEmbedFormat } from './hiddenGroupEmbed'
 import { hasCollapsedChildren, isCollapsed } from './sections'
 import { getMediaCustomizationsFromText, type LinkAttribute } from './links'
 
@@ -741,31 +742,18 @@ const noteTypeset:TypesetTypes = {
 			}
 		},
 
-		{
+		hiddenGroupEmbedFormat<MathData>({
 			name: 'math',
-			selector: 'span.math-source',
-			render: (attributes, children) => {
-
-				let containerAttr = {
-					className: 'inline-math-container',
-					...getHiddenGroupAttributes(attributes)
-				}
-
-				let sourceAttr = {
-					className: 'math-source hidden'
-				}
-				
+			renderOutput: (math, revealed, attributes) => {
 				let tMathAttr = {
-					'math-source': attributes.math.source,
+					'math-source': math.source
 				} as any
 
-				if (attributes.revealed) {
-					containerAttr.className += ' revealed'
-					sourceAttr.className += ' revealed'
+				if (revealed) {
 					tMathAttr.className = 'revealed'
 				}
 
-				if (attributes.math.isBlock) {
+				if (math.isBlock) {
 					tMathAttr.block = ''
 				}
 
@@ -774,12 +762,9 @@ const noteTypeset:TypesetTypes = {
 					tMathAttr.className += ' ' + attributes.decoration.focus.class
 				}
 
-				return h('span', containerAttr, [
-					h('span', sourceAttr, children),
-					h('t-math', tMathAttr, [])
-				])
+				return h('t-math', tMathAttr, [])
 			}
-		},
+		}),
 
 		{
 			name: 'templateToken',

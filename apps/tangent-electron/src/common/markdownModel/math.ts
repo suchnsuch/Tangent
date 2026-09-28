@@ -7,6 +7,7 @@ import { getInlineId } from './inline'
 
 export type MathData = {
 	source?: string
+	isBlock?: boolean
 }
 
 type MathBlockContext = CodeParsingContext & {
