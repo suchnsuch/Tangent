@@ -739,7 +739,10 @@ const noteTypeset:TypesetTypes = {
 			render: (attributes, children) => {
 
 				let containerAttr = {
-					className: 'inline-math-container'
+					className: 'inline-math-container',
+					// renderInline() merges adjacent nodes whose props are equal, which
+					// would fuse two instances of the same source into one element.
+					'data-instance': attributes.math.instance
 				}
 
 				let sourceAttr = {
