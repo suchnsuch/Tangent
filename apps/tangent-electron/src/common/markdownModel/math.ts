@@ -6,6 +6,8 @@ import { type ParsingContext, ParsingContextType } from './parsingContext'
 
 export type MathData = {
 	source?: string
+	/** Distinguishes adjacent inline math that shares a source. */
+	instance?: string
 }
 
 type MathBlockContext = CodeParsingContext & {
@@ -29,6 +31,7 @@ export function parseInlineMath(char: string, parser: NoteParser): boolean {
 				// We've got it!
 				// Close old stuff
 				parser.commitSpan(null, 0)
+				const start = feed.index
 				// Consume the opening token
 				feed.next(token.length)
 				const index = feed.index
@@ -36,7 +39,8 @@ export function parseInlineMath(char: string, parser: NoteParser): boolean {
 				parser.commitSpan({
 					math: {
 						source: feed.substring(index, index + findResult.contentCount + 1),
-						isBlock
+						isBlock,
+						instance: parser.getInstanceId(start, feed.index + feed.currentStepLength)
 					},
 					// Using hiddenGroup instead of hidden allows for math to embed within inline formatting.
 					// The "hidden" class is implicit and added afterwards.

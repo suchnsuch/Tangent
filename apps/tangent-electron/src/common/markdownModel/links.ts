@@ -14,6 +14,13 @@ interface ExtendedLinkInfo extends LinkInfo {
 	complete?: boolean
 }
 
+/** The `t_link` attribute attached to the ops of a parsed link. */
+type LinkAttribute = HrefFormedLink & {
+	block?: boolean
+	/** Distinguishes adjacent links that share an href. */
+	instance?: string
+}
+
 // A `[[` that is at the beginning of a string or has a non=`\` character in front
 const wikiLinkStartMatcher = /(?<=^|[^\\])(\[\[)/
 
@@ -552,7 +559,7 @@ export function parseRawLink(char: string, parser: NoteParser): boolean {
 		const isAtStartOfContent = getIsAtStartOfContent(builder.spans)
 
 		feed.consumeUntil(' ')
-		const t_link: HrefFormedLink & { block?: boolean } = {
+		const t_link: LinkAttribute = {
 			href: feed.substring(lastLetterIndex, feed.index),
 			form: 'raw'
 		}
@@ -563,6 +570,7 @@ export function parseRawLink(char: string, parser: NoteParser): boolean {
 			feed.next(-1)
 			lastChar = feed.peek(-1)
 		}
+		t_link.instance = parser.getInstanceId(firstChar, feed.index)
 
 		const nextSpan: AttributeMap = { t_link }
 
@@ -607,11 +615,12 @@ export function parseLink(char: string, parser: NoteParser): boolean {
 
 		const isAtStartOfContent = getIsAtStartOfContent(builder.spans)
 
-		const t_link: HrefFormedLink & { block?: boolean } = {
+		const t_link: LinkAttribute = {
 			href: wikiLinkInfo.href,
 			form: 'wiki',
 			text: wikiLinkInfo.text ?? null,
-			content_id: wikiLinkInfo.content_id ?? null
+			content_id: wikiLinkInfo.content_id ?? null,
+			instance: parser.getInstanceId(wikiLinkInfo.start - (isEmbed ? 1 : 0), wikiLinkInfo.end)
 		}
 
 		// Avoiding adding the key unless the value exists
@@ -767,12 +776,13 @@ export function parseLink(char: string, parser: NoteParser): boolean {
 
 		const isAtStartOfContent = getIsAtStartOfContent(builder.spans)
 
-		const t_link: HrefFormedLink & { block?: boolean } = {
+		const t_link: LinkAttribute = {
 			href: mdLinkInfo.href,
 			form: 'md',
 			text: mdLinkInfo.text ?? null,
 			content_id: mdLinkInfo.content_id ?? null,
-			title: mdLinkInfo.title ?? null
+			title: mdLinkInfo.title ?? null,
+			instance: parser.getInstanceId(mdLinkInfo.start - (isEmbed ? 1 : 0), mdLinkInfo.end)
 		}
 
 		// Avoiding adding the key unless the value exists
