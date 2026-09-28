@@ -175,7 +175,8 @@ describe('furigana rendering', () => {
 	}
 
 	function render(attributes: AttributeMap) {
-		return furiganaFormat.render(attributes, ['source'], null, null) as any
+		const rendered = furiganaFormat.render(attributes, ['source'], null, null) as any
+		return furiganaFormat.postProcess?.(rendered) ?? rendered
 	}
 
 	test('renders a t-furigana element carrying base/reading', () => {
