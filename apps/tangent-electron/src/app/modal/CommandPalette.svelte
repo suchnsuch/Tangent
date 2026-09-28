@@ -61,6 +61,7 @@ interface Option {
 	ref?: TreeNodeReference
 	action?: PaletteAction
 	match?: SearchMatchResult
+	id?: string
 }
 
 let commandActions: PaletteAction[] = null
@@ -288,7 +289,8 @@ function updateOptions(input: string) {
 								...match,
 								type: 'header',
 								input: "#".repeat(h.level) + ' ' + safeHeaderLine(h.text)
-							}
+							},
+							id: h.text,
 						})
 					}
 				}
@@ -417,8 +419,11 @@ function optionID(option: Option) {
 	if (option.ref) {
 		return option.ref
 	}
+	if (option.id) {
+		return option.id
+	}
 	else {
-		return option.match?.input ?? option.node
+		return option.node
 	}
 }
 
