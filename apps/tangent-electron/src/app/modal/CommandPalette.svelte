@@ -16,9 +16,8 @@ import { getNode, getPreview, sortReferences, type TreeNodeReference } from 'com
 import QueryResultItemSummary from 'app/views/summaries/QueryResultItemSummary.svelte'
 import { shortcutFromEvent, shortcutHtmlString, shortcutsDisplayString, shortcutsHtmlString } from 'app/utils/shortcuts'
 import ShowCommandPaletteCommand from 'app/model/commands/ShowCommandPalette'
-import paths from 'common/paths'
-    import { safeHeaderLine } from 'common/markdownModel/header';
-    import { IndexData } from 'common/indexing/indexTypes';
+import { safeHeaderLine } from 'common/markdownModel/header'	
+import { IndexData } from 'common/indexing/indexTypes'
 
 let workspace = getContext('workspace') as Workspace
 
@@ -283,14 +282,15 @@ function updateOptions(input: string) {
 				for (const h of IndexData.headers(viewState.node.meta)) {
 					const match = h.text.match(searchMatcher)
 					if (match) {
-						options.push({
+						
+						options.push({ 
 							node: viewState.node,
 							match: {
 								...match,
 								type: 'header',
 								input: "#".repeat(h.level) + ' ' + safeHeaderLine(h.text)
 							},
-							id: h.text,
+							id: safeHeaderLine(h.text) + h.start,
 						})
 					}
 				}
