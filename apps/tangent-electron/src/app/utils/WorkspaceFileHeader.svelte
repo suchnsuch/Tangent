@@ -1,14 +1,15 @@
 <script lang="ts">
-import { getContext, onDestroy } from 'svelte';
-import type { Workspace } from 'app/model';
-import type WorkspaceTreeNode from 'app/model/WorkspaceTreeNode';
-import OneLineEditor from 'app/views/editors/OneLineEditor/OneLineEditor';
-import { Source, asRoot } from 'typewriter-editor';
-import { wait } from '@such-n-such/core';
-import NodeIcon from 'app/views/smart-icons/NodeIcon.svelte';
-import AutoCompleteMenu from 'app/views/editors/autocomplete/AutoCompleteMenu.svelte';
-import UnicodeAutocompleter from 'app/views/editors/autocomplete/UnicodeAutocompleter';
-import UnicodeAutocompleteMenu from 'app/views/editors/autocomplete/UnicodeAutocompleteMenu.svelte';
+import { getContext, onDestroy } from 'svelte'
+import type { Workspace } from 'app/model'
+import type WorkspaceTreeNode from 'app/model/WorkspaceTreeNode'
+import OneLineEditor from 'app/views/editors/OneLineEditor/OneLineEditor'
+import { Source, asRoot, type EditorRange } from 'typewriter-editor'
+import { wait } from '@such-n-such/core'
+import NodeIcon from 'app/views/smart-icons/NodeIcon.svelte'
+import AutoCompleteMenu from 'app/views/editors/autocomplete/AutoCompleteMenu.svelte'
+import UnicodeAutocompleter from 'app/views/editors/autocomplete/UnicodeAutocompleter'
+import UnicodeAutocompleteMenu from 'app/views/editors/autocomplete/UnicodeAutocompleteMenu.svelte'
+import { deepEqual } from 'fast-equals'
 
 // Using an editor here to have full control over paste behavior.
 const workspace = getContext('workspace') as Workspace
@@ -135,9 +136,17 @@ function onHeaderKeydown(event: KeyboardEvent) {
 		return
 	}
 	else if (event.key === 'Escape') {
-		event.preventDefault()
 		const name = node ? $node.name : ''
-		editor.setText(name, [0, name.length], Source.api)
+		if (editor.getText() != name) {
+			editor.setText(name, [0, name.length], Source.api)
+			event.preventDefault()
+		}
+
+		const targetSelection: EditorRange = [0, editor.doc.length - 1]
+		if (!deepEqual(editor.doc.selection, targetSelection)) {
+			editor.select(targetSelection)
+			event.preventDefault()
+		}
 
 		if (onKeyboardExit) onKeyboardExit(event)
 		return

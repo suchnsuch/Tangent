@@ -11,11 +11,11 @@ export function noArrowNavigate(editor: Editor) {
 		switch (shortcut) {
 			case 'Up':
 			case 'Left':
-				if (start > 0) preventArrowNavigate(event)
+				if (start > 0 || start != end) preventArrowNavigate(event)
 				return
 			case 'Down':
 			case 'Right':
-				if (end < editor.doc.length - 1) preventArrowNavigate(event)
+				if (end < editor.doc.length - 1 || start != end) preventArrowNavigate(event)
 				return
 		}
 	}

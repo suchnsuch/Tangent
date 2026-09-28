@@ -19,17 +19,21 @@ export namespace Focus {
 }
 
 export function focusLayer(node: HTMLElement, layer: string) {
-	function annotate(event: FocusEvent) {
+	function focusIn(event: FocusEvent) {
 		Focus.annotate(event, layer)
 	}
 
-	node.addEventListener('focusin', annotate)
-	node.addEventListener('focusout', annotate)
+	function focusOut(event: FocusEvent) {
+		Focus.annotate(event, layer)
+	}
+
+	node.addEventListener('focusin', focusIn)
+	node.addEventListener('focusout', focusOut)
 
 	return {
 		destroy() {
-			node.removeEventListener('focusin', annotate)
-			node.removeEventListener('focusout', annotate)
+			node.removeEventListener('focusin', focusIn)
+			node.removeEventListener('focusout', focusOut)
 		}
 	}
 }

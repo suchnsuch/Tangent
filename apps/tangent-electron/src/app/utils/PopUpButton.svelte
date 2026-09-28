@@ -90,6 +90,17 @@ function update(button, menu: HTMLElement, show) {
 			if (escapeToRoot) {
 				// This allows the menu to bypass all restrictions of where it was created
 				document.body.appendChild(menuElement)
+
+				const item = menu.querySelector('.menu-item')
+				if (item instanceof HTMLElement) {
+					console.log('focusing', item)
+					tick().then(() => {
+						item.focus()
+					})
+				}
+				else {
+					console.log('Nothing to focus')
+				}
 			}
 			popper = createPopper(button, menu, {
 				placement,
@@ -194,6 +205,14 @@ function windowKey(event: KeyboardEvent) {
 		showMenu = false
 	}
 }
+
+function onMenuCanceled(event: Event) {
+	showMenu = false
+	if (event instanceof KeyboardEvent) {
+		console.log('Restoring focus')
+		buttonElement.focus()
+	}
+}
 </script>
 
 <button
@@ -221,7 +240,7 @@ function windowKey(event: KeyboardEvent) {
 <!-- svelte-ignore a11y-click-events-have-key-events -->
 <!-- svelte-ignore a11y-no-static-element-interactions -->
 <div class={`menu ${menuMode}`} class:templated={template != null}
-	use:focusLayer={'PopUpButton'}
+	use:focusLayer={'PopUpButton-Content'}
 	bind:this={menuElement}
 	on:click={menuClick}
 >
@@ -230,6 +249,7 @@ function windowKey(event: KeyboardEvent) {
 			<Menu
 				template={Array.isArray(template) ? template : template()}
 				onExecuted={() => showMenu = false}
+				onCanceled={onMenuCanceled}
 			/>
 		{:else}
 			Add content to this menu to fill it in

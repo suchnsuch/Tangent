@@ -182,9 +182,9 @@ function onSettingsKeydown(event: KeyboardEvent) {
 function onSettingsFocusIn(event: FocusEvent) {
 	if (settingsFocusTimeout) {
 		clearTimeout(settingsFocusTimeout)
-		if (event.target instanceof HTMLElement && event.target.matches('.arrowNavigate')) {
-			event.target.classList.add('focusable')
-		}
+	}
+	if (event.target instanceof HTMLElement && event.target.matches(':focus-visible')) {
+		showSettingsState?.set(true)
 	}
 }
 function onSettingsFocusOut(event: FocusEvent) {
@@ -309,7 +309,6 @@ function onDetailsResized(entries: ResizeObserverEntry[]) {
 				use:resizeObserver={onSettingsResize}
 				use:arrowNavigate={{
 					targetSelector: settingsFocusSelector,
-					focusClass: 'focusable'
 				}}
 				use:countPopUps={settingsPopups}
 				tabindex="-1"

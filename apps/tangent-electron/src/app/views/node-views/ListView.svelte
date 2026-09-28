@@ -57,7 +57,7 @@ function updateShowCreateFromHover(event: MouseEvent) {
 	bind:this={container}
 	use:arrowNavigate={{
 		targetSelector: arrowNavigateTargetSelector,
-		focusClass: ['focusable', 'focused']
+		focusClass: ['focused']
 	}}
 	tabindex="-1"
 	on:mousemove={updateShowCreateFromHover}

@@ -11,8 +11,6 @@ input, button, select, textarea, .button {
 	box-sizing: border-box;
 	border: 1px solid var(--borderColor);
 	border-radius: var(--inputBorderRadius);
-
-	outline: none;
 }
 
 input {
@@ -21,10 +19,6 @@ input {
 
 	&:disabled {
 		color: #ccc;
-	}
-
-	&:focus {
-		outline: none;
 	}
 }
 
@@ -140,12 +134,11 @@ button, .button, select {
 	color: inherit; // This allows context colors to easily apply.
 	background-color: var(--buttonBackgroundColor);
 	transition: background-color .2s, border-color .2s, outline-color .2s, color .2s;
-	outline: none;
 	outline-color: transparent; // Prevents wonky transitions
 	border: none;
 
 	&:focus {
-		outline: none;
+		outline-color: transparent;
 	}
 
 	&:disabled {
@@ -211,8 +204,8 @@ button, .button {
 	}
 }
 
-input, button, select, textarea, .button {
-	&.focusable {
+[data-input-mode="keyboard"] {
+	input, button, select, textarea, .button {
 		outline: 2px solid transparent;
 
 		&.focused:not(:focus):not(:hover) {

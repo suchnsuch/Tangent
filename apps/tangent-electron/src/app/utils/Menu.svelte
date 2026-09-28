@@ -4,14 +4,18 @@ import { type Placement, createPopper } from "@popperjs/core"
 
 import type { ContextMenuConstructorOptions } from "app/model/menus"
 import MenuItem from "./MenuItem.svelte"
-import type { CancelMenuCallback, ExecuteMenuCallback, RequestMenuCallback } from './MenuItem.svelte'
+import type { ExecuteMenuCallback, RequestMenuCallback, RequestMenuOptions } from './MenuItem.svelte'
+import arrowNavigate from "./arrowNavigate"
 
 export let template: ContextMenuConstructorOptions[]
 export let placementElement: HTMLElement = null
 export let placement: Placement = 'bottom'
 
+/** Called when an item has been triggered */
 export let onExecuted: ExecuteMenuCallback
 export let onRequestMenu: RequestMenuCallback = null
+/** Called when a menu wishes to exit after doing nothing */
+export let onCanceled: (event: Event) => void = null
 
 $: hasAnyCheckboxes = determineHasCheckboxes(template)
 function determineHasCheckboxes(template: ContextMenuConstructorOptions[]) {
@@ -40,6 +44,11 @@ onMount(() => {
 			]
 		})
 
+		const item = menu.querySelector('.menu-item')
+		if (item instanceof HTMLElement) {
+			item.focus()
+		}
+
 		return () => {
 			popper.destroy()
 		}
@@ -61,7 +70,11 @@ let incomingMenu: SubmenuData = null
 let shownMenu: SubmenuData = null
 let outgoingMenu: SubmenuData = null
 
-function handleRequestMenu(element: HTMLElement, subTemplate: ContextMenuConstructorOptions[]) {
+function handleRequestMenu(
+	element: HTMLElement,
+	subTemplate: ContextMenuConstructorOptions[],
+	options?: RequestMenuOptions
+) {
 	if (incomingMenu && incomingMenu.element !== element && incomingMenu.timeout) {
 		// Shown menu has not yet landed, and should be discarded
 		clearTimeout(incomingMenu.timeout)
@@ -87,11 +100,14 @@ function handleRequestMenu(element: HTMLElement, subTemplate: ContextMenuConstru
 			template: subTemplate
 		}
 
+		const delay = options?.useDelay === false ? 0 :
+			(outgoingMenu ? interMenuDelay : menuDelay)
+
 		incomingMenu.timeout = setTimeout(() => {
 			shownMenu = incomingMenu
 			incomingMenu = null
 			shownMenu.element.classList.add('open')
-		}, outgoingMenu ? interMenuDelay : menuDelay)
+		}, delay)
 	}
 
 	// Propagate menu request up the chain
@@ -133,10 +149,30 @@ function onMouseEnter() {
 	}
 }
 
+function onKeyDown(event: KeyboardEvent) {
+	if (onCanceled && (event.key === 'ArrowLeft' || event.key === 'Escape')) {
+		event.preventDefault()
+		onCanceled(event)
+	}
+}
+
+function handleCancelSubmenu(event: Event) {
+	const restoreTarget = shownMenu?.element
+	cancelShownMenu(0, true)
+	if (restoreTarget && event instanceof KeyboardEvent) {
+		restoreTarget.focus()
+	}
+}
+
 </script>
 
+<!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
 <nav bind:this={menu}
 	on:mouseenter={onMouseEnter}
+	on:keydown={onKeyDown}
+	use:arrowNavigate={{
+		targetSelector: '.menu-item:not(:disabled)'
+	}}
 >
 	{#each template as item}
 		{#if item.type === 'separator'}
@@ -160,6 +196,7 @@ function onMouseEnter() {
 		placement="right-start"
 		{onExecuted}
 		onRequestMenu={handleRequestMenu}
+		onCanceled={handleCancelSubmenu}
 	/>
 {/if}
 

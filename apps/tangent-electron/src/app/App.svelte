@@ -292,6 +292,14 @@ function onFocusOut(event: AnnotatedFocusEvent) {
 	
 }
 
+// We only want to show focus highlights when we're in keyboard focus mode
+function onPointerDown(event: PointerEvent) {
+	document.documentElement.dataset['inputMode'] = 'pointer'
+}
+function onKeyDown(event: KeyboardEvent) {
+	document.documentElement.dataset['inputMode'] = 'keyboard'
+}
+
 // Do this so that child tooltips can have workspace context
 function tooltipContextInjection(injector) {
 	injector('workspace', workspace)
@@ -324,7 +332,13 @@ Below is a stack trace of the error. Please provide any additional details above
 <svelte:head>
 	<title>{title}</title>
 </svelte:head>
-<svelte:body on:focusin={onFocusIn} on:focusout={onFocusOut} on:contextmenu={dropAllTooltips} />
+<svelte:body
+	on:focusin={onFocusIn}
+	on:focusout={onFocusOut}
+	on:pointerdown={onPointerDown}
+	on:keydown={onKeyDown}
+	on:contextmenu={dropAllTooltips}
+/>
 
 {#if applicationState === 'initializing' && showLoading}
 	<div class="loading">

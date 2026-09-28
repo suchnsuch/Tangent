@@ -1,6 +1,14 @@
 <script lang="ts" context="module">
 export type ExecuteMenuCallback = () => void
-export type RequestMenuCallback = (element: HTMLElement, template: ContextMenuConstructorOptions[]) => void
+export type RequestMenuOptions = {
+	/** Defaults to true. Set to false to disable show delay. */
+	useDelay?: boolean
+}
+export type RequestMenuCallback = (
+	element: HTMLElement,
+	template: ContextMenuConstructorOptions[],
+	options?: RequestMenuOptions
+) => void
 export type CancelMenuCallback = (element: HTMLElement) => void
 </script>
 
@@ -17,8 +25,11 @@ const workspace = getContext('workspace') as Workspace
 export let template: ContextMenuConstructorOptions
 export let forceCheckboxSpace = false
 
+/** Called when the menu item is executed */
 export let onExecuted: ExecuteMenuCallback
+/** Called when the menu wants to present a submenu */
 export let onRequestMenu: RequestMenuCallback
+/** Called when the menu item no longer wants to present a submenu */
 export let onCancelMenu: CancelMenuCallback
 
 let button: HTMLElement
@@ -48,9 +59,34 @@ function onClick(event: Event) {
 	}
 	if (click) {
 		click()
+		if (onExecuted) onExecuted()
 	}
 	if (link) {
 		workspace.api.links.openExternal(link)
+		if (onExecuted) onExecuted()
+	}
+}
+
+function onKeyDown(event: KeyboardEvent) {
+	if (event.key === 'Enter') {
+		if (template.command || template.click || template.link) {
+			onClick(event)
+			event.preventDefault()
+		}
+		else if (template.submenu) {
+			onRequestMenu(button, template.submenu, {
+				useDelay: false
+			})
+			event.preventDefault()
+		}
+	}
+	else if (event.key === 'ArrowRight') {
+		if (template.submenu) {
+			onRequestMenu(button, template.submenu, {
+				useDelay: false
+			})
+			event.preventDefault()
+		}
 	}
 }
 </script>
@@ -61,6 +97,7 @@ function onClick(event: Event) {
 	on:mouseenter={onMouseEnter}
 	on:mouseleave={onMouseLeave}
 	on:click={onClick}
+	on:keydown={onKeyDown}
 	use:commandAction={{
 		command: template.command,
 		context: template.commandContext,
