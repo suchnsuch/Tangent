@@ -67,19 +67,34 @@ type DebugDrawConfig = {
 	time?: number
 }
 
-function debugDrawRect(rect: DOMRect, config?: DebugDrawConfig) {
+type DebugDrawRectConfig = DebugDrawConfig & {
+	/** Text to show in the rect */
+	text?: string
+	/** The size of the text */
+	textSize?: string
+}
+
+function debugDrawRect(rect: DOMRect, config?: DebugDrawRectConfig) {
 	if (!rect) return
 	const time = config?.time ?? 1000
 	const element = document.createElement('div')
 
-	element.style.border = '1px solid ' + (config?.color ?? 'lime')
-	element.style.color = 'transparent'
+	const color = config?.color ?? 'lime'
+
+	element.style.border = '1px solid ' + color
+	element.style.color = color
+	element.style.backgroundColor = 'transparent'
 	element.style.position = 'fixed'
 	element.style.zIndex = '100000'
 	element.style.left = rect.left + 'px'
 	element.style.top = rect.top + 'px'
 	element.style.width = rect.width + 'px'
 	element.style.height = rect.height + 'px'
+
+	element.innerText = config?.text ?? ''
+	if (config?.textSize) {
+		element.style.fontSize = config.textSize
+	}
 
 	document.body.appendChild(element)
 
@@ -311,12 +326,7 @@ export default function arrowNavigate(node: HTMLElement, options?: ArrowNavigate
 			const dirToItem = Point.normalize(delta)
 			const dot = Point.dot(direction, dirToItem)
 			
-			if (dot <= 0) continue
-
-			if ((window as any).__debugArrowNavigate) {
-				debugDrawRect(targetRect)
-				debugDrawPoint(itemPoint)
-			}
+			if (dot <= .5) continue
 
 			// When the desire is directly up/down/left/right,
 			// heavily emphasize moving along those directions.
@@ -325,8 +335,16 @@ export default function arrowNavigate(node: HTMLElement, options?: ArrowNavigate
 				: Point.distance(currentPoint, itemPoint)
 
 			// Things not aligned with desire should count as "further away"
-			const attenuatedDistance = distance / dot
-			
+			const attenuatedDistance = distance / (dot * dot)
+
+			if ((window as any).__debugArrowNavigate) {
+				debugDrawRect(targetRect, {
+					text: `• ${dot.toFixed(2)} ad ${attenuatedDistance.toFixed(2)}`,
+					textSize: '60%'
+				})
+				debugDrawPoint(itemPoint)
+			}
+
 			if (isBetter(distance, dot)) {
 				best = target
 				bestPoint = itemPoint
