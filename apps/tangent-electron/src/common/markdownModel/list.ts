@@ -14,8 +14,9 @@ const largeUnorderedGlyphs = '*\u2022\u204C\u204D\u25D8\u2765\u29BE\u29BF\u25C9'
  * U+29bf ⦿	(Circled Bullet)
  * U+25c9 ◉	(Fisheye (Japanese Bullet)) */
  
-const standardUnorderedGlyphs = '-+\u2023\u2043\u2219\u22C5\u25E6\u2619\u2767'
-/* U+2219 ∙	(Bullet Operator)
+const standardUnorderedGlyphs = '-+\u00B7\u2023\u2043\u2219\u22C5\u25E6\u2619\u2767'
+/* U+00b7 ·	(Middle Dot)
+ * U+2219 ∙	(Bullet Operator)
  * U+22C5 ⋅	(Dot Operator)
  * U+2023 ‣	(Triangular Bullet)
  * U+2043 ⁃	(Hyphen Bullet)
