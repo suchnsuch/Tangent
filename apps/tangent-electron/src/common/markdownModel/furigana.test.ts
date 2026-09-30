@@ -106,21 +106,20 @@ describe('furigana markdown parsing', () => {
 			attributes: {
 				furigana: {
 					base: '漢字',
-					reading: 'かんじ',
-					instance: '7-19'
+					reading: 'かんじ'
 				},
-				hiddenGroup: true
+				hiddenGroup: '7-19'
 			}
 		})
 	})
 
-	test('adjacent identical spans get distinct instances', () => {
+	test('adjacent identical spans get distinct inline ids', () => {
 		const line = parseMarkdown('{a|b}{a|b}').lines[0]
-		const instances = line.content.ops
+		const inlineIds = line.content.ops
 			.filter(op => op.attributes?.furigana)
-			.map(op => op.attributes.furigana.instance)
+			.map(op => op.attributes.hiddenGroup)
 
-		expect(instances).toEqual(['0-5', '5-10'])
+		expect(inlineIds).toEqual(['0-5', '5-10'])
 	})
 
 	test('escaped opener hides its backslash without activating furigana', () => {

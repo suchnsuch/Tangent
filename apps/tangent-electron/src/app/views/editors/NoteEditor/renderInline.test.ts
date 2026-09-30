@@ -28,33 +28,32 @@ describe('renderInline: adjacent hidden-group embeds', () => {
 		expect([...containers].map(c => c.getAttribute('data-hidden-group'))).toEqual(['0-3', '3-6'])
 	})
 
-	test('Distinct furigana instances with the same content render as two containers', () => {
+	test('Distinct furigana groups with the same content render as two containers', () => {
 		const editor = getEditor()
 		const delta = new Delta([
-			{ insert: '{a|b}', attributes: { furigana: { base: 'a', reading: 'b', instance: '0-5' }, hiddenGroup: true } },
-			{ insert: '{a|b}', attributes: { furigana: { base: 'a', reading: 'b', instance: '5-10' }, hiddenGroup: true } }
+			{ insert: '{a|b}', attributes: { furigana: { base: 'a', reading: 'b' }, hiddenGroup: '0-5' } },
+			{ insert: '{a|b}', attributes: { furigana: { base: 'a', reading: 'b' }, hiddenGroup: '5-10' } }
 		])
 
 		expect(render(delta).querySelectorAll('.inline-furigana-container')).toHaveLength(2)
 	})
 
-	test('Decorations splitting one furigana instance do not duplicate its output', () => {
+	test('Decorations splitting one furigana group do not duplicate its output', () => {
 		const editor = getEditor()
-		const furigana = { base: 'Mr. Smith', reading: 'ミスター・スミス', instance: '0-20' }
+		const furigana = { base: 'Mr. Smith', reading: 'ミスター・スミス' }
 		const delta = new Delta([
 			{
 				insert: '{Mr.',
-				attributes: { furigana, hiddenGroup: true, decoration: { focus: { class: 'unfocused' } } }
+				attributes: { furigana, hiddenGroup: '0-20', decoration: { focus: { class: 'unfocused' } } }
 			},
 			{
 				insert: ' Smith|ミスター・スミス}',
-				attributes: { furigana, hiddenGroup: true, decoration: { focus: { class: 'focused' } } }
+				attributes: { furigana, hiddenGroup: '0-20', decoration: { focus: { class: 'focused' } } }
 			}
 		])
-		const html = inlineToHTML(editor, delta)
-
-		expect(containerCount(html, 'furigana')).toBe(1)
-		expect(elementCount(html, 't-furigana')).toBe(1)
+		const root = render(delta)
+		expect(root.querySelectorAll('.inline-furigana-container')).toHaveLength(1)
+		expect(root.querySelectorAll('t-furigana')).toHaveLength(1)
 	})
 })
 

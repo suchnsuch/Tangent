@@ -4,19 +4,8 @@ import type { AttributeMap } from '@typewriter/document'
 
 type HiddenGroupEmbedNode = VNode & { hiddenGroupOutput?: VChild }
 
-/**
- * Shared shape for inline formats that keep the raw Markdown source around as a
- * hidden, cursor-navigable span alongside an always-rendered output element
- * (e.g. inline math's `<t-math>`, furigana's `<ruby>`). Reveal state only
- * ever toggles the source span's classes; the output renders the same
- * either way.
- *
- * `name` doubles as the attribute key holding the format's data
- * (`attributes[name]`) and as the stem of its selector and class names.
- *
- * The output is appended after adjacent format nodes merge so decorations that
- * split one instance into several ops do not duplicate its rendered element.
- */
+// Defer output until after adjacent format nodes merge so decorations that
+// split one inline group into several ops do not duplicate the rendered element.
 export function hiddenGroupEmbedFormat<Data>(options: {
 	name: string
 	renderOutput: (data: Data, revealed: boolean, attributes: AttributeMap) => VChild

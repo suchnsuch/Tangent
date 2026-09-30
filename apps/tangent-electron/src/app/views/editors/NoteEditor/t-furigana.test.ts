@@ -36,12 +36,14 @@ describe('t-furigana', () => {
 		el.remove()
 	})
 
-	test('click requests selection matching only this span\'s instance', () => {
+	test('click requests selection matching only this span\'s inline id', () => {
+		const group = document.createElement('span')
+		group.setAttribute('data-hidden-group', '0-12')
 		const el = document.createElement('t-furigana')
 		el.setAttribute('base', '漢字')
 		el.setAttribute('reading', 'かんじ')
-		el.setAttribute('instance', '0-12')
-		document.body.appendChild(el)
+		group.appendChild(el)
+		document.body.appendChild(group)
 
 		let captured: any
 		el.addEventListener('click', event => {
@@ -49,9 +51,9 @@ describe('t-furigana', () => {
 		})
 		el.dispatchEvent(new MouseEvent('click', { bubbles: true }))
 
-		expect(captured.inline({ furigana: { base: '漢字', reading: 'かんじ', instance: '0-12' } })).toBe(true)
-		expect(captured.inline({ furigana: { base: '漢字', reading: 'かんじ', instance: '12-24' } })).toBe(false)
+		expect(captured.inline({ hiddenGroup: '0-12' })).toBe(true)
+		expect(captured.inline({ hiddenGroup: '12-24' })).toBe(false)
 
-		el.remove()
+		group.remove()
 	})
 })

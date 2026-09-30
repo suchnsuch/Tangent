@@ -58,11 +58,12 @@ class TangentFurigana extends HTMLElement {
 	}
 
 	onClick(event: MouseEvent) {
-		const instance = this.getAttribute('instance')
+		const hiddenGroup = this.closest('[data-hidden-group]')?.getAttribute('data-hidden-group')
+		if (!hiddenGroup) return
 
 		markAsSelectionRequest(event, {
 			inline: attr => {
-				return attr?.furigana?.instance === instance
+				return attr?.hiddenGroup === hiddenGroup
 			}
 		})
 	}

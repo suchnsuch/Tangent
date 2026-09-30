@@ -770,7 +770,7 @@ const noteTypeset:TypesetTypes = {
 		hiddenGroupEmbedFormat<FuriganaData>({
 			name: 'furigana',
 			renderOutput: (furigana, revealed, attributes) => {
-				const tFuriganaAttr = { base: furigana.base, reading: furigana.reading, instance: furigana.instance } as any
+				const tFuriganaAttr = { base: furigana.base, reading: furigana.reading } as any
 
 				if (attributes.decoration?.focus) {
 					// Inject the focus decoration onto the shadow root, as math does.
