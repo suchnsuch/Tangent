@@ -15,6 +15,10 @@ function containerCount(html: string) {
 	return (html.match(/inline-math-container/g) ?? []).length
 }
 
+function elementCount(html: string, element: string) {
+	return (html.match(new RegExp(`<${element}(?:\\s|>)`, 'g')) ?? []).length
+}
+
 describe('renderInline: adjacent inline math', () => {
 	test('Distinct instances with the same source render as two containers', () => {
 		const editor = getEditor()
@@ -36,6 +40,24 @@ describe('renderInline: adjacent embeds', () => {
 		const delta = parseMarkdown('![[a.png]]![[b.png]]').lines[0].content
 		const html = inlineToHTML(editor, delta)
 
-		expect(html.match(/<t-embed/g)).toHaveLength(2)
+		expect(elementCount(html, 't-embed')).toBe(2)
+	})
+
+	test('Nested formatting does not split an embed instance', () => {
+		const editor = getEditor()
+		const delta = parseMarkdown('![[a.png|**x**]]').lines[0].content
+		const html = inlineToHTML(editor, delta)
+
+		expect(elementCount(html, 't-embed')).toBe(1)
+	})
+})
+
+describe('renderInline: adjacent links', () => {
+	test('Distinct wiki-link instances with the same href render separately', () => {
+		const editor = getEditor()
+		const delta = parseMarkdown('[[a]][[a]]').lines[0].content
+		const html = inlineToHTML(editor, delta)
+
+		expect(elementCount(html, 't-link')).toBe(2)
 	})
 })

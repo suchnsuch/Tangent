@@ -569,6 +569,7 @@ export function parseRawLink(char: string, parser: NoteParser): boolean {
 			lastChar = feed.peek(-1)
 		}
 		const nextSpan: AttributeMap = { t_link }
+		nextSpan.hiddenGroup = getInlineId(parser, firstChar, feed.index)
 
 		const restOfLine = feed.getLineText()
 
@@ -580,7 +581,6 @@ export function parseRawLink(char: string, parser: NoteParser): boolean {
 
 		if (isEmbed) {
 			nextSpan.t_embed = true
-			nextSpan.hiddenGroup = getInlineId(parser, firstChar, feed.index)
 			nextSpan.hidden = true
 			nextSpan.link_internal = true
 		}
@@ -656,7 +656,7 @@ export function parseLink(char: string, parser: NoteParser): boolean {
 			parser.commitSpan({ start: true }, 0)
 		}
 		else {
-			builder.addOpenFormat('wiki-link', { t_link })
+			builder.addOpenFormat('wiki-link', { t_link, hiddenGroup: inlineId })
 		}
 
 		if (parser.detailedLinks) {
@@ -668,7 +668,7 @@ export function parseLink(char: string, parser: NoteParser): boolean {
 		feed.next()
 		parser.commitSpan({
 			link_internal: true,
-			hiddenGroup: isEmbed ? inlineId : true,
+			hiddenGroup: inlineId,
 			// TODO: option to show/hide the open/close brackets for links
 			hidden: true,
 			start: true,
@@ -682,7 +682,7 @@ export function parseLink(char: string, parser: NoteParser): boolean {
 		} : {
 			// No custom text. The link must stand alone.
 			link_internal: true,
-			hiddenGroup: true
+			hiddenGroup: inlineId
 		})
 
 		const endsWithSlash = wikiLinkInfo.href.at(-1) === '/'
@@ -746,7 +746,7 @@ export function parseLink(char: string, parser: NoteParser): boolean {
 			})
 
 			builder.addOpenFormat('wiki-link-custom', {
-				hiddenGroup: isEmbed ? inlineId : true,
+				hiddenGroup: inlineId,
 				link_internal: true
 			})
 
@@ -754,14 +754,14 @@ export function parseLink(char: string, parser: NoteParser): boolean {
 				type: ParsingContextType.Inline,
 				indent: parser.lineData.indent.indent,
 				programs: [
-					awaitWikiLinkAt(feed.index + wikiLinkInfo.text.length, isEmbed ? inlineId : true),
+					awaitWikiLinkAt(feed.index + wikiLinkInfo.text.length, inlineId),
 					...parser.defaultInlineFormattingPrograms
 				]
 			})
 		}
 		else {
 			// Finish the link now
-			finishWikiLink(parser, 0, isEmbed ? inlineId : true)
+			finishWikiLink(parser, 0, inlineId)
 		}
 		return true
 	}

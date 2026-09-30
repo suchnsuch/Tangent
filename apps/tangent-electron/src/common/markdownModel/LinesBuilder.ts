@@ -25,15 +25,24 @@ export default class LinesBuilder {
 		if (!content.length) return
 
 		let finalAttributes: AttributeMap = {}
+		const formatAttributes = [
+			...Object.values(this.openBlockScopedFormats),
+			...Object.values(this.openLineScopedFormats),
+			attributes
+		]
 
 		if (this.outputFormattingRetains) {
 			Object.assign(finalAttributes, negativeInlineFormats)
 		}
 
-		Object.assign(finalAttributes,
-			...Object.values(this.openBlockScopedFormats),
-			...Object.values(this.openLineScopedFormats),
-			attributes)
+		Object.assign(finalAttributes, ...formatAttributes)
+
+		const hiddenGroupId = formatAttributes.find(format => {
+			return typeof format?.hiddenGroup === 'string'
+		})?.hiddenGroup
+		if (typeof hiddenGroupId === 'string') {
+			finalAttributes.hiddenGroup = hiddenGroupId
+		}
 
 		if (this.outputFormattingRetains) {
 			this.spans.push({
