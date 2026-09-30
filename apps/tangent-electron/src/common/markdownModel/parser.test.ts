@@ -224,11 +224,10 @@ End`
 			expect(doc.lines[0].content.ops).toEqual(buildOpsFromInsertList([
 				'Some ',
 				'$math$', {
-					hiddenGroup: true,
+					hiddenGroup: '5-11',
 					math: {
 						isBlock: false,
-						source: 'math',
-						instance: '5-11'
+						source: 'math'
 					}
 				},
 				' here'
@@ -242,11 +241,10 @@ End`
 			expect(doc.lines[0].content.ops).toEqual(buildOpsFromInsertList([
 				'Some ',
 				'$$math$$', {
-					hiddenGroup: true,
+					hiddenGroup: '5-13',
 					math: {
 						isBlock: true,
-						source: 'math',
-						instance: '5-13'
+						source: 'math'
 					}
 				},
 				' here'
@@ -358,8 +356,7 @@ describe('Link parsing', () => {
 				form: 'wiki',
 				href: 'Simple Link',
 				content_id: null,
-				text: null,
-				instance: '5-20'
+				text: null
 			})
 
 			expect(ops).toMatchObject(buildOpsFromInsertList([
@@ -474,8 +471,7 @@ describe('Link parsing', () => {
 				href: 'https://google.com',
 				text: 'web link',
 				content_id: null,
-				title: null,
-				instance: '0-30'
+				title: null
 			})
 		})
 
@@ -553,27 +549,29 @@ describe('Embeds', () => {
 	})
 })
 
-describe('Instance ids', () => {
-	test('Adjacent identical inline math get distinct instances', () => {
+describe('Inline ids', () => {
+	test('Adjacent identical inline math get distinct ids', () => {
 		const ops = parser.parseMarkdown('$a$$a$').lines[0].content.ops
-		expect(ops.map(op => op.attributes.math.instance)).toEqual(['0-3', '3-6'])
+		expect(ops.map(op => op.attributes.hiddenGroup)).toEqual(['0-3', '3-6'])
 
 		// Line reformatting composes ops with Delta.push, which merges equal neighbors
 		const delta = new Delta()
-		for (const op of ops) delta.push(op)
+		for (const op of ops) {
+			delta.push(op)
+		}
 		expect(delta.ops).toHaveLength(2)
 	})
 
-	test('Adjacent same-href embed and link get distinct instances', () => {
-		const ops = parser.parseMarkdown('![[a.png]][[a.png]]').lines[0].content.ops
-		const instances = new Set(ops.map(op => op.attributes?.t_link?.instance))
-		expect([...instances]).toEqual(['0-10', '10-19'])
+	test('Adjacent same-href embeds get distinct ids', () => {
+		const ops = parser.parseMarkdown('![[a.png]]![[a.png]]').lines[0].content.ops
+		const inlineIds = new Set(ops.map(op => op.attributes?.hiddenGroup))
+		expect([...inlineIds]).toEqual(['0-10', '10-20'])
 	})
 
-	test('Instances are relative to their line', () => {
-		const ops = parser.parseMarkdown('Before\n$a$ and [[a]]').lines[1].content.ops
-		expect(ops[0].attributes.math.instance).toEqual('0-3')
-		expect(ops.find(op => op.attributes?.t_link)?.attributes.t_link.instance).toEqual('8-13')
+	test('Ids are relative to their line', () => {
+		const ops = parser.parseMarkdown('Before\n$a$ and ![[a]]').lines[1].content.ops
+		expect(ops[0].attributes.hiddenGroup).toEqual('0-3')
+		expect(ops.find(op => op.attributes?.t_embed)?.attributes.hiddenGroup).toEqual('8-14')
 	})
 })
 

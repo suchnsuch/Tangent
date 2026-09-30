@@ -3,11 +3,10 @@ import DocumentFeeder from './DocumentFeeder'
 import { isWhitespace } from './matches'
 import NoteParser from './NoteParser'
 import { type ParsingContext, ParsingContextType } from './parsingContext'
+import { getInlineId } from './inline'
 
 export type MathData = {
 	source?: string
-	/** Distinguishes adjacent inline math that shares a source. */
-	instance?: string
 }
 
 type MathBlockContext = CodeParsingContext & {
@@ -39,12 +38,11 @@ export function parseInlineMath(char: string, parser: NoteParser): boolean {
 				parser.commitSpan({
 					math: {
 						source: feed.substring(index, index + findResult.contentCount + 1),
-						isBlock,
-						instance: parser.getInstanceId(start, feed.index + feed.currentStepLength)
+						isBlock
 					},
 					// Using hiddenGroup instead of hidden allows for math to embed within inline formatting.
 					// The "hidden" class is implicit and added afterwards.
-					hiddenGroup: true
+					hiddenGroup: getInlineId(parser, start, feed.index + feed.currentStepLength)
 				})
 				return true
 			}

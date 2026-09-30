@@ -100,10 +100,11 @@ class TangentMath extends HTMLElement {
 			})
 		}
 		else {
-			const instance = this.getAttribute('math-instance')
+			const hiddenGroup = this.closest('[data-hidden-group]')?.getAttribute('data-hidden-group')
+			if (!hiddenGroup) return
 			markAsSelectionRequest(event, {
 				inline: attr => {
-					return attr?.math?.instance == instance
+					return attr?.hiddenGroup === hiddenGroup
 				}
 			})
 		}

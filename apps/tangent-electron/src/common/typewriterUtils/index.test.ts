@@ -58,19 +58,19 @@ describe('Edit Info', () => {
 
 describe('getRangeWhile', () => {
 	const doc = new TextDocument([Line.create(new Delta([
-		{ insert: '$a$', attributes: { math: { source: 'a', instance: '0-3' } } },
-		{ insert: '$a$', attributes: { math: { source: 'a', instance: '3-6' } } },
-		{ insert: '![[', attributes: { t_link: { href: 'a.png', instance: '6-16' }, link_internal: 'start' } },
-		{ insert: 'a.png', attributes: { t_link: { href: 'a.png', instance: '6-16' }, link_internal: 'href' } },
-		{ insert: ']]', attributes: { t_link: { href: 'a.png', instance: '6-16' }, link_internal: 'end' } },
+		{ insert: '$a$', attributes: { math: { source: 'a' }, hiddenGroup: '0-3' } },
+		{ insert: '$a$', attributes: { math: { source: 'a' }, hiddenGroup: '3-6' } },
+		{ insert: '![[', attributes: { t_link: { href: 'a.png' }, hiddenGroup: '6-16', link_internal: 'start' } },
+		{ insert: 'a.png', attributes: { t_link: { href: 'a.png' }, hiddenGroup: '6-16', link_internal: 'href' } },
+		{ insert: ']]', attributes: { t_link: { href: 'a.png' }, hiddenGroup: '6-16', link_internal: 'end' } },
 		{ insert: 'x' }
 	]))])
 
-	test('Matching on instance stops at an adjacent instance with the same value', () => {
-		expect(getRangeWhile(doc, 4, attr => attr?.math?.instance === '3-6')).toEqual([3, 6])
+	test('Matching on an inline id stops at an adjacent group with the same value', () => {
+		expect(getRangeWhile(doc, 4, attr => attr?.hiddenGroup === '3-6')).toEqual([3, 6])
 	})
 
-	test('Matching on instance covers every op of a multi-op span', () => {
-		expect(getRangeWhile(doc, 10, attr => attr?.t_link?.instance === '6-16')).toEqual([6, 16])
+	test('Matching on an inline id covers every op of a multi-op span', () => {
+		expect(getRangeWhile(doc, 10, attr => attr?.hiddenGroup === '6-16')).toEqual([6, 16])
 	})
 })

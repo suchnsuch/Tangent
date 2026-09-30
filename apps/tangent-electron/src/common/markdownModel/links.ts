@@ -9,16 +9,14 @@ import NoteParser from './NoteParser'
 import { ParsingContextType, type ParsingProgram } from './parsingContext'
 import { isExternalLink } from 'common/links'
 import { isImplicitExtension } from "common/fileExtensions"
+import { getInlineId } from './inline'
 
 interface ExtendedLinkInfo extends LinkInfo {
 	complete?: boolean
 }
 
-/** The `t_link` attribute attached to the ops of a parsed link. */
-type LinkAttribute = HrefFormedLink & {
+export type LinkAttribute = HrefFormedLink & {
 	block?: boolean
-	/** Distinguishes adjacent links that share an href. */
-	instance?: string
 }
 
 // A `[[` that is at the beginning of a string or has a non=`\` character in front
@@ -570,8 +568,6 @@ export function parseRawLink(char: string, parser: NoteParser): boolean {
 			feed.next(-1)
 			lastChar = feed.peek(-1)
 		}
-		t_link.instance = parser.getInstanceId(firstChar, feed.index)
-
 		const nextSpan: AttributeMap = { t_link }
 
 		const restOfLine = feed.getLineText()
@@ -584,6 +580,7 @@ export function parseRawLink(char: string, parser: NoteParser): boolean {
 
 		if (isEmbed) {
 			nextSpan.t_embed = true
+			nextSpan.hiddenGroup = getInlineId(parser, firstChar, feed.index)
 			nextSpan.hidden = true
 			nextSpan.link_internal = true
 		}
@@ -614,13 +611,18 @@ export function parseLink(char: string, parser: NoteParser): boolean {
 		parser.commitSpan(null, isEmbed ? -1 : 0)
 
 		const isAtStartOfContent = getIsAtStartOfContent(builder.spans)
+		if (isEmbed) {
+			wikiLinkInfo.start-- // For the `!`
+			// Mutate the info into an embed
+			;(wikiLinkInfo as any).type = StructureType.Embed
+		}
+		const inlineId = getInlineId(parser, wikiLinkInfo.start, wikiLinkInfo.end)
 
 		const t_link: LinkAttribute = {
 			href: wikiLinkInfo.href,
 			form: 'wiki',
 			text: wikiLinkInfo.text ?? null,
-			content_id: wikiLinkInfo.content_id ?? null,
-			instance: parser.getInstanceId(wikiLinkInfo.start - (isEmbed ? 1 : 0), wikiLinkInfo.end)
+			content_id: wikiLinkInfo.content_id ?? null
 		}
 
 		// Avoiding adding the key unless the value exists
@@ -646,7 +648,7 @@ export function parseLink(char: string, parser: NoteParser): boolean {
 			builder.addOpenFormat('wiki-link', {
 				t_embed: true,
 				t_link,
-				hiddenGroup: true,
+				hiddenGroup: inlineId,
 				hidden: true,
 				link_internal: true
 			})
@@ -660,18 +662,13 @@ export function parseLink(char: string, parser: NoteParser): boolean {
 		if (parser.detailedLinks) {
 			wikiLinkInfo.context = feed.getLineText(parser.lineStart)
 		}
-		if (isEmbed) {
-			wikiLinkInfo.start-- // For the `!`
-			// Mutate the info into an embed
-			;(wikiLinkInfo as any).type = StructureType.Embed
-		}
 		parser.pushStructure(wikiLinkInfo)
 
 		// Commit the `[[`
 		feed.next()
 		parser.commitSpan({
 			link_internal: true,
-			hiddenGroup: true,
+			hiddenGroup: isEmbed ? inlineId : true,
 			// TODO: option to show/hide the open/close brackets for links
 			hidden: true,
 			start: true,
@@ -749,7 +746,7 @@ export function parseLink(char: string, parser: NoteParser): boolean {
 			})
 
 			builder.addOpenFormat('wiki-link-custom', {
-				hiddenGroup: true,
+				hiddenGroup: isEmbed ? inlineId : true,
 				link_internal: true
 			})
 
@@ -757,14 +754,14 @@ export function parseLink(char: string, parser: NoteParser): boolean {
 				type: ParsingContextType.Inline,
 				indent: parser.lineData.indent.indent,
 				programs: [
-					awaitWikiLinkAt(feed.index + wikiLinkInfo.text.length),
+					awaitWikiLinkAt(feed.index + wikiLinkInfo.text.length, isEmbed ? inlineId : true),
 					...parser.defaultInlineFormattingPrograms
 				]
 			})
 		}
 		else {
 			// Finish the link now
-			finishWikiLink(parser)
+			finishWikiLink(parser, 0, isEmbed ? inlineId : true)
 		}
 		return true
 	}
@@ -775,14 +772,19 @@ export function parseLink(char: string, parser: NoteParser): boolean {
 		parser.commitSpan(null, isEmbed ? -1 : 0)
 
 		const isAtStartOfContent = getIsAtStartOfContent(builder.spans)
+		if (isEmbed) {
+			mdLinkInfo.start-- // For the `!`
+			// Mutate the info into an embed
+			;(mdLinkInfo as any).type = StructureType.Embed
+		}
+		const inlineId = getInlineId(parser, mdLinkInfo.start, mdLinkInfo.end)
 
 		const t_link: LinkAttribute = {
 			href: mdLinkInfo.href,
 			form: 'md',
 			text: mdLinkInfo.text ?? null,
 			content_id: mdLinkInfo.content_id ?? null,
-			title: mdLinkInfo.title ?? null,
-			instance: parser.getInstanceId(mdLinkInfo.start - (isEmbed ? 1 : 0), mdLinkInfo.end)
+			title: mdLinkInfo.title ?? null
 		}
 
 		// Avoiding adding the key unless the value exists
@@ -809,11 +811,6 @@ export function parseLink(char: string, parser: NoteParser): boolean {
 			if (parser.detailedLinks) {
 				mdLinkInfo.context = feed.getLineText(parser.lineStart)
 			}
-			if (isEmbed) {
-				mdLinkInfo.start-- // For the `!`
-				// Mutate the info into an embed
-				;(mdLinkInfo as any).type = StructureType.Embed
-			}
 			parser.pushStructure(mdLinkInfo)
 		}
 
@@ -821,7 +818,7 @@ export function parseLink(char: string, parser: NoteParser): boolean {
 			builder.addOpenFormat('md-link', {
 				t_embed: true,
 				t_link,
-				hiddenGroup: true,
+				hiddenGroup: inlineId,
 				hidden: true,
 				link_internal: true
 			})
@@ -831,7 +828,7 @@ export function parseLink(char: string, parser: NoteParser): boolean {
 		else {
 			builder.addOpenFormat('md-link', {
 				t_link,
-				hiddenGroup: true
+				hiddenGroup: inlineId
 			})
 		}
 
@@ -867,7 +864,7 @@ export function parseLink(char: string, parser: NoteParser): boolean {
 	return false
 }
 
-function awaitWikiLinkAt(index: number): ParsingProgram {
+function awaitWikiLinkAt(index: number, hiddenGroup: true | string): ParsingProgram {
 	const next = index + 1
 	return (_, parser: NoteParser) => {
 		const feedIndex = parser.feed.index
@@ -875,7 +872,7 @@ function awaitWikiLinkAt(index: number): ParsingProgram {
 			parser.commitSpan(null)
 			parser.builder.dropOpenFormat('wiki-link-custom')
 
-			finishWikiLink(parser)
+			finishWikiLink(parser, 0, hiddenGroup)
 			parser.popContext()
 			return true
 		}
@@ -884,7 +881,7 @@ function awaitWikiLinkAt(index: number): ParsingProgram {
 			parser.commitSpan(null, 0)
 			parser.builder.dropOpenFormat('wiki-link-custom')
 
-			finishWikiLink(parser, -1)
+			finishWikiLink(parser, -1, hiddenGroup)
 			parser.popContext()
 			return true
 		}
@@ -892,14 +889,14 @@ function awaitWikiLinkAt(index: number): ParsingProgram {
 	}
 }
 
-function finishWikiLink(parser: NoteParser, offset=0) {
+function finishWikiLink(parser: NoteParser, offset=0, hiddenGroup: true | string = true) {
 	const { feed, builder } = parser
 
 	// Commit the `]]`
 	feed.next(2 + offset)
 	parser.commitSpan({
 		link_internal: true,
-		hiddenGroup: true,
+		hiddenGroup,
 		// TODO: option to show/hide the open/close brackets for links
 		hidden: true,
 		end: true,

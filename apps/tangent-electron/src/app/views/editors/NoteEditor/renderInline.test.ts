@@ -19,11 +19,14 @@ describe('renderInline: adjacent inline math', () => {
 	test('Distinct instances with the same source render as two containers', () => {
 		const editor = getEditor()
 		const delta = new Delta([
-			{ insert: '$a$', attributes: { math: { source: 'a', instance: '0-3' }, hiddenGroup: true } },
-			{ insert: '$a$', attributes: { math: { source: 'a', instance: '3-6' }, hiddenGroup: true } }
+			{ insert: '$a$', attributes: { math: { source: 'a' }, hiddenGroup: '0-3' } },
+			{ insert: '$a$', attributes: { math: { source: 'a' }, hiddenGroup: '3-6' } }
 		])
 
-		expect(containerCount(inlineToHTML(editor, delta))).toBe(2)
+		const html = inlineToHTML(editor, delta)
+		expect(containerCount(html)).toBe(2)
+		expect(html).toContain('data-hidden-group="0-3"')
+		expect(html).toContain('data-hidden-group="3-6"')
 	})
 })
 

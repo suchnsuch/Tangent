@@ -7,8 +7,7 @@ import type { TagSectionData } from './tag'
 import type { CodeData } from './code'
 import type { MathData } from './math'
 import { hasCollapsedChildren, isCollapsed } from './sections'
-import type { HrefFormedLink } from 'common/indexing/indexTypes'
-import { getMediaCustomizationsFromText } from './links'
+import { getMediaCustomizationsFromText, type LinkAttribute } from './links'
 
 const defaultOptions = {}
 
@@ -471,6 +470,16 @@ const noteTypeset:TypesetTypes = {
 		revealableLine('horizontal_rule', 'p')
 	],
 	formats: [
+		{
+			name: 'hiddenGroup',
+			selector: 'span[data-hidden-group]',
+			render: (attributes, children) => {
+				if (typeof attributes.hiddenGroup === 'string') {
+					return h('span', { 'data-hidden-group': attributes.hiddenGroup }, children)
+				}
+			}
+		},
+
 		// Formatting that starts a line
 		{
 			name: 'line_format',
@@ -552,7 +561,7 @@ const noteTypeset:TypesetTypes = {
 					className += ' revealed'
 				}
 
-				let link = attributes.t_link as HrefFormedLink & { instance?: string }
+				let link = attributes.t_link as LinkAttribute
 
 				let embedClassname = 'output'
 				const customizations = getMediaCustomizationsFromText(link.text)
@@ -570,10 +579,7 @@ const noteTypeset:TypesetTypes = {
 				let node = h(
 					'span',
 					{
-						class: className,
-						// Keep adjacent embed instances from being fused before
-						// postProcess appends their rendered outputs.
-						'data-instance': link.instance
+						class: className
 					},
 					children
 				) as any
@@ -742,10 +748,7 @@ const noteTypeset:TypesetTypes = {
 			render: (attributes, children) => {
 
 				let containerAttr = {
-					className: 'inline-math-container',
-					// renderInline() merges adjacent nodes whose props are equal, which
-					// would fuse two instances of the same source into one element.
-					'data-instance': attributes.math.instance
+					className: 'inline-math-container'
 				}
 
 				let sourceAttr = {
@@ -753,8 +756,7 @@ const noteTypeset:TypesetTypes = {
 				}
 				
 				let tMathAttr = {
-					'math-source': attributes.math.source,
-					'math-instance': attributes.math.instance
+					'math-source': attributes.math.source
 				} as any
 
 				if (attributes.revealed) {

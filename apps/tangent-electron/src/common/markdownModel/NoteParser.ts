@@ -118,15 +118,6 @@ export default class NoteParser {
 	get isStartOfContent() { return this._isStartOfContent }
 	get lineData() { return this._lineData }
 	
-	/**
-	 * Identifies the span `[start, end)` among the other spans of its line.
-	 * Relative to the line so that the id only changes when the span moves
-	 * within its line, not whenever any earlier line is edited.
-	 */
-	getInstanceId(start: number, end: number) {
-		return `${start - this._lineStart}-${end - this._lineStart}`
-	}
-	
 	parse() {
 		this._isStartOfLine = true
 
