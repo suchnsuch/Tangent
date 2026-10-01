@@ -9,7 +9,7 @@ import NoteParser from './NoteParser'
 import { ParsingContextType, type ParsingProgram } from './parsingContext'
 import { isExternalLink } from 'common/links'
 import { isImplicitExtension } from "common/fileExtensions"
-import { getInlineId } from './inline'
+import { getInlineId, type HiddenGroup } from './inline'
 
 interface ExtendedLinkInfo extends LinkInfo {
 	complete?: boolean
@@ -864,7 +864,7 @@ export function parseLink(char: string, parser: NoteParser): boolean {
 	return false
 }
 
-function awaitWikiLinkAt(index: number, hiddenGroup: true | string): ParsingProgram {
+function awaitWikiLinkAt(index: number, hiddenGroup: HiddenGroup): ParsingProgram {
 	const next = index + 1
 	return (_, parser: NoteParser) => {
 		const feedIndex = parser.feed.index
@@ -889,7 +889,7 @@ function awaitWikiLinkAt(index: number, hiddenGroup: true | string): ParsingProg
 	}
 }
 
-function finishWikiLink(parser: NoteParser, offset=0, hiddenGroup: true | string = true) {
+function finishWikiLink(parser: NoteParser, offset=0, hiddenGroup: HiddenGroup = true) {
 	const { feed, builder } = parser
 
 	// Commit the `]]`

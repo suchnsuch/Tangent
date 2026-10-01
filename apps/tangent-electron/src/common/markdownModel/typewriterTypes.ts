@@ -579,7 +579,7 @@ const noteTypeset:TypesetTypes = {
 				let node = h(
 					'span',
 					{
-						class: className
+						class: className,
 					},
 					children
 				) as any
@@ -756,7 +756,7 @@ const noteTypeset:TypesetTypes = {
 				}
 				
 				let tMathAttr = {
-					'math-source': attributes.math.source
+					'math-source': attributes.math.source,
 				} as any
 
 				if (attributes.revealed) {
