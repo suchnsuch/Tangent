@@ -34,6 +34,13 @@ function getHideableFormatClass(attributes, baseClass = '') {
 	return className
 }
 
+function getHiddenGroupAttributes(attributes) {
+	if (typeof attributes.hiddenGroup === 'string') {
+		return { 'data-hidden-group': attributes.hiddenGroup }
+	}
+	return {}
+}
+
 function hideableFormat(
 	formatName: string,
 	options?: {
@@ -470,16 +477,6 @@ const noteTypeset:TypesetTypes = {
 		revealableLine('horizontal_rule', 'p')
 	],
 	formats: [
-		{
-			name: 'hiddenGroup',
-			selector: 'span[data-hidden-group]',
-			render: (attributes, children) => {
-				if (typeof attributes.hiddenGroup === 'string') {
-					return h('span', { 'data-hidden-group': attributes.hiddenGroup }, children)
-				}
-			}
-		},
-
 		// Formatting that starts a line
 		{
 			name: 'line_format',
@@ -580,6 +577,7 @@ const noteTypeset:TypesetTypes = {
 					'span',
 					{
 						class: className,
+						...getHiddenGroupAttributes(attributes)
 					},
 					children
 				) as any
@@ -613,7 +611,8 @@ const noteTypeset:TypesetTypes = {
 					't-link',
 					{
 						...attributes.t_link,
-						className: className
+						className: className,
+						...getHiddenGroupAttributes(attributes)
 					},
 					children)
 			}
@@ -748,7 +747,8 @@ const noteTypeset:TypesetTypes = {
 			render: (attributes, children) => {
 
 				let containerAttr = {
-					className: 'inline-math-container'
+					className: 'inline-math-container',
+					...getHiddenGroupAttributes(attributes)
 				}
 
 				let sourceAttr = {
