@@ -307,7 +307,7 @@ function onViewContextMenu(event: MouseEvent) {
 				command={workspace.commands.shiftHistoryBack}
 				menuMode="low-profile"
 				placement="bottom-start"
-				hidePopUpIndicator
+				showPopUpIndicator={false}
 				closeMenuOnClick
 			>
 				<SvgIcon slot="button" ref="arrows.svg#back"></SvgIcon>	
@@ -322,7 +322,7 @@ function onViewContextMenu(event: MouseEvent) {
 				command={workspace.commands.shiftHistoryForward}
 				menuMode="low-profile"
 				placement="bottom-start"
-				hidePopUpIndicator
+				showPopUpIndicator={false}
 				closeMenuOnClick
 			>
 				<SvgIcon slot="button" ref="arrows.svg#forward"></SvgIcon>	

@@ -22,10 +22,11 @@ import { tooltip as tooltipHelper, type TooltipDefOrConfig, dropTooltip } from '
 export let name = ''
 export let placement: Placement = 'bottom'
 export let buttonClass = 'popup'
-export let hidePopUpIndicator = false
+export let showPopUpIndicator: boolean = undefined
 export let menuMode: 'normal' | 'low-profile' = 'normal'
 export let closeMenuOnClick = false
 export let blurWhenFinished = true
+export let onDoubleClick: (event: MouseEvent) => void = null
 
 export let escapeToRoot = true
 
@@ -79,6 +80,10 @@ let commandParams: CommandActionOptions = command ? {
 	includeClick: false,
 	tooltip
 } : null
+
+$: willShowPopUpIndicator = (typeof showPopUpIndicator === 'boolean')
+	? showPopUpIndicator
+	: command != null
 
 $: update(buttonElement, menuElement, showMenu)
 function update(button, menu: HTMLElement, show) {
@@ -219,15 +224,16 @@ function onMenuCanceled(event: Event) {
 	bind:this={buttonElement}
 	class={buttonClass}
 	class:open={showMenu}
-	class:has-opener={command != null && !hidePopUpIndicator}
+	class:has-opener={willShowPopUpIndicator}
 	on:click={buttonClick}
 	on:contextmenu={buttonContext}
+	on:dblclick={onDoubleClick}
 	use:commandAction={commandParams}
 	use:focusLayer={'PopUpButton'}
 	use:tooltipHelper={commandParams ? null : tooltip}
 >
 	<span class="buttonContent"><slot name="button">{name}</slot></span>
-	{#if command && !hidePopUpIndicator}
+	{#if willShowPopUpIndicator}
 		<!-- svelte-ignore a11y-click-events-have-key-events -->
 		<!-- svelte-ignore a11y-no-static-element-interactions -->
 		<span class="opener"
