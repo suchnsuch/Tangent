@@ -1,6 +1,9 @@
 import { wait } from '@such-n-such/core'
 import { ipcMain } from 'electron'
-import { autoUpdater, type ProgressInfo, type UpdateInfo } from 'electron-updater'
+import type { ProgressInfo, UpdateInfo } from 'electron-updater'
+import { getAutoUpdater } from './autoUpdater'
+
+const autoUpdater = getAutoUpdater()
 import { mode } from './environment'
 
 import { contentsMap, saveAndCloseWorkspaces } from './workspaces'

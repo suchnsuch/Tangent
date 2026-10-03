@@ -1,9 +1,10 @@
 <script lang="ts">
 import { onMount } from 'svelte'
-import * as pdfjs from 'pdfjs-dist'
+import type { RenderTask } from 'pdfjs-dist'
 import { resizeObserver } from 'app/utils/resizeObserver'
 import { clamp } from 'common/utils'
 import { pageFromContentId } from 'app/model/nodeViewStates/PdfViewState'
+import { getPdfjs } from 'app/shim/pdf'
 
 let {
 	path,
@@ -22,9 +23,13 @@ let canvas: HTMLCanvasElement
 let pagePromise = $derived.by(() => {
 	let page = pageFromContentId(content_id) || 1
 
-	return pdfjs.getDocument(path).promise.then(async pdf => {
-		page = clamp(page, 1, pdf.numPages)
-		return pdf.getPage(page)
+	return getPdfjs().then(pdfjs => {
+		return pdfjs.getDocument({
+			url: path
+		}).promise.then(async pdf => {
+			page = clamp(page, 1, pdf.numPages)
+			return pdf.getPage(page)
+		})
 	})
 })
 
@@ -32,7 +37,7 @@ $effect(() => {
 	if (pagePromise) debouncedRenderPage()
 })
 
-let pageRender: pdfjs.RenderTask = null
+let pageRender: RenderTask = null
 let dirtyTimeout: any = null
 let isPendingPromise = false
 let lastScale = 0

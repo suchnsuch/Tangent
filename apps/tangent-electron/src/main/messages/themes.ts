@@ -2,12 +2,13 @@ import fs from 'fs'
 import path from 'path'
 import { ipcMain } from 'electron'
 import Logger from 'js-logger'
+import { staticRoot } from '../appPaths'
 
 const log = Logger.get('themes')
 
 const codeThemeExtension = '.tangentcodetheme'
 
-const themesPath = path.join(__dirname, '../../static/themes')
+const themesPath = path.join(staticRoot, 'themes')
 
 ipcMain.handle('getCodeThemes', async (event, value) => {
 	// TODO: Support custom themes

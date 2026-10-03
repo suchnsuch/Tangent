@@ -116,3 +116,7 @@ export const visibleFileTypeMatch = getFileTypeRegex([
 export const implicitExtensionsMatch = getExtensionRegex([
 	'.md', queryFileType
 ])
+
+export function isImplicitExtension(fileType: string) {
+	return fileType?.match(implicitExtensionsMatch)
+}

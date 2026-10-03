@@ -10,6 +10,7 @@ import { timeFromContentId } from 'app/model/nodeViewStates/AudioVideoViewState'
 import { appendContextTemplate, type ContextMenuConstructorOptions } from 'app/model/menus'
 import { getMediaCustomizationsFromText, linkTextFromLink } from 'common/markdownModel/links'
 import { deepEqual } from 'fast-equals'
+import { loadMediaChrome } from 'app/shim/media-chrome'
 
 type Form = {
 	mode: 'error'
@@ -299,71 +300,79 @@ function onMediaContext(event: MouseEvent) {
 	<!-- svelte-ignore a11y_missing_attribute -->
 	<img src={form.src} style={containerStyle} onerror={e => error('Image not found!')} />
 {:else if form.mode === 'audio'}
-	<!-- svelte-ignore a11y_click_events_have_key_events -->
-	<!-- svelte-ignore a11y_no_static_element_interactions -->
-	<media-controller style={containerStyle} audio class="audio" onclick={e => e.preventDefault()} oncontextmenu={onMediaContext}>
-		<audio bind:this={mediaElement} slot="media" src={form.src} currenttime={form.time} onloadedmetadata={onAvLoaded}></audio>
-		<media-settings-menu hidden anchor="auto">
-			<media-settings-menu-item>
-				Speed
-				<media-playback-rate-menu slot="submenu" hidden>
-					<div slot="title">Speed</div>
-				</media-playback-rate-menu>
-			</media-settings-menu-item>
-		</media-settings-menu>
-		<media-control-bar>
-			<div class="simple-menu">
-				<media-play-button class="first" notooltip></media-play-button>
-				<div class="floating">
-					<media-seek-backward-button style="min-width: 3em"></media-seek-backward-button>
-					<media-seek-forward-button style="min-width: 3em"></media-seek-forward-button>
+	{#await loadMediaChrome()}
+		…
+	{:then _} 
+		<!-- svelte-ignore a11y_click_events_have_key_events -->
+		<!-- svelte-ignore a11y_no_static_element_interactions -->
+		<media-controller style={containerStyle} audio class="audio" onclick={e => e.preventDefault()} oncontextmenu={onMediaContext}>
+			<audio bind:this={mediaElement} slot="media" src={form.src} currenttime={form.time} onloadedmetadata={onAvLoaded}></audio>
+			<media-settings-menu hidden anchor="auto">
+				<media-settings-menu-item>
+					Speed
+					<media-playback-rate-menu slot="submenu" hidden>
+						<div slot="title">Speed</div>
+					</media-playback-rate-menu>
+				</media-settings-menu-item>
+			</media-settings-menu>
+			<media-control-bar>
+				<div class="simple-menu">
+					<media-play-button class="first" notooltip></media-play-button>
+					<div class="floating">
+						<media-seek-backward-button style="min-width: 3em"></media-seek-backward-button>
+						<media-seek-forward-button style="min-width: 3em"></media-seek-forward-button>
+					</div>
 				</div>
-			</div>
-			<div class="simple-menu">
-				<media-mute-button notooltip></media-mute-button>
-				<div class="floating">
-					<media-volume-range></media-volume-range>
+				<div class="simple-menu">
+					<media-mute-button notooltip></media-mute-button>
+					<div class="floating">
+						<media-volume-range></media-volume-range>
+					</div>
 				</div>
-			</div>
-			<media-time-display showduration notoggle></media-time-display>
-			<media-time-range></media-time-range>
-			<media-settings-menu-button></media-settings-menu-button>
-		</media-control-bar>
-	</media-controller>
+				<media-time-display showduration notoggle></media-time-display>
+				<media-time-range></media-time-range>
+				<media-settings-menu-button></media-settings-menu-button>
+			</media-control-bar>
+		</media-controller>
+	{/await}
 {:else if form.mode === 'video'}
-	<!-- svelte-ignore a11y_click_events_have_key_events -->
-	<!-- svelte-ignore a11y_no_static_element_interactions -->
-	<media-controller style={containerStyle} onclick={e => e.preventDefault()} oncontextmenu={onMediaContext}>
-		<!-- svelte-ignore a11y_media_has_caption -->
-		<video bind:this={mediaElement} slot="media" src={form.src} currenttime={form.time} onloadedmetadata={onAvLoaded}></video>
-		<media-settings-menu hidden anchor="auto">
-			<media-settings-menu-item>
-				Speed
-				<media-playback-rate-menu slot="submenu" hidden>
-					<div slot="title">Speed</div>
-				</media-playback-rate-menu>
-			</media-settings-menu-item>
-		</media-settings-menu>
-		<media-control-bar>
-			<div class="simple-menu">
-				<media-play-button class="first" notooltip></media-play-button>
-				<div class="floating">
-					<media-seek-backward-button style="min-width: 3em"></media-seek-backward-button>
-					<media-seek-forward-button style="min-width: 3em"></media-seek-forward-button>
+	{#await loadMediaChrome()}
+		…
+	{:then _} 
+		<!-- svelte-ignore a11y_click_events_have_key_events -->
+		<!-- svelte-ignore a11y_no_static_element_interactions -->
+		<media-controller style={containerStyle} onclick={e => e.preventDefault()} oncontextmenu={onMediaContext}>
+			<!-- svelte-ignore a11y_media_has_caption -->
+			<video bind:this={mediaElement} slot="media" src={form.src} currenttime={form.time} onloadedmetadata={onAvLoaded}></video>
+			<media-settings-menu hidden anchor="auto">
+				<media-settings-menu-item>
+					Speed
+					<media-playback-rate-menu slot="submenu" hidden>
+						<div slot="title">Speed</div>
+					</media-playback-rate-menu>
+				</media-settings-menu-item>
+			</media-settings-menu>
+			<media-control-bar>
+				<div class="simple-menu">
+					<media-play-button class="first" notooltip></media-play-button>
+					<div class="floating">
+						<media-seek-backward-button style="min-width: 3em"></media-seek-backward-button>
+						<media-seek-forward-button style="min-width: 3em"></media-seek-forward-button>
+					</div>
 				</div>
-			</div>
-			<div class="simple-menu">
-				<media-mute-button notooltip></media-mute-button>
-				<div class="floating">
-					<media-volume-range></media-volume-range>
+				<div class="simple-menu">
+					<media-mute-button notooltip></media-mute-button>
+					<div class="floating">
+						<media-volume-range></media-volume-range>
+					</div>
 				</div>
-			</div>
-			<media-time-display showduration notoggle></media-time-display>
-			<media-time-range></media-time-range>
-			<media-settings-menu-button></media-settings-menu-button>
-			<media-fullscreen-button></media-fullscreen-button>
-		</media-control-bar>
-	</media-controller>
+				<media-time-display showduration notoggle></media-time-display>
+				<media-time-range></media-time-range>
+				<media-settings-menu-button></media-settings-menu-button>
+				<media-fullscreen-button></media-fullscreen-button>
+			</media-control-bar>
+		</media-controller>
+	{/await}
 {:else if form.mode === 'pdf'}
 	<div class="pdf" style={containerStyle}>
 		<PdfPreview path={form.src} content_id={form.content_id} bind:height />

@@ -105,29 +105,60 @@ export function join(...segments: string[]): string {
 	return normalizeSeperators(result)
 }
 
-export function resolve(value: string): string {
-	let segments = segment(value)
-
-	let resultSegements: string[] = []
+function resolveSegments(segments: string[]) {
+	const resultSegments: string[] = []
 	for (const segment of segments) {
 		switch (segment) {
 			case '.':
 				// Skip
 				break
 			case '..':
-				resultSegements.pop()
+				resultSegments.pop()
 				break
 			default:
-				resultSegements.push(segment)
+				resultSegments.push(segment)
 				break
 		}
 	}
-
-	const bestSeperator = getBestPathSeperator(value)
-	return resultSegements.join(bestSeperator)
+	return resultSegments
 }
 
-export function getBestPathSeperator(aPath: string) {
+export function relative(from: string, to: string): string {
+	const fromSegments = resolveSegments(segment(from))
+	const toSegments = resolveSegments(segment(to))
+
+	const min = Math.min(fromSegments.length, toSegments.length)
+	let commonIndex = 0
+	for (; commonIndex < min; commonIndex++) {
+		if (fromSegments[commonIndex] !== toSegments[commonIndex]) {
+			break
+		}
+	}
+
+	const resultSegments: string[] = []
+	
+	const backtrack = fromSegments.length - commonIndex
+	for (let i = 0; i < backtrack; i++) {
+		resultSegments.push('..')
+	}
+
+	for (let i = commonIndex; i < toSegments.length; i++) {
+		resultSegments.push(toSegments[i])
+	}
+
+	return resultSegments.join(getBestPathSeparator(to))
+}
+
+export function resolve(value: string): string {
+	const segments = segment(value)
+
+	const resultSegments: string[] = resolveSegments(segments)
+
+	const bestSeparator = getBestPathSeparator(value)
+	return resultSegments.join(bestSeparator)
+}
+
+export function getBestPathSeparator(aPath: string) {
 	const forwardIndex = aPath.indexOf('/')
 	const backwardIndex = aPath.indexOf('\\')
 
@@ -145,7 +176,7 @@ export function getBestPathSeperator(aPath: string) {
  * @returns 
  */
 export function normalizeSeperators(aPath: string, seperator: string = null) {
-	const bestSeperator = seperator ?? getBestPathSeperator(aPath)
+	const bestSeperator = seperator ?? getBestPathSeparator(aPath)
 
 	if (bestSeperator === '/') {
 		return aPath.replace(/\\/g, '/')
@@ -168,5 +199,6 @@ export default {
 	basename,
 	extname,
 	join,
+	relative,
 	resolve
 }

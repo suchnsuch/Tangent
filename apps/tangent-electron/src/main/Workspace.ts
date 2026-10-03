@@ -375,6 +375,13 @@ export default class Workspace {
 
 	getNodeOrPlaceholder(link: HrefFormedLink) {
 		const result = resolveLink(this.contentsStore, link)
+
+		if (typeof result === 'string') {
+			// `resolveLink()` returns a string when it cannot resolve
+			// If it can't resolve, we do nothing
+			return null
+		}
+
 		if (Array.isArray(result)) {
 			if (result.length === 0) {
 				if (!this.createVirtualFiles) {

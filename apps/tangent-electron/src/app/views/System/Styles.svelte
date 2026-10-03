@@ -134,7 +134,6 @@ function createNewStyle() {
 .overview {
 	padding: 0 2em;
 	font-size: 90%;
-	font-style: italic;
 }
 
 nav {

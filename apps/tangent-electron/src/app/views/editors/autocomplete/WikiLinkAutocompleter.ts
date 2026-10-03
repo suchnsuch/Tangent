@@ -3,7 +3,7 @@ import { TextDocument, type EditorRange, Editor, normalizeRange, ShortcutEvent }
 import type { AutocompleteHandler, AutocompleteModule } from "./autocompleteModule";
 import { iterateOverChildren, type TreeNode, type TreePredicate, TreePredicateResult } from 'common/trees'
 import { WritableStore } from 'common/stores'
-import { matchWikiLink } from 'common/markdownModel/links'
+import { linkTextFromLink, matchWikiLink, workspaceLinkToMarkdownLink, workspaceLinkToWikiLink, type WorkspaceLink } from 'common/markdownModel/links'
 import { type HeaderInfo, IndexData } from "common/indexing/indexTypes";
 import { safeHeaderLine } from "common/markdownModel/header";
 import { rangeContainsRange } from 'common/typewriterUtils';
@@ -33,10 +33,6 @@ const defaultOptions: WikiLinkAutocompleterOptions = {
 	enableContent: true,
 	enableText: true,
 	enableEmbedding: true
-}
-
-export function showFileType(fileType: string) {
-	return !fileType.match(implicitExtensionsMatch)
 }
 
 export default class WikiLinkAutocompleter implements AutocompleteHandler {
@@ -196,42 +192,31 @@ export default class WikiLinkAutocompleter implements AutocompleteHandler {
 		return link !== null
 	}
 
-	getCurrentOptionText(hard: boolean = true) {
-		let result = '[['
-		
+	getCurrentWorkspaceLink(hard: boolean = true): WorkspaceLink {
+		let target: TreeNode | string = null
 		const mode = this.mode.value
-		let pathText = null
+
 		const selectedNode = this.selectedNode.value
-		if (!hard && mode === 'node' || !selectedNode || !selectedNode.node){
-			pathText = this.pathText.value
-		}
-		else if (selectedNode.node === this.currentTangentNode) {
-			pathText = ''
+		if (!hard && mode === 'node' || !selectedNode || !selectedNode.node) {
+			target = this.pathText.value
 		}
 		else if (selectedNode) {
+			target = selectedNode.node
+		}
 
-			const form = this.workspace?.settings?.linkAutocompleteForm.value ?? 'short'
-			let length: 'short'|'full' = 'short'
-			if (form === 'full') {
-				length = form
-			}
-
-			pathText = this.workspace.directoryStore.getPathToItem(selectedNode.node, {
-				includeExtension: showFileType,
-				length
+		let content_id: string = null
+		if (!hard && mode === 'content') {
+			this.contentText.ifHasValue(v => {
+				content_id = v.substring(1)
 			})
 		}
-		result += pathText
-
-		if (!hard && mode === 'content') {
-			this.contentText.ifHasValue(v => result += v)
-		}
 		else {
-			this.selectedContent.ifHasValue(v => result += '#' + safeHeaderLine(v.text))
+			this.selectedContent.ifHasValue(v => content_id = safeHeaderLine(v.text))
 		}
 
+		let text: string = null
 		if (this.linkText.value) {
-			result += this.linkText.value
+			text = this.linkText.value.substring(1)
 		}
 		else {
 			const match = selectedNode?.match
@@ -243,26 +228,47 @@ export default class WikiLinkAutocompleter implements AutocompleteHandler {
 				if (match.input !== relativePath && match.input !== selectedNode.node.path) {
 					// This matched to an alias or header
 					if (selectedNode.node.fileType === 'folder') {
-						result += '|' + selectedNode.node.name
+						text = selectedNode.node.name
 					}
 					else {
 						const headerIndex = match.input.lastIndexOf('#')
 						if (headerIndex >= 0 && match.input.substring(0, headerIndex) === relativePath) {
 							// This is a header
-							result += '#' + match.input.substring(headerIndex + 1)
+							content_id = match.input.substring(headerIndex + 1)
 						}
 						else {
 							// This is an alias
-							result += '|' + paths.basename(match.input, paths.extname(match.input))
+							text = paths.basename(match.input, paths.extname(match.input))
 						}
 					}
 				}
 			}
 		}
 
-		result += ']]'
+		return {
+			target,
+			content_id,
+			text
+		}
+	}
 
-		return result
+	getCurrentOptionText() {
+		return this.getCurrentWikiText(true)
+	}
+
+	getCurrentWikiText(hard: boolean = true) {
+		return linkTextFromLink(workspaceLinkToWikiLink(
+			this.getCurrentWorkspaceLink(hard),
+			this.workspace.directoryStore,
+			this.workspace?.settings?.linkAutocompleteForm.value ?? 'short'
+		))
+	}
+
+	getCurrentMarkdownText(hard: boolean = true) {
+		return linkTextFromLink(workspaceLinkToMarkdownLink(
+			this.getCurrentWorkspaceLink(hard),
+			this.currentTangentNode
+		))
 	}
 
 	onPathText(pathText: string) {
@@ -369,7 +375,7 @@ export default class WikiLinkAutocompleter implements AutocompleteHandler {
 	}
 
 	applySelection(hard=true) {
-		this.autocomplete.updateAutocomplete(this.getCurrentOptionText(hard))
+		this.autocomplete.updateAutocomplete(this.getCurrentWikiText(hard))
 	}
 
 	applyCurrentText() {
@@ -463,6 +469,14 @@ export default class WikiLinkAutocompleter implements AutocompleteHandler {
 			// can occur
 			this.applySelection()
 			this.end()
+			return
+		}
+
+		if (event.modShortcut === 'Alt+Enter') {
+			// Turn this link into a markdown link
+			this.autocomplete.updateAutocomplete(this.getCurrentMarkdownText())
+			this.end()
+			event.preventDefault()
 			return
 		}
 

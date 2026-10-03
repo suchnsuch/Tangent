@@ -4,7 +4,7 @@
 	"copyright": "Copyright © 2022 Taylor Hadden",
 
 	"generateUpdatesFilesForAllChannels": true,
-	"electronVersion": "42.1.0",
+	"electronVersion": "44.3.0",
 
 	"files": [
 		"node_modules/**/*",
@@ -14,14 +14,7 @@
 		{
 			"from": "__build",
 			"to": "__build",
-			"filter": ["**/*",
-				"!bundle/app.css", "!bundle/app.css.map"
-			]
-		},
-		{
-			"from": "__build/bundle",
-			"to": "static",
-			"filter": ["*.css", "*.css.map"]
+			"filter": ["**/*"]
 		}
 	],
 
@@ -146,7 +139,8 @@
 		{
 			"provider": "s3",
 			"bucket": "suchnsuch-public",
-			"path": "/Tangent/Releases/"
+			"region": "us-east-2",
+			"path": "Tangent/Releases"
 		}
 	],
 

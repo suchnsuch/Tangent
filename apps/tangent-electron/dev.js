@@ -1,12 +1,11 @@
-const { buildAll } = require('./build')
-const electron = require('electron')
-const proc = require('child_process')
 const electronmon = require('electronmon')
+const { startDevServer} = require('./build')
 
-let watcher = null
+let devServer = null
+let electronApp = null
 
 async function start() {
-	watcher = await buildAll()
+	devServer = await startDevServer()
 
 	let args = []
 	if (process.env.DEBUG) {
@@ -16,34 +15,48 @@ async function start() {
 		args = ['.']
 	}
 
-	const useMon = true
-	if (useMon) {
-		const app = await electronmon({
-			args,
-			patterns: [
-				// We only want the built files to trigger anything
-				'!build/**/*',
-				'!dist/**/*',
-				'!src/**/*',
-				'!test-results/**/*',
-				'!tests-integration/**/*',
-			]
-		})
-	}
-	else {
-		const child = proc.spawn(electron, args, {
-			stdio: 'inherit'
-		})
+	electronApp = await electronmon({
+		args,
+		// Only reload for main & preload packages
+		// The vite dev server handles the app
+		patterns: [
+			'!build/**/*',
+			'!dist/**/*',
+			'!src/**/*',
+			'!static/**/*',
+			'!test-results/**/*',
+			'!tests-integration/**/*',
+			'!__build/renderer/**/*'
+		],
+		env: {
+			// Inject the dev server url
+			VITE_DEV_SERVER_URL: devServer.url
+		}
+	})
+}
 
-		child.on('close', close)
+async function close() {
+	if (electronApp) {
+		const destroying = electronApp.destroy()
+		electronApp = null
+		await destroying
+	}
+
+	if (devServer) {
+		try {
+			const closing = devServer.close()
+			devServer = null
+			await closing
+		}
+		catch(e) {
+			console.error('Could not close devServer', devServer)
+		}
 	}
 }
 
-function close() {
-	if (watcher && watcher.close) {
-		watcher.close()
-	}
-}
+process.on('SIGINT', () => {
+	Promise.resolve(close()).finally(() => process.exit(0))
+})
 
 start().catch(e => {
 	console.error('There was an error running the application')

@@ -81,6 +81,24 @@ describe('join()', () => {
 	})
 })
 
+describe('relative()', () => {
+	it('Finds uncles', () => {
+		ensureMatchesPosix('relative', 'parent/child/grandchild', 'parent/uncle')
+	})
+	it('Finds siblings', () => {
+		ensureMatchesPosix('relative', 'parent/child', 'parent/sibling')
+	})
+	it('Finds children', () => {
+		ensureMatchesPosix('relative', 'parent/child', 'parent/child/grandchild')
+	})
+	it('Accounts for the same path', () => {
+		ensureMatchesPosix('relative', 'parent/child', 'parent/child')
+	})
+	it('Handles completely separate directories', () => {
+		ensureMatchesPosix('relative', 'one/set/or', 'the/other/set')
+	})
+})
+
 describe('resolve()', () => {
 	test('Does nothing when necessary', () => {
 		ensureMatchesPosix('resolve', '/some/long/path/with/nothing.txt')

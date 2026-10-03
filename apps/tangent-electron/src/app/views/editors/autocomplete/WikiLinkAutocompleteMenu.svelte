@@ -4,11 +4,12 @@ import NodeLine from '../../summaries/NodeLine.svelte'
 import type WikiLinkAutocompleter from "./WikiLinkAutocompleter"
 import SearchSegmentHighlight from 'app/utils/SearchSegmentHighlight.svelte'
 import ScrollingItemList from 'app/utils/ScrollingItemList.svelte'
-import { showFileType } from './WikiLinkAutocompleter';
 import SvgIcon from 'app/views/smart-icons/SVGIcon.svelte';
 import { noteIcon } from 'common/icons';
 import { getContext } from 'svelte'
 import type { Workspace } from 'app/model'
+import { shortcutDisplayString } from 'app/utils/shortcuts'
+import { isImplicitExtension } from 'common/fileExtensions'
 
 let workspace = getContext('workspace') as Workspace
 
@@ -52,7 +53,7 @@ function nodeOptionEvent(option: any, event: Event) {
 			onItemEvent={nodeOptionEvent}>
 			<svelte:fragment slot="item" let:item={option}>
 				{#if option.node}
-					<NodeLine node={option.node} showFileType={showFileType(option.node.fileType)} nameMatch={option.match} />
+					<NodeLine node={option.node} showFileType={!isImplicitExtension(option.node.fileType)} nameMatch={option.match} />
 				{:else if $pathText}
 					{#if $isEmbed}
 						Nothing found to embed.
@@ -121,6 +122,8 @@ function nodeOptionEvent(option: any, event: Event) {
 					{/if}
 				</div>
 			{/if}
+			<div>Press <span class="key">{shortcutDisplayString("Alt+Enter")}</span> to make a markdown link.</div>
+			<div>Press <span class="key">Enter</span> to accept, <span class="key">Esc</span> to cancel.</div>
 		</div>
 	{/if}
 </div>

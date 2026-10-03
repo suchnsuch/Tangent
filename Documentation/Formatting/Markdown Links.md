@@ -9,6 +9,7 @@ The web link shortcut is `Command+K` on Mac and `Control+K` on Windows.
 * With a url in your clipboard, pressing the shortcut will automatically convert the current word or selected text to a full link.
 * With the typing cursor over a raw url, pressing the shortcut will convert the url to a standard link with the webpage's title.
 * With the typing cursor over a formatted markdown link, pressing the shortcut will strip out the link, leaving the text in its place.
+* With the typing cursor over a formatted [[Wiki Links|Wiki Link]], pressing the shortcut will convert the markdown link to a wiki link.
 
 # Local Markdown Links
 Markdown links can also be used to link to files and folders on your local computer with relative or absolute paths.

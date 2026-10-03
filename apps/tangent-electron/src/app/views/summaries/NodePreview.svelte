@@ -11,6 +11,7 @@ import NodeIcon from '../smart-icons/NodeIcon.svelte'
 import { NoteDetailMode } from 'app/model/nodeViewStates/NoteViewState'
 import PdfPreview from '../node-views/PdfPreview.svelte'
 import NoteDetailsSummary from './NoteDetailsSummary.svelte'
+import { loadMediaChrome } from 'app/shim/media-chrome'
 
 const workspace: Workspace = getContext('workspace')
 
@@ -80,33 +81,41 @@ export let noteDetailMode: NoteDetailMode = NoteDetailMode.None
 				{#if embedType === EmbedType.Image}
 					<div class="image" style={`background-image: url("${node.cacheBustPath}"); ${layout === 'auto' ? 'height: 250px;' : ''}`}></div>
 				{:else if embedType === EmbedType.Audio}
-					<media-controller class="audio stretch" autohide="-1" gesturesdisabled>
-						<audio slot="media" src={node.cacheBustPath}></audio>
-						<!-- svelte-ignore a11y-click-events-have-key-events -->
-						<!-- svelte-ignore a11y-no-static-element-interactions -->
-						<media-play-button slot="centered-chrome" on:click|preventDefault></media-play-button>
-						<!-- svelte-ignore a11y-click-events-have-key-events -->
-						<!-- svelte-ignore a11y-no-static-element-interactions -->
-						<media-control-bar on:click|preventDefault>
-							<media-time-display showduration notoggle></media-time-display>
-							<media-time-range></media-time-range>
-						</media-control-bar>
-					</media-controller>
+					{#await loadMediaChrome()}
+						…
+					{:then _} 
+						<media-controller class="audio stretch" autohide="-1" gesturesdisabled>
+							<audio slot="media" src={node.cacheBustPath}></audio>
+							<!-- svelte-ignore a11y-click-events-have-key-events -->
+							<!-- svelte-ignore a11y-no-static-element-interactions -->
+							<media-play-button slot="centered-chrome" on:click|preventDefault></media-play-button>
+							<!-- svelte-ignore a11y-click-events-have-key-events -->
+							<!-- svelte-ignore a11y-no-static-element-interactions -->
+							<media-control-bar on:click|preventDefault>
+								<media-time-display showduration notoggle></media-time-display>
+								<media-time-range></media-time-range>
+							</media-control-bar>
+						</media-controller>
+					{/await}
 				{:else if embedType === EmbedType.Video}
 					<!-- svelte-ignore a11y-click-events-have-key-events -->
 					<!-- svelte-ignore a11y-no-static-element-interactions -->
 					<div class="video stretch" on:click|preventDefault>
-						<media-controller class="roundedBottom" gesturesdisabled>
-							<!-- svelte-ignore a11y-media-has-caption -->
-							<video slot="media" src={node.cacheBustPath}></video>
-							<media-control-bar>
-								<media-play-button></media-play-button>
-								<media-mute-button></media-mute-button>
-								<media-time-display showduration notoggle></media-time-display>
-								<media-time-range></media-time-range>
-								<media-fullscreen-button></media-fullscreen-button>
-							</media-control-bar>
-						</media-controller>
+						{#await loadMediaChrome()}
+							…
+						{:then _}
+							<media-controller class="roundedBottom" gesturesdisabled>
+								<!-- svelte-ignore a11y-media-has-caption -->
+								<video slot="media" src={node.cacheBustPath}></video>
+								<media-control-bar>
+									<media-play-button></media-play-button>
+									<media-mute-button></media-mute-button>
+									<media-time-display showduration notoggle></media-time-display>
+									<media-time-range></media-time-range>
+									<media-fullscreen-button></media-fullscreen-button>
+								</media-control-bar>
+							</media-controller>
+						{/await}
 					</div>
 				{:else if embedType === EmbedType.PDF}
 					<div class="pdf stretch">

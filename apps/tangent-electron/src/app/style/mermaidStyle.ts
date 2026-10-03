@@ -1,4 +1,4 @@
-import mermaid from 'mermaid'
+import { setMermaidConfig } from 'app/shim/mermaid'
 
 /**
  * Mermaid hard codes styling properties on every single diagram.
@@ -61,7 +61,7 @@ export function updateMermaidStyle(darkMode: boolean) {
 		excludeBkgColor: darkMode ? 'black' : 'var(--backgroundColor)',
 	}
 
-	mermaid.initialize({
+	setMermaidConfig({
 		startOnLoad: false,
 		theme: 'base',
 		themeVariables,

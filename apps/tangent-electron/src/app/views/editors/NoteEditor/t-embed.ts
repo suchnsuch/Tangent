@@ -7,6 +7,7 @@ import { markAsSelectionRequest } from 'app/events'
 import { deepEqual } from 'fast-equals'
 import type { HandleResult } from 'app/model/NodeHandle'
 import { isExternalLink } from 'common/links'
+import { defineCustomElement } from 'app/utils/defineCustomElement'
 
 function createStyleElement(href: string) {
 	const style = document.createElement('link')
@@ -167,5 +168,5 @@ class TangentEmbed extends TangentLink {
 	}
 }
 
-customElements.define('t-embed', TangentEmbed)
+defineCustomElement('t-embed', TangentEmbed)
 export default TangentEmbed

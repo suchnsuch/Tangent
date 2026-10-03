@@ -2,13 +2,14 @@ import { Delta, deltaToText, Editor, type EditorRange, Line, normalizeRange, Op,
 import { type AttributePredicate, findWordAroundPositionInDocument, getRangesIntersecting, getRangeWhile, getSelectedLines, intersectRanges } from 'common/typewriterUtils'
 import MarkdownEditor from './MarkdownEditor'
 import { type HrefFormedLink } from 'common/indexing/indexTypes'
-import { findLinkAround, matchMarkdownLink, matchWikiLink, resolveLink } from 'common/markdownModel/links'
+import { findLinkAround, linkTextFromLink, matchMarkdownLink, matchWikiLink, resolveLink, workspaceLinkToMarkdownLink, workspaceLinkToWikiLink, type WorkspaceLink } from 'common/markdownModel/links'
 import { getLineFormattingPrefix } from 'common/markdownModel/line'
 import { repeatString } from '@such-n-such/core'
 import { findSectionLines } from 'common/markdownModel/sections'
 import { numberOf } from 'common/stringUtils'
 import { getAutoChild, getDelimiterForGlyph, getGlyphForNumber, ListForm, listMatcher, matchList, splitCheckboxGlyphs, type ListDefinition } from 'common/markdownModel/list'
 import { indentMatcher } from 'common/markdownModel/matches'
+import { deepEqual } from 'fast-equals'
 
 export function toggleInlineFormat(editor: Editor, selection: EditorRange, formattingCharacters: string, predicate: AttributePredicate, event?: Event) {
 	const { doc } = editor
@@ -179,13 +180,58 @@ export async function toggleLink(editor: MarkdownEditor, selection: EditorRange,
 	const activeFormats = doc.getFormats(selection)
 	
 	const link = activeFormats.t_link as HrefFormedLink
-	// No stomping!
-	if (link?.form === 'wiki') return
 
 	event?.preventDefault()
 	
 	if (link) {
-		if (link.form === 'raw') {
+		if (link.form === 'wiki') {
+			if (!workspace) return
+
+			const from = editor.workspace.directoryStore.get(editor.modules.tangent?.getNotePath())
+			if (!from) return
+
+			const target = resolveLink(editor.workspace.directoryStore, link)
+			if (typeof target !== 'object' || Array.isArray(target)) return
+
+			// Convert a wiki link to a markdown link
+			const fullLink = findLinkAround(doc, at, (text, pos) => matchWikiLink(text, pos))
+			const { start, end } = fullLink
+			
+			const newLink: WorkspaceLink = {
+				target
+			}
+
+			if (fullLink.content_id) {
+				newLink.content_id = fullLink.content_id
+			}
+
+			if (fullLink.text) {
+				newLink.text = fullLink.text
+			}
+			else if (fullLink.content_id) {
+				newLink.text = fullLink.content_id
+			}
+			else {
+				newLink.text = target.name
+			}
+
+			const newText = linkTextFromLink(workspaceLinkToMarkdownLink(
+				newLink,
+				from
+			))
+
+			console.log({
+				fullLink, newText
+			})
+
+			const change = editor.change
+				.delete([start, end])
+				.insert(end, newText)
+			change.select(change.transformSelection(selection))
+			change.apply()
+			return
+		}
+		else if (link.form === 'raw') {
 			if (!workspace) return
 			// Convert a raw link into a named link
 			const line = doc.getLineAt(at)
@@ -238,7 +284,12 @@ export async function toggleLink(editor: MarkdownEditor, selection: EditorRange,
 				const { start, end } = link
 				let [from, to] = editor.doc.selection
 
-				const secondMarkupStart = end - link.href.length - 3
+				let linkLength = link.href.length
+				if (link.content_id != null) {
+					linkLength += 1 + link.content_id.length
+				}
+
+				const secondMarkupStart = end - linkLength - 3
 
 				let change = editor.change
 					.delete([start, start + 1])
@@ -325,8 +376,44 @@ export function toggleWikiLink(editor: MarkdownEditor, selection: EditorRange, m
 	const activeFormats = doc.getFormats(selection)
 
 	const link = activeFormats.t_link as HrefFormedLink
+
 	// No stomping!
-	if (link?.form === 'md' || link?.form === 'raw') return
+	if (link?.form === 'raw') return
+
+	if (link?.form === 'md' && editor.workspace) {
+		const target = resolveLink(editor.workspace.directoryStore, link)
+		if (typeof target !== 'object' || Array.isArray(target)) return
+
+		// Convert the markdown link to a wiki link
+		const fullLink = findLinkAround(doc, at, (text, pos) => matchMarkdownLink(text, pos))
+
+		const { start, end } = fullLink
+
+		const newLink: WorkspaceLink = {
+			target
+		}
+
+		if (fullLink.content_id) {
+			newLink.content_id = fullLink.content_id
+		}
+
+		if (fullLink.text && fullLink.text != target.name) {
+			newLink.text = fullLink.text
+		}
+
+		const newText = linkTextFromLink(workspaceLinkToWikiLink(newLink,
+			editor.workspace.directoryStore,
+			editor.workspace.settings?.linkAutocompleteForm.value ?? 'short'
+		))
+
+		const change = editor.change
+			.delete([start, end])
+			.insert(end, newText)
+		change.select(change.transformSelection(selection))
+		change.apply()
+		event?.preventDefault()
+		return
+	}
 
 	event?.preventDefault()
 

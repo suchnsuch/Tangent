@@ -5,3 +5,8 @@ declare namespace svelte.JSX {
         onfinalize?: (event: CustomEvent<DndEvent> & {target: EventTarget & T}) => void;
     }
 }
+declare module 'virtual:prism-languages' {
+	/** Language name to a loader for its prism definition. */
+	const languageModules: Record<string, () => Promise<unknown>>
+	export default languageModules
+}

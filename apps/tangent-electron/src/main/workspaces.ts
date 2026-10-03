@@ -6,6 +6,7 @@ import path from 'path'
 import { getWorkspaceNamePrefix } from './environment'
 import type WindowHandle from "./WindowHandle"
 import Workspace from "./Workspace"
+import { defaultsRoot } from './appPaths'
 
 const log = Logger.get('workspaces')
 
@@ -19,7 +20,7 @@ export function getWorkspacesInfoPath() {
 	return _workspacesInfoPath
 }
 
-const defaultSettingsPath = path.resolve(path.join(__dirname, '../../defaults'))
+const defaultSettingsPath = defaultsRoot
 
 /**
  * Abusing the map and js nullishness:

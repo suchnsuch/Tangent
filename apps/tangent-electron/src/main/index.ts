@@ -9,11 +9,13 @@ dotenv.config()
 import sourceMapSupport from 'source-map-support'
 sourceMapSupport.install()
 
+// Squirrel's install and update hooks want handling as early as possible
+import squirrelStartup from 'electron-squirrel-startup'
+
 import fs from 'fs'
 import path from 'path'
 
 import yargs from 'yargs'
-import { hideBin } from 'yargs/helpers'
 
 import { mode } from './environment'
 import {
@@ -39,6 +41,7 @@ import { getRegistry } from './grammarLoader'
 import { INITIAL } from 'vscode-textmate'
 import { initializeDebugging } from './debugging'
 import { addShutDownTask, isReadyToShutDown, shutDown } from './shutdown'
+import { registerSchemes } from './protocols'
 
 var isInitialized = false
 
@@ -54,6 +57,11 @@ function initializeApplication() {
 	else {
 		Logger.setLevel(Logger.DEBUG)
 	}
+
+	// Workspace files are served over a custom protocol so that the renderer
+	// resolves them the same way no matter where the document was loaded from.
+	// This has to happen before the app is ready.
+	registerSchemes()
 
 	Logger.info(`
 
@@ -316,7 +324,7 @@ if (mode === 'production') {
 }
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
-if (require('electron-squirrel-startup')) { // eslint-disable-line global-require
+if (squirrelStartup) {
 	app.quit()
 	shouldInit = false
 }

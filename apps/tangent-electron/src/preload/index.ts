@@ -1,6 +1,7 @@
 import type WindowApi from 'common/WindowApi'
 import type { UserMessage } from 'common/WindowApi'
 import { contextBridge, ipcRenderer } from 'electron'
+import { getFileUrl } from 'common/fileUrl'
 
 function on(channel:string,  handler: (...args) => void) {
 	ipcRenderer.on(channel, (event, ...args) => {
@@ -146,6 +147,9 @@ const bridge: WindowApi = {
 		},
 	},
 	file: {
+		getUrl(filepath, cacheBust) {
+			return getFileUrl(filepath, cacheBust)
+		},
 		onTreeChange(handler) {
 			on('treeChange', handler)
 		},

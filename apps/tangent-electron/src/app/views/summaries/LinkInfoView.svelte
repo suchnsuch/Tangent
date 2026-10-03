@@ -1,6 +1,6 @@
 <script lang="ts">
 import { getContext } from 'svelte'
-import { asRoot } from 'typewriter-editor'
+import { asRoot, Source } from 'typewriter-editor'
 
 import type { ConnectionInfo } from 'common/indexing/indexTypes'
 import paths from 'common/paths'
@@ -8,27 +8,42 @@ import paths from 'common/paths'
 import type { Workspace } from 'app/model'
 import MarkdownView from '../editors/NoteEditor/MarkdownView'
 import { markdownToTextDocument } from 'common/markdownModel'
-import { writable } from 'svelte/store'
 import { appendContextTemplate } from 'app/model/menus'
 
 let workspace: Workspace = getContext('workspace')
 
-export let link: ConnectionInfo
-export let target: 'to' | 'from'
+let {
+	link,
+	target,
 
-export let className = ''
-export let showHeader = true
+	className = '',
+	showHeader = true,
 
-export let onSelect: (event: KeyboardEvent|MouseEvent) => void
+	onSelect,
+} : {
+	link: ConnectionInfo
+	target: 'to' | 'from'
+	
+	className: string
+	showHeader?: boolean
 
-$: targetPath = target === 'to' ? link.to : link.from
-$: targetNode = workspace.directoryStore.get(targetPath)
+	onSelect: (event: KeyboardEvent|MouseEvent) => void
+} = $props()
 
-const contextStore = writable(link?.context || '')
-const editor = new MarkdownView({ doc: markdownToTextDocument($contextStore) })
+let targetPath = $derived(target === 'to' ? link.to : link.from)
+let targetNode = $derived(workspace.directoryStore.get(targetPath))
+let contextText = $derived(link?.context || '')
 
-$: contextStore.set(link?.context || '')
-$: editor.set(markdownToTextDocument($contextStore))
+const editor = new MarkdownView({
+	workspace: workspace
+})
+
+$effect(() => {
+	editor.modules.tangent?.setNotePath(targetNode?.path)
+	editor.set(markdownToTextDocument(contextText, {
+		filepath: targetNode?.path
+	}), Source.api)
+})
 
 function onKeydown(event: KeyboardEvent) {
 	if (event.defaultPrevented || event.key !== 'Enter') return
@@ -58,14 +73,14 @@ function onContextMenu(event: MouseEvent) {
 
 </script>
 
-<!-- svelte-ignore a11y-no-noninteractive-tabindex -->
-<!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
+<!-- svelte-ignore a11y_no_noninteractive_tabindex -->
+<!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
 <main
 	class={className}
 	tabindex="0"
-	on:click={onSelect}
-	on:keydown={onKeydown}
-	on:contextmenu={onContextMenu}
+	onclick={onSelect}
+	onkeydown={onKeydown}
+	oncontextmenu={onContextMenu}
 >
 	{#if showHeader}<h1>{targetNode?.name || paths.basename(targetPath)}</h1>{/if}
 	{#if editor}

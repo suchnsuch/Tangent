@@ -1,13 +1,14 @@
-import { type EmbedInfo, type HrefFormedLink, type LinkInfo, StructureType } from "../indexing/indexTypes"
+import { type EmbedInfo, type HrefForm, type HrefFormedLink, type LinkInfo, StructureType } from "../indexing/indexTypes"
 import type { AttributeMap, Op, TextDocument } from '@typewriter/document'
 import { lineToText } from '../typewriterUtils'
-import { type TreeNode, validatePath } from 'common/trees'
+import { DirectoryStore, type TreeNode, validatePath } from 'common/trees'
 import paths from '../paths'
 import type { DefaultIndexStore } from 'common/indexing/IndexTreeStore'
 import { getTagPath } from 'common/indexing/TagNode'
 import NoteParser from './NoteParser'
 import { ParsingContextType, type ParsingProgram } from './parsingContext'
 import { isExternalLink } from 'common/links'
+import { isImplicitExtension } from "common/fileExtensions"
 
 interface ExtendedLinkInfo extends LinkInfo {
 	complete?: boolean
@@ -357,13 +358,104 @@ export function createContentIdMatcher(contentId: string): RegExp {
 	return new RegExp('^' + segments.join('([-_ ]|%20)+') + '$', 'i')
 }
 
+/** A workspace link is a simplified intermediate version of a link without a built-out href */
+export type WorkspaceLink = {
+	/** The intended target of the link */
+	target: TreeNode | string
+	/** A standard content id */
+	content_id?: string
+	/** The text to display */
+	text?: string
+}
+
+export function workspaceLinkToWikiLink(link: WorkspaceLink, directory: DirectoryStore, length: 'short'|'full'): HrefFormedLink {
+
+	const result: HrefFormedLink = {
+		form: 'wiki',
+		href: ''
+	}
+
+	if (typeof link.target === 'string') {
+		result.href = link.target
+	}
+	else {
+		result.to = link.target.path
+		result.href = directory.getPathToItem(link.target, {
+			includeExtension: fileType => !isImplicitExtension(fileType),
+			length
+		})
+	}
+
+	if (link.text != null) {
+		result.text = link.text
+	}
+	if (link.content_id != null) {
+		result.content_id = link.content_id
+	}
+
+	return result
+}
+
+export function workspaceLinkToMarkdownLink(link: WorkspaceLink, from: TreeNode): HrefFormedLink {
+	const target = link.target
+
+	const result: HrefFormedLink = {
+		form: 'md',
+		href: '',
+		from: from.path
+	}
+
+	if (typeof target === 'string') {
+		result.href = target
+	}
+	else {
+		result.to = target.path
+
+		const fromPath = from.fileType === 'folder'
+			? from.path
+			: paths.dirname(from.path)
+		const relativePath = paths.relative(fromPath, target.path)
+		if (!relativePath.startsWith('..')) {
+			result.href += './'
+		}
+		result.href += relativePath
+	}
+
+	if (link.content_id != null) {
+		result.content_id = link.content_id
+	}
+
+	let text: string = link.text
+	if (!text) {
+		if (link.content_id) {
+			text = link.content_id
+		}
+		else if (typeof target === 'string') {
+			text = paths.basename(target, paths.extname(target))
+		}
+		else if (target) {
+			text = paths.basename(target.path, paths.extname(target.path))
+		}
+	}
+	if (text != null) {
+		result.text = text
+	}
+
+	return result
+}
+
+/**
+ * Turns a link into the text of the appropriate form that represents the link.
+ * Supports md, wiki, and raw links.
+ * Empty string values for `text` and `content_id` are forwarded.
+ */
 export function linkTextFromLink(link: HrefFormedLink): string {
 	if (!link) return null
 
 	if (link.form === 'md') {
 		let href = link.href
 
-		if (link.content_id) {
+		if (link.content_id != null) {
 			href += '#' + link.content_id
 		}
 
@@ -377,11 +469,11 @@ export function linkTextFromLink(link: HrefFormedLink): string {
 	if (link.form === 'wiki') {
 		let result = '[[' + link.href
 
-		if (link.content_id) {
+		if (link.content_id != null) {
 			result += '#' + link.content_id
 		}
 
-		if (link.text) {
+		if (link.text != null) {
 			result += '|' + link.text
 		}
 
@@ -700,6 +792,19 @@ export function parseLink(char: string, parser: NoteParser): boolean {
 		}
 		if (parser.filepath) {
 			t_link.from = parser.filepath
+			
+			// A markdown link without a source filepath is meaningless
+			// In such a case, no structure makes sense
+			mdLinkInfo.from = parser.filepath
+			if (parser.detailedLinks) {
+				mdLinkInfo.context = feed.getLineText(parser.lineStart)
+			}
+			if (isEmbed) {
+				mdLinkInfo.start-- // For the `!`
+				// Mutate the info into an embed
+				;(mdLinkInfo as any).type = StructureType.Embed
+			}
+			parser.pushStructure(mdLinkInfo)
 		}
 
 		if (isEmbed) {

@@ -4,18 +4,19 @@ import { Registry, parseRawGrammar, type IOnigLib } from 'vscode-textmate'
 import { loadWASM, createOnigScanner, createOnigString } from 'vscode-oniguruma'
 
 import Logger from 'js-logger'
+import { hoistedNodeModulesRoot, nodeModulesRoot } from './appPaths'
 const log = Logger.get('grammar-loader')
 
 async function getNodePath(partial: string) {
 	try {
-		const truePath = path.resolve(__dirname, '../../node_modules', partial) 
+		const truePath = path.resolve(nodeModulesRoot, partial)
 		// Confirm it exists:
 		const stat = await fs.promises.stat(truePath)
 		return truePath
 	}
 	catch (e) {
 		log.warn('Falling back to root node modules for:', partial)
-		return path.resolve(__dirname, '../../../../node_modules', partial)
+		return path.resolve(hoistedNodeModulesRoot, partial)
 	}
 }
 

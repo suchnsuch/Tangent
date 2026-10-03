@@ -1623,6 +1623,16 @@ describe('Link toggling', () => {
 		expect(editor.doc.selection).toEqual([9, 9])
 	})
 
+	it('Should toggle a markdown link off with a content id', async () => {
+		editor.doc = markdownToTextDocument(`My cool [link](https://duckduckgo.com/foo#content-id-thing) `)
+		editor.select(10)
+		await wait(waitTime)
+		toggleLink(editor, editor.doc.selection)
+
+		expect(editor.getText()).toEqual(`My cool link `)
+		expect(editor.doc.selection).toEqual([9, 9])
+	})
+
 	it('Toggling off a markdown link with the cursor in the url should place the cursor at the end', async () => {
 		editor.doc = markdownToTextDocument(`My cool [link](https://duckduckgo.com/) `)
 		editor.select(25)

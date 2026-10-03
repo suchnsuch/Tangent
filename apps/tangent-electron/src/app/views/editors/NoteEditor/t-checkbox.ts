@@ -1,3 +1,5 @@
+import { defineCustomElement } from 'app/utils/defineCustomElement'
+
 const svgNamespace = "http://www.w3.org/2000/svg"
 
 class TangentCheckbox extends HTMLElement {
@@ -48,5 +50,5 @@ class TangentCheckbox extends HTMLElement {
 	}
 }
 
-customElements.define('t-checkbox', TangentCheckbox)
+defineCustomElement('t-checkbox', TangentCheckbox)
 export default TangentCheckbox

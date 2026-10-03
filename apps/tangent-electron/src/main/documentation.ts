@@ -8,6 +8,7 @@ import Logger from 'js-logger'
 import type WindowHandle from './WindowHandle'
 import { getOrCreateWindowForWorkspace } from './windows'
 import { getWorkspaceNamePrefix } from './environment'
+import { documentationArchivePath } from './appPaths'
 
 const log = Logger.get('documentation')
 
@@ -28,7 +29,7 @@ function getChangelogPath() {
 }
 
 function getDocumentationSourcePath() {
-	return path.resolve(path.join(__dirname, '../../__build', 'documentation.zip'))
+	return documentationArchivePath
 }
 
 export async function initDocumentation(force = false) {

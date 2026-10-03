@@ -16,8 +16,10 @@ export interface IndexData {
 	
 	inLinks?: ConnectionInfo[]
 
-	// Holding these in a list instead of an object
-	// for ease of arbitrary note-level finding
+	/**
+	 * Holding these in a list instead of an object
+	 * for ease of arbitrary note-level finding
+	 */
 	structure?: StructureData[]
 }
 
@@ -147,35 +149,35 @@ export enum StructureType {
 	Tag
 }
 
-// The common `type` value allows for easy switching into the type data
+/** The common `type` value allows for easy switching into the type data */
 export type StructureData = LinkInfo | HeaderInfo | EmbedInfo | FrontMatter | TodoInfo | TagInfo
 
 export type ConnectionInfo = LinkInfo | EmbedInfo | TagInfo
 
 interface UntypedLinkInfo {
-	// The text range of the incoming link
+	/** The text range of the incoming link */
 	start: number
 	end: number
 	
-	// The filepath information. "abc" of [[abc|text]]
+	/** The filepath information. "abc" of [[abc|text]] */
 	href: string
 	
-	// The textual override, if any. "text" of [[abc|text]]
+	/** The textual override, if any. "text" of [[abc|text]] */
 	text?: string
 
-	// The custom title of a link, if any. "Title" of [text](href "Title")
+	/** The custom title of a link, if any. "Title" of [text](href "Title") */
 	title?: string
 	
-	// The header/block link. "header" of [[abc#header]]; "^foo" of [[abc#^foo]]
+	/** The header/block link. "header" of [[abc#header]]; "^foo" of [[abc#^foo]] */
 	content_id?: string
 	
-	// The full path of the file the link originates from
+	/** The full path of the file the link originates from */
 	from?: string
 	
-	// The full path of the target file
+	/** The full path of the resolved target file */
 	to?: string,
 	
-	// The full line context of the link
+	/** The full line context of the link */
 	context?: string
 }
 
@@ -206,7 +208,7 @@ export interface HeaderInfo {
 	end: number
 
 	level: number
-	// The full text — e.g. `## Header Text` — of the header
+	/** The full text — e.g. `## Header Text` — of the header */
 	text: string
 }
 
@@ -221,11 +223,11 @@ export type TodoState = 'open' | 'checked' | 'canceled'
 export interface TodoInfo {
 	type: StructureType.Todo
 
-	// The entire line
+	/** The entire line */
 	start: number
 	end: number
 
 	state: TodoState
-	// The text after the checkbox
+	/** The text after the checkbox */
 	text: string
 }

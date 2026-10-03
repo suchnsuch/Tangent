@@ -12,6 +12,8 @@ import { cleanMenuTemplate } from '../common/menus'
 import { getSettings } from './settings'
 import { addShutDownTask } from './shutdown'
 import { wait } from '@such-n-such/core'
+import { APP_URL } from './appProtocol'
+import { preloadPath, staticRoot } from './appPaths'
 
 let defaultLanguages = null
 
@@ -30,7 +32,7 @@ export function createWindow(assignedWorkspace?: string) {
 		minWidth: 100,
 		minHeight: 100,
 		webPreferences: {
-			preload: path.join(__dirname, 'preload.js')
+			preload: preloadPath
 		},
 		show: false,
 		autoHideMenuBar: getTitleBarStyle() == 'default',
@@ -39,7 +41,15 @@ export function createWindow(assignedWorkspace?: string) {
 
 	if (os.platform() === 'linux') {
 		// To work around an icon issue, apply the icon to the window directly
-		windowOptions.icon = path.join(__dirname, '../../static/tangent_256.png')
+		windowOptions.icon = path.join(staticRoot, 'tangent_256.png')
+	}
+
+	if (process.env.INTEGRATION_TEST_INVISIBLE) {
+		// Integration tests need windows to render normally (a window that is
+		// never shown gets its animation frames & timers throttled), but they
+		// don't need to be seen. Opacity is only implemented on mac & windows.
+		// I want to watch YouTube while my tests run!
+		windowOptions.opacity = 0
 	}
 
 	const newWindow = new BrowserWindow(windowOptions)
@@ -79,8 +89,10 @@ export function createWindow(assignedWorkspace?: string) {
 		return { action: 'deny' }
 	})
 
-	// and load the index.html of the app.
-	newWindow.loadFile(path.join(__dirname, '../../static/index.html'))
+	// In development the renderer comes from vite's dev server so that changes
+	// hot reload. Both that and `app://` are real origins, so the page resolves
+	// urls identically either way.
+	newWindow.loadURL(process.env.VITE_DEV_SERVER_URL || APP_URL)
 
 	if (mode === 'development' && !process.env.INTEGRATION_TEST) {
 		// Open the DevTools.

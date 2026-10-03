@@ -51,16 +51,14 @@ export interface IndexerOptions {
 	registry: Registry
 }
 
+const LATEST_VERSION = 2
+
 export default class Indexer {
 
 	interop: IndexInterop
 	store: IndexTreeStore<TreeNode, TagTreeNode>
 	registry: Registry
 	linkCache: Map<string, TreeNode>
-
-	parsingOptions: MarkdownParsingOptions = {
-		detailedLinks: true
-	}
 
 	constructor(options: IndexerOptions) {
 		this.store = options.store
@@ -73,7 +71,11 @@ export default class Indexer {
 		const indexStart = performance.now()
 
 		const rawMap = new Map<string, IndexData>()
-		if (rawIndex?.items) {
+		const rawVersion = rawIndex?.version
+
+		const canLoadIndex = rawVersion === LATEST_VERSION && rawIndex?.items
+
+		if (canLoadIndex) {
 			for (const itemPath of Object.keys(rawIndex.items)) {
 				const item = rawIndex.items[itemPath]
 
@@ -153,7 +155,13 @@ export default class Indexer {
 
 		const postReindex = performance.now()
 
-		log.info(`  Cached index contained ${rawMap.size} files.`)
+		if (canLoadIndex) {
+			log.info(`  Cached index contained ${rawMap.size} files.`)
+		}
+		else if (rawIndex && rawVersion !== LATEST_VERSION) {
+			log.info(`  Cached index was at version "${rawVersion}". Reindexing to version ${LATEST_VERSION}.`)
+		}
+
 		log.info(`  Integrated cache and reindexed ${tasks.length} files in ${postReindex - indexStart}ms.`)
 
 		// TODO: don't reset this every load
@@ -199,7 +207,7 @@ export default class Indexer {
 
 	getRawIndex() {
 		const raw = {
-			version: 1,
+			version: LATEST_VERSION,
 			date: new Date(),
 			items: {}
 		}
@@ -322,7 +330,10 @@ export default class Indexer {
 			}
 
 			try {
-				const { structure } = parseMarkdown(contents, this.parsingOptions)
+				const { structure } = parseMarkdown(contents, {
+					detailedLinks: true,
+					filepath: node.path
+				})
 
 				if (structure.length) {
 					meta.structure = structure
@@ -350,7 +361,7 @@ export default class Indexer {
 		}
 
 		if (!target && connection.href) {
-			if (this.linkCache) {
+			if (this.linkCache && (connection.form === 'wiki' || connection.form === 'tag')) {
 				// This will break if links ever support relativity
 				const cacheID = connection.type.toString() + connection.href
 				target = this.linkCache.get(cacheID)

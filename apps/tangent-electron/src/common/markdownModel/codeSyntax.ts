@@ -2,22 +2,27 @@
  * So basically, I hate how Prism is packaged, but it's still the best
  * option I was able to locate. So I'm doing stuff myself.
  */
+import Prism from 'prismjs'
 import config from 'prismjs/components'
 import type { TokenStream } from 'prismjs'
-import { wait } from '@such-n-such/core'
-import { AttributeMap, Op } from '@typewriter/delta'
+import { Op } from '@typewriter/delta'
 
 import type LinesBuilder from './LinesBuilder'
-
-let DomPrism = typeof window !== 'undefined' ? (window as any).Prism : null
 
 const languageAliasLookup = new Map<string, string>()
 const loadedLanguages = new Set<string>()
 
-if (DomPrism) {
-	for (const key of Object.keys(DomPrism.languages)) {
-		loadedLanguages.add(key)
-	}
+let loadLanguageDefinition: (name: string) => Promise<unknown> = null
+
+/**
+ * Allows definitions for other languages to be provided via external means.
+ */
+export function setLanguageLoader(languageLoader: (name: string) => Promise<unknown>) {
+	loadLanguageDefinition = languageLoader
+}
+
+for (const key of Object.keys(Prism.languages)) {
+	loadedLanguages.add(key)
 }
 
 // Add core prism languages
@@ -43,18 +48,9 @@ for (const name of Object.keys(config.languages)) {
 })
 
 export function tokenize(code: string, language: string): TokenStream {
-	if (DomPrism) {
-		const grammar = DomPrism.languages[language]
-		if (grammar) {
-			return DomPrism.tokenize(code, grammar)
-		}
-	}
-	else {
-		const prismjs = require('prismjs')
-		const grammar = prismjs.languages[language]
-		if (grammar) {
-			return prismjs.tokenize(code, grammar)
-		}
+	const grammar = Prism.languages[language]
+	if (grammar) {
+		return Prism.tokenize(code, grammar)
 	}
 	return null
 }
@@ -69,69 +65,64 @@ export function getLanguageAliases() {
  * @returns The de-aliased language, "Loading" if a language needed to load, or null if the language was not found
  */
 export function getLanguage(format: string) {
-	let language = languageAliasLookup.get(format)
+	const language = languageAliasLookup.get(format)
 	if (!language) return
-	if (DomPrism) {
-		if (!loadedLanguages.has(language)) {
 
-			const languagesToLoad = [language]
-			const languagesToCheck = [language]
+	// Ask prism directly rather than trusting `loadedLanguages`: definitions can
+	// also arrive by being imported outright, without going through the loader
+	if (Prism.languages[language]) return language
 
-			// Check for the language dependencies, and their dependences, etc
-			while (languagesToCheck.length > 0) {
-				// First in first out so that dependencies are found in order of depth
-				const languageToCheck = languagesToCheck.shift()
+	// If an attempt has been made or there is no loader, give up
+	if (loadedLanguages.has(language) || !loadLanguageDefinition) return null
 
-				if (!loadedLanguages.has(languageToCheck))
-				{
-					const languageData = config.languages[languageToCheck]
-					const require = languageData?.require
-					if (require) {
-						if (typeof require === 'string') {
-							languagesToLoad.push(require)
-							languagesToCheck.push(require)
-						}
-						else if (Array.isArray(require)) {
-							for (const r of require) {
-								languagesToLoad.push(r)
-								languagesToLoad.push(r)
-							}
-						}
+	const languagesToLoad = [language]
+	const languagesToCheck = [language]
+
+	// Check for the language dependencies, and their dependences, etc
+	while (languagesToCheck.length > 0) {
+		// First in first out so that dependencies are found in order of depth
+		const languageToCheck = languagesToCheck.shift()
+
+		if (!loadedLanguages.has(languageToCheck))
+		{
+			const languageData = config.languages[languageToCheck]
+			const dependencies = languageData?.require
+			if (dependencies) {
+				if (typeof dependencies === 'string') {
+					languagesToLoad.push(dependencies)
+					languagesToCheck.push(dependencies)
+				}
+				else if (Array.isArray(dependencies)) {
+					for (const dependency of dependencies) {
+						languagesToLoad.push(dependency)
+						languagesToCheck.push(dependency)
 					}
 				}
 			}
+		}
+	}
 
-			console.log('For', language, 'loading', languagesToLoad.slice())
+	// Last in first out so that dependencies are loaded before what needs them
+	async function loadAll() {
+		while (languagesToLoad.length > 0) {
+			const languageToLoad = languagesToLoad.pop()
+			if (loadedLanguages.has(languageToLoad)) continue
 
-			// Last in first out so that dependencies are loaded in reverse order
-
-			async function loadAll() {
-				while (languagesToLoad.length > 0) {
-					const languageToLoad = languagesToLoad.pop()
-					const script = document.createElement('script')
-					script.src = `../__build/bundle/prism/languages/prism-${languageToLoad}.min.js`
-					document.head.appendChild(script)
-					loadedLanguages.add(languageToLoad)
-
-					// Delay these so that they actually happen one at a time
-					if (languagesToLoad.length) await wait()
-				}
+			try {
+				await loadLanguageDefinition(languageToLoad)
+				loadedLanguages.add(languageToLoad)
 			}
-
-			loadAll()
-
-			return 'Loading'
-		}
-		if (DomPrism.languages[language]) {
-			return language
+			catch (err) {
+				console.error('Could not load the prism definition for', languageToLoad, err)
+				// Give up on this language rather than retrying forever
+				loadedLanguages.add(languageToLoad)
+			}
 		}
 	}
-	else if (DomPrism === null) { // Explictly check for null so that misconfigured browser environments just fail
-		if (format in require('prismjs').languages) {
-			return format
-		}
-	}
-	return null
+
+	loadAll()
+
+	return 'Loading'
 }
 
 export function parseTokens(tokens: TokenStream, builder: LinesBuilder) {

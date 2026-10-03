@@ -80,6 +80,9 @@ export default interface WindowAPI {
 	}
 
 	file: {
+		/** Converts a workspace file path into a url the renderer can load. **/
+		getUrl(filepath: string, cacheBust?: Date | number | string): string
+
 		selectPath<T extends SelectPathOptions>(options: T): Promise<SelectPathResult<T>>
 		onTreeChange(handler: (change: TreeChange) => void)
 

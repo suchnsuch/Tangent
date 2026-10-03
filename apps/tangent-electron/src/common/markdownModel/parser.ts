@@ -8,8 +8,8 @@ import { linkTextFromLink } from './links'
 
 export type { MarkdownParsingOptions } from './NoteParser'
 
-export function markdownToTextDocument(text: string): TextDocument {
-	return new TextDocument(parseMarkdown(text).lines)
+export function markdownToTextDocument(text: string, options?: MarkdownParsingOptions): TextDocument {
+	return new TextDocument(parseMarkdown(text, options).lines)
 }
 
 export function parseMarkdown(source: string | TextDocument, options?: MarkdownParsingOptions) {

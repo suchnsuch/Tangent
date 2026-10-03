@@ -51,7 +51,9 @@ export const test = base.extend<TangentFixtures & TangentOptions>({
 			args: ['.', workspace],
 			env: {
 				INTEGRATION_TEST: '1',
-				WORKSPACE_NAME: workspaceInfoName
+				WORKSPACE_NAME: workspaceInfoName,
+				// forward other integration test environment variables
+				INTEGRATION_TEST_INVISIBLE: process.env.INTEGRATION_TEST_INVISIBLE ?? '',
 			}
 		})
 

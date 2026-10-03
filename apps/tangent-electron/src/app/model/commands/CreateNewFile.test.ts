@@ -44,11 +44,13 @@ describe('Extension auto inclusion', () => {
 
 	// Counts the side effects a tooltip must never cause
 	const effects = { modal: 0 }
+	let currentNode: TreeNode
 	// `unknown` first: the stub only implements the members these tests reach
 	const workspace = {
 		directoryStore,
 		viewState: {
 			modal: { push: () => effects.modal++ },
+			tangent: { getCurrentViewState: () => ({ node: currentNode }) },
 			directoryView: {
 				selection: {
 					value: [] as TreeNode[]
@@ -59,9 +61,16 @@ describe('Extension auto inclusion', () => {
 
 	const command = new CreateNewFileCommand(workspace)
 	// Expose the private function type-safely
-	function resolveContext(context: CreateNewFileCommandContext) {
+	function resolveContext(context: CreateNewFileCommandContext, node?: TreeNode) {
+		currentNode = node
 		return (command as any).resolveContext(context)
 	}
+
+	beforeEach(() => {
+		currentNode = undefined
+		workspace.viewState.directoryView.selection.value = []
+		effects.modal = 0
+	})
 
 	it('Injects .md when nothing is applied', () => {
 		expect(resolveContext({
@@ -73,6 +82,7 @@ describe('Extension auto inclusion', () => {
 			creationMode: undefined
 		})
 	})
+
 
 	it('Uses the provided extension when specified', () => {
 		expect(resolveContext({
@@ -151,12 +161,31 @@ describe('Extension auto inclusion', () => {
 		expect(command.getTooltip({ relativePath: 'CON/New Note.md' })).toBe('Creates a new note.')
 	})
 
+	it('Ends custom descriptions with one period when a destination is invalid', () => {
+		for (const description of ['A custom journal description', 'A custom journal description.']) {
+			expect(command.getTooltip({ rule: {
+				name: 'Journal', nameTemplate: 'Daily', folder: 'CON', contentTemplate: '',
+				mode: 'create', description
+			} })).toBe('A custom journal description.')
+		}
+	})
+
 	it('Updates the destination for path and explicit-folder contexts', () => {
 		workspace.viewState.directoryView.selection.value = [unicodeFolder]
 		expect(command.getTooltip({ relativePath: 'Projects/Long Term/New Note.md' }))
 			.toBe('Creates a new note in "Projects/Long Term".')
 		expect(command.getTooltip({ folder: ideasFolder }))
 			.toBe('Creates a new note in "Ideas".')
+	})
+
+	it('Includes folders in raw palette names in the destination', () => {
+		const context = { name: 'Projects/Long Term' }
+		expect(command.getTooltip(context)).toBe('Creates a new note in "Projects".')
+		workspace.viewState.directoryView.selection.value = [ideasFolder]
+		expect(command.getTooltip(context)).toBe('Creates a new note in "Ideas/Projects".')
+		expect(command.getTooltip({ name: 'CON/New Note' })).toBe('Creates a new note.')
+		expect(context).toEqual({ name: 'Projects/Long Term' })
+		expect(effects.modal).toBe(0)
 	})
 
 	it('Names the rule when it has no description of its own', () => {
@@ -224,4 +253,198 @@ describe('Extension auto inclusion', () => {
 		})).toBe('Creates a new Entry in "Notes/Archive".')
 		expect(effects).toEqual(beforeEffects)
 	})
+
+	it('Describes relative rule folders against the current note without prompting', () => {
+		currentNode = {
+			name: 'note', path: 'some/root/Ideas/note.md', fileType: 'note', depth: 3
+		}
+		const rule: CreationRuleDefinition = {
+			name: 'Meeting', nameTemplate: '%name%', folder: './',
+			contentTemplate: '', mode: 'create', description: ''
+		}
+		expect(command.getTooltip({ rule })).toBe('Creates a new Meeting in "Ideas".')
+		expect(command.getTooltip({ rule: { ...rule, folder: '../' } }))
+			.toBe('Creates a new Meeting in the root of the workspace.')
+		expect(effects.modal).toBe(0)
+	})
+
+	it('Skips a selected file whose parent no longer exists during tooltip resolution', () => {
+		workspace.viewState.directoryView.selection.value = [{
+			name: 'removed', path: 'some/root/Gone/removed.md', fileType: 'note', depth: 3
+		}]
+		expect(command.getTooltip()).toBe('Creates a new note in the root of the workspace.')
+		expect(effects.modal).toBe(0)
+	})
+
+	it('Resolves paths adjacent to a note', () => {
+		expect(resolveContext({
+			rule: {
+				name: 'relative test',
+				nameTemplate: 'temp',
+				folder: './',
+				mode: 'createOrOpen',
+				contentTemplate: undefined,
+				description: undefined
+			},
+			extension: 'default-md'
+		}, {
+				path: '/some/root/note.md',
+				name: 'test note',
+				fileType: 'note',
+		},
+		)).toEqual({
+			folderPath: 'some/root',
+			contentTemplateFile: undefined,
+			name: 'temp',
+			extension: '.md',
+			creationMode: 'createOrOpen'
+		})
+	})
+
+	it('Resolves paths adjacent to a note name template', () => {
+		expect(resolveContext({
+			rule: {
+				name: 'relative test',
+				nameTemplate: '../assets/idea',
+				folder: '../',
+				mode: 'createOrOpen',
+				contentTemplate: undefined,
+				description: undefined
+			},
+			extension: 'default-md'
+		}, {
+				path: '/path/to/dir/note/idea.md',
+				name: 'test note',
+				fileType: 'note',
+		},
+		)).toEqual({
+			folderPath: 'path/to/assets',
+			contentTemplateFile: undefined,
+			name: 'idea',
+			extension: '.md',
+			creationMode: 'createOrOpen'
+		})
+	})
+
+	it('Resolves parent path from a note', () => {
+		expect(resolveContext({
+			rule: {
+				name: 'relative test',
+				nameTemplate: 'temp',
+				folder: '../',
+				mode: 'createOrOpen',
+				contentTemplate: undefined,
+				description: undefined
+			},
+			extension: 'default-md'
+		}, {
+				path: '/some/root/note.md',
+				name: 'test note',
+				fileType: 'note',
+		},
+		)).toEqual({
+			folderPath: 'some',
+			contentTemplateFile: undefined,
+			name: 'temp',
+			extension: '.md',
+			creationMode: 'createOrOpen'
+		})
+	})
+
+	it('Resolves uncle path from a note', () => {
+		expect(resolveContext({
+			rule: {
+				name: 'relative test',
+				nameTemplate: 'temp',
+				folder: '../test',
+				mode: 'createOrOpen',
+				contentTemplate: undefined,
+				description: undefined
+			},
+			extension: 'default-md'
+		}, {
+				path: '/some/root/note.md',
+				name: 'test note',
+				fileType: 'note',
+		},
+		)).toEqual({
+			folderPath: 'some/test',
+			contentTemplateFile: undefined,
+			name: 'temp',
+			extension: '.md',
+			creationMode: 'createOrOpen'
+		})
+	})
+
+	it('Resolves arbitrary ancestor paths relative to a note', () => {
+		expect(resolveContext({
+			rule: {
+				name: 'relative test',
+				nameTemplate: 'temp',
+				folder: '../../../../../../test',
+				mode: 'createOrOpen',
+				contentTemplate: undefined,
+				description: undefined
+			},
+			extension: 'default-md'
+		}, {
+				path: '/some/root/note.md',
+				name: 'test note',
+				fileType: 'note',
+		},
+		)).toEqual({
+			folderPath: 'test',
+			contentTemplateFile: undefined,
+			name: 'temp',
+			extension: '.md',
+			creationMode: 'createOrOpen'
+		})
+	})
+
+	it('Resolves paths adjacent to a directory', () => {
+		expect(resolveContext({
+			rule: {
+				name: 'relative test',
+				nameTemplate: 'temp',
+				folder: './',
+				mode: 'createOrOpen',
+				contentTemplate: undefined,
+				description: undefined
+			},
+			extension: 'default-md'
+		}, {
+				path: '/some/root',
+				name: 'test note',
+				fileType: 'folder',
+		},
+		)).toEqual({
+			folderPath: 'some/root',
+			contentTemplateFile: undefined,
+			name: 'temp',
+			extension: '.md',
+			creationMode: 'createOrOpen'
+		})
+	})
+
+	it('Resolves paths at root', () => {
+		expect(resolveContext({
+			rule: {
+				name: 'absolute test',
+				nameTemplate: 'temp',
+				folder: './',
+				mode: 'createOrOpen',
+				contentTemplate: undefined,
+				description: undefined
+			},
+			extension: 'default-md'
+		},
+		)).toEqual({
+			folderPath: '.',
+			contentTemplateFile: undefined,
+			name: 'temp',
+			extension: '.md',
+			creationMode: 'createOrOpen'
+		})
+	})
+
 })

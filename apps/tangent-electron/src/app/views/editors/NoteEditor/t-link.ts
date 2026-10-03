@@ -5,6 +5,7 @@ import { isExternalLink } from 'common/links'
 import { type HandleResult, isNode } from 'app/model/NodeHandle'
 import { dropTooltip, requestTooltip, type TooltipConfig } from 'app/utils/tooltips'
 import type { SvelteConstructor } from 'app/utils/svelte'
+import { defineCustomElement } from 'app/utils/defineCustomElement'
 
 export type LinkState = 'uninitialized' | 'empty' | 'resolved' | 'ambiguous' | 'untracked' | 'external' | 'error'
 
@@ -187,4 +188,4 @@ export class TangentLink extends HTMLElement {
 	}
 }
 
-customElements.define('t-link', TangentLink)
+defineCustomElement('t-link', TangentLink)

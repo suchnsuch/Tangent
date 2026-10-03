@@ -4,7 +4,6 @@ import Logger from 'js-logger'
 import Workspace from 'main/Workspace'
 import path from 'path'
 import { getVersionChannel, getWorkspaceNamePrefix } from 'main/environment'
-import { autoUpdater } from 'electron-updater'
 
 const log = Logger.get('workspace')
 

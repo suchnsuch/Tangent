@@ -5,28 +5,35 @@ import WorkspaceFileHeader from 'app/utils/WorkspaceFileHeader.svelte'
 import AudioVideoViewState from 'app/model/nodeViewStates/AudioVideoViewState'
 import { EmbedType } from 'common/embedding'
 
-import 'media-chrome'
-import 'media-chrome/menu'
 import { appendContextTemplate, type ContextMenuConstructorOptions } from 'app/model/menus'
-import { linkTextFromLink } from 'common/markdownModel/links'
+import { loadMediaChrome } from 'app/shim/media-chrome'
 
 const workspace = getContext('workspace') as Workspace
 const {
 	noteWidthMax: maxWidth,
 } = workspace.settings
 
-export let state: AudioVideoViewState
-export let editable: boolean = true
+let {
+	state,
+	editable = true,
 
-export let layout: 'fill' | 'auto' = 'fill'
-export let extraTop: number = 0
-export let extraBottom: number = 0
+	layout = 'fill',
+	extraTop = 0,
+	extraBottom = 0
+} : {
+	state: AudioVideoViewState
+	editable: boolean
 
+	layout: 'fill' | 'auto'
+	extraTop: number
+	extraBottom: number
+} = $props()
+
+// svelte-ignore non_reactive_update
 let mediaElement: HTMLAudioElement | HTMLVideoElement = null
 
-$: playbackPosition = state?.playbackPosition
-
-$: embedType = state?.file?.embedType
+let playbackPosition = $derived(state?.playbackPosition)
+let embedType = $derived(state?.file?.embedType)
 
 function updatePlayback(this: HTMLAudioElement | HTMLVideoElement, event: Event) {
 	playbackPosition.set(this.currentTime)
@@ -73,66 +80,70 @@ function onMediaContext(event: MouseEvent) {
 		{editable}
 	/>
 	<article>
-		<!-- svelte-ignore a11y_no_static_element_interactions -->
-		<media-controller
-			audio={embedType === EmbedType.Audio}
-			class:audio={embedType === EmbedType.Audio}
-			on:contextmenu={onMediaContext}
-		>
-			{#if embedType === EmbedType.Audio}
-				<audio
-					bind:this={mediaElement}
-					slot="media"
-					src={state.file.cacheBustPath}
-					currenttime={$playbackPosition}
+		{#await loadMediaChrome()}
+			…
+		{:then _} 
+			<!-- svelte-ignore a11y_no_static_element_interactions -->
+			<media-controller
+				audio={embedType === EmbedType.Audio}
+				class:audio={embedType === EmbedType.Audio}
+				oncontextmenu={onMediaContext}
+			>
+				{#if embedType === EmbedType.Audio}
+					<audio
+						bind:this={mediaElement}
+						slot="media"
+						src={state.file.cacheBustPath}
+						currenttime={$playbackPosition}
 
-					on:loadedmetadata={setPlayback}
-					on:seeked={updatePlayback}
-					on:pause={updatePlayback}
-				></audio>
-			{:else if embedType === EmbedType.Video}
-				<!-- svelte-ignore a11y-media-has-caption -->
-				<video
-					bind:this={mediaElement}
-					slot="media" preload="auto"
-					src={state.file.cacheBustPath}
-					currenttime={$playbackPosition}
+						onloadedmetadata={setPlayback}
+						onseeked={updatePlayback}
+						onpause={updatePlayback}
+					></audio>
+				{:else if embedType === EmbedType.Video}
+					<!-- svelte-ignore a11y_media_has_caption -->
+					<video
+						bind:this={mediaElement}
+						slot="media" preload="auto"
+						src={state.file.cacheBustPath}
+						currenttime={$playbackPosition}
 
-					on:loadedmetadata={setPlayback}
-					on:seeked={updatePlayback}
-					on:pause={updatePlayback}
-				></video>
-			{/if}
-			<media-settings-menu hidden anchor="auto">
-				<media-settings-menu-item>
-					Speed
-					<media-playback-rate-menu slot="submenu" hidden>
-						<div slot="title">Speed</div>
-					</media-playback-rate-menu>
-				</media-settings-menu-item>
-			</media-settings-menu>
-			<media-control-bar>
-				<div class="simple-menu">
-					<media-play-button class="first" notooltip></media-play-button>
-					<div class="floating">
-						<media-seek-backward-button style="min-width: 3em"></media-seek-backward-button>
-						<media-seek-forward-button style="min-width: 3em"></media-seek-forward-button>
-					</div>
-				</div>
-				<div class="simple-menu">
-					<media-mute-button notooltip></media-mute-button>
-					<div class="floating">
-						<media-volume-range></media-volume-range>
-					</div>
-				</div>
-				<media-time-display showduration notoggle></media-time-display>
-				<media-time-range></media-time-range>
-				<media-settings-menu-button></media-settings-menu-button>
-				{#if embedType === EmbedType.Video}
-					<media-fullscreen-button></media-fullscreen-button>
+						onloadedmetadata={setPlayback}
+						onseeked={updatePlayback}
+						onpause={updatePlayback}
+					></video>
 				{/if}
-			</media-control-bar>
-		</media-controller>
+				<media-settings-menu hidden anchor="auto">
+					<media-settings-menu-item>
+						Speed
+						<media-playback-rate-menu slot="submenu" hidden>
+							<div slot="title">Speed</div>
+						</media-playback-rate-menu>
+					</media-settings-menu-item>
+				</media-settings-menu>
+				<media-control-bar>
+					<div class="simple-menu">
+						<media-play-button class="first" notooltip></media-play-button>
+						<div class="floating">
+							<media-seek-backward-button style="min-width: 3em"></media-seek-backward-button>
+							<media-seek-forward-button style="min-width: 3em"></media-seek-forward-button>
+						</div>
+					</div>
+					<div class="simple-menu">
+						<media-mute-button notooltip></media-mute-button>
+						<div class="floating">
+							<media-volume-range></media-volume-range>
+						</div>
+					</div>
+					<media-time-display showduration notoggle></media-time-display>
+					<media-time-range></media-time-range>
+					<media-settings-menu-button></media-settings-menu-button>
+					{#if embedType === EmbedType.Video}
+						<media-fullscreen-button></media-fullscreen-button>
+					{/if}
+				</media-control-bar>
+			</media-controller>
+		{/await}
 	</article>
 </main>
 

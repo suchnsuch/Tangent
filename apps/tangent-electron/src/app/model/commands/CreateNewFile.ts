@@ -136,7 +136,18 @@ export default class CreateNewFileCommand extends WorkspaceCommand {
 			}
 
 			// Combining into a relative path allows rule name templates to define folders
-			relativePath = paths.join(folderPath || rule.folder, name + '.md')
+			let relativeDirPath = folderPath || rule.folder
+			if (relativeDirPath.startsWith('.')) {
+				const node = this.workspace.viewState.tangent.getCurrentViewState()?.node
+				const relativeNodePath = node && 
+					this.workspace.directoryStore.pathToRelativePath(
+						(node.fileType == 'folder') 
+							? node.path                // in folder
+							: paths.dirname(node.path) // in file
+					) || '' // at root level
+				relativeDirPath = paths.join(relativeNodePath, relativeDirPath)
+			}
+			relativePath = paths.resolve(paths.join(relativeDirPath, name + '.md'))
 
 			if (rule.contentTemplate) {
 				const path = paths.join(this.workspace.directoryStore.files.path, rule.contentTemplate)
@@ -190,9 +201,7 @@ export default class CreateNewFileCommand extends WorkspaceCommand {
 
 				// When looking at a folder, create items within the folder
 				let folder = item.fileType === 'folder' ? item : directoryStore.getParent(item)
-				// A non-folder item the store has no parent entry for -- one removed
-				// since it was selected -- leaves `folder` undefined, and the next
-				// line reads `.depth` off it. A tooltip skips it instead.
+				// Skip selections whose parent disappeared during a tooltip read.
 				if (!interactive && !folder) continue
 
 				if (!deepestFolder || deepestFolder.depth > folder.depth) {
@@ -406,9 +415,13 @@ export default class CreateNewFileCommand extends WorkspaceCommand {
 		const subject = rule ? 'a new ' + rawOrStoreValue(rule.name) : 'a new note'
 
 		const values = this.resolveContext(context ?? {}, { interactive: false })
-		if (!values) return description || `Creates ${subject}.`
+		const resolvedPath = values && validatePath(paths.join(values.folderPath, values.name + values.extension))
+		if (!resolvedPath) {
+			if (description) return description.endsWith('.') ? description : `${description}.`
+			return `Creates ${subject}.`
+		}
 
-		const { folderPath } = values
+		const folderPath = paths.dirname(resolvedPath)
 		const destination = !folderPath || folderPath === '.'
 			? 'the root of the workspace'
 			: `"${folderPath}"`

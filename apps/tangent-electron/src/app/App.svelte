@@ -22,8 +22,6 @@ import { setTLinkTooltipComponent } from './views/editors/NoteEditor/t-link'
 import TLinkTooltip from './views/editors/TLinkTooltip.svelte'
 import { updateMermaidStyle } from './style/mermaidStyle'
 
-// Doing this here so that mhchem is loaded
-import 'katex/contrib/mhchem/mhchem'
 import { setDefaultUseKeyCode } from './utils/shortcuts'
 
 let applicationState: 'initializing' | 'choosingWorkspace' | 'buildingWorkspace' | 'usingWorkspace' | 'error' = 'initializing'

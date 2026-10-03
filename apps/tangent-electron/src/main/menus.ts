@@ -1,4 +1,4 @@
-import { BrowserWindow, Menu, MenuItem, shell, screen, ipcMain, type MenuItemConstructorOptions } from 'electron'
+import { BrowserWindow, Menu, type MenuItem, shell, screen, ipcMain, type MenuItemConstructorOptions } from 'electron'
 import { checkForUpdates } from './updates'
 import { isMac } from '../common/platform'
 import { mode } from './environment'
