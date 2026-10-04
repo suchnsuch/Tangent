@@ -2,7 +2,7 @@ import type { UpdateAPI } from "common/WindowApi";
 import { WritableStore } from 'common/stores'
 import type { ProgressInfo, UpdateInfo } from "electron-updater";
 
-type UpdateMode = 'idle' | 'checking' | 'up-to-date' | 'available' | 'downloading' | 'ready' | 'error'
+export type UpdateMode = 'idle' | 'checking' | 'up-to-date' | 'available' | 'downloading' | 'ready' | 'error'
 
 export default class UpdateState {
 

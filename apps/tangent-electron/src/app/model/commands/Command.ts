@@ -80,7 +80,7 @@ export default abstract class Command {
 		}
 	}
 
-	getTooltip(context?: CommandContext) {
+	getTooltip(context?: CommandContext): string {
 		return null
 	}
 
@@ -88,7 +88,7 @@ export default abstract class Command {
 		return null
 	}
 
-	getLabel(context?: CommandContext) {
+	getLabel(context?: CommandContext): string {
 		return null
 	}
 }

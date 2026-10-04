@@ -1,8 +1,10 @@
 <script lang="ts">
-import { getContext } from 'svelte';
+import { getContext, untrack } from 'svelte';
 import { isMac } from 'common/platform'
 import type Workspace from 'app/model/Workspace'
+import type { UpdateMode } from 'app/model/UpdateState'
 import PopUpButton from 'app/utils/PopUpButton.svelte'
+import DocumentationLink from 'app/utils/DocumentationLink.svelte'
 
 import Appearance from './Appearance.svelte'
 import Attachments from './Attachments.svelte'
@@ -16,28 +18,31 @@ import Styles from './Styles.svelte'
 import Dictionary from './Dictionary.svelte'
 import Shortcuts from './Shortcuts.svelte'
 import Debug from './Debug.svelte'
-import DocumentationLink from 'app/utils/DocumentationLink.svelte'
 
-export let detailsOpen = false
+let {
+	detailsOpen = $bindable(false)
+} = $props()
 
-let workspace = getContext('workspace') as Workspace
-let section = workspace.viewState.system.section
+const workspace = getContext('workspace') as Workspace
+const section = workspace.viewState.system.section
 
 // Update Data
-let updateState = workspace.updateState
+const updateState = workspace.updateState
 let suppressUpdates = false
-$: mode = updateState.mode
-$: downloadProgress = updateState.downloadProgress
+let mode = $derived(updateState.mode)
+let downloadProgress = $derived(updateState.downloadProgress)
 
-$: onModeChanged($mode)
-function onModeChanged(_m?) {
-	if ($mode === 'ready' && !suppressUpdates && !detailsOpen && workspace.viewState.modal.stack.length == 0) {
-		detailsOpen = true
-		section.set('Updates')
-	}
-}
+$effect(() => {
+	let _mode = $mode
+	untrack(() => {
+		if (_mode === 'ready' && !suppressUpdates && !detailsOpen && workspace.viewState.modal.stack.length == 0) {
+			detailsOpen = true
+			section.set('Updates')
+		}	
+	}) 
+})
 
-$: downloadPercent = $downloadProgress?.percent || 0
+let downloadPercent = $derived($downloadProgress?.percent || 0)
 
 // Sub-menus
 const menus = [
@@ -95,7 +100,7 @@ if (workspace.isPreviewBuild() || workspace.settings.updateChannel.value !== 'la
 	})
 }
 
-$: currentMenu = menus.find(m => m.name === $section) ?? menus[0]
+let currentMenu = $derived(menus.find(m => m.name === $section) ?? menus[0])
 </script>
 
 <PopUpButton buttonClass="subtle"
@@ -106,7 +111,7 @@ $: currentMenu = menus.find(m => m.name === $section) ?? menus[0]
 		shortcut: isMac ? '⌘ ,' : 'Ctrl+,'
 	}}
 >
-	<svelte:fragment slot="button">
+	{#snippet button()}
 		<div class={'buttonContent ' + $mode} class:supressed={suppressUpdates}>
 			<svg style={`width: 24px; height: 24px;`}>
 				{#if $mode === 'ready'}
@@ -119,31 +124,33 @@ $: currentMenu = menus.find(m => m.name === $section) ?? menus[0]
 				<div class="progress" style={`width: ${downloadPercent}%;`}></div>
 			</div>
 		</div>
-	</svelte:fragment>
-	<main class="SystemMenu">
-		<nav>
-			{#each menus as menu}
-				<button
-					on:click={() => $section = menu.name}
-					class:current={menu === currentMenu}>
-					{menu.name}
-				</button>
-			{/each}
-		</nav>
-		<article class="systemMenu">
-			<h1>{currentMenu.name}</h1>
-			{#if currentMenu.documentation !== false}
-				<DocumentationLink
-					pageName={currentMenu.documentation ?? currentMenu.name}
-					pagePath={'Configuration/' + (currentMenu.documentation ?? currentMenu.name)}
-					style="position: absolute;
-						top: .5em;
-						right: 10px;"
-				/>
-			{/if}
-			<svelte:component this={currentMenu.component}/>
-		</article>
-	</main>
+	{/snippet}
+	{#snippet menu()}
+		<main class="SystemMenu">
+			<nav>
+				{#each menus as menu}
+					<button
+						onclick={() => $section = menu.name}
+						class:current={menu === currentMenu}>
+						{menu.name}
+					</button>
+				{/each}
+			</nav>
+			<article class="systemMenu">
+				<h1>{currentMenu.name}</h1>
+				{#if currentMenu.documentation !== false}
+					<DocumentationLink
+						pageName={currentMenu.documentation ?? currentMenu.name}
+						pagePath={'Configuration/' + (currentMenu.documentation ?? currentMenu.name)}
+						style="position: absolute;
+							top: .5em;
+							right: 10px;"
+					/>
+				{/if}
+				<currentMenu.component />
+			</article>
+		</main>
+	{/snippet}
 </PopUpButton>
 
 <style lang="scss">

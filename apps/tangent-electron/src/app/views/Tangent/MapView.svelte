@@ -900,10 +900,10 @@ function cleanupConnectionHover() {
 				current={mapNode.node.value === $current.currentNode}
 				threaded={threadStack.includes(mapNode.node.value)}
 				showIcon={$showIconsOnMapNodes}
-				on:click={e => onMapNodeClick(e, mapNode)}
-				on:dblclick={e => onMapNodeDoubleClick(e, mapNode)}
-				on:contextmenu={e => onMapNodeContextMenu(e, mapNode)}
-				on:pointerdown={e => onMapNodeMouseDown(e, mapNode)}
+				onclick={e => onMapNodeClick(e, mapNode)}
+				ondblclick={e => onMapNodeDoubleClick(e, mapNode)}
+				oncontextmenu={e => onMapNodeContextMenu(e, mapNode)}
+				onpointerdown={e => onMapNodeMouseDown(e, mapNode)}
 				onPointerEnter={e => onMapNodeMouseEnter(e, mapNode)}
 				onNodeSizeUpdated={triggerRePlace}
 				onAddLink={(node, direction) => onMapNodeAddLink(node, direction, mapNode)}

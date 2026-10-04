@@ -1,4 +1,4 @@
-<script lang="ts" context="module">
+<script lang="ts" module>
 let nextPopUpId = 1
 function getPopUpId() {
 	return nextPopUpId++
@@ -13,35 +13,60 @@ import type { AnyCommandContext } from 'app/model/commands/Command'
 import commandAction from 'app/model/commands/CommandAction'
 import type { CommandActionOptions } from 'app/model/commands/CommandAction'
 import { focusLayer } from './focus'
-import { onMount, tick } from 'svelte';
+import { onMount, tick, untrack, type Snippet } from 'svelte';
 import type { ContextMenuConstructorOptions } from 'app/model/menus';
 import Menu from './Menu.svelte'
 import { tooltip as tooltipHelper, type TooltipDefOrConfig, dropTooltip } from './tooltips';
-    import { PopupEvent } from './popUpButton';
-	
-export let name = ''
-export let placement: Placement = 'bottom'
-export let buttonClass = 'popup'
-export let showPopUpIndicator: boolean = undefined
-export let menuMode: 'normal' | 'low-profile' = 'normal'
-export let closeMenuOnClick = false
-export let blurWhenFinished = true
-export let onDoubleClick: (event: MouseEvent) => void = null
+import { PopupEvent, type PopUpCloseHandler } from './popUpButton'
 
-export let escapeToRoot = true
+let {
+	name = '',
+	placement = 'bottom',
+	buttonClass = 'popup',
+	menuMode = 'normal',
+	closeMenuOnClick = false,
+	blurWhenFinished = true,
+	escapeToRoot = true,
+	showMenu = $bindable(false),
 
-export let command: Command = null
-export let commandContext: AnyCommandContext = null
-/**
- * The template for a menu _or_ a function that returns the template.
- * A function will be called each time the menu is opened.
- */
-export let template: ContextMenuConstructorOptions[] | (() => ContextMenuConstructorOptions[]) = null
+	command,
+	commandContext,
 
-export let tooltip: TooltipDefOrConfig = null
+	menu,
+	button,
 
-// Exported so that binding back up can be used
-export let showMenu = false
+	template,
+	tooltip,
+
+	showPopUpIndicator,
+	onDoubleClick,
+}: {
+	name?: string
+	placement?: Placement
+	buttonClass?: string
+	menuMode?: 'normal' | 'low-profile'
+	closeMenuOnClick?: boolean
+	blurWhenFinished?: boolean
+	escapeToRoot?: boolean
+	showMenu?: boolean
+
+	command?: Command
+	commandContext?: AnyCommandContext
+
+	menu?: Snippet
+	button?: Snippet
+
+	/**
+	 * The template for a menu _or_ a function that returns the template.
+	 * A function will be called each time the menu is opened.
+	 */
+	template?: ContextMenuConstructorOptions[] | (() => ContextMenuConstructorOptions[])
+
+	tooltip?: TooltipDefOrConfig
+
+	showPopUpIndicator?: boolean
+	onDoubleClick?: (event: MouseEvent) => void
+} = $props()
 
 const popUpId = getPopUpId()
 
@@ -49,16 +74,7 @@ let allIds: Set<any> = null
 
 onMount(() => {
 	return () => {
-		if (popper) {
-			popper.destroy()
-			popper = null
-			if (buttonElement) {
-				buttonElement.dispatchEvent(new PopupEvent('popup-close', {
-					isOpen: false,
-					bubbles: true,
-				}))
-			}
-		}
+		removePopup()
 
 		if (menuElement && menuElement.isConnected) {
 			menuElement.parentElement.removeChild(menuElement)
@@ -70,73 +86,89 @@ onMount(() => {
 	}
 })
 
-let buttonElement: HTMLButtonElement
-let menuElement: HTMLElement
-let popper = null
+let buttonElement: HTMLButtonElement = $state()
+let menuElement: HTMLElement = $state()
+let popper: ReturnType<typeof createPopper> = null
+let closeHandlers: PopUpCloseHandler[] = null
 
-let commandParams: CommandActionOptions = command ? {
+let commandParams: CommandActionOptions = $derived(command ? {
 	command,
 	context: commandContext,
 	includeClick: false,
 	tooltip
-} : null
+} : null)
 
-$: willShowPopUpIndicator = (typeof showPopUpIndicator === 'boolean')
+let label = $derived(name || command?.getLabel(commandContext))
+
+let willShowPopUpIndicator = $derived((typeof showPopUpIndicator === 'boolean')
 	? showPopUpIndicator
 	: command != null
+)
 
-$: update(buttonElement, menuElement, showMenu)
-function update(button, menu: HTMLElement, show) {
-	if (show && button && menu) {
-		if (popper) {
-			popper.update()
+$effect(() => {
+	let shouldShow = showMenu && buttonElement && menuElement
+	untrack(() => {
+		if (shouldShow) {
+			if (popper) {
+				popper.update()
+			}
+			else {
+				if (escapeToRoot) {
+					// This allows the menu to bypass all restrictions of where it was created
+					document.body.appendChild(menuElement)
+
+					const item = menuElement.querySelector('.menu-item')
+					if (item instanceof HTMLElement) {
+						tick().then(() => {
+							item.focus()
+						})
+					}
+				}
+				popper = createPopper(buttonElement, menuElement, {
+					placement,
+					strategy: 'fixed'
+				})
+				window.addEventListener('click', windowClick)
+				window.addEventListener('contextmenu', windowClick)
+				window.addEventListener('keydown', windowKey)
+
+				const event = new PopupEvent('popup-open', {
+					isOpen: true,
+					bubbles: true,
+				})
+
+				buttonElement.dispatchEvent(event)
+
+				closeHandlers = event.closeHandlers
+			}
+
+			tick().then(() => {
+				if (menuElement) {
+					const menuRect = menuElement.getBoundingClientRect()
+					menuElement.style.maxHeight = `${window.innerHeight-menuRect.top}px`
+				}
+			})
 		}
 		else {
-			if (escapeToRoot) {
-				// This allows the menu to bypass all restrictions of where it was created
-				document.body.appendChild(menuElement)
-
-				const item = menu.querySelector('.menu-item')
-				if (item instanceof HTMLElement) {
-					console.log('focusing', item)
-					tick().then(() => {
-						item.focus()
-					})
-				}
-				else {
-					console.log('Nothing to focus')
-				}
-			}
-			popper = createPopper(button, menu, {
-				placement,
-				strategy: 'fixed'
-			})
-			window.addEventListener('click', windowClick)
-			window.addEventListener('contextmenu', windowClick)
-			window.addEventListener('keydown', windowKey)
-
-			buttonElement.dispatchEvent(new PopupEvent('popup-open', {
-				isOpen: true,
-				bubbles: true,
-			}))
+			removePopup()
 		}
+	})
+})
 
-		tick().then(() => {
-			const menuRect = menu.getBoundingClientRect()
-			menu.style.maxHeight = `${window.innerHeight-menuRect.top}px`
-		})
-	}
-	else if (popper) {
+function removePopup() {
+	if (popper) {
 		popper.destroy()
 		popper = null
 		window.removeEventListener('click', windowClick)
 		window.removeEventListener('contextmenu', windowClick)
 		window.removeEventListener('keydown', windowKey)
 
-		buttonElement.dispatchEvent(new PopupEvent('popup-close', {
-			isOpen: false,
-			bubbles: true,
-		}))
+		if (closeHandlers) {
+			for (const handler of closeHandlers) {
+				handler()
+			}
+			closeHandlers = null
+		}
 	}
 }
 
@@ -214,7 +246,6 @@ function windowKey(event: KeyboardEvent) {
 function onMenuCanceled(event: Event) {
 	showMenu = false
 	if (event instanceof KeyboardEvent) {
-		console.log('Restoring focus')
 		buttonElement.focus()
 	}
 }
@@ -225,42 +256,42 @@ function onMenuCanceled(event: Event) {
 	class={buttonClass}
 	class:open={showMenu}
 	class:has-opener={willShowPopUpIndicator}
-	on:click={buttonClick}
-	on:contextmenu={buttonContext}
-	on:dblclick={onDoubleClick}
+	onclick={buttonClick}
+	oncontextmenu={buttonContext}
+	ondblclick={onDoubleClick}
 	use:commandAction={commandParams}
 	use:focusLayer={'PopUpButton'}
 	use:tooltipHelper={commandParams ? null : tooltip}
 >
-	<span class="buttonContent"><slot name="button">{name}</slot></span>
+	<span class="buttonContent">{#if button}{@render button()}{:else}{label}{/if}</span>
 	{#if willShowPopUpIndicator}
-		<!-- svelte-ignore a11y-click-events-have-key-events -->
-		<!-- svelte-ignore a11y-no-static-element-interactions -->
+		<!-- svelte-ignore a11y_click_events_have_key_events -->
+		<!-- svelte-ignore a11y_no_static_element_interactions -->
 		<span class="opener"
-			on:click={openPopUp}
+			onclick={openPopUp}
 		><svg><use href="opener.svg#opener-arrow"/></svg></span>
 	{/if}
 </button>
 
 {#if showMenu}
-<!-- svelte-ignore a11y-click-events-have-key-events -->
-<!-- svelte-ignore a11y-no-static-element-interactions -->
+<!-- svelte-ignore a11y_click_events_have_key_events -->
+<!-- svelte-ignore a11y_no_static_element_interactions -->
 <div class={`menu ${menuMode}`} class:templated={template != null}
 	use:focusLayer={'PopUpButton-Content'}
 	bind:this={menuElement}
-	on:click={menuClick}
+	onclick={menuClick}
 >
-	<slot>
-		{#if template}
-			<Menu
-				template={Array.isArray(template) ? template : template()}
-				onExecuted={() => showMenu = false}
-				onCanceled={onMenuCanceled}
-			/>
-		{:else}
-			Add content to this menu to fill it in
-		{/if}
-	</slot>
+	{#if menu}
+		{@render menu()}
+	{:else if template}
+		<Menu
+			template={Array.isArray(template) ? template : template()}
+			onExecuted={() => showMenu = false}
+			onCanceled={onMenuCanceled}
+		/>
+	{:else}
+		Add content to this menu to fill it in
+	{/if}
 </div>
 {/if}
 

@@ -1,5 +1,6 @@
 <script lang="ts">
 import { getContext } from 'svelte'
+import type { SvelteHTMLElements } from 'svelte/elements'
 import { fade } from 'svelte/transition'
 
 import type { TreeNode } from 'common/trees'
@@ -18,38 +19,62 @@ import NodeIcon from '../smart-icons/NodeIcon.svelte'
 
 const tangent = getContext('tangent') as Tangent
 
-export let mapNode: MapNode
-export let current: boolean = false
-export let threaded: boolean = false
-export let showIcon: boolean = true
+type Props = {
+	mapNode: MapNode
+	current?: boolean
+	threaded?: boolean
+	showIcon?: boolean
 
-export let onPointerEnter: (event: PointerEvent) => void = null
-export let onNodeSizeUpdated: () => void = null
-export let onAddLink: (node: TreeNode, direction: 'in'|'out') => void = null
+	onPointerEnter?: (event: PointerEvent) => void
+	onNodeSizeUpdated?: () => void
+	onAddLink?: (node: TreeNode, direction: 'in'|'out') => void
+} & Pick<
+	SvelteHTMLElements['div'],
+	'onclick'|'ondblclick'|'onpointerdown'|'onpointerup'|'oncontextmenu'
+>
 
-let inMenuOpen = false
-let outMenuOpen = false
+let {
+	mapNode,
+	current = false,
+	threaded = false,
+	showIcon = true,
 
-let showDateTimeout = null
-let showDate = false
+	onPointerEnter,
+	onNodeSizeUpdated,
+	onAddLink,
 
-$: strength = mapNode.strength
+	...events
+} : Props = $props()
 
-let container: HTMLElement
-mapNode.requestDimensions = () => {
-	if (!container) return null
+let inMenuOpen = $state(false)
+let outMenuOpen = $state(false)
 
-	const rect = container.getBoundingClientRect()
-	// Take into account zoom of the map so offsets can be consistent
-	const zoom = tangent.tangentInfo.value?.zoom.value
-	if (zoom) {
-		rect.width /= zoom
-		rect.height /= zoom
+let showDateTimeout = $state(null)
+let showDate = $state(false)
+
+let strength = $derived(mapNode.strength)
+
+let container: HTMLElement = $state()
+
+$effect(() => applyDimensionFunction(mapNode))
+function applyDimensionFunction(node: MapNode) {
+	node.requestDimensions = () => {
+		if (!container) return null
+
+		const rect = container.getBoundingClientRect()
+		// Take into account zoom of the map so offsets can be consistent
+		const zoom = tangent.tangentInfo.value?.zoom.value
+		if (zoom) {
+			rect.width /= zoom
+			rect.height /= zoom
+		}
+
+		return rect
 	}
-
-	return rect
 }
-$: updateSize(container)
+
+
+$effect(() => updateSize(container))
 function updateSize(container: HTMLElement) {
 	const rect = mapNode.requestDimensions()
 	if (!rect) return
@@ -92,8 +117,8 @@ function _onPointerLeave(event: PointerEvent) {
 
 </script>
 
-<!-- svelte-ignore a11y-click-events-have-key-events -->
-<!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
+<!-- svelte-ignore a11y_click_events_have_key_events -->
+<!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
 <article
 	id={mapNode.domID()}
 	bind:this={container}
@@ -103,13 +128,9 @@ function _onPointerLeave(event: PointerEvent) {
 	class:showIcon
 	style:z-index={1 + mapNode.positionDetails.depth}
 	style:transform={`translate(${mapNode.x}px, ${mapNode.y}px)`}
-	on:click
-	on:dblclick
-	on:pointerdown
-	on:pointerup
-	on:pointerenter={_onPointerEnter}
-	on:pointerleave={_onPointerLeave}
-	on:contextmenu
+	{...events}
+	onpointerenter={_onPointerEnter}
+	onpointerleave={_onPointerLeave}
 >
 <span class="name">
 	{#if showIcon}<NodeIcon node={mapNode?.node.value} size="1em" />{/if}
@@ -137,20 +158,23 @@ function _onPointerLeave(event: PointerEvent) {
 	bind:showMenu={inMenuOpen}
 	tooltip="Add or connect an incoming link"
 >
-	<svelte:fragment slot="button">
+	{#snippet button()}
 		<SVGIcon size={20} ref="mapNode.svg#plus"/>
-	</svelte:fragment>
+	{/snippet}
 
-	<ScrollingItemList
-		items={mapNode?.getInLinks() ?? []}
-		takeFocus={true}
-		onItemEvent={inLinkItemEvent}
-	>
-		<svelte:fragment slot="item" let:item>
-			<NodeLine node={item} />
-		</svelte:fragment>
-		<div slot="empty" class="empty">No Incoming Links</div>
-	</ScrollingItemList>
+	{#snippet menu()}
+		<ScrollingItemList
+			items={mapNode?.getInLinks() ?? []}
+			takeFocus={true}
+			onItemEvent={inLinkItemEvent}
+		>
+			<svelte:fragment slot="item" let:item>
+				<NodeLine node={item} />
+			</svelte:fragment>
+			<div slot="empty" class="empty">No Incoming Links</div>
+		</ScrollingItemList>	
+	{/snippet}
+	
 </PopUpButton>
 <PopUpButton
 	buttonClass="out"
@@ -159,20 +183,22 @@ function _onPointerLeave(event: PointerEvent) {
 	bind:showMenu={outMenuOpen}
 	tooltip="Add or connect an outgoing link"
 >
-	<svelte:fragment slot="button">
+	{#snippet button()}
 		<SVGIcon size={20} ref="mapNode.svg#plus"/>
-	</svelte:fragment>
+	{/snippet}
 
-	<ScrollingItemList
-		items={mapNode?.getOutLinks() ?? []}
-		takeFocus={true}
-		onItemEvent={outLinkItemEvent}
-	>
-		<svelte:fragment slot="item" let:item>
-			<NodeLine node={item} relativeTo={mapNode?.node.value} />
-		</svelte:fragment>
-		<div slot="empty" class="empty">No Outgoing Links</div>
-	</ScrollingItemList>
+	{#snippet menu()}
+		<ScrollingItemList
+			items={mapNode?.getOutLinks() ?? []}
+			takeFocus={true}
+			onItemEvent={outLinkItemEvent}
+		>
+			<svelte:fragment slot="item" let:item>
+				<NodeLine node={item} relativeTo={mapNode?.node.value} />
+			</svelte:fragment>
+			<div slot="empty" class="empty">No Outgoing Links</div>
+		</ScrollingItemList>	
+	{/snippet}
 </PopUpButton>
 </article>
 

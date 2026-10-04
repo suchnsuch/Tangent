@@ -38,20 +38,30 @@ const tabs = [
 	}
 ]
 
-export let visible: boolean
-export let hoveringOver: boolean
-export let hasFocus: boolean
-export let resizing: boolean = false
-export let width = 100
+let {
+	visible,
+	hoveringOver = $bindable(),
+	hasFocus = $bindable(),
+	resizing = $bindable(false),
+	width = $bindable(100),
+} : {
+	visible: boolean
+	hoveringOver: boolean
+	hasFocus: boolean
+	resizing?: boolean
+	width?: number
+} = $props()
 
-let container: HTMLElement = null
-let windowWidth = 100
+let container: HTMLElement = $state()
+let windowWidth = $state(100)
 
-$: width = Math.min($size, windowWidth - 40)
+$effect(() => {
+	width = Math.min($size, windowWidth - 40)
+})
 
-let sortMenuIsOpen = false
-let directoryViewSort = workspace.viewState.directoryView.sortMode
-let tagTreeViewSort = workspace.viewState.tagTreeView.sortMode
+let sortMenuIsOpen = $state(false)
+const directoryViewSort = workspace.viewState.directoryView.sortMode
+const tagTreeViewSort = workspace.viewState.tagTreeView.sortMode
 
 function updateHoveringLeftSidebar(hovering: boolean) {
 	hoveringOver = hovering
@@ -172,32 +182,31 @@ function onDropRoot(event: DragEvent) {
 
 <svelte:window bind:innerWidth={windowWidth} />
 
-<!-- svelte-ignore a11y-mouse-events-have-key-events -->
-<!-- svelte-ignore a11y-no-static-element-interactions -->
+<!-- svelte-ignore a11y_no_static_element_interactions -->
 <div
 	bind:this={container}
 	class="sidebar left"
 	class:pinned={$mode === SidebarMode.pinned}
 	class:visible={visible}
 	class:resizing={resizing}
-	on:mouseover={() => updateHoveringLeftSidebar(true)}
-	on:mouseleave={() => updateHoveringLeftSidebar(false)}
-	on:focusin={() => updateHasFocus(true)}
-	on:focusout={() => updateHasFocus(false)}
-	on:contextmenu={onSidebarContextMenu}
-	on:keydown={onKeydown}
+	onmouseover={() => updateHoveringLeftSidebar(true)}
+	onmouseleave={() => updateHoveringLeftSidebar(false)}
+	onfocusin={() => updateHasFocus(true)}
+	onfocusout={() => updateHasFocus(false)}
+	oncontextmenu={onSidebarContextMenu}
+	onkeydown={onKeydown}
 	style={ `width: ${width}px; transform: translateX(${visible ? 0 : -width - 10}px);` }
 >
 	<header
-		on:dragover={onDragOverRoot}
-		on:dragenter={onDragEnterRoot}
-		on:dragleave={onDragLeaveRoot}
-		on:drop={onDropRoot}
+		ondragover={onDragOverRoot}
+		ondragenter={onDragEnterRoot}
+		ondragleave={onDragLeaveRoot}
+		ondrop={onDropRoot}
 	>
 		<div
 			class="workspace-name"
 			use:tooltip={workspace.directoryStore.files.path}
-			on:contextmenu={onWorkspaceNameContextMenu}
+			oncontextmenu={onWorkspaceNameContextMenu}
 		>
 			{workspace.directoryStore.files.name}
 		</div>
@@ -206,7 +215,7 @@ function onDropRoot(event: DragEvent) {
 			{#each tabs as tab}
 				<button
 					class:active={tab.key === $currentTab}
-					on:click={e => $currentTab = tab.key}
+					onclick={e => $currentTab = tab.key}
 					use:tooltip={"Shows {tab.name}"}
 				>
 					<SvgIcon ref={tab.icon} />
@@ -225,10 +234,12 @@ function onDropRoot(event: DragEvent) {
 					tooltip={`Sorting by ${getSortModeDisplayName($directoryViewSort, true)}`}
 					bind:showMenu={sortMenuIsOpen}
 				>
-					<svelte:fragment slot="button">
+					{#snippet button()}
 						<SortModeIcon sortMode={$directoryViewSort}/>
-					</svelte:fragment>
-					<SortingOptions directoryView={workspace.viewState.directoryView}/>
+					{/snippet}
+					{#snippet menu()}
+						<SortingOptions directoryView={workspace.viewState.directoryView}/>
+					{/snippet}
 				</PopUpButton>
 
 				<span class="spacer"></span>
@@ -252,10 +263,12 @@ function onDropRoot(event: DragEvent) {
 					tooltip={`Sorting by ${getSortModeDisplayName($tagTreeViewSort, true)}`}
 					bind:showMenu={sortMenuIsOpen}
 				>
-					<svelte:fragment slot="button">
+					{#snippet button()}
 						<SortModeIcon sortMode={$tagTreeViewSort}/>
-					</svelte:fragment>
-					<SortingOptions directoryView={workspace.viewState.tagTreeView}/>
+					{/snippet}
+					{#snippet menu()}
+						<SortingOptions directoryView={workspace.viewState.tagTreeView}/>
+					{/snippet}
 				</PopUpButton>
 			{/if}
 		</div>
@@ -268,13 +281,13 @@ function onDropRoot(event: DragEvent) {
 		{/if}
 	</div>
 	<div style:flex-grow="1"
-		on:dragover={onDragOverRoot}
-		on:dragenter={onDragEnterRoot}
-		on:dragleave={onDragLeaveRoot}
-		on:drop={onDropRoot}
+		ondragover={onDragOverRoot}
+		ondragenter={onDragEnterRoot}
+		ondragleave={onDragLeaveRoot}
+		ondrop={onDropRoot}
 	></div>
 	<div class="sidebar-resizer"
-		on:mousedown={startLeftDrag}
+		onmousedown={startLeftDrag}
 	></div>
 </div>
 

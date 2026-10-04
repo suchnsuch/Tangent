@@ -4,20 +4,22 @@ export interface PopupEventInit extends EventInit {
 	isOpen: boolean
 }
 
+export type PopUpCloseHandler = () => void
+
 export class PopupEvent extends Event {
 	readonly isOpen: boolean
+
+	closeHandlers: PopUpCloseHandler[] = []
 
 	constructor(type: string, init: PopupEventInit) {
 		super(type, init)
 		this.isOpen = init.isOpen
 	}
-}
 
-export function sendPopUpEvent(source: HTMLElement, state: boolean) {
-	source.dispatchEvent(new PopupEvent('popup', {
-		isOpen: state,
-		bubbles: true,
-	}))
+	/** Allows observers to notice when a handler is closed even when the popup is not in the dom */
+	onClose(handler: PopUpCloseHandler) {
+		this.closeHandlers.push(handler)
+	}
 }
 
 export type CountPopUpsOptions = {
@@ -27,22 +29,20 @@ export type CountPopUpsOptions = {
 export function countPopUps(element: HTMLElement, options: CountPopUpsOptions) {
 	const counter = 'set' in options ? options : options.counter
 	
-	function onPopup(event: PopupEvent) {
-		if (event.isOpen) {
-			counter.update(i => i + 1)
-		}
-		else {
-			counter.update(i => i - 1)
-		}
+	function onPopUpClose() {
+		counter.update(i => i - 1)
 	}
 
-	element.addEventListener('popup-open', onPopup)
-	element.addEventListener('popup-close', onPopup)
+	function onPopUpOpen(event: PopupEvent) {
+		counter.update(i => i + 1)
+		event.onClose(onPopUpClose)
+	}
+
+	element.addEventListener('popup-open', onPopUpOpen)
 
 	return {
 		destroy() {
-			element.removeEventListener('popup-open', onPopup)
-			element.removeEventListener('popup-close', onPopup)
+			element.removeEventListener('popup-open', onPopUpOpen)
 		}
 	}
 }

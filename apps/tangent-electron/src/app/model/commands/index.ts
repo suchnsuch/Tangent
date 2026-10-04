@@ -1,6 +1,6 @@
 import { FocusLevel } from 'common/dataTypes/TangentInfo'
 import type Workspace from '../Workspace'
-import Command from './Command'
+import Command, { type CommandContext } from './Command'
 import CommandAction from './CommandAction'
 import ChangeCurrentFileCommand from './ChangeCurrentFile'
 import CloseFileCommand from './CloseFile'
@@ -44,7 +44,7 @@ import { CopyAbsolutePathCommand, CopyRelativePathCommand } from './CopyPath'
 import { ToggleCheckboxCommand } from './ToggleCheckboxCommand.ts'
 import { toTitleCase } from 'common/stringUtils'
 import { highlightEmojiToClassDescriptor } from 'common/markdownModel/formatting'
-export { Command, CommandAction, type WorkspaceCommand }
+export { Command, CommandAction, type WorkspaceCommand, type CommandContext }
 
 type LiteralCommands = ReturnType<typeof createAllCommands>
 type GenericCommands = {
