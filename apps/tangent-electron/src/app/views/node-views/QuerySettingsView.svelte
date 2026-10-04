@@ -83,7 +83,7 @@ function onRename(newName: string) {
 
 <div class="lens-settings-row">
 	{#if !state.isLensOverridden}
-		<SetLensSelector info={$info}/>
+		<SetLensSelector viewState={$state}/>
 	{/if}
 	<slot></slot>
 </div>

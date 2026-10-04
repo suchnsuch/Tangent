@@ -71,16 +71,18 @@ function openDocumentation() {
 							<p>{workspace}</p>
 						</button>
 						<PopUpButton name="…" placement="right" menuMode="low-profile">
-							<div class="workspaceMenu buttonGroup vertical">
-								<button
-									use:tooltip={"Reveal this workspace in the file browser."}
-									onclick={() => api.file.showInFileBrowser(workspace)}
-									>Show Workspace</button>
-								<button
-									use:tooltip={"Remove this workspace from this list"}
-									onclick={() => forgetWorkspace(workspace)}
-								>Forget Workspace</button>
-							</div>
+							{#snippet menu()}
+								<div class="workspaceMenu buttonGroup vertical">
+									<button
+										use:tooltip={"Reveal this workspace in the file browser."}
+										onclick={() => api.file.showInFileBrowser(workspace)}
+										>Show Workspace</button>
+									<button
+										use:tooltip={"Remove this workspace from this list"}
+										onclick={() => forgetWorkspace(workspace)}
+									>Forget Workspace</button>
+								</div>
+							{/snippet}
 						</PopUpButton>
 					</li>
 				{/each}

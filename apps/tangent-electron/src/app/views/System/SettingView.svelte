@@ -10,23 +10,44 @@ import ShortcutInput from 'app/utils/ShortcutInput.svelte'
 
 const workspace = getContext('workspace') as Workspace
 
-export let setting: Setting<SettingType, SettingType> | Setting<SettingType, SettingType[]>
-export let name: string = null
-
-export let showReset = true
-export let form: SettingForm = setting.form
-export let display: 'block' | 'inline' = 'block'
-export let inputClass: string = ''
-
 type SettingList = SettingValue<SettingType>[]
-export let getValues: () => Promise<SettingList> = null
-export let includeDefault = true
-export let getValuesImmediately = false
-let procuredValues: SettingList = null
+
+let {
+	setting,
+	name = null,
+
+	showReset = true,
+	form: formOverride,
+	display = 'block',
+	inputClass = '',
+
+	getValues = null,
+	includeDefault = true,
+	getValuesImmediately = false,
+
+	onValidateShortcut = null,
+} : {
+	setting: Setting<SettingType, SettingType> | Setting<SettingType, SettingType[]>
+	name?: string
+
+	showReset?: boolean
+	form?: SettingForm
+	display?: 'block' | 'inline'
+	inputClass?: string
+
+	getValues?: () => Promise<SettingList>
+	includeDefault?: boolean
+	getValuesImmediately?: boolean
+
+	onValidateShortcut?: (shortcut: string) => string
+} = $props()
+
+let form = $derived(formOverride ?? setting.form)
+
+let procuredValues: SettingList = $state(null)
 let hasProcuredValues = false
 
-export let onValidateShortcut: (shortcut: string) => string = null
-
+// svelte-ignore state_referenced_locally
 if (getValues) {
 	if (setting.defaultValue === setting.value) {
 		if (Array.isArray(setting.value)) {
@@ -117,12 +138,12 @@ function displayMax(value: number) {
 	return range.max
 }
 
-$: effectiveValueList = getValues ? procuredValues : setting.validValues
+let effectiveValueList = $derived(getValues ? procuredValues : setting.validValues)
 
-let softValue: any = $setting
-$: {
+let softValue: any = $state()
+$effect.pre(() => {
 	softValue = $setting
-}
+})
 
 function applyValue(value) {
 	$setting = value
@@ -162,28 +183,30 @@ function toggleItem(item) {
 </script>
 
 <main class={'SettingView ' + display}>
-	<!-- svelte-ignore a11y-click-events-have-key-events -->
-	<!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
+	<!-- svelte-ignore a11y_click_events_have_key_events -->
+	<!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
 	<h2
 		use:tooltip={setting.description}
-		on:click={headerClick}
+		onclick={headerClick}
 	>{@html name ?? setting.name}</h2>
-	<!-- svelte-ignore a11y-no-static-element-interactions -->
+	<!-- svelte-ignore a11y_no_static_element_interactions -->
 	<div
 		class="value grow"
-		on:mouseover={procureValues}
-		on:focus={procureValues}
+		onmouseover={procureValues}
+		onfocus={procureValues}
 	>
 		{#if effectiveValueList}
 			{#if Array.isArray($setting)}
 				<div class="range">
 					<PopUpButton name={multiItemDisplay($setting, effectiveValueList)} buttonClass="grow">
-						{#each effectiveValueList as item}
-							<label>
-								<input on:click={() => toggleItem(item)} type="checkbox" checked={$setting.includes(getValue(item))} />
-								<span>{getDisplayName(item) || 'Default'}</span>
-							</label>
-						{/each}
+						{#snippet menu()}
+							{#each effectiveValueList as item}
+								<label>
+									<input onclick={() => toggleItem(item)} type="checkbox" checked={($setting as SettingArrayType).includes(getValue(item))} />
+									<span>{getDisplayName(item) || 'Default'}</span>
+								</label>
+							{/each}
+						{/snippet}
 					</PopUpButton>
 				</div>
 			{:else}
@@ -203,7 +226,7 @@ function toggleItem(item) {
 							<button class:active={getValue(validValue) === $setting}
 								use:tooltip={getDescription(validValue)}
 								class={"grow " + inputClass}
-								on:click={() => applyValue(getValue(validValue))}>
+								onclick={() => applyValue(getValue(validValue))}>
 								{getDisplayName(validValue)}
 							</button>
 						{/each}
@@ -217,8 +240,8 @@ function toggleItem(item) {
 					min={setting.range.min}
 					max={setting.range.max}
 					class={inputClass}
-					on:blur={applySoftValue}
-					on:keydown={applySoftValue}/>
+					onblur={applySoftValue}
+					onkeydown={applySoftValue}/>
 				<input 
 					type="range"
 					class={"grow " + inputClass}
@@ -251,7 +274,7 @@ function toggleItem(item) {
 						placeholder={setting.placeholder ?? (setting.form === 'folder' ? 'Workspace Root' : '')}
 					/>
 					{#if setting.form === 'file' || setting.form === 'folder' || setting.form === 'path'}
-						<button on:click={selectPath} class={"inputButton " + inputClass}>
+						<button onclick={selectPath} class={"inputButton " + inputClass}>
 							<SvgIcon ref={'folder.svg#folder'} size={16} />
 						</button>
 					{/if}
@@ -263,7 +286,7 @@ function toggleItem(item) {
 				use:tooltip={setting.description}
 				bind:checked={$setting}
 				class={inputClass}
-				on:click|stopPropagation
+				onclick={e => e.stopPropagation()}
 			/>
 			<span class="spacer"></span>
 		{/if}
@@ -271,7 +294,7 @@ function toggleItem(item) {
 			<button
 				use:tooltip={"Reset \"" + setting.name + "\" to its default value."}
 				class={"reset subtle " + inputClass}
-				on:click={() => $setting = setting.defaultValue}
+				onclick={() => $setting = setting.defaultValue}
 				disabled={$setting === setting.defaultValue}
 			><SvgIcon size={20} ref="reset.svg#arc"/></button>
 		{/if}

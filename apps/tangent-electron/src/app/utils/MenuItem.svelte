@@ -1,4 +1,4 @@
-<script lang="ts" context="module">
+<script lang="ts" module>
 export type ExecuteMenuCallback = () => void
 export type RequestMenuOptions = {
 	/** Defaults to true. Set to false to disable show delay. */
@@ -22,19 +22,27 @@ import commandAction from '../model/commands/CommandAction'
 
 const workspace = getContext('workspace') as Workspace
 
-export let template: ContextMenuConstructorOptions
-export let forceCheckboxSpace = false
+let {
+	template,
+	forceCheckboxSpace = false,
+	onExecuted,
+	onRequestMenu,
+	onCancelMenu,
+} : {
+	template: ContextMenuConstructorOptions
+	forceCheckboxSpace?: boolean
 
-/** Called when the menu item is executed */
-export let onExecuted: ExecuteMenuCallback
-/** Called when the menu wants to present a submenu */
-export let onRequestMenu: RequestMenuCallback
-/** Called when the menu item no longer wants to present a submenu */
-export let onCancelMenu: CancelMenuCallback
+	/** Called when the menu item is executed */
+	onExecuted: ExecuteMenuCallback
+	/** Called when the menu wants to present a submenu */
+	onRequestMenu: RequestMenuCallback
+	/** Called when the menu item no longer wants to present a submenu */
+	onCancelMenu: CancelMenuCallback
+} = $props()
 
-let button: HTMLElement
+let button: HTMLElement = $state()
 
-$: shortcut = template.accelerator ?? template.command?.shortcuts
+let shortcut = $derived(template.accelerator ?? template.command?.shortcuts)
 
 function onMouseEnter(event: MouseEvent) {
 	if (template.submenu && onRequestMenu) {
@@ -94,10 +102,10 @@ function onKeyDown(event: KeyboardEvent) {
 <button
 	bind:this={button}
 	class={`menu-item no-callout ${template.type}`}
-	on:mouseenter={onMouseEnter}
-	on:mouseleave={onMouseLeave}
-	on:click={onClick}
-	on:keydown={onKeyDown}
+	onmouseenter={onMouseEnter}
+	onmouseleave={onMouseLeave}
+	onclick={onClick}
+	onkeydown={onKeyDown}
 	use:commandAction={{
 		command: template.command,
 		context: template.commandContext,

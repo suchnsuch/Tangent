@@ -11,23 +11,33 @@ import CreationRuleName from '../summaries/CreationRuleName.svelte'
 
 const workspace = getContext('workspace') as Workspace
 
-export let state: NodeSet
-export let _class = ''
-export let max = 4
-export let direction: 'column' | 'row' = 'column'
+let {
+	state,
+	_class = '',
+	max = 4,
+	direction = 'column',
+	// This is to expose the value
+	willCreateNewFiles = $bindable(true),
+} : {
+	state: NodeSet
+	_class?: string
+	max?: number
+	direction?: 'column' | 'row'
+	willCreateNewFiles?: boolean
+} = $props()
 
-// This is to expose the value
-export let willCreateNewFiles = true
-
-$: rules = state.creationRules
-$: shortList = $rules.slice(0, max)
+let rules = $derived(state.creationRules)
+let shortList = $derived($rules.slice(0, max))
 
 // This works for any node that is a NodeSet, e.g. a Folder
-$: navigateFrom = (state as any).node
+let navigateFrom = $derived((state as any).node)
 
-$: isSingle = shortList.length === 1
+let isSingle = $derived(shortList.length === 1)
 
-$: willCreateNewFiles = determineWillCreateNewFiles($rules)
+let createsNewFiles = $derived(determineWillCreateNewFiles($rules))
+$effect.pre(() => {
+	willCreateNewFiles = createsNewFiles
+})
 function determineWillCreateNewFiles(rules: (CreationRule | CreationRuleDefinition)[]) {
 	for (const rule of rules) {
 		if (!workspace.commands.createNewFile.willOpenExistingFile(rule)) {
@@ -39,7 +49,7 @@ function determineWillCreateNewFiles(rules: (CreationRule | CreationRuleDefiniti
 
 </script>
 
-{#if willCreateNewFiles}
+{#if createsNewFiles}
 <button
 	class={"SetCreationRules " + _class + ' ' + direction}
 	class:single={isSingle}
@@ -71,22 +81,24 @@ function determineWillCreateNewFiles(rules: (CreationRule | CreationRuleDefiniti
 	
 	{#if shortList.length < $rules.length}
 		<PopUpButton name="…" buttonClass="opener no-callout" menuMode="low-profile">
-			<div class="popup buttonGroup vertical">
-				{#each $rules as rule}
-					<button
-						class="no-callout"
-						use:CommandAction={{
-							command: workspace.commands.createNewFile,
-							context: {
-								rule,
-								navigateFrom
-							},
-							preventDefault: true,
-							tooltipShortcut: false
-						}}
-					><CreationRuleName {rule}/></button>
-				{/each}
-			</div>
+			{#snippet menu()}
+				<div class="popup buttonGroup vertical">
+					{#each $rules as rule}
+						<button
+							class="no-callout"
+							use:CommandAction={{
+								command: workspace.commands.createNewFile,
+								context: {
+									rule,
+									navigateFrom
+								},
+								preventDefault: true,
+								tooltipShortcut: false
+							}}
+						><CreationRuleName {rule}/></button>
+					{/each}
+				</div>
+			{/snippet}
 		</PopUpButton>
 	{/if}
 </button>
