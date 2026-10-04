@@ -80,7 +80,7 @@ export default class ShiftThreadHistoryCommand extends WorkspaceCommand {
 	}
 
 	getDefaultPaletteName() {
-		this.getName()
+		return this.getName()
 	}
 
 	getTooltip(context?: ShiftThreadHistoryCommandContext) {
