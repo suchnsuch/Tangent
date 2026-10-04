@@ -71,14 +71,17 @@ input[type="checkbox"] {
 		transition: left .125s;
 		box-shadow: -1px 1px 1px 1px rgba(0, 0, 0, .1);
 	}
+	&:hover {
+		background-color: var(--buttonHoverColor);
+	}
 	&:checked {
 		background-color: var(--accentActiveBackgroundColor);
 		&::after {
 			left: 1.6em;
 		}
-	}
-	&:hover {
-		background-color: var(--accentBackgroundColor);
+		&:hover {
+			background-color: var(--accentBackgroundColor);
+		}
 	}
 }
 
