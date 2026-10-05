@@ -1,6 +1,6 @@
 Furigana are small readings placed above text, most often kana above kanji to show how they're pronounced. Tangent supports the `{base|reading}` syntax from [DenDenMarkdown](https://github.com/denshoch/DenDenMarkdown).
 
-It looks like `{漢字|かんじ}` and renders like: {漢字|かんじ}
+Write it like `{漢字|かんじ}` and it renders like {漢字|かんじ}.
 
 Spaces around the base and the reading are ignored, so `{ 漢字 | かんじ }` renders the same way.
 

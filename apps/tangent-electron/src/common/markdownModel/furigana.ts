@@ -9,21 +9,21 @@ export type FuriganaData = {
 export type FuriganaScanResult =
 	| { type: 'valid', end: number, furigana: FuriganaData }
 	| { type: 'nested', end: number } // `end` is the index of the invalidating inner `{`
-	| { type: 'invalid' }
+	| false
 
 /**
  * Nested spans are intentionally inactive: the first unescaped `{` after
  * the opener invalidates the span rather than being balanced against it.
  */
 export function scanFuriganaSpan(text: string, start = 0): FuriganaScanResult {
-	if (text[start] !== '{' || isEscaped(text, start)) return { type: 'invalid' }
+	if (text[start] !== '{' || isEscaped(text, start)) return false
 
 	let separatorIndex = -1
 
 	for (let index = start + 1; index < text.length; index++) {
 		const char = text[index]
 
-		if (char === '\n' || char === '\r') return { type: 'invalid' }
+		if (char === '\n' || char === '\r') return false
 
 		const next = text[index + 1]
 		if (char === '\\' && next !== '\\' && next !== '\n' && next !== '\r') {
@@ -34,11 +34,11 @@ export function scanFuriganaSpan(text: string, start = 0): FuriganaScanResult {
 		if (char === '{') return { type: 'nested', end: index }
 
 		if (char === '}') {
-			if (separatorIndex < 0) return { type: 'invalid' }
+			if (separatorIndex < 0) return false
 
 			const base = unescapeFuriganaText(trimUnescapedWhitespace(text.slice(start + 1, separatorIndex)))
 			const reading = unescapeFuriganaText(trimUnescapedWhitespace(text.slice(separatorIndex + 1, index)))
-			if (!base || !reading) return { type: 'invalid' }
+			if (!base || !reading) return false
 
 			return { type: 'valid', end: index, furigana: { base, reading } }
 		}
@@ -48,7 +48,7 @@ export function scanFuriganaSpan(text: string, start = 0): FuriganaScanResult {
 		}
 	}
 
-	return { type: 'invalid' }
+	return false
 }
 
 export function parseInlineFurigana(char: string, parser: NoteParser): boolean {
@@ -56,10 +56,11 @@ export function parseInlineFurigana(char: string, parser: NoteParser): boolean {
 
 	const { feed } = parser
 	const result = scanFuriganaSpan(feed.text, feed.index)
+	if (!result) return false
 
 	if (result.type === 'nested') {
-		// Swallow through the invalidating brace as literal text so the
-		// dispatch loop never retries there and rescues it as its own span.
+		// Preserve both openers as literal source; skipping the inner opener
+		// prevents a rejected nested span from activating as a separate span.
 		feed.nextByLength(result.end - feed.index)
 		parser.commitSpan(null)
 		return true
