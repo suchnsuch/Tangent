@@ -130,6 +130,18 @@ function onKeyDown(event: KeyboardEvent) {
 		}
 	}
 }
+
+$effect(() => {
+	if (!template.command && typeof template.checked === 'boolean') {
+		if (template.checked) {
+			button.setAttribute('checked', 'true')
+		}
+		else {
+			button.removeAttribute('checked')
+		}
+	}
+})
+
 </script>
 
 <button
@@ -147,7 +159,7 @@ function onKeyDown(event: KeyboardEvent) {
 		tooltipShortcut: false
 	}}
 >
-	{#if template.type === 'checkbox' || forceCheckboxSpace}
+	{#if template.type === 'checkbox' || template.type === 'radio' || forceCheckboxSpace}
 		<span class="checkbox">✓</span>
 	{/if}
 	<span class="label">{template.label || template.command?.getLabel(template.commandContext) || template.role}</span>
