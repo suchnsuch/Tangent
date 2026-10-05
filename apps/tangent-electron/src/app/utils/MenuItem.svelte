@@ -16,7 +16,7 @@ export type CancelMenuCallback = (element: HTMLElement) => void
 import type { Workspace } from 'app/model'
 import type { ContextMenuConstructorOptions } from "app/model/menus"
 import SvgIcon from "app/views/smart-icons/SVGIcon.svelte";
-import { getContext } from "svelte";
+import { getContext, untrack } from "svelte";
 import { shortcutsHtmlString } from "./shortcuts";
 import commandAction from '../model/commands/CommandAction'
 
@@ -43,18 +43,51 @@ let {
 let button: HTMLElement = $state()
 
 let shortcut = $derived(template.accelerator ?? template.command?.shortcuts)
+let canExecute = $derived(template.click || template.command || template.link)
+
+let showMenu = $state(false)
 
 function onMouseEnter(event: MouseEvent) {
-	if (template.submenu && onRequestMenu) {
-		onRequestMenu(button, template.submenu)
+	if (!canExecute && template.submenu) {
+		showMenu = true
 	}
+}
+
+function onMouseMove(event: MouseEvent) {
+	if (!canExecute || !template.submenu || !onRequestMenu) return
+	
+	let { clientX, clientY } = event
+
+	const rect = button.getBoundingClientRect()
+
+	clientX -= rect.x
+	clientY -= rect.y
+
+	showMenu = clientX > (rect.width - 32)
 }
 
 function onMouseLeave(event: MouseEvent) {
-	if (template.submenu && onCancelMenu) {
-		onCancelMenu(button)
+	if (template.submenu) {
+		showMenu = false
 	}
 }
+
+$effect(() => {
+	if (showMenu) {
+		if (button && onRequestMenu) {
+			untrack(() => {
+				onRequestMenu(button, template.submenu)
+			})
+		}
+	}
+	else {
+		if (button && onCancelMenu) {
+			untrack(() => {
+				onCancelMenu(button)
+			})
+		}
+	}
+})
 
 function onClick(event: Event) {
 	const { command, commandContext, click, link } = template
@@ -103,6 +136,7 @@ function onKeyDown(event: KeyboardEvent) {
 	bind:this={button}
 	class={`menu-item no-callout ${template.type}`}
 	onmouseenter={onMouseEnter}
+	onmousemove={onMouseMove}
 	onmouseleave={onMouseLeave}
 	onclick={onClick}
 	onkeydown={onKeyDown}
@@ -121,10 +155,12 @@ function onKeyDown(event: KeyboardEvent) {
 		<span class="shortcut">{@html shortcutsHtmlString(shortcut)}</span>
 	{/if}
 	{#if template.submenu}
-		<SvgIcon
-			ref="opener.svg#opener-arrow"
-			size={10}
-			styleString="opacity: 0.7;"/>
+		<span class="opener" class:hidden={canExecute && template.submenu}>
+			<SvgIcon
+				ref="opener.svg#opener-arrow"
+				size={10}
+				styleString="opacity: 0.7;"/>
+		</span>
 	{/if}
 </button>
 
@@ -179,5 +215,14 @@ span {
 }
 .shortcut {
 	margin-left: 2em;
+}
+.opener.hidden {
+	opacity: 0;
+	transition: opacity .2s;
+	--iconStroke: var(--deemphasizedTextColor);
+}
+:hover > .opener.hidden, :global([data-input-mode="keyboard"]) :focus .opener.hidden {
+	visibility: visible;
+	opacity: 1;
 }
 </style>
