@@ -8,6 +8,7 @@ import type { CodeData } from './code'
 import type { MathData } from './math'
 import type { FuriganaData } from './furigana'
 import { hiddenGroupEmbedFormat } from './hiddenGroupEmbed'
+import { getHiddenGroupAttributes } from './inline'
 import { hasCollapsedChildren, isCollapsed } from './sections'
 import { getMediaCustomizationsFromText, type LinkAttribute } from './links'
 
@@ -34,13 +35,6 @@ function getHideableFormatClass(attributes, baseClass = '') {
 	}
 	
 	return className
-}
-
-function getHiddenGroupAttributes(attributes) {
-	if (typeof attributes.hiddenGroup === 'string') {
-		return { 'data-hidden-group': attributes.hiddenGroup }
-	}
-	return {}
 }
 
 function hideableFormat(
@@ -745,12 +739,12 @@ const noteTypeset:TypesetTypes = {
 
 		hiddenGroupEmbedFormat<MathData>({
 			name: 'math',
-			renderOutput: (math, revealed, attributes) => {
+			renderOutput: (math, attributes) => {
 				let tMathAttr = {
 					'math-source': math.source
 				} as any
 
-				if (revealed) {
+				if (attributes.revealed) {
 					tMathAttr.className = 'revealed'
 				}
 
@@ -760,7 +754,7 @@ const noteTypeset:TypesetTypes = {
 
 				if (attributes.decoration?.focus) {
 					// Inject the focus decoration onto the shadow root.
-					tMathAttr.className += ' ' + attributes.decoration.focus.class
+					tMathAttr.className = [tMathAttr.className, attributes.decoration.focus.class].filter(Boolean).join(' ')
 				}
 
 				return h('t-math', tMathAttr, [])
@@ -769,7 +763,7 @@ const noteTypeset:TypesetTypes = {
 
 		hiddenGroupEmbedFormat<FuriganaData>({
 			name: 'furigana',
-			renderOutput: (furigana, revealed, attributes) => {
+			renderOutput: (furigana, attributes) => {
 				const tFuriganaAttr = { base: furigana.base, reading: furigana.reading } as any
 
 				if (attributes.decoration?.focus) {

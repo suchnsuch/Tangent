@@ -1,6 +1,5 @@
 import { markAsSelectionRequest } from 'app/events'
 import { defineCustomElement } from 'app/utils/defineCustomElement'
-import { bindInlineSelectionListeners } from './hiddenGroupInlineElement'
 
 const furiganaStyleSheet = new CSSStyleSheet()
 furiganaStyleSheet.replaceSync(`
@@ -26,7 +25,10 @@ class TangentFurigana extends HTMLElement {
 	constructor() {
 		super()
 
-		bindInlineSelectionListeners(this, this.onClick)
+		this.addEventListener('click', this.onClick)
+		this.addEventListener('dblclick', this.onClick)
+		this.addEventListener('mousedown', this.onClick)
+		this.addEventListener('contextmenu', this.onClick)
 
 		const shadow = this.attachShadow({ mode: 'open' })
 		shadow.adoptedStyleSheets = [furiganaStyleSheet]

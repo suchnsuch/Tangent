@@ -1,6 +1,7 @@
 import type { FormatType } from 'typewriter-editor/typesetting'
 import { h, type VChild, type VNode } from 'typewriter-editor/rendering/vdom'
 import type { AttributeMap } from '@typewriter/document'
+import { getHiddenGroupAttributes } from './inline'
 
 type HiddenGroupEmbedNode = VNode & { hiddenGroupOutput?: VChild }
 
@@ -8,7 +9,7 @@ type HiddenGroupEmbedNode = VNode & { hiddenGroupOutput?: VChild }
 // split one inline group into several ops do not duplicate the rendered element.
 export function hiddenGroupEmbedFormat<Data>(options: {
 	name: string
-	renderOutput: (data: Data, revealed: boolean, attributes: AttributeMap) => VChild
+	renderOutput: (data: Data, attributes: AttributeMap) => VChild
 }): FormatType {
 	const { name, renderOutput } = options
 
@@ -23,10 +24,13 @@ export function hiddenGroupEmbedFormat<Data>(options: {
 			const revealed = !!attributes.revealed
 			const revealedClass = revealed ? ' revealed' : ''
 
-			const node = h('span', { className: containerClass + revealedClass }, [
+			const node = h('span', {
+				className: containerClass + revealedClass,
+				...getHiddenGroupAttributes(attributes)
+			}, [
 				h('span', { className: `${sourceClass} hidden${revealedClass}` }, children)
 			]) as HiddenGroupEmbedNode
-			node.hiddenGroupOutput = renderOutput(data, revealed, attributes)
+			node.hiddenGroupOutput = renderOutput(data, attributes)
 			return node
 		},
 		postProcess: (node: HiddenGroupEmbedNode) => {

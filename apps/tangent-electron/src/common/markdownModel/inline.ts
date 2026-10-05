@@ -1,10 +1,17 @@
 import type NoteParser from './NoteParser'
+import type { AttributeMap } from '@typewriter/document'
 
 /**
  * `true` groups hidden markup with its content. A string also identifies the
  * inline instance, so that adjacent instances never share attributes.
  */
 export type HiddenGroup = true | string
+
+export function getHiddenGroupAttributes(attributes: AttributeMap) {
+	return typeof attributes.hiddenGroup === 'string'
+		? { 'data-hidden-group': attributes.hiddenGroup }
+		: {}
+}
 
 /**
  * Identifies the span `[start, end)` by its offsets relative to the start of

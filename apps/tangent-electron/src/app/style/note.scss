@@ -537,10 +537,6 @@ article.note {
 		}
 	}
 
-	// Shared reveal styling for hidden-group inline embeds (see
-	// hiddenGroupEmbed.ts's `${name}-source` / `inline-${name}-container`
-	// naming convention); outline-offset stays per-format since math and
-	// furigana's output shapes sit differently against the outline.
 	.inline-math-container.revealed,
 	.inline-furigana-container.revealed {
 		outline: 2px solid var(--textColor);

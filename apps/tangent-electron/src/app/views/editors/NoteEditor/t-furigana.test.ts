@@ -1,9 +1,9 @@
-import { describe, test, expect } from 'vitest'
+import { describe, it, expect } from 'vitest'
 
 import './t-furigana'
 
 describe('t-furigana', () => {
-	test('renders base and reading as ruby/rt inside its shadow root', () => {
+	it('renders base and reading as ruby/rt inside its shadow root', () => {
 		const el = document.createElement('t-furigana')
 		el.setAttribute('base', '漢字')
 		el.setAttribute('reading', 'かんじ')
@@ -18,7 +18,7 @@ describe('t-furigana', () => {
 		el.remove()
 	})
 
-	test('updates shadow content when attributes change', () => {
+	it('updates shadow content when attributes change', () => {
 		const el = document.createElement('t-furigana')
 		el.setAttribute('base', '字')
 		el.setAttribute('reading', 'じ')
@@ -36,7 +36,7 @@ describe('t-furigana', () => {
 		el.remove()
 	})
 
-	test('click requests selection matching only this span\'s inline id', () => {
+	it.each(['click', 'dblclick', 'mousedown', 'contextmenu'])('%s requests selection matching only this span\'s inline id', eventType => {
 		const group = document.createElement('span')
 		group.setAttribute('data-hidden-group', '0-12')
 		const el = document.createElement('t-furigana')
@@ -46,10 +46,10 @@ describe('t-furigana', () => {
 		document.body.appendChild(group)
 
 		let captured: any
-		el.addEventListener('click', event => {
+		el.addEventListener(eventType, event => {
 			captured = (event as any).editorSelectionRequest
 		})
-		el.dispatchEvent(new MouseEvent('click', { bubbles: true }))
+		el.dispatchEvent(new MouseEvent(eventType, { bubbles: true }))
 
 		expect(captured.inline({ hiddenGroup: '0-12' })).toBe(true)
 		expect(captured.inline({ hiddenGroup: '12-24' })).toBe(false)
