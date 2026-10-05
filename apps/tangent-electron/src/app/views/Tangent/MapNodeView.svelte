@@ -1,5 +1,5 @@
 <script lang="ts">
-import { getContext } from 'svelte'
+import { getContext, untrack } from 'svelte'
 import type { SvelteHTMLElements } from 'svelte/elements'
 import { fade } from 'svelte/transition'
 
@@ -73,14 +73,15 @@ function applyDimensionFunction(node: MapNode) {
 	}
 }
 
-
-$effect(() => updateSize(container))
-function updateSize(container: HTMLElement) {
-	const rect = mapNode.requestDimensions()
-	if (!rect) return
-	mapNode.setDimensions(rect.width, rect.height)
-	if (onNodeSizeUpdated) onNodeSizeUpdated()
-}
+$effect(() => {
+	const containerElement = container
+	untrack(() => {
+		const rect = mapNode.requestDimensions()
+		if (!rect) return
+		mapNode.setDimensions(rect.width, rect.height)
+		if (onNodeSizeUpdated) onNodeSizeUpdated()
+	})
+})
 
 function inLinkItemEvent(node: TreeNode, event: Event) {
 	onLinkItemEvent(node, event, 'in')
