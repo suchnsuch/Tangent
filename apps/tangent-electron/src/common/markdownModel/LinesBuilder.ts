@@ -37,6 +37,9 @@ export default class LinesBuilder {
 
 		Object.assign(finalAttributes, ...formatAttributes)
 
+		// Nested formatting (e.g. `![[a.png|**x**]]`) can overwrite an enclosing
+		// link/embed's string hiddenGroup id with `true` during the attribute merge.
+		// Preserve the outermost string id so all its ops render as one instance.
 		const hiddenGroupId = formatAttributes.find(format => {
 			return typeof format?.hiddenGroup === 'string'
 		})?.hiddenGroup
