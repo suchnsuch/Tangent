@@ -17,7 +17,6 @@ import type { LensSettings } from 'common/settings/LensSettings';
 import CardsLensSettings from 'common/settings/CardsLensSettings';
 import FeedLensSettings from 'common/settings/FeedLensSettings';
 import ListLensSettings from 'common/settings/ListLensSettings';
-import type { SetViewInfo } from 'common/dataTypes/SetViewInfo';
 
 export interface SetViewState extends NodeViewState, NodeSet {
 	context: ViewStateContext
@@ -71,7 +70,6 @@ export abstract class BaseSetViewState extends SelfStore implements SetViewState
 					[this as BaseSetViewState, info.defaultLens, info.lensSettings],
 					([me, defaultLens, lensSettingsList]) => {
 						let found: LensSettings = null
-						console.log('looking for', defaultLens)
 						for (const lensSettings of lensSettingsList) {
 							if (lensSettings.name.value === defaultLens) {
 								found = lensSettings
@@ -82,7 +80,6 @@ export abstract class BaseSetViewState extends SelfStore implements SetViewState
 						if (me.lensTypeOverride && (found?.type !== me.lensTypeOverride)) {
 							// This allows a type override to hit what would be the default anyway
 							// This accounts for the default not being the first of its type
-							console.log('making override?')
 							return info.lensSettings.findOrCreateLens({ type: me.lensTypeOverride })
 						}
 
@@ -94,7 +91,6 @@ export abstract class BaseSetViewState extends SelfStore implements SetViewState
 						}
 
 						// Create the default fallback
-						console.log('making fallback')
 						return info.lensSettings.findOrCreateLens({ type: info.lensSettings.config.defaultType })
 					}
 				).subscribe(set)

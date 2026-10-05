@@ -1,9 +1,12 @@
 <script lang="ts">
+import { getContext } from 'svelte'
+import type { Workspace } from 'app/model'
 import type { ContextMenuConstructorOptions } from 'app/model/menus'
 import type { BaseSetViewState } from 'app/model/nodeViewStates/SetViewState'
 import PopUpButton from 'app/utils/PopUpButton.svelte'
 import type { LensSettings, LensSettingsType } from 'common/settings/LensSettings'
 
+const workspace = getContext('workspace') as Workspace
 
 let {
 	viewState
@@ -25,6 +28,10 @@ let displayName = $derived.by(() => {
 	return $currentSettingsName
 })
 
+let renameTarget: LensSettings = $state(null)
+let renameElement: HTMLInputElement = $state(null)
+let renameText: string = $state(null)
+
 function createNewLens(type: LensSettingsType) {
 	const newLens: LensSettings = new type()
 
@@ -40,7 +47,7 @@ function createNewLens(type: LensSettingsType) {
 		let counter = 0
 		const match = newName.match(/\d+$/)
 		if (match) {
-			baseName = newName.substring(match[0].length).trimEnd()
+			baseName = newName.substring(0, match.index).trimEnd()
 			counter = parseInt(match[0])
 		}
 
@@ -53,6 +60,46 @@ function createNewLens(type: LensSettingsType) {
 	newLens.name.value = newName
 
 	settingsList.add(newLens)
+	defaultLens.set(newLens.name.value)
+}
+
+function setCurrentLens(lens: LensSettings) {
+	$defaultLens = lens.name.value
+}
+
+function startRenaming(lens: LensSettings) {
+	setCurrentLens(lens)
+	renameTarget = lens
+	renameText = lens.name.value
+}
+
+$effect(() => {
+	if (renameElement) {
+		renameElement.focus()
+		renameElement.select()
+	}
+})
+
+function onRenameKeydown(event: KeyboardEvent) {
+	if (event.key === 'Enter') {
+		event.preventDefault()
+		const trimmed = renameText.trim()
+		if (trimmed) {
+			renameTarget.name.set(trimmed)
+			$defaultLens = trimmed
+		}
+		renameElement?.blur()
+	}
+	else if (event.key === 'Escape') {
+		event.preventDefault()
+		renameElement?.blur()
+	}
+}
+
+function onRenameBlur() {
+	renameTarget = null
+	renameElement = null
+	renameText = null
 }
 
 function menuGenerator(): ContextMenuConstructorOptions[] {
@@ -64,9 +111,32 @@ function menuGenerator(): ContextMenuConstructorOptions[] {
 			type: 'radio',
 			checked: lens === $currentSettings,
 			click() {
-				console.log('selecting', lens.name.value)
-				$defaultLens = lens.name.value
-			}
+				setCurrentLens(lens)
+			},
+			submenu: [
+				{
+					label: 'Rename',
+					toolTip: `Renames the "${lens.name.value}" Lens.`,
+					click() {
+						startRenaming(lens)
+					}
+				},
+				{ type: 'separator' },
+				{
+					label: 'Delete',
+					toolTip: `Deletes the "${lens.name.value}" Lens.`,
+					click() {
+						workspace.viewState.modal.pushConfirmDialogue({
+							title: `Delete "${lens.name.value}"?`,
+							message: `Are you sure you want to delete the ${lens.name.value} lens? This cannot be undone.`
+						}).then(result => {
+							if (result) {
+								settingsList.remove(lens)
+							}
+						})
+					}
+				}
+			]
 		})
 	}
 
@@ -93,11 +163,21 @@ function menuGenerator(): ContextMenuConstructorOptions[] {
 </script>
 
 {#if info}
-	<PopUpButton
-		name={displayName}
-		template={menuGenerator}
-		buttonClass="arrowNavigate"
-		placement="bottom-start"
-		closeMenuOnClick={true}
-	/>
+	{#if renameText != null}
+		<input type="text"
+			bind:this={renameElement}
+			bind:value={renameText}
+			onkeydown={onRenameKeydown}
+			onblur={onRenameBlur}
+		/>
+	{:else}
+		<PopUpButton
+			name={displayName}
+			template={menuGenerator}
+			buttonClass="arrowNavigate"
+			placement="bottom-start"
+			closeMenuOnClick={true}
+			showPopUpIndicator
+		/>
+	{/if}
 {/if}
