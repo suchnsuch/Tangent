@@ -32,6 +32,8 @@ export interface ContextMenuConstructorOptions extends MenuItemConstructorOption
 	/** @deprecated Use workspace commands instead */
 	accelerator?: string
 
+	icon?: string | string[]
+
 	submenu?: ContextMenuConstructorOptions[]
 }
 

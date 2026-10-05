@@ -5,6 +5,7 @@ import type { ContextMenuConstructorOptions } from 'app/model/menus'
 import type { BaseSetViewState } from 'app/model/nodeViewStates/SetViewState'
 import PopUpButton from 'app/utils/PopUpButton.svelte'
 import type { LensSettings, LensSettingsType } from 'common/settings/LensSettings'
+import SVGIcon from 'app/views/smart-icons/SVGIcon.svelte'
 
 const workspace = getContext('workspace') as Workspace
 
@@ -17,6 +18,7 @@ let {
 let info = $derived(viewState.info)
 let settingsList = $derived(info && $info.lensSettings)
 let currentSettings = $derived(viewState.currentLensSettings)
+let currentSettingsIcon = $derived(currentSettings && typeof $currentSettings !== 'string' && $currentSettings.getIcon())
 let currentSettingsName = $derived(currentSettings && typeof $currentSettings !== 'string' && $currentSettings.name)
 let defaultLens = $derived(info && $info.defaultLens)
 
@@ -110,6 +112,7 @@ function menuGenerator(): ContextMenuConstructorOptions[] {
 			label: lens.name.value,
 			type: 'radio',
 			checked: lens === $currentSettings,
+			icon: lens.getIcon(),
 			click() {
 				setCurrentLens(lens)
 			},
@@ -151,7 +154,9 @@ function menuGenerator(): ContextMenuConstructorOptions[] {
 					label: `${t.staticName} Lens`,
 					click() {
 						return createNewLens(t)
-					}
+					},
+					toolTip: t.staticDescription,
+					icon: t.staticIcon
 				} satisfies ContextMenuConstructorOptions
 			})
 		]
@@ -178,6 +183,11 @@ function menuGenerator(): ContextMenuConstructorOptions[] {
 			placement="bottom-start"
 			closeMenuOnClick={true}
 			showPopUpIndicator
-		/>
+		>
+			{#snippet button()}
+				<SVGIcon ref={currentSettingsIcon} size={16} />
+				{currentSettingsName && $currentSettingsName}
+			{/snippet}
+		</PopUpButton>
 	{/if}
 {/if}

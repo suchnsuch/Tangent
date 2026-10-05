@@ -58,7 +58,7 @@ let showSettingsFromMouse = false
 let showSettingsFromHover = false
 $: showSettingsState = state.showSettings
 $: willShowSettings = (showSettingsState && $showSettingsState !== false)
-$: showSettings = showSettingsFromMouse || showSettingsFromHover || willShowSettings || $settingsPopups > 0 || true
+$: showSettings = showSettingsFromMouse || showSettingsFromHover || willShowSettings || $settingsPopups > 0
 
 let container: HTMLElement
 let settingsContainer: HTMLElement

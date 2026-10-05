@@ -22,6 +22,14 @@ export default class CardsLensSettings extends LensSettings {
 	get type() { return CardsLensSettings.staticType }
 	static get staticType() { return 'CardsLensSettings' }
 	static get staticName() { return 'Cards' }
+	static get staticIcon() { return 'lenses.svg#cards' }
+	static get staticDescription() {
+		return 'Displays items as a grid of cards.'
+	}
+
+	getIcon(): string | string[] {
+		return CardsLensSettings.staticIcon
+	}
 }
 
 CardsLensSettings satisfies LensSettingsType

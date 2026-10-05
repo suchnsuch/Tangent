@@ -16,6 +16,9 @@ export default interface LensViewState {
 	// Allows the state to apply focus
 	focus?(element: HTMLElement): boolean
 
+	/** Any icon for this lens */
+	getIcon?(): string | string[]
+
 	/*
 	 * Optionally allow the lens to represent a given node.
 	 */

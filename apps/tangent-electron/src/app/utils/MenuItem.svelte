@@ -19,6 +19,7 @@ import SvgIcon from "app/views/smart-icons/SVGIcon.svelte";
 import { getContext, untrack } from "svelte";
 import { shortcutsHtmlString } from "./shortcuts";
 import commandAction from '../model/commands/CommandAction'
+    import { tooltip } from './tooltips';
 
 const workspace = getContext('workspace') as Workspace
 
@@ -152,6 +153,7 @@ $effect(() => {
 	onmouseleave={onMouseLeave}
 	onclick={onClick}
 	onkeydown={onKeyDown}
+	use:tooltip={!template.command && template.toolTip}
 	use:commandAction={{
 		command: template.command,
 		context: template.commandContext,
@@ -161,6 +163,9 @@ $effect(() => {
 >
 	{#if template.type === 'checkbox' || template.type === 'radio' || forceCheckboxSpace}
 		<span class="checkbox">✓</span>
+	{/if}
+	{#if template.icon}
+		<SvgIcon ref={template.icon} size={16} />
 	{/if}
 	<span class="label">{template.label || template.command?.getLabel(template.commandContext) || template.role}</span>
 	{#if shortcut}
@@ -215,6 +220,10 @@ button {
 }
 
 span.checkbox {
+	margin-right: .5em;
+}
+
+button > :global(svg) {
 	margin-right: .5em;
 }
 

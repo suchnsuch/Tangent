@@ -20,10 +20,14 @@ export abstract class LensSettings extends ObjectStore {
 	}
 
 	abstract get type(): string
+
+	abstract getIcon(): string | string[]
 }
 
 export interface LensSettingsType {
 	new (patch?: any): LensSettings
 	get staticType(): string
 	get staticName(): string
+	get staticIcon(): string | string[]
+	get staticDescription(): string
 }

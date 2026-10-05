@@ -13,6 +13,14 @@ export default class ListLensSettings extends LensSettings {
 	get type() { return ListLensSettings.staticType }
 	static get staticType() { return 'ListLensSettings' }
 	static get staticName() { return 'List' }
+	static get staticIcon() { return 'lenses.svg#list' }
+	static get staticDescription() {
+		return 'Displays items in a list.'
+	}
+
+	getIcon(): string | string[] {
+		return ListLensSettings.staticIcon
+	}
 }
 
 ListLensSettings satisfies LensSettingsType

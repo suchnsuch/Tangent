@@ -35,6 +35,14 @@ export default class FeedLensSettings extends LensSettings {
 	get type() { return FeedLensSettings.staticType }
 	static get staticType() { return 'FeedLensSettings' }
 	static get staticName() { return 'Feed' }
+	static get staticIcon() { return 'lenses.svg#feed' }
+	static get staticDescription() {
+		return 'Displays items in an infinite scrolling feed.'
+	}
+
+	getIcon(): string | string[] {
+		return FeedLensSettings.staticIcon
+	}
 }
 
 FeedLensSettings satisfies LensSettingsType
