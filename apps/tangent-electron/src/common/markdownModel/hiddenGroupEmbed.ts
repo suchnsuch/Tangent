@@ -5,8 +5,6 @@ import { getHiddenGroupAttributes } from './inline'
 
 type HiddenGroupEmbedNode = VNode & { hiddenGroupOutput?: VChild }
 
-// Defer output until after adjacent format nodes merge so decorations that
-// split one inline group into several ops do not duplicate the rendered element.
 export function hiddenGroupEmbedFormat<Data>(options: {
 	name: string
 	renderOutput: (data: Data, attributes: AttributeMap) => VChild
@@ -33,6 +31,8 @@ export function hiddenGroupEmbedFormat<Data>(options: {
 			node.hiddenGroupOutput = renderOutput(data, attributes)
 			return node
 		},
+		// Defer output until after adjacent format nodes merge so decorations that
+		// split one inline group into several ops do not duplicate the rendered element.
 		postProcess: (node: HiddenGroupEmbedNode) => {
 			if (node.hiddenGroupOutput !== undefined) {
 				node.children.push(node.hiddenGroupOutput)
