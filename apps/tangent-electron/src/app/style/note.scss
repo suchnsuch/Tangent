@@ -540,25 +540,23 @@ article.note {
 	.inline-math-container.revealed,
 	.inline-furigana-container.revealed {
 		outline: 2px solid var(--textColor);
+		outline-offset: 4px;
 		border-radius: var(--inputBorderRadius);
 	}
 
-	.inline-math-container.revealed {
-		outline-offset: 4px;
-	}
-
+	// Accommodates furigana's larger vertical footprint
 	.inline-furigana-container.revealed {
-		outline-offset: 3px;
+		padding-top: .5em;
 	}
 
 	span.math-source,
 	span.furigana-source {
 		font-family: var(--codeFontFamily);
 		color: var(--accentTextColor);
-	}
 
-	span.math-source.revealed {
-		padding-right: .5em;
+		&.revealed {
+			padding-right: .5em;
+		}
 	}
 
 	.mathLine {
