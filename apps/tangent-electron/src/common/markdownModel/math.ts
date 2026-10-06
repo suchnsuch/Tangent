@@ -3,6 +3,7 @@ import DocumentFeeder from './DocumentFeeder'
 import { isWhitespace } from './matches'
 import NoteParser from './NoteParser'
 import { type ParsingContext, ParsingContextType } from './parsingContext'
+import { getInlineId } from './inline'
 
 export type MathData = {
 	source?: string
@@ -29,6 +30,7 @@ export function parseInlineMath(char: string, parser: NoteParser): boolean {
 				// We've got it!
 				// Close old stuff
 				parser.commitSpan(null, 0)
+				const start = feed.index
 				// Consume the opening token
 				feed.next(token.length)
 				const index = feed.index
@@ -40,7 +42,7 @@ export function parseInlineMath(char: string, parser: NoteParser): boolean {
 					},
 					// Using hiddenGroup instead of hidden allows for math to embed within inline formatting.
 					// The "hidden" class is implicit and added afterwards.
-					hiddenGroup: true
+					hiddenGroup: getInlineId(parser, start, feed.index + feed.currentStepLength)
 				})
 				return true
 			}

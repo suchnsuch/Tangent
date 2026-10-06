@@ -224,7 +224,7 @@ End`
 			expect(doc.lines[0].content.ops).toEqual(buildOpsFromInsertList([
 				'Some ',
 				'$math$', {
-					hiddenGroup: true,
+					hiddenGroup: '5-11',
 					math: {
 						isBlock: false,
 						source: 'math'
@@ -241,7 +241,7 @@ End`
 			expect(doc.lines[0].content.ops).toEqual(buildOpsFromInsertList([
 				'Some ',
 				'$$math$$', {
-					hiddenGroup: true,
+					hiddenGroup: '5-13',
 					math: {
 						isBlock: true,
 						source: 'math'
@@ -546,6 +546,32 @@ describe('Embeds', () => {
 				href: 'An Image.png'
 			}
 		])
+	})
+})
+
+describe('Inline ids', () => {
+	test('Adjacent identical inline math get distinct ids', () => {
+		const ops = parser.parseMarkdown('$a$$a$').lines[0].content.ops
+		expect(ops.map(op => op.attributes.hiddenGroup)).toEqual(['0-3', '3-6'])
+
+		// Line reformatting composes ops with Delta.push, which merges equal neighbors
+		const delta = new Delta()
+		for (const op of ops) {
+			delta.push(op)
+		}
+		expect(delta.ops).toHaveLength(2)
+	})
+
+	test('Adjacent same-href embeds get distinct ids', () => {
+		const ops = parser.parseMarkdown('![[a.png]]![[a.png]]').lines[0].content.ops
+		const inlineIds = new Set(ops.map(op => op.attributes?.hiddenGroup))
+		expect([...inlineIds]).toEqual(['0-10', '10-20'])
+	})
+
+	test('Ids are relative to their line', () => {
+		const ops = parser.parseMarkdown('Before\n$a$ and ![[a]]').lines[1].content.ops
+		expect(ops[0].attributes.hiddenGroup).toEqual('0-3')
+		expect(ops.find(op => op.attributes?.t_embed)?.attributes.hiddenGroup).toEqual('8-14')
 	})
 })
 

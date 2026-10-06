@@ -149,9 +149,10 @@ class TangentEmbed extends TangentLink {
 		super.onClick(event)
 
 		if (!event.defaultPrevented) {
-			const href = this.getCleanedHref()
+			const hiddenGroup = this.closest('[data-hidden-group]')?.getAttribute('data-hidden-group')
+			if (!hiddenGroup) return
 			markAsSelectionRequest(event, { inline: attr => {
-				return attr?.t_link?.href === href
+				return attr?.hiddenGroup === hiddenGroup
 			}})
 		}
 	}

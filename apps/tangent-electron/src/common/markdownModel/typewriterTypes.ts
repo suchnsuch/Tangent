@@ -7,8 +7,7 @@ import type { TagSectionData } from './tag'
 import type { CodeData } from './code'
 import type { MathData } from './math'
 import { hasCollapsedChildren, isCollapsed } from './sections'
-import type { HrefFormedLink } from 'common/indexing/indexTypes'
-import { getMediaCustomizationsFromText } from './links'
+import { getMediaCustomizationsFromText, type LinkAttribute } from './links'
 
 const defaultOptions = {}
 
@@ -33,6 +32,13 @@ function getHideableFormatClass(attributes, baseClass = '') {
 	}
 	
 	return className
+}
+
+function getHiddenGroupAttributes(attributes) {
+	if (typeof attributes.hiddenGroup === 'string') {
+		return { 'data-hidden-group': attributes.hiddenGroup }
+	}
+	return {}
 }
 
 function hideableFormat(
@@ -552,7 +558,7 @@ const noteTypeset:TypesetTypes = {
 					className += ' revealed'
 				}
 
-				let link = attributes.t_link as HrefFormedLink
+				let link = attributes.t_link as LinkAttribute
 
 				let embedClassname = 'output'
 				const customizations = getMediaCustomizationsFromText(link.text)
@@ -571,6 +577,7 @@ const noteTypeset:TypesetTypes = {
 					'span',
 					{
 						class: className,
+						...getHiddenGroupAttributes(attributes)
 					},
 					children
 				) as any
@@ -604,7 +611,8 @@ const noteTypeset:TypesetTypes = {
 					't-link',
 					{
 						...attributes.t_link,
-						className: className
+						className: className,
+						...getHiddenGroupAttributes(attributes)
 					},
 					children)
 			}
@@ -739,7 +747,8 @@ const noteTypeset:TypesetTypes = {
 			render: (attributes, children) => {
 
 				let containerAttr = {
-					className: 'inline-math-container'
+					className: 'inline-math-container',
+					...getHiddenGroupAttributes(attributes)
 				}
 
 				let sourceAttr = {
