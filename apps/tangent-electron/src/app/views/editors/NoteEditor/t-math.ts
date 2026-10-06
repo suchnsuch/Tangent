@@ -8,7 +8,7 @@ import { defineCustomElement } from 'app/utils/defineCustomElement'
 import { getKatex } from 'app/shim/katex'
 
 class TangentMath extends HTMLElement {
-
+	
 	private content: HTMLElement
 
 	constructor() {
