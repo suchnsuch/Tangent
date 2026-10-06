@@ -113,6 +113,7 @@ function menuGenerator(): ContextMenuConstructorOptions[] {
 			type: 'radio',
 			checked: lens === $currentSettings,
 			icon: lens.getIcon(),
+			toolTip: `Switch to the "${lens.name.value}" Lens.`,
 			click() {
 				setCurrentLens(lens)
 			},
@@ -148,6 +149,7 @@ function menuGenerator(): ContextMenuConstructorOptions[] {
 	options.push({
 		type: 'submenu',
 		label: 'New',
+		icon: 'plus.svg#plus',
 		submenu: [
 			...Object.values(settingsList.config.types).map(t => {
 				return {

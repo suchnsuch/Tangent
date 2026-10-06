@@ -241,6 +241,8 @@ span {
 	opacity: 0;
 	transition: opacity .2s;
 	--iconStroke: var(--deemphasizedTextColor);
+
+	transform: scale(.75);
 }
 :hover > .opener.hidden, :global([data-input-mode="keyboard"]) :focus .opener.hidden {
 	visibility: visible;

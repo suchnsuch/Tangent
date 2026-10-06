@@ -321,12 +321,14 @@ function onMenuCanceled(event: Event) {
 button {
 	display: inline-flex;
 	flex-direction: row;
+	gap: .25em;
 
 	align-items: stretch !important;
 
 	.buttonContent {
 		display: flex;
 		align-items: center;
+		gap: .25em;
 	}
 
 	&.has-opener {
