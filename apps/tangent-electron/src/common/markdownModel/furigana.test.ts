@@ -41,9 +41,9 @@ describe('scanFuriganaSpan', () => {
 		expect(scanFuriganaSpan(source)).toBe(false)
 	})
 
-	it('an inner opener invalidates the span at its own index', () => {
-		expect(scanFuriganaSpan('{{ nested | reading } | more }')).toEqual({
-			type: 'nested',
+	it('an inner opener interrupts the span at its own index', () => {
+		expect(scanFuriganaSpan('{{ inner | reading } | more }')).toEqual({
+			type: 'interrupted',
 			end: 1
 		})
 	})
@@ -84,7 +84,7 @@ describe('scanFuriganaSpan', () => {
 })
 
 describe('furigana markdown parsing', () => {
-	it.each(['{ {', '{{ nested | reading } | more }', '{ { followed by {a|b}'])('preserves rejected nested source: %s', source => {
+	it.each(['{ {', '{{ inner | reading } | more }', '{ { followed by {a|b}'])('preserves interrupted source: %s', source => {
 		const document = markdownToTextDocument(source)
 		expect(typewriterToText(document)).toBe(source)
 		const spans = document.lines.flatMap(line => line.content.ops).filter(op => op.attributes?.furigana)
@@ -97,7 +97,7 @@ describe('furigana markdown parsing', () => {
 		'`{ code | inactive }`',
 		'```\n{ fenced | inactive }\n```',
 		'\\{ escaped | opener }',
-		'{{ nested | reading } | more }',
+		'{{ inner | reading } | more }',
 	])('round-trips %s', source => {
 		const document = markdownToTextDocument(source)
 		expect(typewriterToText(document)).toBe(source)
@@ -155,8 +155,8 @@ describe('furigana markdown parsing', () => {
 		expect(furiganaOp).toBeUndefined()
 	})
 
-	it('a rejected nested opener does not leave its inner brace active', () => {
-		const line = parseMarkdown('{{ nested | reading } | more }').lines[0]
+	it('an interrupted span does not leave its inner brace active', () => {
+		const line = parseMarkdown('{{ inner | reading } | more }').lines[0]
 		expect(line.content.ops.some(op => op.attributes?.furigana)).toBe(false)
 	})
 

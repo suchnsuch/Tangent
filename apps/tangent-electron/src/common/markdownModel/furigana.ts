@@ -8,12 +8,12 @@ export type FuriganaData = {
 
 export type FuriganaScanResult =
 	| { type: 'valid', end: number, furigana: FuriganaData }
-	| { type: 'nested', end: number } // `end` is the index of the invalidating inner `{`
+	| { type: 'interrupted', end: number } // `end` is the index of the interrupting `{`
 	| false
 
 /**
- * Nested spans are intentionally inactive: the first unescaped `{` after
- * the opener invalidates the span rather than being balanced against it.
+ * An unescaped `{` before the closing `}` interrupts the span rather than
+ * being balanced against it.
  */
 export function scanFuriganaSpan(text: string, start = 0): FuriganaScanResult {
 	if (text[start] !== '{' || isEscaped(text, start)) return false
@@ -31,7 +31,7 @@ export function scanFuriganaSpan(text: string, start = 0): FuriganaScanResult {
 			continue
 		}
 
-		if (char === '{') return { type: 'nested', end: index }
+		if (char === '{') return { type: 'interrupted', end: index }
 
 		if (char === '}') {
 			if (separatorIndex < 0) return false
@@ -58,9 +58,9 @@ export function parseInlineFurigana(char: string, parser: NoteParser): boolean {
 	const result = scanFuriganaSpan(feed.text, feed.index)
 	if (!result) return false
 
-	if (result.type === 'nested') {
-		// Preserve both openers as literal source; skipping the inner opener
-		// prevents a rejected nested span from activating as a separate span.
+	if (result.type === 'interrupted') {
+		// Preserve both openers as literal source; skipping the interrupting
+		// opener keeps it from starting a span of its own.
 		feed.nextByLength(result.end - feed.index)
 		parser.commitSpan(null)
 		return true
