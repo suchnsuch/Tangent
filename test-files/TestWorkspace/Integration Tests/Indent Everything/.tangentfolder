@@ -1,1 +1,21 @@
-{}
+{
+	"defaultLens": "Cards",
+	"lensSettings": [
+		{
+			"name": "Cards",
+			"sorting": {
+				"sortKey": "created",
+				"sortOrder": "descending"
+			},
+			"type": "CardsLensSettings"
+		},
+		{
+			"name": "Cool List",
+			"type": "ListLensSettings"
+		},
+		{
+			"name": "Feed",
+			"type": "FeedLensSettings"
+		}
+	]
+}
