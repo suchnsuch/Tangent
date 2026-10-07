@@ -1,0 +1,13 @@
+{
+	"defaultLens": "Page",
+	"lensSettings": [
+		{
+			"name": "Cards",
+			"type": "CardsLensSettings"
+		},
+		{
+			"name": "Page",
+			"type": "PageLensSettings"
+		}
+	]
+}

@@ -14,7 +14,7 @@ The forms defined for a query determine what types of items the query will retur
 * `Files` looks for all files that Tangent is prepared to visualize. 
 	* `Notes` looks for files with the `.md` extension: the notes Tangent works with on a regular basis.
 	* `Images` looks for image files. This includes `.png`, `.jpeg`, `.tiff`, `.svg` and more.
-* `Sets` looks for items that can contain files.
+* `Sets` looks for [[Sets]], items that can contain files.
 	* `Folders` looks for standard folders.
 	* `Queries` looks for saved queries. (These are _technically_ files, but we'll ignore that.)
 

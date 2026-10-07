@@ -1,4 +1,4 @@
-The List Lens is one of several [[Lenses]] that can be used to visualize multiple files. It displays the name of files in a list.
+The List Lens is one of several [[Lenses]] that can be used to visualize [[Sets]] of multiple files. It displays the name of files in a list.
 
 # Settings
 ## Sorting

@@ -1,3 +1,10 @@
 {
+	"defaultLens": null,
+	"lensSettings": [
+		{
+			"name": "Cards",
+			"type": "CardsLensSettings"
+		}
+	],
 	"queryString": "Notes with 'This'"
 }

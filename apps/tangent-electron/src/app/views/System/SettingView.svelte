@@ -7,6 +7,7 @@ import SvgIcon from '../smart-icons/SVGIcon.svelte'
 import PopUpButton from 'app/utils/PopUpButton.svelte'
 import { tooltip } from 'app/utils/tooltips'
 import ShortcutInput from 'app/utils/ShortcutInput.svelte'
+import type { SelectPathOptions } from 'common/WindowApi'
 
 const workspace = getContext('workspace') as Workspace
 
@@ -20,12 +21,15 @@ let {
 	form: formOverride,
 	display = 'block',
 	inputClass = '',
+	placeholder: placeholderProp,
 
 	getValues = null,
 	includeDefault = true,
 	getValuesImmediately = false,
 
 	onValidateShortcut = null,
+
+	getSelectPathArgs, processSelectedPath
 } : {
 	setting: Setting<SettingType, SettingType> | Setting<SettingType, SettingType[]>
 	name?: string
@@ -34,15 +38,20 @@ let {
 	form?: SettingForm
 	display?: 'block' | 'inline'
 	inputClass?: string
+	placeholder?: string
 
 	getValues?: () => Promise<SettingList>
 	includeDefault?: boolean
 	getValuesImmediately?: boolean
 
 	onValidateShortcut?: (shortcut: string) => string
+
+	getSelectPathArgs?: (value: SettingType | SettingType[]) => Omit<SelectPathOptions, 'mode' | 'allowExternal' | 'selectMultiple'>
+	processSelectedPath?: (selectedPath: string) => string
 } = $props()
 
 let form = $derived(formOverride ?? setting.form)
+let placeholder = $derived(placeholderProp ?? setting.placeholder)
 
 let procuredValues: SettingList = $state(null)
 let hasProcuredValues = false
@@ -101,12 +110,23 @@ function multiItemDisplay(items: SettingArrayType, sourceItems: SettingList) {
 }
 
 function selectPath(event: MouseEvent) {
-	workspace.api.file.selectPath({
+	let args: SelectPathOptions = {
 		title: `Select ${setting.name}`,
 		message: setting.description,
-		mode: setting.form as any // These should align
-	}).then(path => {
+	}
+
+	if (getSelectPathArgs) {
+		const additional = getSelectPathArgs($setting)
+		if (additional) {
+			Object.assign(args, additional)
+		}
+	}
+
+	args.mode = setting.form as any // These should align
+
+	workspace.api.file.selectPath(args).then(path => {
 		if (path !== undefined) {
+			path = processSelectedPath ? processSelectedPath(path) : path
 			$setting = (path ?? '') as any
 		}
 	})
@@ -240,11 +260,13 @@ function toggleItem(item) {
 					min={setting.range.min}
 					max={setting.range.max}
 					class={inputClass}
+					{placeholder}
 					onblur={applySoftValue}
 					onkeydown={applySoftValue}/>
 				<input 
 					type="range"
 					class={"grow " + inputClass}
+					{placeholder}
 					min={displayMin($setting)}
 					max={displayMax($setting)}
 					step={setting.range.step ?? .01}
@@ -258,7 +280,8 @@ function toggleItem(item) {
 						class={"grow " + inputClass}
 						spellcheck="true"
 						rows="3"
-						placeholder={setting.placeholder}></textarea>
+						{placeholder}
+						></textarea>
 				{:else if form === 'shortcut'}
 					<div style="display: flex; align-items: center;">
 						<ShortcutInput
@@ -271,7 +294,7 @@ function toggleItem(item) {
 					<input type="text"
 						class={"grow " + inputClass}
 						bind:value={$setting}
-						placeholder={setting.placeholder ?? (setting.form === 'folder' ? 'Workspace Root' : '')}
+						placeholder={placeholder ?? (setting.form === 'folder' ? 'Workspace Root' : '')}
 					/>
 					{#if setting.form === 'file' || setting.form === 'folder' || setting.form === 'path'}
 						<button onclick={selectPath} class={"inputButton " + inputClass}>

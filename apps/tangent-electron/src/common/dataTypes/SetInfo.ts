@@ -2,13 +2,15 @@ import { ObjectStore, WritableStore } from 'common/stores'
 import CardsLensSettings from 'common/settings/CardsLensSettings'
 import FeedLensSettings from 'common/settings/FeedLensSettings'
 import ListLensSettings from 'common/settings/ListLensSettings'
+import PageLensSettings from 'common/settings/PageLensSettings'
 import { LensSettingsList, lensSettingsTypesToConfig, type LensSettingsListConfig } from 'common/settings/LensSettingsList'
 
 const setLensSettingsConfig: LensSettingsListConfig = {
 	types: lensSettingsTypesToConfig([
 		CardsLensSettings,
 		FeedLensSettings,
-		ListLensSettings
+		ListLensSettings,
+		PageLensSettings
 	]),
 	defaultType: CardsLensSettings.staticType
 }

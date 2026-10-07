@@ -17,6 +17,8 @@ import type { LensSettings } from 'common/settings/LensSettings';
 import CardsLensSettings from 'common/settings/CardsLensSettings';
 import FeedLensSettings from 'common/settings/FeedLensSettings';
 import ListLensSettings from 'common/settings/ListLensSettings';
+import PageLensSettings from 'common/settings/PageLensSettings';
+import PageViewState from './PageViewState';
 
 export interface SetViewState extends NodeViewState, NodeSet {
 	context: ViewStateContext
@@ -33,6 +35,9 @@ function lensSettingsToViewState(parent: SetViewState, lensSettings: LensSetting
 	}
 	if (lensSettings instanceof ListLensSettings) {
 		return new ListViewState(parent, lensSettings)
+	}
+	if (lensSettings instanceof PageLensSettings) {
+		return new PageViewState(parent, lensSettings)
 	}
 }
 

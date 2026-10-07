@@ -1,0 +1,1 @@
+A "Set" refers to a Folder, [[Tags|Tag Group]], or [[Queries|Query]]. Each of these can be understood as groups of multiple files and notes. This allows them to share features. For example, all Sets share the same [[Lenses]] that can be used to look at collections of notes in different ways.
