@@ -17,7 +17,7 @@ function render(delta: Delta) {
 	return root
 }
 
-describe('renderInline: adjacent inline math', () => {
+describe('renderInline: adjacent hidden-group embeds', () => {
 	test('Distinct instances with the same source render as two containers', () => {
 		const root = render(new Delta([
 			{ insert: '$a$', attributes: { math: { source: 'a' }, hiddenGroup: '0-3' } },
@@ -26,6 +26,39 @@ describe('renderInline: adjacent inline math', () => {
 
 		const containers = root.querySelectorAll('.inline-math-container')
 		expect([...containers].map(c => c.getAttribute('data-hidden-group'))).toEqual(['0-3', '3-6'])
+	})
+
+	test('Distinct furigana groups with the same content render as two containers', () => {
+		const delta = new Delta([
+			{ insert: '{a|b}', attributes: { furigana: { base: 'a', reading: 'b' }, hiddenGroup: '0-5' } },
+			{ insert: '{a|b}', attributes: { furigana: { base: 'a', reading: 'b' }, hiddenGroup: '5-10' } }
+		])
+
+		const root = render(delta)
+		const containers = root.querySelectorAll('.inline-furigana-container')
+		expect([...containers].map(container => container.getAttribute('data-hidden-group'))).toEqual(['0-5', '5-10'])
+		expect(root.querySelectorAll('[data-hidden-group]')).toHaveLength(2)
+		for (const container of containers) {
+			expect(container.querySelector('.furigana-source').parentElement).toBe(container)
+			expect(container.querySelector('t-furigana').parentElement).toBe(container)
+		}
+	})
+
+	test('Decorations splitting one furigana group do not duplicate its output', () => {
+		const furigana = { base: 'Mr. Smith', reading: 'ミスター・スミス' }
+		const delta = new Delta([
+			{
+				insert: '{Mr.',
+				attributes: { furigana, hiddenGroup: '0-20', decoration: { focus: { class: 'unfocused' } } }
+			},
+			{
+				insert: ' Smith|ミスター・スミス}',
+				attributes: { furigana, hiddenGroup: '0-20', decoration: { focus: { class: 'focused' } } }
+			}
+		])
+		const root = render(delta)
+		expect(root.querySelectorAll('.inline-furigana-container')).toHaveLength(1)
+		expect(root.querySelectorAll('t-furigana')).toHaveLength(1)
 	})
 })
 

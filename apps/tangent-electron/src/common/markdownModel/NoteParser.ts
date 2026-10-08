@@ -8,6 +8,7 @@ import { parseHeader } from './header'
 import { type IndentDefinition, parseBlockquote, parseHorizontalRule } from './line'
 import { parseListItem } from './list'
 import { parseInlineMath, parseMathBlock } from './math'
+import { parseInlineFurigana } from './furigana'
 import { parseLink, parseRawLink } from './links'
 import { type ParsingContext, ParsingContextType, type ParsingProgram } from './parsingContext'
 import { parseTag } from './tag'
@@ -27,6 +28,7 @@ const blockPrograms: ParsingProgram[] = [
 
 const inlineObjectPrograms = [
 	parseInlineMath,
+	parseInlineFurigana,
 	parseLink,
 	parseRawLink,
 	parseTag,

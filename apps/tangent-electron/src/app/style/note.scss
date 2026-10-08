@@ -537,13 +537,20 @@ article.note {
 		}
 	}
 
-	.inline-math-container.revealed {
+	.inline-math-container.revealed,
+	.inline-furigana-container.revealed {
 		outline: 2px solid var(--textColor);
 		outline-offset: 4px;
 		border-radius: var(--inputBorderRadius);
 	}
 
-	span.math-source {
+	// Accommodates furigana's larger vertical footprint
+	.inline-furigana-container.revealed {
+		padding-top: .5em;
+	}
+
+	span.math-source,
+	span.furigana-source {
 		font-family: var(--codeFontFamily);
 		color: var(--accentTextColor);
 
