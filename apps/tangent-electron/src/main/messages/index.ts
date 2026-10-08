@@ -643,16 +643,27 @@ ipcMain.handle('saveImageFromClipboard', async (event, contextPath) => {
 })
 
 ipcMain.handle('copyImageToClipboard', async (event, path: string) => {
+	const windowHandle = getWindowHandle(event.sender)
 	const image = nativeImage.createFromPath(path)
-	if (!image.isEmpty()) {
+	if (image.isEmpty()) {
+		log.error('Could not load image from', path)
+		windowHandle.postUserMessage('Error', 'Could not copy image')
+		return
+	}
+	try {
 		return clipboard.write([
 			new ClipboardItem({
-				PNG_MIME_TYPE: new Blob(
+				[PNG_MIME_TYPE]: new Blob(
 					[new Uint8Array(image.toPNG())],
 					{ type: PNG_MIME_TYPE }
 				)
 			})
 		])
+	}
+	catch (e) {
+		log.error('Failed to write image to clipboard from', path, e)
+		windowHandle.postUserMessage('Error', 'Failed to write image to clipboard')
+		return
 	}
 })
 
