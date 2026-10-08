@@ -81,7 +81,7 @@
     "@vitest/browser-playwright": "^4.1.11",
     "cross-env": "^7.0.3",
     "date-fns": "^4.1.0",
-    "electron": "^44.3.0",
+    "electron": "^44.7.0",
     "electron-builder": "^26.3.0",
     "electronmon": "^2.0.4",
     "html-tag-names": "^2.1.0",
