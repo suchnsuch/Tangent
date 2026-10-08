@@ -465,6 +465,10 @@ export function linkTextFromLink(link: HrefFormedLink): string {
 			href += '#' + link.content_id
 		}
 
+		if (href.includes(' ')) {
+			href = '<' + href + '>'
+		}
+
 		if (link.title) {
 			href += ' "' + link.title + '"'
 		}
