@@ -121,6 +121,10 @@ export default class SetFocusLevelCommand extends WorkspaceCommand {
 		return `${toggle ? 'Toggle' : 'Set to'} ${FocusLevel.getFullName(targetFocusLevel)}`
 	}
 
+	showInShortcuts(): boolean {
+		return this.defaultContext != constContext
+	}
+
 	getPaletteActions() {
 		if (!this.isPaletteSource) {
 			return []

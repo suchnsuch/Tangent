@@ -66,4 +66,12 @@ export default class ToggleFocusModeCommand extends SetFocusLevelCommand {
 			{ targetFocusLevel: this.targetFocusLevel.value },
 			context))
 	}
+
+	getName(): string {
+		return 'Toggle Focus Mode'
+	}
+
+	showInShortcuts(): boolean {
+		return true
+	}
 }

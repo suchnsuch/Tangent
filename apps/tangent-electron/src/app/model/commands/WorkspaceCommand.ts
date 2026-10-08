@@ -37,6 +37,11 @@ export default abstract class WorkspaceCommand extends Command {
 		return this.getLabel()
 	}
 
+	/** Override to false to not show the command in the command list */
+	showInShortcuts() {
+		return true
+	}
+
 	getDefaultPaletteName() {
 		return this.getLabel(this.getDefaultPaletteContext())
 	}

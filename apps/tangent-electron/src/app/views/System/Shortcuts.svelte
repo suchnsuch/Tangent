@@ -65,7 +65,7 @@ function getKeyboardList(commands: WorkspaceCommands, keymap: Map<string, string
 
 	for (const key of Object.keys(commands)) {
 		const command = commands[key]
-		if (doesCommandMatch(command, matcher)) {
+		if (command.showInShortcuts() && doesCommandMatch(command, matcher)) {
 
 			let group = groups.get(command.group)
 			if (!group) {
