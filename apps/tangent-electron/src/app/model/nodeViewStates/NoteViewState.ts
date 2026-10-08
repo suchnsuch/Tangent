@@ -277,7 +277,7 @@ export default class NoteViewState implements NodeViewState, LensViewState {
 				for (const line of this.note.lines) {
 					if (line.attributes.header && safeHeaderLine(lineToText(line)).match(idMatch)) {
 						annotation.start = start
-						annotation.end = start + line.length
+						annotation.end = start + line.length - 1 // Don't include fake trailing \n
 						break
 					}
 					start += line.length

@@ -389,4 +389,8 @@ describe('Content ID Matching', () => {
 		expect('My'.match(createContentIdMatcher('My-header'))).toBeFalsy()
 		expect(' My Header '.match(createContentIdMatcher('My Header'))).toBeFalsy()
 	})
+
+	it('Can select ids with parenthesis', () => {
+		expect('My (Parenthetical) Header'.match(createContentIdMatcher('My (Parenthetical) Header'))).toBeTruthy()
+	})
 })

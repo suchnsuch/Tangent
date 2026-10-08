@@ -10,6 +10,7 @@ import { ParsingContextType, type ParsingProgram } from './parsingContext'
 import { isExternalLink } from 'common/links'
 import { isImplicitExtension } from "common/fileExtensions"
 import { getInlineId, type HiddenGroup } from './inline'
+import { escapeRegExp } from "@such-n-such/core"
 
 interface ExtendedLinkInfo extends LinkInfo {
 	complete?: boolean
@@ -360,7 +361,7 @@ export function createContentIdMatcher(contentId: string): RegExp {
 	// Header matches
 	// We want "space-likes" to all be treated the same for cross-compatability & consistency
 	const segments = normalizedContentId.split(/[-_ ]+|%20/)
-	return new RegExp('^' + segments.join('([-_ ]|%20)+') + '$', 'i')
+	return new RegExp('^' + segments.map(escapeRegExp).join('([-_ ]|%20)+') + '$', 'i')
 }
 
 /** A workspace link is a simplified intermediate version of a link without a built-out href */

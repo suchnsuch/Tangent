@@ -135,7 +135,7 @@ let mouseDownY = 0
 $: note = state.note
 
 let annotationHighlightTimeout: number = null
-let allowAnnotationReactions = true // A flag that automatically shifts annotations when content is edited
+let allowAnnotationReactions = 1 // A flag that automatically shifts annotations when content is edited
 let ignoreNextAnnotationUpdate = false
 const annotations = new ForwardingStore<Annotation[]>([])
 const annotationIndex = new ForwardingStore<number>(-1)
@@ -372,9 +372,9 @@ function onFileChanged(note: NoteFile) {
 		try {
 			if (editable) {
 				isInitializing = true
-				allowAnnotationReactions = false
+				allowAnnotationReactions--
 				editor.set(textDocument, Source.api)
-				allowAnnotationReactions = true
+				allowAnnotationReactions++
 				isInitializing = false
 			}
 			else {
@@ -432,7 +432,7 @@ function updateAnnotations(annotations: Annotation[], index=0) {
 		window.clearTimeout(annotationHighlightTimeout)
 
 		if (allowAnnotationReactions && !ignoreNextAnnotationUpdate) {
-			allowAnnotationReactions = false
+			allowAnnotationReactions--
 
 			if (index < 0 || index >= annotations.length) {
 				index = 0
@@ -459,7 +459,7 @@ function updateAnnotations(annotations: Annotation[], index=0) {
 			else if (state.selection) {
 				state.selection.set([selection, selection])
 			}
-			allowAnnotationReactions = true
+			allowAnnotationReactions++
 		}
 	}
 
@@ -517,7 +517,7 @@ function onEditorChange(changeEvent: EditorChangeEvent) {
 	// Manage annotation interactions
 	const annos = $annotations
 	if (allowAnnotationReactions && annos && annos.length) {
-		allowAnnotationReactions = false
+		allowAnnotationReactions--
 
 		let editInfo: EditInfo = null
 		let invalidChange = false
@@ -585,7 +585,7 @@ function onEditorChange(changeEvent: EditorChangeEvent) {
 			state.setAnnotations(newAnnotations)
 		}
 		
-		allowAnnotationReactions = true
+		allowAnnotationReactions++
 	}
 
 	if (editable) {
@@ -824,14 +824,14 @@ function resumeFocus(arg?) {
 	if (headerEditElement !== document.activeElement && editorElement !== document.activeElement) {
 		console.log('Resuming focus to ', note.name, state.selection.value)
 		
-		allowAnnotationReactions = false
+		allowAnnotationReactions--
 		editorElement?.focus({
 			preventScroll: true
 		})
 		if (!state.selection.value) {
 			editor.select(getInitialSelection(editor.doc))
 		}
-		allowAnnotationReactions = true
+		allowAnnotationReactions++
 	}
 }
 
