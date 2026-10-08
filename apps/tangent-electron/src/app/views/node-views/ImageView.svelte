@@ -52,9 +52,9 @@ function onKeydown(event: KeyboardEvent) {
 
 function mouseDown(event: MouseEvent) {
 
-	if (event.button === 0) {
-		event.preventDefault()
-	}
+	if (event.button !== 0) return
+	
+	event.preventDefault()
 
 	if (document.activeElement !== container) {
 		container.focus()
