@@ -20,15 +20,12 @@
 
 	"mac": {
 		"category": "public.app-category.productivity",
-		"hardenedRuntime": true,
-		"entitlements": "build/entitlements.mac.plist",
-		"entitlementsInherit": "build/entitlements.mac.plist",
 		"target": {
 			"target": "default",
 			"arch": "universal"
 		},
 		"icon": "build/Icon.icon",
-		"notarize": false,
+		"notarize": true,
 		"extendInfo": {
 			"CFBundleDocumentTypes": [
 				{
