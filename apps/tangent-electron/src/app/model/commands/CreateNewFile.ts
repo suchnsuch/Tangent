@@ -77,7 +77,14 @@ export default class CreateNewFileCommand extends WorkspaceCommand {
 		return existingNode instanceof File
 	}
 
-	private resolveContext(context: CreateNewFileCommandContext): CreationValues {
+	/**
+	 * Resolves the values a context would create a file with.
+	 * Pass `interactive: false` to resolve without side effects: the naming dialog is
+	 * never pushed and an unresolvable context returns `undefined` instead of throwing.
+	 */
+	private resolveContext(context: CreateNewFileCommandContext, options?: { interactive?: boolean }): CreationValues {
+
+		const interactive = options?.interactive ?? true
 
 		let { rule, path, relativePath, folder, name, extension, updateSelection, creationMode } = context || {}
 		const { directoryStore, viewState } = this.workspace
@@ -99,16 +106,28 @@ export default class CreateNewFileCommand extends WorkspaceCommand {
 					name = nameResult
 				}
 				else if (nameResult !== null) {
-					const { preName, postName } = nameResult
+					if (!interactive) {
+						// Resolving for a preview, so the typed name is unknown and a
+						// placeholder stands in for it. A separator after the token would
+						// make the typed name a folder; dropping that suffix resolves to
+						// the deepest folder the template still fixes.
+						const { preName, postName } = nameResult
+						name = /[\\/]/.test(postName)
+							? preName + 'New Note'
+							: preName + 'New Note' + postName
+					}
+					else {
+						const { preName, postName } = nameResult
 
-					this.workspace.viewState.modal.push(CreateFileDialog, {
-						title: 'Create New ' + rule.name,
-						preName,
-						postName,
-						context
-					})
-					// The dialog will handle the rest
-					return
+						this.workspace.viewState.modal.push(CreateFileDialog, {
+							title: 'Create New ' + rule.name,
+							preName,
+							postName,
+							context
+						})
+						// The dialog will handle the rest
+						return
+					}
 				}
 				else {
 					// Fall back to the default naming flow
@@ -149,6 +168,7 @@ export default class CreateNewFileCommand extends WorkspaceCommand {
 		if (relativePath) {
 			const validatedPath = validatePath(relativePath)
 			if (!validatedPath) {
+				if (!interactive) return
 				throw new Error(`Could not create file. "${relativePath}" is invalid and could not be made valid.`)
 			}
 			relativePath = validatedPath
@@ -181,6 +201,8 @@ export default class CreateNewFileCommand extends WorkspaceCommand {
 
 				// When looking at a folder, create items within the folder
 				let folder = item.fileType === 'folder' ? item : directoryStore.getParent(item)
+				// Skip selections whose parent disappeared during a tooltip read.
+				if (!interactive && !folder) continue
 
 				if (!deepestFolder || deepestFolder.depth > folder.depth) {
 					deepestFolder = folder
@@ -193,6 +215,7 @@ export default class CreateNewFileCommand extends WorkspaceCommand {
 
 			folderPath = directoryStore.pathToRelativePath(deepestFolder.path)
 			if (folderPath === false) {
+				if (!interactive) return
 				throw new Error('A relative folder path could not be determined! This should not happen by this point.')
 			}
 		}
@@ -386,12 +409,26 @@ export default class CreateNewFileCommand extends WorkspaceCommand {
 		return 'Create New Note'
 	}
 
-	getTooltip(context: CreateNewFileCommandContext) {
+	getTooltip(context?: CreateNewFileCommandContext) {
 		const rule = context?.rule
-		if (rule) {
-			const description = rawOrStoreValue(rule.description)
-			return description || 'Creates a new ' + rawOrStoreValue(rule.name)
+		const description = rule ? rawOrStoreValue(rule.description) : undefined
+		const subject = rule ? 'a new ' + rawOrStoreValue(rule.name) : 'a new note'
+
+		const values = this.resolveContext(context ?? {}, { interactive: false })
+		const resolvedPath = values && validatePath(paths.join(values.folderPath, values.name + values.extension))
+		if (!resolvedPath) {
+			if (description) return description.endsWith('.') ? description : `${description}.`
+			return `Creates ${subject}.`
 		}
-		return 'Creates a new note'
+
+		const folderPath = paths.dirname(resolvedPath)
+		const destination = !folderPath || folderPath === '.'
+			? 'the root of the workspace'
+			: `"${folderPath}"`
+
+		if (description) {
+			return `${description}\nDestination: ${destination}.`
+		}
+		return `Creates ${subject} in ${destination}.`
 	}
 }
