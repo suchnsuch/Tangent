@@ -15,7 +15,7 @@
 			"name": "comment.line.double-slash.tangentquery"
 		},
 		{
-			"match": "\\b(?i:Files|Notes|Images|Sets|Folders|Queries)\\b",
+			"match": "\\b(?i:Files|Notes|Sections|Images|Sets|Folders|Queries)\\b",
 			"name": "keyword.other.form"
 		},
 		{ "include": "#joins" },

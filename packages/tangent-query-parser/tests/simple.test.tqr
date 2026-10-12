@@ -28,3 +28,8 @@ Notes with "test" and (in [[Place]] or (with /foo/ or in [[Location]]))
 
 Notes not in [[Place]]
 //    ^^^ keyword.other.negate
+
+Sections with #Tag
+// <~- keyword.other.form
+//       ^^^^ keyword.other.clause
+//            ^^^^string.tag
