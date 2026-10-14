@@ -54,10 +54,7 @@ export class CopyRelativePathCommand extends WorkspaceCommand {
 	}
 
 	getPath(node: TreeNode): string {
-		const workspaceAbsolutePath = this.workspace.viewState.directoryView.root.path
-		const nodeAbsolutePath = node.path
-		const nodeRelativePath = nodeAbsolutePath.substring(workspaceAbsolutePath.length)
-		return nodeRelativePath
+		return this.workspace.directoryStore.pathToRelativePath(node.path) || ''
 	}
 
 	execute(context?: CopyPathCommandContext): void {
