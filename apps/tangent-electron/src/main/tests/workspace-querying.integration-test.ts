@@ -1,4 +1,4 @@
-import { describe, test, expect, beforeAll, afterAll } from 'vitest'
+import { describe, test, expect, beforeAll, afterAll, it } from 'vitest'
 
 import { installTextmate } from '@such-n-such/tangent-query-parser'
 import type Indexer from 'common/indexing/Indexer'
@@ -15,6 +15,17 @@ function resultToNodePaths(result: QueryResult) {
 	expect(result.errors).toBeUndefined()
 
 	return result.items?.map(i => workspace.contentsStore.pathToRelativePath(i.path))
+}
+
+function resultsWithRelativePath(result: QueryResult) {
+	expect(result.errors).toBeUndefined()
+
+	return result.items?.map(i => {
+		return {
+			...i,
+			path: workspace.contentsStore.pathToRelativePath(i.path)
+		}
+	})
 }
 
 beforeAll(async () => {
@@ -142,6 +153,7 @@ describe('Group negation', () => {
 			'A Note to Link To.md',
 			'Another Link Note.md',
 			'Another Note to Link To.md',
+			'Note With Headers.md',
 			'Note With Links.md',
 			'Note With Tag.md',
 			'Note with Keyword.md',
@@ -169,6 +181,7 @@ describe('Querying Tags', () => {
 	test('Can get items with tag', async () => {
 		const result = await solveQuery('Notes with #test-tag')
 		expect(resultToNodePaths(result)).toEqual([
+			'Note With Headers.md',
 			'Note With Tag.md'
 		])
 	})
@@ -204,6 +217,7 @@ describe('Querying Todos', () => {
 	test('Can get items with any todos', async () => {
 		const result = await solveQuery('Notes with todos')
 		expect(resultToNodePaths(result)).toEqual([
+			'Note With Headers.md',
 			'Todos/Note With Canceled Todos.md',
 			'Todos/Note With Closed Todos.md',
 			'Todos/Note With Mixed Todos.md',
@@ -214,6 +228,7 @@ describe('Querying Todos', () => {
 	test('Can get items with open todos', async () => {
 		const result = await solveQuery('Notes with open todos')
 		expect(resultToNodePaths(result)).toEqual([
+			'Note With Headers.md',
 			'Todos/Note With Mixed Todos.md',
 			'Todos/Note With Open Todos.md'
 		])
@@ -240,6 +255,59 @@ describe('Querying Todos', () => {
 			'Todos/Note With Canceled Todos.md',
 			'Todos/Note With Closed Todos.md',
 			'Todos/Note With Mixed Todos.md'
+		])
+	})
+})
+
+describe('Querying Sections', () => {
+	it('Can find sections in notes', async () => {
+		const result = await solveQuery('Sections named "Headers inside of it"')
+		expect(resultsWithRelativePath(result)).toMatchObject([
+			{
+				path: 'Note With Headers.md',
+				start: 65,
+				end: 122
+			}
+		])
+	})
+	it('Includes sub-sections', async () => {
+		const result = await solveQuery('Sections named "An Outer Header"')
+		expect(resultsWithRelativePath(result)).toMatchObject([
+			{
+				path: 'Note With Headers.md',
+				start: 0,
+				end: 122
+			}
+		])
+	})
+	it('Can find tags', async () => {
+		const result = await solveQuery('Sections with #test-tag')
+		expect(resultsWithRelativePath(result)).toMatchObject([
+			{
+				path: 'Note With Headers.md',
+				start: 122,
+				end: 166
+			}
+		])
+	})
+	it('Can find todos', async () => {
+		const result = await solveQuery('Sections with Open Todos')
+		expect(resultsWithRelativePath(result)).toMatchObject([
+			{
+				path: 'Note With Headers.md',
+				start: 166,
+				end: 207
+			}
+		])
+	})
+	it('Can find text', async () => {
+		const result = await solveQuery('Sections with "This sentence definitely doesn\'t exist anywhere else."')
+		expect(resultsWithRelativePath(result)).toMatchObject([
+			{
+				path: 'Note With Headers.md',
+				start: 207,
+				end: 292
+			}
 		])
 	})
 })

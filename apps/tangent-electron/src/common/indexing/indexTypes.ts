@@ -208,7 +208,7 @@ export interface HeaderInfo {
 	end: number
 
 	level: number
-	/** The full text — e.g. `## Header Text` — of the header */
+	/** The sanitized text of the header */
 	text: string
 }
 

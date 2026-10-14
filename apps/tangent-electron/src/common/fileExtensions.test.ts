@@ -12,4 +12,11 @@ describe('File Extension Utils', () => {
 		expect('.mdx'.match(mdMatch)).toBeNull()
 		expect('.md'.match(mdMatch)).not.toBeNull()
 	})
+	it('Should not match anything when given a blank list', () => {
+		const match = getFileTypeRegex([])
+		expect('.md'.match(match)).toBeNull()
+		expect('.jpg'.match(match)).toBeNull()
+		expect('foo'.match(match)).toBeNull()
+		expect('folder'.match(match)).toBeNull()
+	})
 })

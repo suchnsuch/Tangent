@@ -17,6 +17,8 @@ export function getExtensionRegex(extensions: string[]) {
 }
 
 export function getFileTypeRegex(fileTypes: string[]) {
+	if (!fileTypes || fileTypes.length === 0) return /a^/ // _Should_ match nothing
+	
 	let matchString = '('
 	for (let i = 0; i < fileTypes.length; i++){
 		const fileType = fileTypes[i]

@@ -1,5 +1,10 @@
 import type { TreeNode, DirectoryStore } from 'common/trees'
 
+export type Range = {
+	start: number
+	end: number
+}
+
 export interface TreeNodeReference {
 	path: string
 

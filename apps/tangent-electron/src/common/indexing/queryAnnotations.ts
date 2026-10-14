@@ -1,13 +1,19 @@
 import type { PartialClauseValue } from '@such-n-such/tangent-query-parser'
-import type { Annotation } from 'common/nodeReferences'
+import type { Annotation, Range } from 'common/nodeReferences'
 
-export function getTextAnnotations(text: string, partial: PartialClauseValue, target?: Annotation['target']): Annotation[] {
+export function getTextAnnotations(
+	text: string,
+	partial: PartialClauseValue,
+	range: Range,
+	target?: Annotation['target']
+) : Annotation[]
+{
 	if ('text' in partial) {
-		let startIndex = 0
+		let startIndex = range.start
 		let annotations: Annotation[] = []
 		while (startIndex < text.length) {
 			const index = text.indexOf(partial.text, startIndex)
-			if (index >= 0) {
+			if (index >= 0 && (range.end === -1 || range.end >= index + partial.text.length)) {
 				annotations.push({
 					target,
 					data: partial,
@@ -39,8 +45,8 @@ export function getTextAnnotations(text: string, partial: PartialClauseValue, ta
 						result.push({
 							target,
 							data: { ...partial, group: groupIndex },
-							start,
-							end
+							start: start + range.start,
+							end: end + range.start
 						})
 					}
 				}
@@ -55,8 +61,13 @@ export function getTextAnnotations(text: string, partial: PartialClauseValue, ta
 			}]
 		}
 
+		const clippedText = text.substring(
+			range.start,
+			range.end < 0 ? undefined : range.end
+		)
+
 		if (regex.global) {
-			const matches = text.matchAll(regex)
+			const matches = clippedText.matchAll(regex)
 			if (matches) {
 				const result = []
 				for (const match of matches) {
@@ -66,7 +77,7 @@ export function getTextAnnotations(text: string, partial: PartialClauseValue, ta
 			}
 		}
 		else {
-			const match = text.match(regex)
+			const match = clippedText.match(regex)
 			if (match) {
 				return matchToAnnotations(match)
 			}

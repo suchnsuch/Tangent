@@ -1,11 +1,11 @@
 import { filterIterator, mapIterator } from '@such-n-such/core'
-import { type Clause, type ClauseGroup, ClauseType, ClauseMod, isGroup, parseQueryText, type PartialClauseReference, type PartialClauseValue, type Query, type QueryError, type PartialClauseType, TodoQueryState, tagContainsTag, ClauseGroupMod } from '@such-n-such/tangent-query-parser'
+import { type Clause, type ClauseGroup, ClauseType, ClauseMod, isGroup, parseQueryText, type PartialClauseReference, type Query, type QueryError, type PartialClauseType, TodoQueryState, tagContainsTag, ClauseGroupMod } from '@such-n-such/tangent-query-parser'
 import QueryInfo, { queryFileType } from 'common/dataTypes/QueryInfo'
 import { DirectoryStore, type TreeNode, TreePredicateResult, validatePath } from 'common/trees'
-import { getExtensionRegex, getFileTypeRegex, imageFileExtensions, noteFileExtensions } from 'common/fileExtensions'
-import { addPreviewToReference, type Annotation, areNodesOrReferencesEquivalent, cleanReference, createReference, getNode, getNodeFromReference, getNodeOrReferenceId, isNode, isReference, isReferenceEquivalentToNode, isSubReference, type TreeNodeOrReference, type TreeNodeReference } from 'common/nodeReferences'
+import { getExtensionRegex, getFileTypeRegex, imageFileExtensions, noteExtensionMatch, noteFileExtensions } from 'common/fileExtensions'
+import { addPreviewToReference, type Annotation, areNodesOrReferencesEquivalent, cleanReference, createReference, getNode, getNodeFromReference, isNode, isReference, isSubReference, type Range, type TreeNodeOrReference, type TreeNodeReference } from 'common/nodeReferences'
 import type { ObjectStore } from 'common/stores'
-import { IndexData, type TodoState } from './indexTypes'
+import { IndexData, StructureType, type HeaderInfo, type TodoState } from './indexTypes'
 import { getTextAnnotations } from './queryAnnotations'
 import type { QueryResult } from './queryResults'
 import { getTagPath, isTagTreeNode } from './TagNode'
@@ -37,6 +37,8 @@ function isTextReadable(item: TreeNodeOrReference): boolean {
 
 function newSet() { return new Set<TreeNodeOrReference>() }
 const emptySet = newSet()
+
+const fullRange = { start: 0, end: -1 }
 
 function printClause(clause: Clause) {
 	let result = '( ' + clause.type + ' '
@@ -82,6 +84,12 @@ function doTodoStatesMatch(state: TodoState, query: TodoQueryState): boolean {
 		default:
 			return false
 	}
+}
+
+function rangeContainsRange(container: Range, contained: Range): boolean {
+	return container.start <= contained.start
+		&& (container.end === -1 // Everything
+			|| container.end >= contained.end)
 }
 
 /**
@@ -134,6 +142,7 @@ export async function solveQuery(query: Query, interop: QuerySolverInterop): Pro
 	const errors: QueryError[] = []
 
 	let extensions = new Set<string>()
+	let targetsSections = false
 	for (const form of forms) {
 		switch (form) {
 			case 'Sets':
@@ -150,6 +159,9 @@ export async function solveQuery(query: Query, interop: QuerySolverInterop): Pro
 				addAllToSet(extensions, noteFileExtensions)
 				addAllToSet(extensions, imageFileExtensions)
 				break
+			case 'Sections':
+				targetsSections = true
+				break
 			case 'Notes':
 				addAllToSet(extensions, noteFileExtensions)
 				break
@@ -161,10 +173,43 @@ export async function solveQuery(query: Query, interop: QuerySolverInterop): Pro
 
 	const validFileTypeMatcher = getFileTypeRegex([...extensions.values()])
 
+	let headerList: HeaderInfo[] = [] // Share to minimize object churn
+
 	const baseSet = newSet()
 	for (const node of allValidNodes(directory)) {
 		if (node.fileType.match(validFileTypeMatcher)) {
 			baseSet.add(node)
+		}
+		if (targetsSections && node.fileType.match(noteExtensionMatch) && node.meta?.structure) {
+			const structure = node.meta.structure
+			for (const item of structure) {
+				if (item.type !== StructureType.Header) continue
+				for (let i = headerList.length - 1; i >= 0; i--) {
+					if (headerList[i].level >= item.level) {
+						// The listed header is closed by the new header
+						const closingHeader = headerList.pop()
+						const ref: TreeNodeReference = {
+							path: node.path,
+							title: closingHeader.text,
+							start: closingHeader.start,
+							end: item.start
+						}
+						baseSet.add(ref)
+					}
+				}
+				headerList.push(item)
+			}
+
+			while (headerList.length) {
+				const closingHeader = headerList.pop()
+				const ref: TreeNodeReference = {
+					path: node.path,
+					title: closingHeader.text,
+					start: closingHeader.start,
+					end: -1 // Alias for the end of the file, whatever that is
+				}
+				baseSet.add(ref)
+			}
 		}
 	}
 
@@ -273,21 +318,23 @@ export async function solveQuery(query: Query, interop: QuerySolverInterop): Pro
 		}
 	}
 
+	const contentsMap = new Map<string, TreeNodeReference>()
+
 	async function cacheNodeContents(ref: TreeNodeOrReference) {
 		if (isNode(ref)) {
 			ref = createReference(ref, true)
 		}
-		if (!ref.content) {
-			const node = getNodeFromReference(ref, directory)
-			if (node.fileType === 'folder' || node?.meta?.virtual) {
-				ref.content = ''
+		if (!ref.content || !ref.lines) {
+			const cache = contentsMap.get(ref.path)
+			if (cache) {
+				ref.content = cache.content
+				ref.lines = cache.lines
 			}
 			else {
 				ref.content = await getFileContents(ref.path) || ''
+				ref.lines = ref.content.split('\n')
+				contentsMap.set(ref.path, ref)
 			}
-		}
-		if (!ref.lines) {
-			ref.lines = ref.content.split('\n')
 		}
 		return ref
 	}
@@ -303,7 +350,7 @@ export async function solveQuery(query: Query, interop: QuerySolverInterop): Pro
 					name = n.name
 				}
 
-				return getTextAnnotations(name, clause, 'name')
+				return getTextAnnotations(name, clause, fullRange, 'name')
 			}))
 		}
 		else if (clause.type === ClauseType.In) {
@@ -382,10 +429,7 @@ export async function solveQuery(query: Query, interop: QuerySolverInterop): Pro
 				
 				return new Set(queryFilter(set, item => {
 					const node = getNode(item, directory)
-					if (isSubReference(item)) {
-						log.warn('Tags in sub references not yet supported!', item)
-						return false
-					}
+					const range = isSubReference(item) ? item as Range : fullRange
 
 					const annotations: Annotation[] = []
 
@@ -399,7 +443,7 @@ export async function solveQuery(query: Query, interop: QuerySolverInterop): Pro
 							log.error(`While filtering for tag "${searchTag.path}", found an item (${node.path}) with a tag reference that points to a non-tag item (${tag.to})`, node, tagNode)
 							continue
 						}
-						if (tagContainsTag(searchTag.names, tagNode.names)) {
+						if (rangeContainsRange(range, tag) && tagContainsTag(searchTag.names, tagNode.names)) {
 							annotations.push({
 								start: tag.start,
 								end: tag.end,
@@ -414,17 +458,14 @@ export async function solveQuery(query: Query, interop: QuerySolverInterop): Pro
 			else if ('todo' in clause) {
 				return new Set(queryFilter(set, item => {
 					const node = getNode(item, directory)
-					if (isSubReference(item)) {
-						log.warn('Todos in sub references not yet supported!', item)
-						return false
-					}
+					const range = isSubReference(item) ? item as Range : fullRange
 
 					const targetState = clause.todo
 					
 					const annotations: Annotation[] = []
 					
 					for (const todo of IndexData.todos(node.meta)) {
-						if (doTodoStatesMatch(todo.state, targetState)) {
+						if (rangeContainsRange(range, todo) && doTodoStatesMatch(todo.state, targetState)) {
 							annotations.push({
 								start: todo.start,
 								end: todo.end,
@@ -443,38 +484,35 @@ export async function solveQuery(query: Query, interop: QuerySolverInterop): Pro
 
 					ref = await cacheNodeContents(ref)
 
-					if (isSubReference(ref)) {
-						// TODO: Anything
-					}
-					else {
-						const annotations = getTextAnnotations(ref.content, clause)
-						if (annotations && annotations.length) {
+					const range = isSubReference(ref) ? ref as Range : fullRange
 
-							if (!ref.annotations) ref.annotations = annotations
-							else ref.annotations.push(...annotations)
+					const annotations = getTextAnnotations(ref.content, clause, range)
+					if (annotations && annotations.length) {
 
-							for (const annotation of annotations) {
-								if (annotation.target ?? 'content' !== 'content') continue;
+						if (!ref.annotations) ref.annotations = annotations
+						else ref.annotations.push(...annotations)
 
-								let lineStart = 0
-								for (const line of ref.lines) {
-									const lineEnd = lineStart + line.length
+						for (const annotation of annotations) {
+							if (annotation.target ?? 'content' !== 'content') continue;
 
-									if (annotation.start < lineEnd) {
-										if (!ref.preview) ref.preview = []
-										addPreviewToReference(ref, {
-											start: lineStart,
-											content: line
-										})
-										break
-									}
+							let lineStart = 0
+							for (const line of ref.lines) {
+								const lineEnd = lineStart + line.length
 
-									lineStart = lineEnd + 1
+								if (annotation.start < lineEnd) {
+									if (!ref.preview) ref.preview = []
+									addPreviewToReference(ref, {
+										start: lineStart,
+										content: line
+									})
+									break
 								}
-							}
 
-							return ref
+								lineStart = lineEnd + 1
+							}
 						}
+
+						return ref
 					}
 
 					return null
