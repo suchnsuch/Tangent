@@ -139,7 +139,5 @@
 			"region": "us-east-2",
 			"path": "Tangent/Releases"
 		}
-	],
-
-	"afterSign": "build/notarize.js"
+	]
 }
