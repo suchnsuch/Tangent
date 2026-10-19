@@ -12,7 +12,7 @@ function copyTooltip(what: string): string {
 }
 function copyPath(workspace: Workspace, path: string) {
 	navigator.clipboard.writeText(path)
-	workspace.api.postMessage({ title: "Copy to clipboard", message: `'${path}' copied to clipboard`, type: 'info'})
+	workspace.api.postMessage({ title: "Copied to Clipboard", message: `"${path}" copied to clipboard.`, type: 'info'})
 }
 
 export class CopyAbsolutePathCommand extends WorkspaceCommand {
