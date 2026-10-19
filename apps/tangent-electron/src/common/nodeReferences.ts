@@ -1,4 +1,5 @@
 import type { TreeNode, DirectoryStore } from 'common/trees'
+import type { StructureType } from './indexing/indexTypes'
 
 export type Range = {
 	start: number
@@ -20,6 +21,7 @@ export interface TreeNodeReference {
 	end?: number
 
 	title?: string
+	type?: StructureType
 	preview?: NodePreview | NodePreview[]
 	annotations?: Annotation[]
 }

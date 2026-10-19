@@ -24,6 +24,15 @@ export interface QuerySolverInterop {
 	noteFileExtensions: string[]
 }
 
+type SolverReference = TreeNodeReference & {
+	/** If present, this reference will be extended to this mark at the end */
+	extendedEnd?: number
+}
+
+function isSolverReference(ref: TreeNodeReference | SolverReference): ref is SolverReference {
+	return 'extendedEnd' in ref
+}
+
 type ReferenceIterator = (handler: (item: TreeNodeOrReference, mod?: ClauseMod) => boolean) => boolean
 
 const textReadableMatch = getExtensionRegex([
@@ -173,8 +182,6 @@ export async function solveQuery(query: Query, interop: QuerySolverInterop): Pro
 
 	const validFileTypeMatcher = getFileTypeRegex([...extensions.values()])
 
-	let headerList: HeaderInfo[] = [] // Share to minimize object churn
-
 	const baseSet = newSet()
 	for (const node of allValidNodes(directory)) {
 		if (node.fileType.match(validFileTypeMatcher)) {
@@ -182,33 +189,27 @@ export async function solveQuery(query: Query, interop: QuerySolverInterop): Pro
 		}
 		if (targetsSections && node.fileType.match(noteExtensionMatch) && node.meta?.structure) {
 			const structure = node.meta.structure
-			for (const item of structure) {
-				if (item.type !== StructureType.Header) continue
-				for (let i = headerList.length - 1; i >= 0; i--) {
-					if (headerList[i].level >= item.level) {
-						// The listed header is closed by the new header
-						const closingHeader = headerList.pop()
-						const ref: TreeNodeReference = {
-							path: node.path,
-							title: closingHeader.text,
-							start: closingHeader.start,
-							end: item.start
-						}
-						baseSet.add(ref)
-					}
-				}
-				headerList.push(item)
-			}
+			const headerList: HeaderInfo[] = []
 
-			while (headerList.length) {
-				const closingHeader = headerList.pop()
-				const ref: TreeNodeReference = {
+			// Iterate backwards so that the next/closing sections are always known
+			for (let i = structure.length - 1; i >= 0; i--) {
+				const item = structure[i]
+				if (item.type !== StructureType.Header) continue
+
+				const nextHeader = headerList.at(-1)
+				const closingHeader = headerList.findLast(h => h.level >= item.level)
+
+				const ref: SolverReference = {
 					path: node.path,
-					title: closingHeader.text,
-					start: closingHeader.start,
-					end: -1 // Alias for the end of the file, whatever that is
+					title: item.text,
+					start: item.start,
+					// The query solving range is just the owned content.
+					end: nextHeader?.start ?? -1,
+					// The full scope of the section will be restored once matched.
+					extendedEnd: closingHeader?.start ?? -1
 				}
 				baseSet.add(ref)
+				headerList.push(item)
 			}
 		}
 	}
@@ -583,6 +584,11 @@ export async function solveQuery(query: Query, interop: QuerySolverInterop): Pro
 
 	const items = [...mapIterator(await solveGroup(query, baseSet), item => {
 		if (isNode(item)) return createReference(item)
+
+		if (isSolverReference(item)) {
+			item.end = item.extendedEnd
+			delete item.extendedEnd
+		}
 
 		cleanReference(item)
 		return item
