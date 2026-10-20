@@ -108,6 +108,7 @@ let {
 
 	editable = true,
 	allowOverscroll = true,
+	smoothScrollOnInit = true,
 	showHeaderIcon = false,
 	fixedTitle,
 
@@ -138,7 +139,7 @@ let effectiveExtraBottom = $state(extraBottom)
 // svelte-ignore state_referenced_locally
 let lastFocusLevel = focusLevel
 
-let isInitializing = false
+let hasInitializedSelection = false
 let allowSelectionScroll = true
 let saveTimeout = null
 let hasSelection = $state(false)
@@ -399,11 +400,11 @@ function onFileChanged(note: NoteFile) {
 
 		try {
 			if (editable) {
-				isInitializing = true
+				hasInitializedSelection = false
 				allowAnnotationReactions--
 				editor.set(textDocument, Source.api)
 				allowAnnotationReactions++
-				isInitializing = false
+				hasInitializedSelection = true
 			}
 			else {
 				editor.set(textDocument, Source.api)
@@ -433,8 +434,8 @@ $effect(() => {
 	untrack(() => initializeSelection(h, e))
 })
 function initializeSelection(_h?, _e?) {
-	isInitializing = true
 	if (note && headerEditElement && editorElement && isCurrent) {
+		hasInitializedSelection = false
 		if (note.loadState === 'new') {
 			getSelection().selectAllChildren(headerEditElement)
 			headerEditElement.focus()
@@ -449,8 +450,8 @@ function initializeSelection(_h?, _e?) {
 		if (!editable) {
 			editorElement.removeAttribute('contenteditable')
 		}
+		hasInitializedSelection = true
 	}
-	isInitializing = false
 }
 
 $effect(() => {
@@ -475,7 +476,9 @@ function updateAnnotations(annotations: Annotation[], index=0) {
 				index = 0
 			}
 
-			annotationHighlightTimeout = window.setTimeout(() => {
+			const useSmoothScroll = hasInitializedSelection || smoothScrollOnInit
+
+			const applyScroll = () => {
 				const annotation = annotations[index]
 				const range: EditorRange = [annotation.start, annotation.end]
 				const bounds = editor.getBounds(range)
@@ -485,12 +488,17 @@ function updateAnnotations(annotations: Annotation[], index=0) {
 				const bufferHeight = containerRect.height * .2
 				
 				if (containerRect.top + bufferHeight > bounds.top || containerRect.bottom - bufferHeight < bounds.bottom) {
-					centerOnEditorRange(range, smoothScrollTime)
+					centerOnEditorRange(range, useSmoothScroll ? smoothScrollTime : 0)
 				}
-			}, 100)
+			}
+
+			if (useSmoothScroll) {
+				annotationHighlightTimeout = window.setTimeout(applyScroll, 100)
+			}
+			else applyScroll()
 
 			const selection = annotations[index].end
-			if (document.activeElement === editorElement || (isCurrent && isInitializing)) {
+			if (document.activeElement === editorElement || (isCurrent && !hasInitializedSelection)) {
 				editor.select(selection)
 			}
 			else if (noteState.selection) {
@@ -667,7 +675,7 @@ function onEditorChange(changeEvent: EditorChangeEvent) {
 			}
 		}
 		
-		if (!isInitializing) {
+		if (hasInitializedSelection) {
 			hasSelection = changeEvent.doc.selection != null
 			justScrolled = false
 		}
