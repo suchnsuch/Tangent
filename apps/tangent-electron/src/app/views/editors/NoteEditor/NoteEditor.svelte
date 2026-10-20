@@ -1,5 +1,5 @@
 <script lang="ts">
-import { getContext, onDestroy, tick } from 'svelte'
+import { getContext, onDestroy, tick, untrack } from 'svelte'
 import {
 	DecorateEvent,
 	type DecorationsModule,
@@ -15,7 +15,7 @@ import {
 
 import { wait } from '@such-n-such/core'
 
-import type Workspace from "app/model/Workspace";
+import type Workspace from "app/model/Workspace"
 import type NoteFile from 'app/model/NoteFile'
 
 import MarkdownEditor from './MarkdownEditor'
@@ -27,41 +27,41 @@ import AutoCompleteMenu from '../autocomplete/AutoCompleteMenu.svelte'
 import WikiLinkAutocompleteMenu from '../autocomplete/WikiLinkAutocompleteMenu.svelte'
 import type { FileLoadState } from 'app/model/File'
 import { FocusLevel } from 'common/dataTypes/TangentInfo'
-import { type HrefFormedLink, StructureType } from 'common/indexing/indexTypes'
-import type { ConnectionInfo } from 'common/indexing/indexTypes'
+import { StructureType } from 'common/indexing/indexTypes'
 import { areLineArraysOpTextEquivalent, type EditInfo, getEditInfo, getRangeWhile, rangesAreEquivalent, stripLineAttributes } from 'common/typewriterUtils'
-import { scrollTo } from 'app/utils';
-import { getLinkDirectionFromEvent, type KeyboardExitCallback, type NavigationCallback, type NavigationData, type ViewReadyCallback } from 'app/events'
-import WorkspaceFileHeader from 'app/utils/WorkspaceFileHeader.svelte';
-import { TangentLink } from './t-link';
-import { appendContextTemplate, type ContextMenuConstructorOptions } from 'app/model/menus';
-import { getInitialSelection } from 'common/markdownModel';
-import { marginToAxis, type ScrollToCallback, type ScrollToOptions } from 'app/utils/scrollto';
-import { resolveLink } from 'common/markdownModel/links';
-import type { Annotation } from 'common/nodeReferences';
+import { scrollTo } from 'app/utils'
+import { getLinkDirectionFromEvent } from 'app/events'
+import WorkspaceFileHeader from 'app/utils/WorkspaceFileHeader.svelte'
+import { TangentLink } from './t-link'
+import { appendContextTemplate, type ContextMenuConstructorOptions } from 'app/model/menus'
+import { getInitialSelection } from 'common/markdownModel'
+import { marginToAxis, type ScrollToOptions } from 'app/utils/scrollto'
+import { resolveLink } from 'common/markdownModel/links'
+import type { Annotation } from 'common/nodeReferences'
 import { ForwardingStore, subscribeUntil } from 'common/stores'
-import type { NoteViewState } from 'app/model/nodeViewStates';
-import { getActiveSentenceRange } from 'common/markdownModel/line';
-import paths from 'common/paths';
-import TagAutocompleter from '../autocomplete/TagAutocompleter';
-import TagAutocompleteMenu from '../autocomplete/TagAutocompleteMenu.svelte';
-import { getPixelValue, smoothScrollTime } from 'app/utils/style';
-import UnicodeAutocompleter from '../autocomplete/UnicodeAutocompleter';
-import UnicodeAutocompleteMenu from '../autocomplete/UnicodeAutocompleteMenu.svelte';
-import CodeBlockAutocompleter from '../autocomplete/CodeBlockAutoCompleter';
-import CodeBlockAutocompleteMenu from '../autocomplete/CodeBlockAutocompleteMenu.svelte';
-import { handleIsNode } from 'app/model/NodeHandle';
-import { revealContentAroundRange } from './editorModule';
-import { fly } from 'svelte/transition';
-import { derived } from 'svelte/store';
-import { EmbedFile } from 'app/model';
-import LineGutterLeft from './LineGutterLeft.svelte';
-import LineGutterRight from './LineGutterRight.svelte';
-import { dropTooltip, requestTooltip, type TooltipConfig } from 'app/utils/tooltips';
-import YamlTooltip from './YamlTooltip.svelte';
-import TemplateTokenTooltip from './TemplateTokenTooltip.svelte';
-import TemplateTokenAutocompleter from '../autocomplete/TemplateTokenAutocompleter';
-import TemplateTokenAutocompleteMenu from '../autocomplete/TemplateTokenAutocompleteMenu.svelte';
+import type { NoteViewState } from 'app/model/nodeViewStates'
+import { getActiveSentenceRange } from 'common/markdownModel/line'
+import paths from 'common/paths'
+import TagAutocompleter from '../autocomplete/TagAutocompleter'
+import TagAutocompleteMenu from '../autocomplete/TagAutocompleteMenu.svelte'
+import { getPixelValue, smoothScrollTime } from 'app/utils/style'
+import UnicodeAutocompleter from '../autocomplete/UnicodeAutocompleter'
+import UnicodeAutocompleteMenu from '../autocomplete/UnicodeAutocompleteMenu.svelte'
+import CodeBlockAutocompleter from '../autocomplete/CodeBlockAutoCompleter'
+import CodeBlockAutocompleteMenu from '../autocomplete/CodeBlockAutocompleteMenu.svelte'
+import { handleIsNode } from 'app/model/NodeHandle'
+import { revealContentAroundRange } from './editorModule'
+import { fly } from 'svelte/transition'
+import { derived } from 'svelte/store'
+import { EmbedFile } from 'app/model'
+import LineGutterLeft from './LineGutterLeft.svelte'
+import LineGutterRight from './LineGutterRight.svelte'
+import { dropTooltip, requestTooltip, type TooltipConfig } from 'app/utils/tooltips'
+import YamlTooltip from './YamlTooltip.svelte'
+import TemplateTokenTooltip from './TemplateTokenTooltip.svelte'
+import TemplateTokenAutocompleter from '../autocomplete/TemplateTokenAutocompleter'
+import TemplateTokenAutocompleteMenu from '../autocomplete/TemplateTokenAutocompleteMenu.svelte'
+import type { NodeViewProps } from 'app/views/node-views/nodeView'
 
 // Technically, this just needs to exist _somewhere_. Putting it here because of the svelte dependency
 // Force the use of the variable so that it is included in the bundle
@@ -84,83 +84,102 @@ const {
 
 const editor = new MarkdownEditor(workspace)
 
-let headerElement: HTMLElement
-let headerEditElement: HTMLElement
-let editorElement: HTMLElement
+let headerElement: HTMLElement = $state()
+let headerEditElement: HTMLElement = $state()
+let editorElement: HTMLElement = $state()
+let container: HTMLElement = $state()
 
-export let state: Pick<NoteViewState, 'note'> & Partial<NoteViewState>
+type NoteEditorProps = {
+	state: Pick<NoteViewState, 'note'> & Partial<NoteViewState>
 
-export let isCurrent: boolean = false
+	editable?: boolean
+	/** Wether to automatically provide buffer space below content so that it can be scrolled to the top. */
+	allowOverscroll?: boolean
+	/** Disable to have any annotation-based scrolling jump immediately to its target location. */
+	smoothScrollOnInit?: boolean
+	/** Whether the note header remains at the top of the note while scrolling. */
+	fixedTitle?: boolean
+	/** Whether the header shows the node type. */
+	showHeaderIcon?: boolean
+} & NodeViewProps
 
-export let layout: 'fill' | 'auto' = 'fill'
-export let background: 'auto' | 'none' = 'auto'
-export let allowOverscroll = true
-export let editable: boolean = true
-export let focusLevel: FocusLevel = FocusLevel.Thread
+let {
+	state: noteState, // Renamed to avoid $state() collision
 
-export let extraTop: number = 0
-export let extraBottom: number = 0
+	editable = true,
+	allowOverscroll = true,
+	showHeaderIcon = false,
+	fixedTitle,
 
-export let fixedTitle: boolean = null
-export let showHeaderIcon = false
+	isCurrent = false,
+	focusLevel = FocusLevel.Thread,
+	layout = 'fill',
+	background = 'auto',
+	extraTop = 0,
+	extraBottom = 0,
 
-export let onNavigate: NavigationCallback = null
-export let onViewReady: ViewReadyCallback = null
-export let onScrollRequest: ScrollToCallback = null
-export let onKeyboardExit: KeyboardExitCallback = null
-
-let container: HTMLElement
+	onNavigate,
+	onViewReady,
+	onScrollRequest,
+	onKeyboardExit
+	
+} : NoteEditorProps = $props()
 
 let _lastFile: NoteFile
 let _lastFileLoadState: FileLoadState = null
 
-let effectiveExtraTop = extraTop
+// svelte-ignore state_referenced_locally
+let effectiveExtraTop = $state(extraTop)
+// svelte-ignore state_referenced_locally
 let lastExtraTop = extraTop
-let effectiveExtraBottom = extraBottom
+// svelte-ignore state_referenced_locally
+let effectiveExtraBottom = $state(extraBottom)
 
+// svelte-ignore state_referenced_locally
 let lastFocusLevel = focusLevel
 
 let isInitializing = false
 let allowSelectionScroll = true
 let saveTimeout = null
-let hasSelection = false
-let justScrolled = true
-let editorIsFocused = false
+let hasSelection = $state(false)
+let justScrolled = $state(true)
+let editorIsFocused = $state(false)
 
 let selectEndEnabled = true
 let isEditorMouseDown = false
 let mouseDownX = 0
 let mouseDownY = 0
 
-$: note = state.note
+let note = $derived(noteState.note)
 
 let annotationHighlightTimeout: number = null
 let allowAnnotationReactions = 1 // A flag that automatically shifts annotations when content is edited
 let ignoreNextAnnotationUpdate = false
 const annotations = new ForwardingStore<Annotation[]>([])
 const annotationIndex = new ForwardingStore<number>(-1)
-$: annotations.forwardFrom(state.annotations)
-$: annotationIndex.forwardFrom(state.annotationIndex)
-$: updateAnnotations($annotations, $annotationIndex)
+$effect(() => annotations.forwardFrom(noteState.annotations))
+$effect(() => annotationIndex.forwardFrom(noteState.annotationIndex))
 
-$: focusing = workspace.viewState.focusing
-$: if (isCurrent) {
-	$focusing = (focusLevel >= FocusLevel.Paragraph) && (layout !== 'fill' || hasSelection && !justScrolled)
-}
+let focusing = $derived(workspace.viewState.focusing)
+$effect(() => {
+	if (isCurrent) {
+		$focusing = (focusLevel >= FocusLevel.Paragraph) && (layout !== 'fill' || hasSelection && !justScrolled)
+	}
+})
 
-$: showSpellCheck = determineSpellCheck(isCurrent, $contentSpellCheck)
-function determineSpellCheck(isCurrent: boolean, setting: 'never'|'editing'|'always') {
-	if (setting === 'never') return false
-	if (setting === 'always') return true
+let showSpellCheck = $derived.by(() => {
+	if ($contentSpellCheck === 'never') return false
+	if ($contentSpellCheck === 'always') return true
 	return isCurrent
-}
+})
 
-$: virtual = $note.meta?.virtual
+let virtual = $derived($note.meta?.virtual)
 
-$: willFixTitle = (fixedTitle ?? $fixedTitleSetting)
+let willFixTitle = $derived(fixedTitle ?? $fixedTitleSetting)
 
-let fallbackErrors: Error[] = null
+let fallbackErrors: Error[] = $state(null)
 
+// svelte-ignore state_referenced_locally
 editor.enabled = editable
 editor.on('root', onEditorRoot)
 editor.on('change', onEditorChange)
@@ -179,9 +198,9 @@ function onEditorRoot() {
 
 	editor.modules.tangent?.setNotePath(note.path)
 
-	if (state?.scrollY && layout === 'fill') {
+	if (noteState?.scrollY && layout === 'fill') {
 		wait().then(() => {
-			subscribeUntil(state.scrollY, scroll => {
+			subscribeUntil(noteState.scrollY, scroll => {
 				if (typeof scroll === 'number') {
 					if (container) {
 						container.scrollTop = scroll
@@ -192,12 +211,12 @@ function onEditorRoot() {
 		})
 	}
 
-	if (state?.collapsedLines) {
-		subscribeUntil(derived([state.note, state.noteViewInfo], stores => stores), ([note, info]) => {
+	if (noteState?.collapsedLines) {
+		subscribeUntil(derived([noteState.note, noteState.noteViewInfo], stores => stores), ([note, info]) => {
 			if (note.isReady && info) {
 				// Delay so that any render pass is complete
 				tick().then(() => {
-					editor.collapsingSections.setCollapsedStateStore(state.collapsedLines)	
+					editor.collapsingSections.setCollapsedStateStore(noteState.collapsedLines)	
 				})
 				return true
 			}
@@ -206,7 +225,7 @@ function onEditorRoot() {
 
 	if (isCurrent) {
 		tick().then(() => {
-			if (state.selection.value && !editor.doc.selection) {
+			if (noteState.selection.value && !editor.doc.selection) {
 				resumeFocus()
 			}
 		})
@@ -216,8 +235,8 @@ function onEditorRoot() {
 		smartParagraphBreaks.subscribe(v => editor.modules.tangent?.setSmartParagraphBreaks(v))
 	)
 
-	if (state.editor === null) {
-		state.editor = editor
+	if (noteState.editor === null) {
+		noteState.editor = editor
 	}
 }
 
@@ -240,8 +259,8 @@ onDestroy(() => {
 		editor.destroy()
 	}
 
-	if (state.editor) {
-		state.editor = null
+	if (noteState.editor) {
+		noteState.editor = null
 	}
 
 	for (const unsub of unsubs) {
@@ -270,7 +289,13 @@ function disableFallbackMode() {
 	})
 }
 
-$: updateExtraSpace(extraTop, extraBottom, focusLevel, container)
+$effect(() => {
+	const et = extraTop
+	const eb = extraBottom
+	const fl = focusLevel
+	const ct = container
+	untrack(() => updateExtraSpace(et, eb, fl, ct))
+})
 function updateExtraSpace(et?, eb?, fl?, ct?) {
 	effectiveExtraTop = extraTop
 	effectiveExtraBottom = extraBottom
@@ -315,7 +340,10 @@ function updateExtraSpace(et?, eb?, fl?, ct?) {
 	lastExtraTop = effectiveExtraTop
 }
 
-$: onFileChanged($note)
+$effect(() => {
+	const n = $note
+	untrack(() => onFileChanged(n))
+})
 function onFileChanged(note: NoteFile) {
 	let skipLineCheck = false
 	if (note !== _lastFile) {
@@ -399,7 +427,11 @@ function onFileChanged(note: NoteFile) {
 	if (!_lastFileLoadState) _lastFileLoadState = 'unloaded'
 }
 
-$: initializeSelection(headerEditElement, editorElement)
+$effect(() => {
+	const h = headerEditElement
+	const e = editorElement
+	untrack(() => initializeSelection(h, e))
+})
 function initializeSelection(_h?, _e?) {
 	isInitializing = true
 	if (note && headerEditElement && editorElement && isCurrent) {
@@ -421,6 +453,11 @@ function initializeSelection(_h?, _e?) {
 	isInitializing = false
 }
 
+$effect(() => {
+	const a = $annotations
+	const i = $annotationIndex
+	untrack(() => updateAnnotations(a, i))
+})
 function updateAnnotations(annotations: Annotation[], index=0) {
 
 	if (!editor._root || !note.isReady) {
@@ -456,8 +493,8 @@ function updateAnnotations(annotations: Annotation[], index=0) {
 			if (document.activeElement === editorElement || (isCurrent && isInitializing)) {
 				editor.select(selection)
 			}
-			else if (state.selection) {
-				state.selection.set([selection, selection])
+			else if (noteState.selection) {
+				noteState.selection.set([selection, selection])
 			}
 			allowAnnotationReactions++
 		}
@@ -547,7 +584,7 @@ function onEditorChange(changeEvent: EditorChangeEvent) {
 
 				if (editable && !contentChanged
 					&& typeof annotation.data === 'object' && 'href' in annotation.data
-					&& !rangesAreEquivalent(editor.doc.selection, state.selection.value)
+					&& !rangesAreEquivalent(editor.doc.selection, noteState.selection.value)
 				) {
 					// Remove link-based annotations when selection change
 					edited = true
@@ -582,7 +619,7 @@ function onEditorChange(changeEvent: EditorChangeEvent) {
 
 		if (invalidChange || edited) {
 			ignoreNextAnnotationUpdate = true
-			state.setAnnotations(newAnnotations)
+			noteState.setAnnotations(newAnnotations)
 		}
 		
 		allowAnnotationReactions++
@@ -591,14 +628,14 @@ function onEditorChange(changeEvent: EditorChangeEvent) {
 	if (editable) {
 		let selectionChanged = false
 		if (editor.doc.selection) {
-			if (!rangesAreEquivalent(editor.doc.selection, state.selection.value)) {
+			if (!rangesAreEquivalent(editor.doc.selection, noteState.selection.value)) {
 				selectionChanged = true
-				state.selection.set(editor.doc.selection)
+				noteState.selection.set(editor.doc.selection)
 			}
 			
-			if (state.scrollY.value && container?.scrollTop) {
+			if (noteState.scrollY.value && container?.scrollTop) {
 				wait().then(() => {
-					state.scrollY.set(container.scrollTop)
+					noteState.scrollY.set(container.scrollTop)
 				})
 			}
 		}
@@ -764,7 +801,7 @@ function applyAnnotations(event?: DecorateEvent) {
 
 		function applyAnnotation(annotation: Annotation, current: boolean) {
 			// Only display annotations targeting the content
-			if (annotation.target ?? 'content' !== 'content') return
+			if ((annotation.target ?? 'content') !== 'content') return
 			
 			let className = 'annotation'
 			if (current) {
@@ -822,13 +859,13 @@ function resumeFocus(arg?) {
 	}
 
 	if (headerEditElement !== document.activeElement && editorElement !== document.activeElement) {
-		console.log('Resuming focus to ', note.name, state.selection.value)
+		console.log('Resuming focus to ', note.name, noteState.selection.value)
 		
 		allowAnnotationReactions--
 		editorElement?.focus({
 			preventScroll: true
 		})
-		if (!state.selection.value) {
+		if (!noteState.selection.value) {
 			editor.select(getInitialSelection(editor.doc))
 		}
 		allowAnnotationReactions++
@@ -840,7 +877,7 @@ function onNoteKeydown(event: KeyboardEventWithShortcut) {
 
 	if (event.modShortcut === 'Escape' && $annotations.length) {
 		event.preventDefault()
-		state.setAnnotations([])
+		noteState.setAnnotations([])
 		return
 	}
 
@@ -890,7 +927,7 @@ function onHeaderKeyExit(event: KeyboardEvent) {
 function navigationForward(event: NavigationEvent) {
 	const link = event.link
 	if (!link.href && link.content_id) {
-		if (state.highlightLink) state.highlightLink(link)
+		if (noteState.highlightLink) noteState.highlightLink(link)
 	}
 	else {
 		console.log('Navigation forward')
@@ -906,12 +943,12 @@ function onWheel(event: WheelEvent) {
 	if (!event.ctrlKey) {
 		justScrolled = true
 	}
-	if (state.scrollY && layout === 'fill') {
+	if (noteState.scrollY && layout === 'fill') {
 		// I would like to do this when the note is unmounted
 		// but that is not working for some reason
 		requestAnimationFrame(() => {
 			if (container) {
-				state.scrollY.set(container.scrollTop)
+				noteState.scrollY.set(container.scrollTop)
 			}
 		})
 	}
@@ -921,8 +958,8 @@ function onEditorFocus() {
 	editorIsFocused = true
 	// this allows clicks to bypass stored selection state while allowing
 	// focus shifts with the keyboard to restore selection state.
-	if (state.selection.value && !isEditorMouseDown) {
-		editor?.select(state.selection.value)
+	if (noteState.selection.value && !isEditorMouseDown) {
+		editor?.select(noteState.selection.value)
 	}
 }
 
@@ -947,6 +984,7 @@ function onEditorMouseDown(event: MouseEvent) {
 }
 
 function onEditorMouseUp(event: MouseEvent) {
+	event.preventDefault()
 	isEditorMouseDown = false
 	if (focusLevel >= FocusLevel.Typewriter) {
 		if (editor.doc.selection) {
@@ -1018,8 +1056,8 @@ function onEditorMouseOut(event: MouseEvent) {
 // Line gutter adornments //
 ///////////////////////////
 type LineTarget = { element: HTMLElement, index: number }
-let leftHoverdLineTarget: LineTarget = null
-let rightHoveredLineTarget: LineTarget = null
+let leftHoveredLineTarget: LineTarget = $state(null)
+let rightHoveredLineTarget: LineTarget = $state(null)
 
 function onMouseMove(event: MouseEvent) {
 
@@ -1040,8 +1078,8 @@ function onMouseMove(event: MouseEvent) {
 
 		if (event.clientY > lineBounds.top && event.clientY <= lineBounds.bottom) {
 			if (event.clientX > leftBound - 50 && event.clientX < lineBounds.left + 150) {
-				if (leftHoverdLineTarget?.element !== lineElement) {
-					leftHoverdLineTarget = {
+				if (leftHoveredLineTarget?.element !== lineElement) {
+					leftHoveredLineTarget = {
 						element: lineElement,
 						index: i
 					}
@@ -1062,12 +1100,12 @@ function onMouseMove(event: MouseEvent) {
 		}
 	}
 
-	if (clearLeft) leftHoverdLineTarget = null
+	if (clearLeft) leftHoveredLineTarget = null
 	if (clearRight) rightHoveredLineTarget = null
 }
 
 function onMouseLeave(event: MouseEvent) {
-	if (leftHoverdLineTarget) leftHoverdLineTarget = null
+	if (leftHoveredLineTarget) leftHoveredLineTarget = null
 	if (rightHoveredLineTarget) rightHoveredLineTarget = null
 }
 //// End ////
@@ -1313,22 +1351,27 @@ let resizeObserver = new ResizeObserver(elements => {
 	if (resizeTimeout) clearTimeout(resizeTimeout)
 	resizeTimeout = setTimeout(() => updateAllCodeBlockSizing(), 200)
 })
-$: if ($letCodeExpand && container && editorElement) {
-	resizeObserver.observe(container)
-}
-else {
-	resizeObserver.disconnect()
-	// Burn down the styling
-	const codeWrappers = editorElement?.querySelectorAll('pre')
-	if (codeWrappers?.length) {
-		for (let i = 0; i < codeWrappers.length; i++) {
-			const pre = codeWrappers[i]
-			pre.style.marginLeft = ''
-			pre.style.marginRight = ''
+$effect(() => {
+	if ($letCodeExpand && container && editorElement) {
+		resizeObserver.observe(container)
+	}
+	else {
+		resizeObserver.disconnect()
+		// Burn down the styling
+		const codeWrappers = editorElement?.querySelectorAll('pre')
+		if (codeWrappers?.length) {
+			for (let i = 0; i < codeWrappers.length; i++) {
+				const pre = codeWrappers[i]
+				pre.style.marginLeft = ''
+				pre.style.marginRight = ''
+			}
 		}
 	}
-}
-
+	return () => {
+		resizeObserver.disconnect()
+		if (resizeTimeout) clearTimeout(resizeTimeout)
+	}
+})
 
 type CodeBlockSizingContext = {
 	containerRect: DOMRect
@@ -1429,16 +1472,15 @@ function updateCodeBlockSizing(pre: HTMLElement, context: CodeBlockSizingContext
 
 </script>
 
-<!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
-<!-- svelte-ignore a11y-mouse-events-have-key-events -->
+<!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
 <main
-	on:mousedown={onMouseDown}
-	on:mouseup={selectFromVerticalPosition}
-	on:mousemove={onMouseMove}
-	on:mouseleave={onMouseLeave}
-	on:wheel={onWheel}
-	on:keydown={onNoteKeydown}
 	bind:this={container}
+	onmousedown={onMouseDown}
+	onmouseup={selectFromVerticalPosition}
+	onmousemove={onMouseMove}
+	onmouseleave={onMouseLeave}
+	onwheel={onWheel}
+	onkeydown={onNoteKeydown}
 	class={`noteEditor layout-${layout} background-${background} margins-${$margins}`}
 	class:editable={editable}
 	class:hangingHeaders={$hangingHeaders}
@@ -1459,15 +1501,14 @@ function updateCodeBlockSizing(pre: HTMLElement, context: CodeBlockSizingContext
 		showExtension={false}
 		onKeyboardExit={onHeaderKeyExit}
 		/>
-	<!-- svelte-ignore a11y-click-events-have-key-events -->
 	<article
 		bind:this={editorElement}
 		use:asRoot={editor}
-		on:mousedown={onEditorMouseDown}
-		on:mouseup|preventDefault={onEditorMouseUp}
-		on:focus={onEditorFocus}
-		on:blur={onEditorBlur}
-		on:contextmenu={onContextMenu}
+		onmousedown={onEditorMouseDown}
+		onmouseup={onEditorMouseUp}
+		onfocus={onEditorFocus}
+		onblur={onEditorBlur}
+		oncontextmenu={onContextMenu}
 		class="note"
 		class:focusing={$focusing}
 		spellcheck={showSpellCheck}
@@ -1497,7 +1538,7 @@ function updateCodeBlockSizing(pre: HTMLElement, context: CodeBlockSizingContext
 			<TemplateTokenAutocompleteMenu {handler} />
 		{/if}
 	</AutoCompleteMenu>
-	<LineGutterLeft {editor} target={leftHoverdLineTarget} />
+	<LineGutterLeft {editor} target={leftHoveredLineTarget} />
 	<LineGutterRight {editor} target={rightHoveredLineTarget} />
 </main>
 
@@ -1519,7 +1560,7 @@ function updateCodeBlockSizing(pre: HTMLElement, context: CodeBlockSizingContext
 	<div>
 		<button
 			title="Attempt to re-enable the normal editing mode. This may fail."
-			on:click={disableFallbackMode}
+			onclick={disableFallbackMode}
 		>
 			Retry Normal Editing
 		</button>
