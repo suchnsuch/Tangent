@@ -1,6 +1,5 @@
 import { requestCallbackOnIdle } from '@such-n-such/core'
 import { getMermaid } from 'app/shim/mermaid'
-import { render } from 'pele'
 import { defineCustomElement } from 'app/utils/defineCustomElement'
 
 let nextIdValue = 0
@@ -65,7 +64,7 @@ class TangentCodePreview extends HTMLElement {
 
 		try {
 			if (token !== this.renderToken) return
-			this.content.innerHTML = render(source).svg
+			this.content.innerHTML = getMermaid().render(source).svg
 
 		}
 		catch (error) {
