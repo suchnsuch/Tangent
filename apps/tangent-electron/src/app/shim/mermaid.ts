@@ -1,10 +1,10 @@
-import { render } from 'pele'
-let config = {} as unknown
+import { render, type RenderOptions  } from 'pele'
+let config: RenderOptions = null
 
 /**
  * Records the configuration mermaid should use, without loading it.
  */
-export function setMermaidConfig(newConfig: unknown) {
+export function setMermaidConfig(newConfig: RenderOptions) {
 	config = newConfig
 }
 

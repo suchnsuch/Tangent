@@ -61,22 +61,5 @@ export function updateMermaidStyle(darkMode: boolean) {
 		excludeBkgColor: darkMode ? 'black' : 'var(--backgroundColor)',
 	}
 
-	setMermaidConfig({
-		startOnLoad: false,
-		theme: 'base',
-		themeVariables,
-
-		// Otherwise, temporary rendering elements are not cleaned up
-		suppressErrorRendering: true,
-
-		// Mindmap styling appears to be explicitly broken
-		themeCSS: `
-.mindmap-node {
-	fill: var(--backgroundColor);
-}
-.edgePaths .edge {
-	stroke: var(--borderColor) !important;
-}
-		`
-	})
+	setMermaidConfig({themeVariables} as unknown)
 }
