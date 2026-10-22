@@ -24,5 +24,8 @@
 		"@vitest/browser": "^4.0.16",
 		"rollup-plugin-visualizer": "^7.1.1",
 		"vitest": "^4.0.16"
+	},
+	"dependencies": {
+		"pele": "^1.8.0"
 	}
 }
