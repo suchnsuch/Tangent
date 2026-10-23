@@ -5,7 +5,7 @@ import { renderAsync } from 'pele/lazy'
 import { requestCallbackOnIdle } from '@such-n-such/core'
 import { defineCustomElement } from 'app/utils/defineCustomElement'
 
-import peleCss from '../../../style/pele.css?raw'
+import { createStyleElement } from './utils'
 
 // let nextIdValue = 0
 
@@ -17,10 +17,12 @@ class TangentCodePreview extends HTMLElement {
 	constructor() {
 		super()
 
+
 		const shadow = this.attachShadow({ mode: 'open' })
 		const content = document.createElement('div')
 		content.style.textAlign = 'center'
 		content.style.whiteSpace = 'normal'
+		shadow.appendChild(createStyleElement('./pele.css'))
 		shadow.appendChild(content)
 
 		this.content = content
@@ -95,7 +97,7 @@ class TangentCodePreview extends HTMLElement {
 
 			if (token !== this.renderToken) return
 			const { svg } = await renderAsync(source, {math: mathResolver})
-			this.content.innerHTML = `<style>${peleCss}</style>${svg}`
+			this.content.innerHTML = svg
 		}
 		catch (error) {
 			if (token !== this.renderToken) return
