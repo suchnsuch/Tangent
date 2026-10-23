@@ -86,8 +86,6 @@ class TangentCodePreview extends HTMLElement {
 				const { width, height } = temp.getBoundingClientRect()
 				this.content.removeChild(temp)
 
-				console.log({arrow: ">>", tex, html})
-
 				return {
 					html,          // or svg, depending on what your integration expects
 					width,
