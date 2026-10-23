@@ -2,7 +2,7 @@
   --pele-bg: #fffcf0;
   --pele-fg: #100f0f;
   --pele-muted: #6f6e69;
-  --pele-line: green !important;
+  --pele-line: #100f0f;
   --pele-surface: #f2f0e5;
   --pele-surface-alt: #e6e4d9;
   --pele-border: #cecdc3;
@@ -15,15 +15,11 @@
     --pele-bg: #100f0f;
     --pele-fg: #cecdc3;
     --pele-muted: #878580;
-    --pele-line: red !important;
+    --pele-line: #cecdc3;
     --pele-surface: #1c1b1a;
     --pele-surface-alt: #282726;
     --pele-border: #403e3c;
     --pele-accent: #4385be;
     --pele-critical: #d14d41;
   }
-}
-
-body {
-  background-color: red !important;
 }

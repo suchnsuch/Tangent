@@ -2,7 +2,7 @@ import { renderAsync } from 'pele/lazy'
 import { requestCallbackOnIdle } from '@such-n-such/core'
 import { defineCustomElement } from 'app/utils/defineCustomElement'
 
-import cssSource from '../../../style/pele.css?raw'
+import peleCss from '../../../style/pele.css?raw'
 
 // let nextIdValue = 0
 
@@ -68,7 +68,7 @@ class TangentCodePreview extends HTMLElement {
 			if (token !== this.renderToken) return
 			const { svg } = await renderAsync(source, {})
 
-			this.content.innerHTML = `<style>${cssSource}</style>` + svg
+			this.content.innerHTML = `<style>${peleCss}</style>${svg}`
 		}
 		catch (error) {
 			if (token !== this.renderToken) return
