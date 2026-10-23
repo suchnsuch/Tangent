@@ -67,7 +67,6 @@ class TangentCodePreview extends HTMLElement {
 		try {
 			if (token !== this.renderToken) return
 			const { svg } = await renderAsync(source, {})
-
 			this.content.innerHTML = `<style>${peleCss}</style>${svg}`
 		}
 		catch (error) {
