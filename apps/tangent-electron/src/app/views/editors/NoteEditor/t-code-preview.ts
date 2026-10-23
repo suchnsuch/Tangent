@@ -1,8 +1,10 @@
+import { renderAsync } from 'pele/lazy'
 import { requestCallbackOnIdle } from '@such-n-such/core'
-import { getMermaid } from 'app/shim/mermaid'
 import { defineCustomElement } from 'app/utils/defineCustomElement'
 
-let nextIdValue = 0
+import cssSource from '../../../style/pele.css?raw'
+
+// let nextIdValue = 0
 
 class TangentCodePreview extends HTMLElement {
 	private content: HTMLElement
@@ -64,8 +66,9 @@ class TangentCodePreview extends HTMLElement {
 
 		try {
 			if (token !== this.renderToken) return
-			this.content.innerHTML = getMermaid().render(source).svg
+			const { svg } = await renderAsync(source, {})
 
+			this.content.innerHTML = `<style>${cssSource}</style>` + svg
 		}
 		catch (error) {
 			if (token !== this.renderToken) return
