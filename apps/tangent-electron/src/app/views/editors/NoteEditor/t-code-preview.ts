@@ -1,3 +1,6 @@
+import katex from 'katex';
+import 'katex/dist/katex.min.css';
+
 import { renderAsync } from 'pele/lazy'
 import { requestCallbackOnIdle } from '@such-n-such/core'
 import { defineCustomElement } from 'app/utils/defineCustomElement'
@@ -51,6 +54,7 @@ class TangentCodePreview extends HTMLElement {
 		}
 	}
 
+
 	async updatePreview() {
 		const language = this.getAttribute('language')
 		const source = this.getAttribute('source')
@@ -65,8 +69,34 @@ class TangentCodePreview extends HTMLElement {
 		}
 
 		try {
+			
+			const mathResolver = (tex) => {
+				const html = katex.renderToString(tex, {
+					throwOnError: false,
+					displayMode: false,
+					output:'mathml'
+				})
+
+				// Pele needs to know the pixel dimensions measure once with a temporary element
+				const temp = document.createElement('div')
+				temp.innerHTML = html
+				temp.style.position = 'absolute'
+				temp.style.visibility = 'hidden'
+				this.content.appendChild(temp)
+				const { width, height } = temp.getBoundingClientRect()
+				this.content.removeChild(temp)
+
+				console.log({arrow: ">>", tex, html})
+
+				return {
+					html,          // or svg, depending on what your integration expects
+					width,
+					height,
+				}
+			}
+
 			if (token !== this.renderToken) return
-			const { svg } = await renderAsync(source, {})
+			const { svg } = await renderAsync(source, {math: mathResolver})
 			this.content.innerHTML = `<style>${peleCss}</style>${svg}`
 		}
 		catch (error) {
