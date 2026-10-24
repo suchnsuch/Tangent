@@ -11,6 +11,7 @@
   --pele-surface: var(--noteBackgroundColor);
   --pele-surface-alt: var(--buttonHoverColor);
   --pele-border: var(--borderColor);
+  --pele-line: var(--textColor);
   --pele-accent: var(--buttonBackgroundColor);
   --pele-critical: var(--emptyLinkTextColor);
 
@@ -42,10 +43,6 @@
   }
 }
 @media (prefers-color-scheme: dark) {
-  .pele {
-    --pele-line: var(--textColor);
-  }
-
   .pele-gantt {
     --pele-surface-alt: #161616;
   }
