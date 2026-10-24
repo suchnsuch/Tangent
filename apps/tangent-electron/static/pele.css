@@ -26,23 +26,14 @@
 
   pieStrokeColor: var(--borderColor);
   pieOuterStrokeColor: var(--borderColor);
-
-  git0: hsl(${hueValue}, ${saturationValue}%, ${lightness}%);
-  git1: hsl(${hueValue + 120}, ${saturationValue}%, ${lightness}%);
-  git2: hsl(${hueValue - 120}, ${saturationValue}%, ${lightness}%);
-  git3: hsl(${hueValue + 180}, ${saturationValue}%, ${lightness}%);
-  git4: hsl(${hueValue - 60}, ${saturationValue}%, ${lightness}%);
-  git5: hsl(${hueValue - 90}, ${saturationValue}%, ${lightness}%);
-  git6: hsl(${hueValue - 180}, ${saturationValue}%, ${lightness}%);
-  git7: hsl(${hueValue - 180}, ${saturationValue}%, ${lightness}%);
-  branchLabelColor: var(--textColor); */
+*/
 }
 
 .pele {
   --pele-bg: var(--backgroundColor);
   --pele-fg: var(--textColor);
   --pele-muted: var(--deemphasizedTextColor);
-  --pele-line: var(--borderColor);
+  --pele-line: var(--textColor);
   /* --pele-surface: var(--noteBackgroundColor); */
   --pele-surface-alt: var(--buttonHoverColor);
   --pele-border: var(--borderColor);
@@ -65,6 +56,20 @@
   --pele-series-10: hsl(var(--accentHue), var(--accentSaturation), calc(var(--accentLightness) * .6));
   --pele-series-11: hsl(calc(var(--accentHue) + 120), var(--accentSaturation), calc(var(--accentLightness) * .6));
   --pele-series-12: hsl(calc(var(--accentHue) - 120), var(--accentSaturation), calc(var(--accentLightness) * .6));
+}
+
+.pele-commit {
+  --pele-series-1: hsl(${hueValue}, ${saturationValue}%, ${lightness}%);
+  --pele-series-2: hsl(${hueValue + 120}, ${saturationValue}%, ${lightness}%);
+  --pele-series-3: hsl(${hueValue - 120}, ${saturationValue}%, ${lightness}%);
+  --pele-series-4: hsl(${hueValue + 180}, ${saturationValue}%, ${lightness}%);
+  --pele-series-5: hsl(${hueValue - 60}, ${saturationValue}%, ${lightness}%);
+  --pele-series-6: hsl(${hueValue - 90}, ${saturationValue}%, ${lightness}%);
+  --pele-series-7: hsl(${hueValue - 180}, ${saturationValue}%, ${lightness}%);
+  --pele-series-8: hsl(${hueValue - 180}, ${saturationValue}%, ${lightness}%);
+  branchLabelColor: var(--textColor);
+
+
 }
 
 .pele text {
