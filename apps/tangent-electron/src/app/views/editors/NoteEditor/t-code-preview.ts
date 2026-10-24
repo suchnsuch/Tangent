@@ -22,6 +22,7 @@ class TangentCodePreview extends HTMLElement {
 		const content = document.createElement('div')
 		content.style.textAlign = 'center'
 		content.style.whiteSpace = 'normal'
+		shadow.appendChild(createStyleElement('./global.css'))
 		shadow.appendChild(createStyleElement('./pele.css'))
 		shadow.appendChild(content)
 
