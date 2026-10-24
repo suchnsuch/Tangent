@@ -1,8 +1,13 @@
+import katex from 'katex';
+import 'katex/dist/katex.min.css';
+
+import { renderAsync } from 'pele/lazy'
 import { requestCallbackOnIdle } from '@such-n-such/core'
-import { getMermaid } from 'app/shim/mermaid'
 import { defineCustomElement } from 'app/utils/defineCustomElement'
 
-let nextIdValue = 0
+import { createStyleElement } from './utils'
+
+// let nextIdValue = 0
 
 class TangentCodePreview extends HTMLElement {
 	private content: HTMLElement
@@ -12,10 +17,13 @@ class TangentCodePreview extends HTMLElement {
 	constructor() {
 		super()
 
+
 		const shadow = this.attachShadow({ mode: 'open' })
 		const content = document.createElement('div')
 		content.style.textAlign = 'center'
 		content.style.whiteSpace = 'normal'
+		shadow.appendChild(createStyleElement('./global.css'))
+		shadow.appendChild(createStyleElement('./pele.css'))
 		shadow.appendChild(content)
 
 		this.content = content
@@ -49,6 +57,7 @@ class TangentCodePreview extends HTMLElement {
 		}
 	}
 
+
 	async updatePreview() {
 		const language = this.getAttribute('language')
 		const source = this.getAttribute('source')
@@ -63,10 +72,33 @@ class TangentCodePreview extends HTMLElement {
 		}
 
 		try {
-			const mermaid = await getMermaid()
-			const result = await mermaid.render('mermaid-diagram-' + nextIdValue++, source)
+			
+			const mathResolver = (tex) => {
+				const html = katex.renderToString(tex, {
+					throwOnError: false,
+					displayMode: false,
+					output:'mathml'
+				})
+
+				// Pele needs to know the pixel dimensions measure once with a temporary element
+				const temp = document.createElement('div')
+				temp.innerHTML = html
+				temp.style.position = 'absolute'
+				temp.style.visibility = 'hidden'
+				this.content.appendChild(temp)
+				const { width, height } = temp.getBoundingClientRect()
+				this.content.removeChild(temp)
+
+				return {
+					html,          // or svg, depending on what your integration expects
+					width,
+					height,
+				}
+			}
+
 			if (token !== this.renderToken) return
-			this.content.innerHTML = result.svg
+			const { svg } = await renderAsync(source, {math: mathResolver})
+			this.content.innerHTML = svg
 		}
 		catch (error) {
 			if (token !== this.renderToken) return
