@@ -55,6 +55,7 @@ function copySection(event: MouseEvent) {
 	console.log(text)
 
 	navigator.clipboard.writeText(text)
+	editor.workspace?.api.postMessage({ title: 'Copied to Clipboard', message: 'Content copied to clipboard.', type: 'info'})
 }
 </script>
 
