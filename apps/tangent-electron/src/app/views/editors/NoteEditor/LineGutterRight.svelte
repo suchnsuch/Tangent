@@ -16,7 +16,7 @@ function getCopyToolTip() {
 	const line = editor.doc.lines.at(index)
 	if (!line) return
 
-	let tooltip = 'Copy this section.'
+	let tooltip = 'Copy this section'
 
 	if ('code' in line.attributes ||
 		'front_matter' in line.attributes ||
