@@ -85,7 +85,7 @@ class TangentCodePreview extends HTMLElement {
 			nextIdValue++
 			
 			if (token !== this.renderToken) return
-			const { svg } = await renderAsync(source, {math})
+			const { svg } = await renderAsync(source, {math, idPrefix: `pele-${nextIdValue}`})
 			this.content.innerHTML = svg
 		}
 		catch (error) {
