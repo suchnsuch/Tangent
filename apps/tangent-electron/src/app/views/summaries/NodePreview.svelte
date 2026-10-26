@@ -10,134 +10,145 @@ import NoteEditor from '../editors/NoteEditor/NoteEditor.svelte'
 import NodeIcon from '../smart-icons/NodeIcon.svelte'
 import { NoteDetailMode } from 'app/model/nodeViewStates/NoteViewState'
 import PdfPreview from '../node-views/PdfPreview.svelte'
+import type { NodeViewProps } from '../node-views/nodeView'
 import NoteDetailsSummary from './NoteDetailsSummary.svelte'
 import { loadMediaChrome } from 'app/shim/media-chrome'
+import type { EditorRange } from 'typewriter-editor'
 
 const workspace: Workspace = getContext('workspace')
 
-export let item: TreeNodeOrReference
+let {
+	item,
 
-export let layout: 'fill' | 'auto' = 'fill'
-export let background: 'auto' | 'none' = 'none'
+	layout = 'fill',
+	background = 'none',
 
-export let noteFixedTitle = false
-export let noteShowHeaderIcon = true
-export let noteDetailMode: NoteDetailMode = NoteDetailMode.None
+	noteFixedTitle = false,
+	noteShowHeaderIcon = true,
+	noteDetailMode = NoteDetailMode.None
+} : Pick<NodeViewProps, 'layout' | 'background'> & {
+	item: TreeNodeOrReference
+
+	noteFixedTitle?: boolean
+	noteShowHeaderIcon?: boolean
+	noteDetailMode?: NoteDetailMode
+} = $props()
+
+let node = $derived(getNode(item, workspace.directoryStore))
+let ref = $derived(isReference(item) ? item : null)
+
+function preventDefault(event: Event) {
+	event.preventDefault()
+}
 
 </script>
 
-{#if !isSubReference(item)}
-	{@const node = getNode(item, workspace.directoryStore)}
-	{@const ref = isReference(item) ? item : null}
-	
-	{#if node instanceof NoteFile}
-		{@const noteState = {
-			// A bit messy, but faster than an entire view state
-			note: node,
-			annotations: ref?.annotations ? new WritableStore(ref.annotations) : undefined,
-			detailMode: noteDetailMode
-		}}
-		<NoteEditor
-			state={noteState}
-			{background}
-			{layout}
-			allowOverscroll={false}
-			editable={false}
-			fixedTitle={noteFixedTitle}
-			extraBottom={20}
-			showHeaderIcon={noteShowHeaderIcon}
-		/>
-		{#if noteDetailMode != NoteDetailMode.None}
-			<div class="detailsInfoBar">
-				<span></span>
-				<span class="separator"></span>
-				<NoteDetailsSummary state={noteState} mode={noteDetailMode} />
+{#if node instanceof NoteFile}
+	{@const subRef = ref && isSubReference(ref) ? ref : null}
+	{@const noteState = {
+		// A bit messy, but faster than an entire view state
+		note: node,
+		annotations: ref?.annotations ? new WritableStore(ref.annotations) : undefined,
+		detailMode: noteDetailMode,
+		slice: subRef ? new WritableStore([subRef.start, subRef.end] as EditorRange) : null
+	}}
+	<NoteEditor
+		state={noteState}
+		{background}
+		{layout}
+		allowOverscroll={false}
+		smoothScrollOnInit={false}
+		editable={false}
+		fixedTitle={noteFixedTitle}
+		extraBottom={20}
+		showHeaderIcon={noteShowHeaderIcon}
+	/>
+	{#if noteDetailMode != NoteDetailMode.None}
+		<div class="detailsInfoBar">
+			<span></span>
+			<span class="separator"></span>
+			<NoteDetailsSummary state={noteState} mode={noteDetailMode} />
+		</div>
+	{/if}
+{:else if node instanceof Folder}
+	{@const children = node.children?.length ? [...node.visibleChildren()] : []}
+	<div class={"folderCard " + layout}>
+		<WorkspaceFileHeader {node} editable={false} showExtension={false} />
+		{#if children.length > 0}
+			<div class="children">
+				<ul class:long={children.length > 10}>
+					{#each children as child}
+						<li>{child.name}</li>
+					{/each}
+				</ul>
+			</div>
+			<div class="count">{pluralize(children.length, '$$ Children', 'One Child', '')}</div>
+		{:else}
+			<div class="empty">
+				Folder is Empty
 			</div>
 		{/if}
-	{:else if node instanceof Folder}
-		{@const children = node.children?.length ? [...node.visibleChildren()] : []}
-		<div class={"folderCard " + layout}>
-			<WorkspaceFileHeader {node} editable={false} showExtension={false} />
-			{#if children.length > 0}
-				<div class="children">
-					<ul class:long={children.length > 10}>
-						{#each children as child}
-							<li>{child.name}</li>
-						{/each}
-					</ul>
-				</div>
-				<div class="count">{pluralize(children.length, '$$ Children', 'One Child', '')}</div>
-			{:else}
-				<div class="empty">
-					Folder is Empty
-				</div>
-			{/if}
-		</div>
-	{:else if node instanceof EmbedFile}
-		{@const embedType = node.embedType}
-		{#if embedType !== EmbedType.Invalid}
-			<div class={"embedCard " + layout}>
-				<WorkspaceFileHeader {node} editable={false} />
-				{#if embedType === EmbedType.Image}
-					<div class="image" style={`background-image: url("${node.cacheBustPath}"); ${layout === 'auto' ? 'height: 250px;' : ''}`}></div>
-				{:else if embedType === EmbedType.Audio}
+	</div>
+{:else if node instanceof EmbedFile}
+	{@const embedType = node.embedType}
+	{#if embedType !== EmbedType.Invalid}
+		<div class={"embedCard " + layout}>
+			<WorkspaceFileHeader {node} editable={false} />
+			{#if embedType === EmbedType.Image}
+				<div class="image" style={`background-image: url("${node.cacheBustPath}"); ${layout === 'auto' ? 'height: 250px;' : ''}`}></div>
+			{:else if embedType === EmbedType.Audio}
+				{#await loadMediaChrome()}
+					…
+				{:then _} 
+					<media-controller class="audio stretch" autohide="-1" gesturesdisabled>
+						<audio slot="media" src={node.cacheBustPath}></audio>
+						<!-- svelte-ignore a11y_click_events_have_key_events -->
+						<!-- svelte-ignore a11y_no_static_element_interactions -->
+						<media-play-button slot="centered-chrome" onclick={preventDefault}></media-play-button>
+						<!-- svelte-ignore a11y_click_events_have_key_events -->
+						<!-- svelte-ignore a11y_no_static_element_interactions -->
+						<media-control-bar onclick={preventDefault}>
+							<media-time-display showduration notoggle></media-time-display>
+							<media-time-range></media-time-range>
+						</media-control-bar>
+					</media-controller>
+				{/await}
+			{:else if embedType === EmbedType.Video}
+				<!-- svelte-ignore a11y_click_events_have_key_events -->
+				<!-- svelte-ignore a11y_no_static_element_interactions -->
+				<div class="video stretch" onclick={preventDefault}>
 					{#await loadMediaChrome()}
 						…
-					{:then _} 
-						<media-controller class="audio stretch" autohide="-1" gesturesdisabled>
-							<audio slot="media" src={node.cacheBustPath}></audio>
-							<!-- svelte-ignore a11y-click-events-have-key-events -->
-							<!-- svelte-ignore a11y-no-static-element-interactions -->
-							<media-play-button slot="centered-chrome" on:click|preventDefault></media-play-button>
-							<!-- svelte-ignore a11y-click-events-have-key-events -->
-							<!-- svelte-ignore a11y-no-static-element-interactions -->
-							<media-control-bar on:click|preventDefault>
+					{:then _}
+						<media-controller class="roundedBottom" gesturesdisabled>
+							<!-- svelte-ignore a11y_media_has_caption -->
+							<video slot="media" src={node.cacheBustPath}></video>
+							<media-control-bar>
+								<media-play-button></media-play-button>
+								<media-mute-button></media-mute-button>
 								<media-time-display showduration notoggle></media-time-display>
 								<media-time-range></media-time-range>
+								<media-fullscreen-button></media-fullscreen-button>
 							</media-control-bar>
 						</media-controller>
 					{/await}
-				{:else if embedType === EmbedType.Video}
-					<!-- svelte-ignore a11y-click-events-have-key-events -->
-					<!-- svelte-ignore a11y-no-static-element-interactions -->
-					<div class="video stretch" on:click|preventDefault>
-						{#await loadMediaChrome()}
-							…
-						{:then _}
-							<media-controller class="roundedBottom" gesturesdisabled>
-								<!-- svelte-ignore a11y-media-has-caption -->
-								<video slot="media" src={node.cacheBustPath}></video>
-								<media-control-bar>
-									<media-play-button></media-play-button>
-									<media-mute-button></media-mute-button>
-									<media-time-display showduration notoggle></media-time-display>
-									<media-time-range></media-time-range>
-									<media-fullscreen-button></media-fullscreen-button>
-								</media-control-bar>
-							</media-controller>
-						{/await}
-					</div>
-				{:else if embedType === EmbedType.PDF}
-					<div class="pdf stretch">
-						<PdfPreview path={node.cacheBustPath} />
-					</div>
-				{/if}
-			</div>
-		{/if}
-		
-	{:else if node instanceof WorkspaceTreeNode}
-		<div class={"fallbackCard " + layout}>
-			<WorkspaceFileHeader {node} editable={false} showExtension={false} />
-			<div style="text-align: center; --iconStroke: var(--deemphasizedTextColor);">
-				<NodeIcon {node} size="8em" />
-			</div>
+				</div>
+			{:else if embedType === EmbedType.PDF}
+				<div class="pdf stretch">
+					<PdfPreview path={node.cacheBustPath} />
+				</div>
+			{/if}
 		</div>
 	{/if}
-{:else}
-	{@const ref = isReference(item) ? item : null}
-	Show Subreference "{ref.title}" here.
+	
+{:else if node instanceof WorkspaceTreeNode}
+	<div class={"fallbackCard " + layout}>
+		<WorkspaceFileHeader {node} editable={false} showExtension={false} />
+		<div style="text-align: center; --iconStroke: var(--deemphasizedTextColor);">
+			<NodeIcon {node} size="8em" />
+		</div>
+	</div>
 {/if}
-
 
 <style lang="scss">
 .fill {

@@ -74,6 +74,7 @@ export default class NoteViewState implements NodeViewState, LensViewState {
 
 	// Local Values
 	detailMode: NoteDetailMode
+	slice?: WritableStore<EditorRange>
 	readonly annotations: WritableStore<Annotation[]> = new WritableStore([])
 	readonly annotationIndex: WritableStore<number> = new WritableStore(-1)
 

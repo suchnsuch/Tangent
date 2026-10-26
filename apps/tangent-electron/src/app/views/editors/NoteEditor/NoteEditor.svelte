@@ -82,13 +82,6 @@ const {
 	contentSpellCheck
 } = workspace.settings
 
-const editor = new MarkdownEditor(workspace)
-
-let headerElement: HTMLElement = $state()
-let headerEditElement: HTMLElement = $state()
-let editorElement: HTMLElement = $state()
-let container: HTMLElement = $state()
-
 type NoteEditorProps = {
 	state: Pick<NoteViewState, 'note'> & Partial<NoteViewState>
 
@@ -125,6 +118,16 @@ let {
 	onKeyboardExit
 	
 } : NoteEditorProps = $props()
+
+const editor = new MarkdownEditor(workspace, {
+	// svelte-ignore state_referenced_locally
+	slice: noteState?.slice
+})
+
+let headerElement: HTMLElement = $state()
+let headerEditElement: HTMLElement = $state()
+let editorElement: HTMLElement = $state()
+let container: HTMLElement = $state()
 
 let _lastFile: NoteFile
 let _lastFileLoadState: FileLoadState = null
