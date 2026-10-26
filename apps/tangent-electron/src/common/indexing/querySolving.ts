@@ -208,6 +208,7 @@ export async function solveQuery(query: Query, interop: QuerySolverInterop): Pro
 					path: node.path,
 					title: item.text,
 					start: item.start,
+					type: StructureType.Header,
 					// The query solving range is just the owned content.
 					end: getHeaderEndFromNextStart(nextHeader),
 					// The full scope of the section will be restored once matched.
