@@ -182,6 +182,11 @@ export async function solveQuery(query: Query, interop: QuerySolverInterop): Pro
 
 	const validFileTypeMatcher = getFileTypeRegex([...extensions.values()])
 
+	function getHeaderEndFromNextStart(nextHeader: HeaderInfo) {
+		if (!nextHeader) return -1
+		return nextHeader.start - 1 // Offset to jump the newline
+	}
+
 	const baseSet = newSet()
 	for (const node of allValidNodes(directory)) {
 		if (node.fileType.match(validFileTypeMatcher)) {
@@ -197,16 +202,16 @@ export async function solveQuery(query: Query, interop: QuerySolverInterop): Pro
 				if (item.type !== StructureType.Header) continue
 
 				const nextHeader = headerList.at(-1)
-				const closingHeader = headerList.findLast(h => h.level >= item.level)
+				const closingHeader = headerList.findLast(h => h.level <= item.level)
 
 				const ref: SolverReference = {
 					path: node.path,
 					title: item.text,
 					start: item.start,
 					// The query solving range is just the owned content.
-					end: nextHeader?.start ?? -1,
+					end: getHeaderEndFromNextStart(nextHeader),
 					// The full scope of the section will be restored once matched.
-					extendedEnd: closingHeader?.start ?? -1
+					extendedEnd: getHeaderEndFromNextStart(closingHeader)
 				}
 				baseSet.add(ref)
 				headerList.push(item)
@@ -585,12 +590,13 @@ export async function solveQuery(query: Query, interop: QuerySolverInterop): Pro
 	const items = [...mapIterator(await solveGroup(query, baseSet), item => {
 		if (isNode(item)) return createReference(item)
 
+		cleanReference(item)
+
 		if (isSolverReference(item)) {
 			item.end = item.extendedEnd
 			delete item.extendedEnd
 		}
 
-		cleanReference(item)
 		return item
 	})]
 
