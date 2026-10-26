@@ -37,7 +37,6 @@ class TangentCodePreview extends HTMLElement {
 	}
 
 	connectedCallback() {
-		console.log('Constructor!')
 		if (this.isConnected) {
 			this.content.innerHTML = '<span style="color: var(--deemphasizedTextColor);">loading…</span>'
 			this.debouncedUpdatePreview()
