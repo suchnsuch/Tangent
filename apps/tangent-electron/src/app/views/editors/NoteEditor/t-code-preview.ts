@@ -7,7 +7,7 @@ import { defineCustomElement } from 'app/utils/defineCustomElement'
 
 import { createStyleElement } from './utils'
 
-// let nextIdValue = 0
+let nextIdValue = 0
 
 class TangentCodePreview extends HTMLElement {
 	private content: HTMLElement
@@ -17,15 +17,12 @@ class TangentCodePreview extends HTMLElement {
 	constructor() {
 		super()
 
-
 		const shadow = this.attachShadow({ mode: 'open' })
 		const content = document.createElement('div')
 		content.style.textAlign = 'center'
 		content.style.whiteSpace = 'normal'
-		shadow.appendChild(createStyleElement('./global.css'))
 		shadow.appendChild(createStyleElement('./pele.css'))
 		shadow.appendChild(content)
-
 		this.content = content
 	}
 
@@ -89,11 +86,7 @@ class TangentCodePreview extends HTMLElement {
 				const { width, height } = temp.getBoundingClientRect()
 				this.content.removeChild(temp)
 
-				return {
-					html,          // or svg, depending on what your integration expects
-					width,
-					height,
-				}
+				return { html, width, height }
 			}
 
 			if (token !== this.renderToken) return
