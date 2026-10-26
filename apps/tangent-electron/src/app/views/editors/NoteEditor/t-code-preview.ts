@@ -5,7 +5,7 @@ import { renderAsync } from 'pele/lazy'
 import { requestCallbackOnIdle } from '@such-n-such/core'
 import { defineCustomElement } from 'app/utils/defineCustomElement'
 
-import { createStyleElement } from './utils'
+import { computeBoundingBox, createStyleElement } from './utils'
 
 let nextIdValue = 0
 
@@ -68,29 +68,24 @@ class TangentCodePreview extends HTMLElement {
 			return
 		}
 
-		try {
+		const math = (tex: string) => {
+			const html = katex.renderToString(tex, {
+				throwOnError: false,
+				displayMode: false,
+				output:'mathml'
+			})
 			
-			const mathResolver = (tex) => {
-				const html = katex.renderToString(tex, {
-					throwOnError: false,
-					displayMode: false,
-					output:'mathml'
-				})
-
-				// Pele needs to know the pixel dimensions measure once with a temporary element
-				const temp = document.createElement('div')
-				temp.innerHTML = html
-				temp.style.position = 'absolute'
-				temp.style.visibility = 'hidden'
-				this.content.appendChild(temp)
-				const { width, height } = temp.getBoundingClientRect()
-				this.content.removeChild(temp)
-
-				return { html, width, height }
+			return { 
+				html, // the rendered math
+				...computeBoundingBox(html, this.content) // Pele needs to know the pixel dimensions measure once with a temporary element
 			}
+		}
 
+		try {
+			nextIdValue++
+			
 			if (token !== this.renderToken) return
-			const { svg } = await renderAsync(source, {math: mathResolver})
+			const { svg } = await renderAsync(source, {math})
 			this.content.innerHTML = svg
 		}
 		catch (error) {
