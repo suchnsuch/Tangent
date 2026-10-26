@@ -8,13 +8,7 @@ import { deepEqual } from 'fast-equals'
 import type { HandleResult } from 'app/model/NodeHandle'
 import { isExternalLink } from 'common/links'
 import { defineCustomElement } from 'app/utils/defineCustomElement'
-
-function createStyleElement(href: string) {
-	const style = document.createElement('link')
-	style.setAttribute('rel', 'stylesheet')
-	style.setAttribute('href', href)
-	return style
-}
+import { createStyleElement } from './utils'
 
 class TangentEmbed extends TangentLink {
 

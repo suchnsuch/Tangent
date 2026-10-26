@@ -1,6 +1,11 @@
+import katex from 'katex';
+import 'katex/dist/katex.min.css';
+
+import { renderAsync } from 'pele/lazy'
 import { requestCallbackOnIdle } from '@such-n-such/core'
-import { getMermaid } from 'app/shim/mermaid'
 import { defineCustomElement } from 'app/utils/defineCustomElement'
+
+import { computeBoundingBox, createStyleElement } from './utils'
 
 let nextIdValue = 0
 
@@ -16,8 +21,8 @@ class TangentCodePreview extends HTMLElement {
 		const content = document.createElement('div')
 		content.style.textAlign = 'center'
 		content.style.whiteSpace = 'normal'
+		shadow.appendChild(createStyleElement('./pele.css'))
 		shadow.appendChild(content)
-
 		this.content = content
 	}
 
@@ -49,6 +54,7 @@ class TangentCodePreview extends HTMLElement {
 		}
 	}
 
+
 	async updatePreview() {
 		const language = this.getAttribute('language')
 		const source = this.getAttribute('source')
@@ -62,11 +68,25 @@ class TangentCodePreview extends HTMLElement {
 			return
 		}
 
+		const math = (tex: string) => {
+			const html = katex.renderToString(tex, {
+				throwOnError: false,
+				displayMode: false,
+				output:'mathml'
+			})
+			
+			return { 
+				html, // the rendered math
+				...computeBoundingBox(html, this.content) // Pele needs to know the pixel dimensions measure once with a temporary element
+			}
+		}
+
 		try {
-			const mermaid = await getMermaid()
-			const result = await mermaid.render('mermaid-diagram-' + nextIdValue++, source)
+			nextIdValue++
+			
 			if (token !== this.renderToken) return
-			this.content.innerHTML = result.svg
+			const { svg } = await renderAsync(source, {math, idPrefix: `pele-${nextIdValue}`})
+			this.content.innerHTML = svg
 		}
 		catch (error) {
 			if (token !== this.renderToken) return
