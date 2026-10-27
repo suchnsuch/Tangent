@@ -485,6 +485,7 @@ function updateAnnotations(annotations: Annotation[], index=0) {
 			const useSmoothScroll = hasInitializedSelection || smoothScrollOnInit
 
 			const applyScroll = () => {
+				if (!container) return
 				const annotation = annotations[index]
 				const range: EditorRange = [annotation.start, annotation.end]
 				const bounds = editor.getBounds(range)

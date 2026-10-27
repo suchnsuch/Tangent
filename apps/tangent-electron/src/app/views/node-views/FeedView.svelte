@@ -11,7 +11,7 @@ import { cachedScroll } from 'app/utils/scrollCaching'
 import type { ScrollToOptions } from 'app/utils/scrollto'
 
 import { ForwardingStore } from 'common/stores'
-import { areNodesOrReferencesEquivalent, getNode, type TreeNodeOrReference } from 'common/nodeReferences'
+import { areNodesOrReferencesEquivalent, getNode, getNodeOrReferenceId, type TreeNodeOrReference } from 'common/nodeReferences'
 
 import { getContext, onMount, tick } from 'svelte'
 import NodeViewSelector from './NodeViewSelector.svelte'
@@ -389,7 +389,7 @@ function extraBottomClick(event: MouseEvent) {
 	style:padding-top={`${extraTop}px`}
 	style:--fixedHeaderExtraTop={`${extraTop}px`}
 >
-	{#each feedNodes as item (item.path)}
+	{#each feedNodes as item (getNodeOrReferenceId(item))}
 		<!-- svelte-ignore a11y-click-events-have-key-events -->
 		<div class="note"
 			class:current={item === $currentItem} 

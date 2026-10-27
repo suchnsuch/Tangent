@@ -52,7 +52,6 @@ $: canShowSettings = state.settingsComponent != null ||
 	$lensState?.settingsComponent != null
 
 let settingsPopups = writable(0)
-$: console.log({ popups: $settingsPopups })
 let hintSettings = false
 let showSettingsFromMouse = false
 let showSettingsFromHover = false
