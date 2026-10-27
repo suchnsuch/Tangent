@@ -1,6 +1,6 @@
 <script lang="ts">
 import Nav from './Nav.svelte'
-import { page } from '$app/stores'
+import { page } from '$app/state'
 
 function getTitle(path: string) {
 	if (path.startsWith('/')) {
@@ -14,7 +14,7 @@ function getTitle(path: string) {
 </script>
 
 <svelte:head>
-	<title>Tangent Notes{getTitle($page.url.pathname)}</title>
+	<title>Tangent Notes{getTitle(page.url.pathname)}</title>
 </svelte:head>
 
 <header>

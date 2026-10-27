@@ -23,7 +23,7 @@ export default mergeConfig(
 		},
 		plugins: [
 			svelte({
-				configFile: path.join(__dirname, 'svelte.config.mjs')
+				configFile: path.join(import.meta.dirname, 'svelte.config.mjs')
 			})
 		],
 		resolve: {

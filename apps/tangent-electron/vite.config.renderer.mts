@@ -3,7 +3,6 @@ import path from 'path'
 import { createRequire } from 'module'
 import { defineConfig, type Plugin } from 'vite'
 import { svelte } from '@sveltejs/vite-plugin-svelte'
-import tsconfigPaths from 'vite-tsconfig-paths'
 import { visualizer } from 'rollup-plugin-visualizer'
 
 const root = import.meta.dirname
@@ -80,9 +79,6 @@ export default defineConfig({
 		svelte({
 			configFile: path.join(root, 'svelte.config.mjs')
 		}),
-		tsconfigPaths({
-			projects: [path.join(root, 'tsconfig.json')]
-		}),
 		willVisualize && visualizer({
 			filename: path.join(root, '__build/renderer_stats.html'),
 			sourcemap: true,
@@ -94,7 +90,8 @@ export default defineConfig({
 	resolve: {
 		// The defaults from https://vite.dev/config/shared-options.html#resolve-conditions
 		// plus 'svelte', so that typewriter-editor's export map resolves
-		conditions: ['module', 'browser', 'development|production', 'svelte']
+		conditions: ['module', 'browser', 'development|production', 'svelte'],
+		tsconfigPaths: true
 	},
 
 	server: {

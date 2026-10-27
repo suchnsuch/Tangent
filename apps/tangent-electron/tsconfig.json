@@ -3,9 +3,9 @@
 	"compilerOptions": {
 		"outDir": "__build",
 		"sourceMap": true,
-		"baseUrl": "src",
 		"paths": {
-			"svelte/*": ["../node_modules/svelte/src/runtime/*"]
+			"svelte/*": ["./node_modules/svelte/src/runtime/*"],
+			"*": ["./src/*"]
 		},
 		"target": "ES2022",
 		"lib": ["ESNext", "DOM"],
@@ -16,5 +16,6 @@
 		"strict": false,
 		"verbatimModuleSyntax": true
 	},
+	"include": [ "**/*", "**/*.svelte" ],
 	"exclude": [ "__build", "node_modules", "out" ]
 }

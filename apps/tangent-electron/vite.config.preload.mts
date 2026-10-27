@@ -1,6 +1,5 @@
 import path from 'path'
 import { defineConfig } from 'vite'
-import tsconfigPaths from 'vite-tsconfig-paths'
 
 const root = import.meta.dirname
 
@@ -28,9 +27,7 @@ export default defineConfig({
 		external: ['electron']
 	},
 
-	plugins: [
-		tsconfigPaths({
-			projects: [path.join(root, 'tsconfig.json')]
-		})
-	]
+	resolve: {
+		tsconfigPaths: true
+	}
 })

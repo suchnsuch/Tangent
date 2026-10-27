@@ -25,8 +25,8 @@
     "@such-n-such/core": "^0.4.0"
   },
   "devDependencies": {
-    "typescript": "^5.1.6",
-    "vitest": "^4.0.16",
+    "typescript": "^6.0.3",
+    "vitest": "^5.0.5",
     "vscode-oniguruma": "^2.0.1",
     "vscode-textmate": "^9.2.0",
     "vscode-tmgrammar-test": "^0.1.1"

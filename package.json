@@ -21,8 +21,9 @@
 		"apps/tangent-test-workspace-generator"
 	],
 	"devDependencies": {
-		"@vitest/browser": "^4.0.16",
+		"@vitest/browser": "^5.0.5",
 		"rollup-plugin-visualizer": "^7.1.1",
-		"vitest": "^4.0.16"
+		"typescript": "^6.0.3",
+		"vitest": "^5.0.5"
 	}
 }

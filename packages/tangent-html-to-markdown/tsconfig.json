@@ -2,7 +2,9 @@
 	"compilerOptions": {
 		"outDir": "lib",
 		"target": "ESNext",
-		"moduleResolution": "node",
+		"strict": false,
+		"module": "ESNext",
+		"moduleResolution": "bundler",
 		"esModuleInterop": true,
 		"allowJs": true,
 		"types": ["node"]

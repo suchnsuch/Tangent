@@ -2,8 +2,11 @@
 	"compilerOptions": {
 		"outDir": "dist",
 		"target": "ESNext",
-		"moduleResolution": "node",
+		"strict": false,
+		"module": "nodenext",
+		"moduleResolution": "nodenext",
 		"esModuleInterop": true,
-		"allowJs": true
+		"allowJs": true,
+		"types": ["node"]
 	}
 }

@@ -1,5 +1,5 @@
 <script lang="ts">
-import { page } from '$app/stores'
+import { page } from '$app/state'
 
 interface LinkInfo {
 	link: string
@@ -32,7 +32,7 @@ function linkName(link: Link) {
 <nav>
 	<div class="links">
 		{#each links as link}
-			<a class:active={$page.url.pathname === linkPath(link)} href={linkPath(link)}>{linkName(link)}</a>
+			<a class:active={page.url.pathname === linkPath(link)} href={linkPath(link)}>{linkName(link)}</a>
 		{/each}
 	</div>
 </nav>
