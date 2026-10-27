@@ -209,7 +209,7 @@ function updateShowCreateFromHover(event: MouseEvent) {
 					user-select: auto;
 				}
 
-				.noteEditor header {
+				.noteEditor header, .noteEditor .headerContainer {
 					// Fix the header overlap since the headers have background color
 					border-top-left-radius: var(--borderRadius);
 					border-top-right-radius: var(--borderRadius);

@@ -1,6 +1,6 @@
 <script lang="ts">
 import { getContext } from 'svelte'
-import { getNode, isReference, isSubReference, type TreeNodeOrReference } from 'common/nodeReferences'
+import { getNode, isReference, isSubReference, type TreeNodeOrReference, type TreeNodeReference } from 'common/nodeReferences'
 import { getLinkDirectionFromEvent, type NavigationCallback } from 'app/events'
 import { Workspace } from 'app/model'
 import WorkspaceTreeNode from 'app/model/WorkspaceTreeNode'
@@ -11,6 +11,7 @@ import NodeIcon from '../smart-icons/NodeIcon.svelte'
 import arrowNavigate from 'app/utils/arrowNavigate'
 import FloatingSetCreationRules, { shouldShowCreationRulesFromHover } from './FloatingSetCreationRules.svelte'
     import EmptyList from './EmptyList.svelte';
+    import { StructureType } from 'common/indexing/indexTypes';
 
 const workspace = getContext('workspace') as Workspace
 
@@ -67,22 +68,31 @@ function updateShowCreateFromHover(event: MouseEvent) {
 	{/if}
 	<article>
 		{#each $items as item}
-			{#if isReference(item) && isSubReference(item)}
-				Show Subreference "{item.title}" here.
-			{:else}
-				{@const node = getNode(item, workspace.directoryStore)}
-				<!-- svelte-ignore a11y-no-static-element-interactions -->
-				<!-- svelte-ignore a11y-click-events-have-key-events -->
-				<!-- svelte-ignore a11y_no_noninteractive_tabindex -->
-				<div class="button no-callout arrowNavigate"
-					tabindex="0"
-					on:click={e => nodeClick(e, item)}
-					on:keydown={e => nodeKeydown(e, item)}
-				>
-					<NodeIcon {node} />
-					{node.name}
-				</div>
-			{/if}
+			{@const node = getNode(item, workspace.directoryStore)}
+			{@const ref = isSubReference(item) ? item as TreeNodeReference : null}
+			<!-- svelte-ignore a11y-no-static-element-interactions -->
+			<!-- svelte-ignore a11y-click-events-have-key-events -->
+			<!-- svelte-ignore a11y_no_noninteractive_tabindex -->
+			<div class="item button no-callout arrowNavigate"
+				tabindex="0"
+				on:click={e => nodeClick(e, item)}
+				on:keydown={e => nodeKeydown(e, item)}
+			>
+				<NodeIcon {node} />
+				{#if ref}
+					<div class="ref">
+						<div class="title">
+							{#if ref.type === StructureType.Header}
+								§
+							{/if}
+							{ref.title}
+						</div>
+						<div class="name">{node.name}</div>
+					</div>
+				{:else}
+					{node.name} 
+				{/if}
+			</div>
 		{:else}
 			<EmptyList {layout} {extraTop} />
 		{/each}
@@ -107,10 +117,17 @@ article {
 	padding: 1em 2em;
 }
 
-div {
+.item {
 	display: flex;
 	align-items: center;
 	gap: 0.5em;
+}
+
+.ref {
+	.name {
+		color: var(--deemphasizedTextColor);
+		font-size: 80%;
+	}
 }
 
 .empty {

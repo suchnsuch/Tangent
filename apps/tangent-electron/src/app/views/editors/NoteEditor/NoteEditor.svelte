@@ -1,5 +1,5 @@
 <script lang="ts">
-import { getContext, onDestroy, tick, untrack } from 'svelte'
+import { getContext, onDestroy, tick, untrack, type Snippet } from 'svelte'
 import {
 	DecorateEvent,
 	type DecorationsModule,
@@ -90,6 +90,8 @@ type NoteEditorProps = {
 	allowOverscroll?: boolean
 	/** Disable to have any annotation-based scrolling jump immediately to its target location. */
 	smoothScrollOnInit?: boolean
+	/** A header override for the editor */
+	header?: Snippet
 	/** Whether the note header remains at the top of the note while scrolling. */
 	fixedTitle?: boolean
 	/** Whether the header shows the node type. */
@@ -102,6 +104,7 @@ let {
 	editable = true,
 	allowOverscroll = true,
 	smoothScrollOnInit = true,
+	header,
 	showHeaderIcon = false,
 	fixedTitle,
 
@@ -1502,16 +1505,23 @@ function updateCodeBlockSizing(pre: HTMLElement, context: CodeBlockSizingContext
 	style:--extraTop={extraTop + 'px'}
 >
 	<div class="extraTop" style={`height: ${effectiveExtraTop}px;`}></div>
-	<WorkspaceFileHeader
-		node={$note}
-		bind:headerElement
-		bind:headerEditElement
-		{editable}
-		preventMouseUpDefault={true}
-		showIcon={showHeaderIcon}
-		showExtension={false}
-		onKeyboardExit={onHeaderKeyExit}
+	{#if header}
+		<div bind:this={headerElement} class="headerContainer">
+			{@render header()}
+		</div>
+	{:else}
+		<WorkspaceFileHeader
+			node={$note}
+			bind:headerElement
+			bind:headerEditElement
+			{editable}
+			preventMouseUpDefault={true}
+			showIcon={showHeaderIcon}
+			showExtension={false}
+			onKeyboardExit={onHeaderKeyExit}
 		/>
+	{/if}
+	
 	<article
 		bind:this={editorElement}
 		use:asRoot={editor}
@@ -1603,14 +1613,14 @@ main {
 	}
 
 	&.fixedTitle {
-		> :global(header) {
+		> :global(header), > .headerContainer {
 			position: sticky;
 			top: var(--extraTop);
 			z-index: 10;
 			background: linear-gradient(var(--noteBackgroundColor) 92%, transparent);
 		}
 
-		> :global(header::before) {
+		> :global(header::before), > .headerContainer::before {
 			content: "";
 			display: block;
 			height: var(--extraTop);

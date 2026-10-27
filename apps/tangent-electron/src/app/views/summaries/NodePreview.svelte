@@ -1,6 +1,6 @@
 <script lang="ts">
 import { getContext } from 'svelte'
-import { getNode, isReference, isSubReference, type TreeNodeOrReference } from 'common/nodeReferences'
+import { getNode, isReference, isSubReference, type TreeNodeOrReference, type TreeNodeReference } from 'common/nodeReferences'
 import { WritableStore } from 'common/stores'
 import { pluralize } from 'common/plurals'
 import { EmbedType } from 'common/embedding'
@@ -14,6 +14,7 @@ import type { NodeViewProps } from '../node-views/nodeView'
 import NoteDetailsSummary from './NoteDetailsSummary.svelte'
 import { loadMediaChrome } from 'app/shim/media-chrome'
 import type { EditorRange } from 'typewriter-editor'
+import { IndexData, StructureType } from 'common/indexing/indexTypes'
 
 const workspace: Workspace = getContext('workspace')
 
@@ -41,35 +42,78 @@ function preventDefault(event: Event) {
 	event.preventDefault()
 }
 
+function getSubRefSlice(subRef: TreeNodeReference) {
+	if (!subRef) return null
+
+	let { start, end } = subRef
+
+	if (subRef.type === StructureType.Header) {
+		// We're already displaying the header as the title
+		// No need to repeat
+
+		for (const header of IndexData.headers(node?.meta)) {
+			if (header.start === subRef.start) {
+				start = header.end + 1
+				break
+			}
+		}
+	}
+
+	return new WritableStore([start, end] as EditorRange)
+}
+
 </script>
 
+{#snippet subRefHeader()}
+	<header class="subRefNoteHeader">
+		<div class="title">
+			{#if ref.type === StructureType.Header}
+				§
+			{/if}
+			{ref.title}
+		</div>
+		<div class="nodeName">{node?.name}</div>
+	</header>
+{/snippet}
+
 {#if node instanceof NoteFile}
-	{@const subRef = ref && isSubReference(ref) ? ref : null}
+	{@const subRef = (ref && isSubReference(ref)) ? ref : null}
 	{@const noteState = {
 		// A bit messy, but faster than an entire view state
 		note: node,
 		annotations: ref?.annotations ? new WritableStore(ref.annotations) : undefined,
 		detailMode: noteDetailMode,
-		slice: subRef ? new WritableStore([subRef.start, subRef.end] as EditorRange) : null
+		slice: getSubRefSlice(subRef)
 	}}
-	<NoteEditor
-		state={noteState}
-		{background}
-		{layout}
-		allowOverscroll={false}
-		smoothScrollOnInit={false}
-		editable={false}
-		fixedTitle={noteFixedTitle}
-		extraBottom={20}
-		showHeaderIcon={noteShowHeaderIcon}
-	/>
-	{#if noteDetailMode != NoteDetailMode.None}
-		<div class="detailsInfoBar">
-			<span></span>
-			<span class="separator"></span>
-			<NoteDetailsSummary state={noteState} mode={noteDetailMode} />
-		</div>
-	{/if}
+	<div class={[
+			'noteCard', layout,
+			{
+				subReference: subRef != null,
+				hideNodeHeader: subRef?.title != null
+			}
+		]
+	}>
+		
+		<NoteEditor
+			state={noteState}
+			{background}
+			{layout}
+			allowOverscroll={false}
+			smoothScrollOnInit={false}
+			editable={false}
+			fixedTitle={noteFixedTitle}
+			extraBottom={20}
+			showHeaderIcon={noteShowHeaderIcon}
+			header={subRef ? subRefHeader : null}
+		/>
+		{#if noteDetailMode != NoteDetailMode.None}
+			<div class="detailsInfoBar">
+				<span></span>
+				<span class="separator"></span>
+				<NoteDetailsSummary state={noteState} mode={noteDetailMode} />
+			</div>
+		{/if}
+	</div>
 {:else if node instanceof Folder}
 	{@const children = node.children?.length ? [...node.visibleChildren()] : []}
 	<div class={"folderCard " + layout}>
@@ -154,6 +198,24 @@ function preventDefault(event: Event) {
 .fill {
 	position: absolute;
 	inset: 0;
+}
+
+.noteCard {
+	.subRefNoteHeader {
+		padding: 1em;
+		padding-bottom: .75em;
+
+		.title {
+			font-size: 120%;
+			font-weight: 600;
+			margin-bottom: .25em;
+		}
+
+		.nodeName {
+			color: var(--deemphasizedTextColor);
+			font-size: 80%;
+		}
+	}
 }
 
 .folderCard {
