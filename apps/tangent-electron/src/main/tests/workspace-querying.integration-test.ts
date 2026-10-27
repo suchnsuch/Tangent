@@ -266,7 +266,7 @@ describe('Querying Sections', () => {
 			{
 				path: 'Note With Headers.md',
 				start: 65,
-				end: 122
+				end: 121
 			}
 		])
 	})
@@ -276,7 +276,7 @@ describe('Querying Sections', () => {
 			{
 				path: 'Note With Headers.md',
 				start: 0,
-				end: 122
+				end: 121
 			}
 		])
 	})
@@ -286,7 +286,7 @@ describe('Querying Sections', () => {
 			{
 				path: 'Note With Headers.md',
 				start: 122,
-				end: 166
+				end: 165
 			}
 		])
 	})
@@ -296,7 +296,7 @@ describe('Querying Sections', () => {
 			{
 				path: 'Note With Headers.md',
 				start: 166,
-				end: 207
+				end: 206
 			}
 		])
 	})
@@ -306,7 +306,7 @@ describe('Querying Sections', () => {
 			{
 				path: 'Note With Headers.md',
 				start: 207,
-				end: 292
+				end: 291
 			}
 		])
 	})

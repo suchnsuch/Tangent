@@ -1,10 +1,15 @@
 import type { PartialClauseValue } from '@such-n-such/tangent-query-parser'
 import type { Annotation, Range } from 'common/nodeReferences'
 
+const fullRange = {
+	start: 0,
+	end: -1
+}
+
 export function getTextAnnotations(
 	text: string,
 	partial: PartialClauseValue,
-	range: Range,
+	range: Range = fullRange,
 	target?: Annotation['target']
 ) : Annotation[]
 {
