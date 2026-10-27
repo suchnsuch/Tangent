@@ -120,11 +120,16 @@ export function sliceRendering(editor: Editor, init?: SliceRenderingInit) {
 		}
 
 		// Find initial end
-		for (; index < doc.lines.length; index++) {
-			const [start, end] = doc.getLineRange(doc.lines[index])
-			if (start <= range[1] && end > range[1]) {
-				endIndex = index
-				break
+		if (range[1] === -1) {
+			endIndex = doc.lines.length - 1
+		}
+		else {
+			for (; index < doc.lines.length; index++) {
+				const [start, end] = doc.getLineRange(doc.lines[index])
+				if (start <= range[1] && end > range[1]) {
+					endIndex = index
+					break
+				}
 			}
 		}
 
