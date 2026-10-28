@@ -1,13 +1,12 @@
 import { swapRemove } from '@such-n-such/core'
 import paths from 'common/paths'
 import type { TreeChange, TreeNode } from 'common/trees'
-import { getNodeFromReference, getNodeOrReferenceId, isNode, isSubReference, type TreeNodeOrReference, type TreeNodeReference } from 'common/nodeReferences'
+import { getNodeFromReference, getNodeOrReferencePathId, isNode, type TreeNodeOrReference, type TreeNodeReference } from 'common/nodeReferences'
 import type Workspace from '../Workspace'
 import type { NodeViewState } from './NodeViewState'
 import type { Tangent } from '..'
 import UnhandledViewState from './UnhandledViewState'
 import File from '../File'
-import { IndexData } from 'common/indexing/indexTypes'
 
 export type ViewStateContextCreator = (workspace: Workspace, tangent: Tangent, parent: ViewStateContext) => ViewStateContext
 export type ViewStateCreator = (context: ViewStateContext, node: TreeNode, reference: TreeNodeReference) => NodeViewState
@@ -58,7 +57,7 @@ export default class ViewStateContext {
 
 	getState(item: TreeNodeOrReference, createIfNone=false, allowUnhandled=true) {
 		if (!item) return null
-		const pathID = getNodeOrReferenceId(item)
+		const pathID = getNodeOrReferencePathId(item)
 		let state = this.states.get(pathID)
 		if (createIfNone && !state) {
 

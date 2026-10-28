@@ -158,7 +158,19 @@ export function areNodesOrReferencesEquivalent(a: TreeNodeOrReference, b: TreeNo
  */
 export function getNodeOrReferenceId(item: TreeNodeOrReference): any {
 	if (isNode(item)) return item
+	return getReferenceId(item)
+}
 
+/**
+ * Returns an id that provides path-level unique identification for a node or reference.
+ * Differs from `getNodeOrReferenceId` by _not_ using object-identity for nodes.
+ */
+export function getNodeOrReferencePathId(item: TreeNodeOrReference): string {
+	if (isNode(item)) return item.path
+	return getReferenceId(item)
+}
+
+export function getReferenceId(item: TreeNodeReference) {
 	if (!item.id) {
 		let id = item.path
 
