@@ -100,7 +100,7 @@ export default class FolderViewState extends BaseSetViewState {
 
 	dispose() {
 		super.dispose()
-		this.folderInfoFile.unloadFile()
+		this.folderInfoFile.dropFile()
 		if (this.folderUnsub) {
 			this.folderUnsub()
 			this.folderUnsub = null

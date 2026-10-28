@@ -109,7 +109,7 @@ export default class QueryViewState extends BaseSetViewState {
 
 	dispose() {
 		super.dispose()
-		this.queryFile.unloadFile()
+		this.queryFile.dropFile()
 	}
 
 	get detailsSummaryComponent() {

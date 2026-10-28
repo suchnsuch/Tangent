@@ -65,7 +65,7 @@ export default class TagViewState extends BaseSetViewState {
 
 	dispose() {
 		super.dispose()
-		this.tagInfoFile.unloadFile()
+		this.tagInfoFile.dropFile()
 	}
 
 	get settingsComponent() { return TagSettingsView }
