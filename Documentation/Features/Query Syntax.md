@@ -17,6 +17,7 @@ The forms defined for a query determine what types of items the query will retur
 * `Sets` looks for [[Sets]], items that can contain files.
 	* `Folders` looks for standard folders.
 	* `Queries` looks for saved queries. (These are _technically_ files, but we'll ignore that.)
+* `Sections` looks for content within headers (including headers themselves). Content matches based on the closest header.
 
 # Clauses
 A clause filters a form by some criteria. Clauses are built out of __Keywords__ and __Values__.
