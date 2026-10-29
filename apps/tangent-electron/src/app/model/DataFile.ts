@@ -28,11 +28,6 @@ export default class DataFile extends File {
 		// Always want to call load file so that usage count is incremented
 		this.loadFile()
 
-		if (this.loadState === 'new') {
-			// Init to blank
-			this.onFileContentChanged(undefined)
-		}
-
 		if (this._data) return this._data as T
 
 		if (!this.waitingPromise) {
