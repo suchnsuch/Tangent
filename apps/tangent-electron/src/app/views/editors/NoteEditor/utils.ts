@@ -13,5 +13,5 @@ export function computeBoundingBox(html: string, parent: HTMLElement) {
 	parent.appendChild(temp)
 	const boundingBox = temp.getBoundingClientRect()
 	parent.removeChild(temp)
-	return boundingBox
+	return {width: boundingBox.width, height: boundingBox.height}
 }
