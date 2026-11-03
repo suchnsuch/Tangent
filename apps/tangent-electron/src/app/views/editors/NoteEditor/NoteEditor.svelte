@@ -658,6 +658,8 @@ function onEditorChange(changeEvent: EditorChangeEvent) {
 		if (changeEvent.changedLines?.length > 0) {
 			// Only push updates to the note when real changes occur
 			note.lines = editor.doc.lines
+			// We don't want to change selection or scroll due to annotations when updating
+			ignoreNextAnnotationUpdate = true
 		}
 
 		if (changeEvent.change?.delta?.ops.length > 0 && note.meta?.virtual) {
