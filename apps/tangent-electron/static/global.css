@@ -1,5 +1,21 @@
+/**
+ * Non-color values aren't supported by `light-dark()`
+ * Declaring here as a fallback.
+ */
+@media (prefers-color-scheme: light) {
+	:where(:root) {
+		--accentLightness: 55%;
+	}
+}
+
+@media (prefers-color-scheme: dark) {
+	:where(:root) {
+		--accentLightness: 25%;
+	}
+}
+
 /* Variables */
-:where(:root), :where(.light) {
+:where(:root) {
 	/* Structure */
 	--topBarHeight: 36px;
 
@@ -12,150 +28,151 @@
 	--indentWidth: calc(var(--indentSize) * var(--spaceWidth));
 	tab-size: var(--indentWidth);
 
-	--backgroundColor: #f6f6f6;
-	--transparentBackgroundColor: rgb(from var(--backgroundColor) r g b / .8);
-	--textColor: #252525;
-	--deemphasizedTextColor: #575757;
-	--heavilyDeemphasizedTextColor: #858585;
+	color-scheme: light dark;
 
-	--scrollbarColor: rgba(0, 0, 0, .1);
-	--scrollbarHoverColor: rgba(0, 0, 0, .2);
-	--scrollbarActiveColor: rgba(0, 0, 0, .15);
+	--backgroundColor: light-dark(#f6f6f6, #323232);
+	--transparentBackgroundColor: light-dark(
+		rgb(from var(--backgroundColor) r g b / .8),
+		rgb(from var(--backgroundColor) r g b / .5)
+	);
 
-	--buttonBackgroundColor: #e9e9e9;
-	--buttonHoverColor: #e5e5e5;
-	--noteBackgroundColor: white;
-	--embossedBackgroundColor: #f7f7f7;
+	--textColor: light-dark(#252525, #ccc);
+	--deemphasizedTextColor: light-dark(#575757, #9a9a9a);
+	--heavilyDeemphasizedTextColor: light-dark(#858585, #686868);
 
-	--borderColor: #e5e5e5;
+	--scrollbarColor: light-dark(
+		rgba(0, 0, 0, .1),
+		rgba(255, 255, 255, .1)
+	);
+	--scrollbarHoverColor: light-dark(
+		rgba(0, 0, 0, .2),
+		rgba(255, 255, 255, .2)
+	);
+	--scrollbarActiveColor: light-dark(
+		rgba(0, 0, 0, .15),
+		rgba(255, 255, 255, .15)
+	);
+
+	--buttonBackgroundColor: light-dark(#e9e9e9, #4c4c4c);
+	--buttonHoverColor: light-dark(#e5e5e5, #565656);
+	--noteBackgroundColor: light-dark(white, #1e1e1e);
+	--embossedBackgroundColor: light-dark(#f7f7f7, #151515);
+
+	--borderColor: light-dark(#e5e5e5, #3d3d3d);
 	--borderRadius: .75rem;
 
-	--iconStroke: #414141;
+	--iconStroke: light-dark(#414141, #cecbcb);
 
 	--accentHue: 141;
 	--accentSaturation: 67%;
-	--accentLightness: 55%;
 
-	--accentTextColor: hsl(var(--accentHue), var(--accentSaturation), 35%);
-	--deemphasizedAccentTextColor: hsl(var(--accentHue), var(--accentSaturation), 25%);
+	--accentTextColor: light-dark(
+		hsl(var(--accentHue), var(--accentSaturation), 35%),
+		hsl(var(--accentHue), var(--accentSaturation), 60%)
+	);
+	--deemphasizedAccentTextColor: light-dark(
+		hsl(var(--accentHue), var(--accentSaturation), 25%),
+		hsl(var(--accentHue), calc(var(--accentSaturation) * .8 ), 40%)
+	);
 
 	--accentBackgroundColor: hsl(
 		var(--accentHue),
 		var(--accentSaturation),
 		var(--accentLightness));
-	--accentDeemphasizedBackgroundColor: hsla(
-		var(--accentHue),
-		var(--accentSaturation),
-		var(--accentLightness), .3);
-	--accentActiveBackgroundColor: hsl(
-		var(--accentHue),
-		var(--accentSaturation),
-		48%);
+	
+	--accentDeemphasizedBackgroundColor: light-dark(
+		hsla(
+			var(--accentHue),
+			var(--accentSaturation),
+			var(--accentLightness),
+			.3
+		),
+		hsla(
+			var(--accentHue),
+			var(--accentSaturation),
+			34%,
+			.3
+		)
+	);
 
-	--accentLastThreadColor: hsl(
-		calc(var(--accentHue) + 60),
-		calc(var(--accentSaturation) * .5),
-		var(--accentLightness));
-	--accentLastLastThreadColor: hsl(
-		calc(var(--accentHue) + 120),
-		calc(var(--accentSaturation) * .333),
-		45%);
+	--accentActiveBackgroundColor: light-dark(
+		hsl(
+			var(--accentHue),
+			var(--accentSaturation),
+			48%
+		),
+		hsl(
+			var(--accentHue),
+			var(--accentSaturation),
+			20%
+		)
+	);
 
-	--externalLinkColor: rgb(0, 100, 200);
-	--untrackedLinkColor: #6d00c6;
-	--emptyLinkTextColor: #9b321f;
+	--accentLastThreadColor: light-dark(
+		hsl(
+			calc(var(--accentHue) + 60),
+			calc(var(--accentSaturation) * .5),
+			var(--accentLightness)
+		),
+		hsl(
+			calc(var(--accentHue) + 60),
+			calc(var(--accentSaturation)),
+			30%
+		)
+	);
 
-	--selectionBackgroundColor: var(--accentBackgroundColor);
-	--keySelectionBackgroundColor: rgba(0, 0, 0, .1);
-	--selectionPressedBackgroundColor: rgba(0, 0, 0, .2);
+	--accentLastLastThreadColor: light-dark(
+		hsl(
+			calc(var(--accentHue) + 120),
+			calc(var(--accentSaturation) * .333),
+			45%
+		),
+		hsl(
+			calc(var(--accentHue) + 120),
+			calc(var(--accentSaturation) * .666),
+			35%
+		)
+	);
 
-	--highlightRedBGColor: #fa9d9d;
-	--highlightOrangeBGColor: #fcbd89;
-	--highlightYellowBGColor: yellow;
-	--highlightGreenBGColor: #94eb75;
-	--highlightBlueBGColor: #a3d2fc;
-	--highlightPurpleBGColor: #e7aaff;
+	--externalLinkColor: light-dark(
+		rgb(0, 100, 200),
+		rgb(0, 150, 250)
+	);
+	--untrackedLinkColor: light-dark(#6d00c6, #a864e0);
+	--emptyLinkTextColor: light-dark(#9b321f, #d65a49);
+
+	--selectionBackgroundColor: light-dark(
+		var(--accentBackgroundColor),
+		rgba(255, 255, 255, .16)
+	);
+	--keySelectionBackgroundColor: light-dark(
+		rgba(0, 0, 0, .1),
+		rgba(255, 255, 255, .08)
+	);
+	--selectionPressedBackgroundColor: light-dark(
+		rgba(0, 0, 0, .2),
+		rgba(255, 255, 255, .13)
+	);
+
+	--highlightRedBGColor: light-dark(#fa9d9d, #ed5454);
+	--highlightOrangeBGColor: light-dark(#fcbd89, #f48b35);
+	--highlightYellowBGColor: light-dark(yellow, #dfdc30);
+	--highlightGreenBGColor: light-dark(#94eb75, #94dd3c);
+	--highlightBlueBGColor: light-dark(#a3d2fc, #4fa9f4);
+	--highlightPurpleBGColor: light-dark(#e7aaff, #b881e9);
 	--highlightGrayBGColor: #b7b7b7;
 	--highlightTextColor: var(--textColor);
 
 	--highlightBackgroundColor: var(--highlightYellowBGColor);
-	--warningTextColor: rgb(194, 120, 9);
+	--warningTextColor: light-dark(rgb(194, 120, 9), orange);
 
-	--dropTargetBackgroundColor: var(--accentBackgroundColor);
-	--dropTargetChildBackgroundColor: rgb(0 0 0 / .1);
+	--dropTargetBackgroundColor: light-dark(var(--accentBackgroundColor), var(--selectionBackgroundColor));
+	--dropTargetChildBackgroundColor: light-dark(
+		rgb(0 0 0 / .1),
+		rgba(255, 255, 255, .05)
+	)
 
 	--revealedTextColor: green;
-	--templateTokenTextColor: var(--untrackedLinkColor);
-}
-
-:where(.dark) {
-	--backgroundColor: #323232;
-	--transparentBackgroundColor: rgb(from var(--backgroundColor) r g b / .5);
-	--textColor: #ccc;
-	--deemphasizedTextColor: #9a9a9a;
-	--heavilyDeemphasizedTextColor: #686868;
-
-	--scrollbarColor: rgba(255, 255, 255, .1);
-	--scrollbarHoverColor: rgba(255, 255, 255, .2);
-	--scrollbarActiveColor: rgba(255, 255, 255, .15);
-
-	--buttonBackgroundColor: #4c4c4c;
-	--buttonHoverColor: #565656;
-	--noteBackgroundColor: #1e1e1e;
-	--embossedBackgroundColor: #151515;
-
-	--borderColor: #3d3d3d;
-
-	--iconStroke: #cecbcb;
-
-	--accentTextColor: hsl(var(--accentHue), var(--accentSaturation), 60%);
-	--deemphasizedAccentTextColor: hsl(var(--accentHue), calc(var(--accentSaturation) * .8 ), 40%);
-
-	--accentLightness: 25%;
-
-	--accentBackgroundColor: hsl(
-		var(--accentHue),
-		var(--accentSaturation),
-		var(--accentLightness));
-	--accentDeemphasizedBackgroundColor: hsla(
-		var(--accentHue),
-		var(--accentSaturation),
-		34%, .3);
-	--accentActiveBackgroundColor: hsl(
-		var(--accentHue),
-		var(--accentSaturation),
-		20%);
-
-	--accentLastThreadColor: hsl(
-		calc(var(--accentHue) + 60),
-		calc(var(--accentSaturation)),
-		30%);
-	--accentLastLastThreadColor: hsl(
-		calc(var(--accentHue) + 120),
-		calc(var(--accentSaturation) * .666),
-		35%);
-
-	--externalLinkColor: rgb(0, 150, 250);
-	--untrackedLinkColor: #a864e0;
-	--emptyLinkTextColor: #d65a49;
-
-	--selectionBackgroundColor: rgba(255, 255, 255, .16);
-	--keySelectionBackgroundColor: rgba(255, 255, 255, .08);
-	--selectionPressedBackgroundColor: rgba(255, 255, 255, .13);
-
-	--highlightRedBGColor: #ed5454;
-	--highlightOrangeBGColor: #f48b35;
-	--highlightYellowBGColor: #dfdc30;
-	--highlightGreenBGColor: #94dd3c;
-	--highlightBlueBGColor: #4fa9f4;
-	--highlightPurpleBGColor: #b881e9;
-
-	--highlightBackgroundColor: var(--highlightYellowBGColor);
-	--warningTextColor: orange;
-
-	--dropTargetBackgroundColor: var(--selectionBackgroundColor);
-	--dropTargetChildBackgroundColor: rgba(255, 255, 255, .05);
-
 	--templateTokenTextColor: var(--untrackedLinkColor);
 }
 
@@ -180,18 +197,17 @@ body {
 	outline: none;/*2px solid var(--deemphasizedAccentTextColor);*/
 }
 
-.light ::selection {
-	background-color: hsl(210, 100%, 87%);
+::selection {
+	background-color: light-dark(
+		hsl(210, 100%, 87%),
+		hsl(210, 33%, 30%)
+	);
 }
-.light ::selection:window-inactive {
-	background-color: hsl(210, 50%, 87%);
-}
-
-.dark ::selection {
-	background-color: hsl(210, 33%, 30%);
-}
-.dark ::selection:window-inactive {
-	background-color: hsl(210, 08%, 30%);
+::selection:window-inactive {
+	background-color: light-dark(
+		hsl(210, 50%, 87%),
+		hsl(210, 08%, 30%)
+	);
 }
 
 /* Scrollbar settings for windows because windows scrollbars are heinous */

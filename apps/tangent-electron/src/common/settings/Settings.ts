@@ -735,7 +735,9 @@ export default class Settings extends ObjectStore {
 	})
 
 	constructor() {
-		super()
+		super({
+			applyToRawValues: true
+		})
 		this.setupObservables()
 	}
 }
