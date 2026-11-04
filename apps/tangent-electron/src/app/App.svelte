@@ -48,6 +48,7 @@ let reselectionTimeout: number
 
 setContext('api', api)
 
+// This is deprecated. Remove in v0.14
 const osDarkMode = mediaQueryStore('(prefers-color-scheme: dark)')
 $: settingsMode = workspace?.settings.appearance
 $: {

@@ -34,15 +34,17 @@ input[type="number"], input[type="text"] {
 }
 
 input[type="number"] {
-	box-shadow: -1px 1px 2px 1px rgba(0, 0, 0, .2) inset;
+	box-shadow: -1px 1px 2px 1px light-dark(rgba(0, 0, 0, .2), rgba(0, 0, 0, .5)) inset;
 }
 
 input {
-	--controlColor: white;
+	--controlColor: light-dark(white, var(--textColor));
 }
 
-.dark input {
-	--controlColor: var(--textColor);
+@media (prefers-color-scheme: light) {
+	input[type="range"] {
+		--controlColor: var(--accentActiveBackgroundColor);
+	}
 }
 
 input[type="checkbox"] {
@@ -117,20 +119,10 @@ input[type="range"] {
 	}
 }
 
-.light input[type="range"] {
-	--controlColor: var(--accentActiveBackgroundColor);
-}
-
 textarea {
 	color: var(--textColor);
 	background-color: var(--buttonBackgroundColor);
 	resize: vertical;
-}
-
-.dark {
-	input[type="number"] {
-		box-shadow: -1px 1px 2px 1px rgba(0, 0, 0, .5) inset;
-	}
 }
 
 button, .button, select {

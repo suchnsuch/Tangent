@@ -6,7 +6,6 @@ import { app, ipcMain, nativeTheme } from 'electron'
 import Logger from 'js-logger'
 
 import { getVersionChannel, getWorkspaceNamePrefix } from './environment'
-import { applyPatch } from 'common/stores'
 import Settings from 'common/settings/Settings'
 
 let _settingsPath: string = null
@@ -54,6 +53,7 @@ export async function loadSettings() {
 				}
 			}
 			settings.applyPatch(data)
+			bindCoreSettings()
 			log.info('    Settings loaded')
 		}
 		catch (err) {
@@ -71,6 +71,16 @@ export async function loadSettings() {
 	postSettings()
 
 	return settings
+}
+
+function bindCoreSettings() {
+	if (!settings) return
+
+	settings.appearance.subscribe(appearance => {
+		if (nativeTheme.themeSource !== appearance) {
+			nativeTheme.themeSource = appearance as 'system' | 'light' | 'dark'
+		}
+	})
 }
 
 export async function saveSettings(sync=false) {
@@ -100,14 +110,7 @@ export function getSettings() {
 }
 
 export function patchSettings(patch) {
-	applyPatch(settings, patch, {
-		applyToRawValues: true
-	})
-
-	// This might not be the best place, but it's not bad
-	if (nativeTheme.themeSource !== settings.appearance.value) {
-		nativeTheme.themeSource = settings.appearance.value as 'system' | 'light' | 'dark'
-	}
+	settings.applyPatch(patch)
 
 	// Technically async. Dangling like this isn't ideal.
 	saveSettings()

@@ -16,7 +16,9 @@ In order to take effect, your styles will need to have higher [specificity](http
 ## Global Styling Variables
 Tangent makes extensive use of [CSS variables](https://developer.mozilla.org/en-US/docs/Web/CSS/Using_CSS_custom_properties) to control styling. The majority of the variables are defined in `global.css`, which can be viewed from the "Sources" tab of the development tools.
 
-These variables are defined for both **light** and **dark** themes with the `.light` and `.dark` selectors, respectively. By using those selectors, your custom styles can match the global [[Appearance]] of Tangent.
+**Light** and **dark** themes (as determined by [[Appearance]] settings) are handled with the [`prefers-color-scheme` media query](https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/At-rules/@media/prefers-color-scheme). The [`light-dark()` CSS function](https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/Values/color_value/light-dark) is used where appropriate to define light & dark colors. By using the same mechanisms, your custom styles can match the light & dark mode of Tangent.
+
+Previously, light and dark themes were defined with the `.light` and `.dark` selectors, respectively. These selectors are now #Deprecated and will be removed in a following release.
 
 ## Styling Notes
 Notes are styled under the `article.note` selector. Using this selector yourself will set you up for matching specificity, and will limit the effect your styles will have to just the content of your notes.
