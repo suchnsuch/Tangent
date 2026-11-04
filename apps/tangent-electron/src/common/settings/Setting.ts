@@ -52,7 +52,7 @@ export type SettingForm = 'default' | 'file' | 'folder' | 'path' | 'textarea' | 
  * This is done because we want `validValues` to always define _single_ values
  */
 export interface SettingDefinition<T extends SettingType, V extends (T | T[]) = T> {
-	defaultValue?: V
+	defaultValue?: NoInfer<V>
 	name?: string
 	description?: string
 	validValues?: SettingValue<T>[]

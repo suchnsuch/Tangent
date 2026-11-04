@@ -78,7 +78,7 @@ function bindCoreSettings() {
 
 	settings.appearance.subscribe(appearance => {
 		if (nativeTheme.themeSource !== appearance) {
-			nativeTheme.themeSource = appearance as 'system' | 'light' | 'dark'
+			nativeTheme.themeSource = appearance
 		}
 	})
 }
