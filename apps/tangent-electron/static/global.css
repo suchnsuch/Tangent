@@ -40,6 +40,28 @@
 	--deemphasizedTextColor: light-dark(#575757, #9a9a9a);
 	--heavilyDeemphasizedTextColor: light-dark(#858585, #686868);
 
+	--highlightTextColor: #252525;
+	--highlightRedBGColor: light-dark(#fa9d9d, #ed5454);
+	--highlightOrangeBGColor: light-dark(#fcbd89, #f48b35);
+	--highlightYellowBGColor: light-dark(yellow, #dfdc30);
+	--highlightGreenBGColor: light-dark(#94eb75, #94dd3c);
+	--highlightBlueBGColor: light-dark(#a3d2fc, #4fa9f4);
+	--highlightPurpleBGColor: light-dark(#e7aaff, #b881e9);
+	--highlightGrayBGColor: #b7b7b7;
+	--highlightBackgroundColor: var(--highlightYellowBGColor);
+
+	--warningTextColor: light-dark(rgb(194, 120, 9), orange);
+
+	--externalLinkColor: light-dark(
+		rgb(0, 100, 200),
+		rgb(0, 150, 250)
+	);
+	--untrackedLinkColor: light-dark(#6d00c6, #a864e0);
+	--emptyLinkTextColor: light-dark(#9b321f, #d65a49);
+
+	--revealedTextColor: green;
+	--templateTokenTextColor: var(--untrackedLinkColor);
+
 	--scrollbarColor: light-dark(
 		rgba(0, 0, 0, .1),
 		rgba(255, 255, 255, .1)
@@ -134,13 +156,6 @@
 		)
 	);
 
-	--externalLinkColor: light-dark(
-		rgb(0, 100, 200),
-		rgb(0, 150, 250)
-	);
-	--untrackedLinkColor: light-dark(#6d00c6, #a864e0);
-	--emptyLinkTextColor: light-dark(#9b321f, #d65a49);
-
 	--selectionBackgroundColor: light-dark(
 		var(--accentBackgroundColor),
 		rgba(255, 255, 255, .16)
@@ -154,26 +169,11 @@
 		rgba(255, 255, 255, .13)
 	);
 
-	--highlightRedBGColor: light-dark(#fa9d9d, #ed5454);
-	--highlightOrangeBGColor: light-dark(#fcbd89, #f48b35);
-	--highlightYellowBGColor: light-dark(yellow, #dfdc30);
-	--highlightGreenBGColor: light-dark(#94eb75, #94dd3c);
-	--highlightBlueBGColor: light-dark(#a3d2fc, #4fa9f4);
-	--highlightPurpleBGColor: light-dark(#e7aaff, #b881e9);
-	--highlightGrayBGColor: #b7b7b7;
-	--highlightTextColor: var(--textColor);
-
-	--highlightBackgroundColor: var(--highlightYellowBGColor);
-	--warningTextColor: light-dark(rgb(194, 120, 9), orange);
-
 	--dropTargetBackgroundColor: light-dark(var(--accentBackgroundColor), var(--selectionBackgroundColor));
 	--dropTargetChildBackgroundColor: light-dark(
 		rgb(0 0 0 / .1),
 		rgba(255, 255, 255, .05)
-	)
-
-	--revealedTextColor: green;
-	--templateTokenTextColor: var(--untrackedLinkColor);
+	);
 }
 
 html, body {
