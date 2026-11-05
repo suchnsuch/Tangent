@@ -87,7 +87,7 @@ export default class Settings extends ObjectStore {
 		defaultValue: true
 	})
 
-	appearance = new Setting<string>({
+	appearance = new Setting({
 		name: 'Appearance',
 		description: 'Controls whether Tangent displays in light or dark mode.',
 		validValues: [
@@ -109,9 +109,9 @@ export default class Settings extends ObjectStore {
 		]
 	})
 
-	titlebar = new Setting<string>({
+	titlebar = new Setting({
 		name: 'Titlebar',
-		description: 'Controsl the appearance of the titlebars of Tangent\'s windows. (Requires restart.)',
+		description: 'Controls the appearance of the titlebars of Tangent\'s windows. (Requires restart.)',
 		validValues: [
 			{
 				value: 'system',
@@ -171,7 +171,7 @@ export default class Settings extends ObjectStore {
 		}
 	})
 
-	scrollBarWidth = new Setting<string>({
+	scrollBarWidth = new Setting({
 		name: 'Scroll Bar Width',
 		description: 'Determines the thickness of scroll bar handles.',
 		validValues: [
@@ -234,7 +234,7 @@ export default class Settings extends ObjectStore {
 		defaultValue: 'new'
 	})
 
-	noteLinkFollowBehavior = new Setting<string>({
+	noteLinkFollowBehavior = new Setting({
 		name: 'Link Following',
 		description: 'What keys need to be pressed when left clicking on a link to follow it.',
 		validValues: [
@@ -257,7 +257,7 @@ export default class Settings extends ObjectStore {
 	})
 
 	// Map
-	mapZoomScrollMode = new Setting<string>({
+	mapZoomScrollMode = new Setting({
 		name: 'Zoom & Pan',
 		description: 'Determines how the map zooms and pans. Panning is always possible by clicking & dragging.',
 		validValues: [
@@ -313,7 +313,7 @@ export default class Settings extends ObjectStore {
 	})
 
 	// Notes
-	noteMargins = new Setting<string>({
+	noteMargins = new Setting({
 		name: 'Margins',
 		description: 'Determines how much space is given around notes and note elements.',
 		defaultValue: 'normal',
@@ -450,7 +450,7 @@ export default class Settings extends ObjectStore {
 			{
 				value: '+',
 				displayName: '[+]',
-				description: 'An alternative that doesn\' cause issues with right-to-left (RTL) languages.'
+				description: 'An alternative that doesn\'t cause issues with right-to-left (RTL) languages.'
 			}
 		],
 		defaultValue: 'x'
@@ -467,7 +467,7 @@ export default class Settings extends ObjectStore {
 	})
 
 	// Files
-	dirtyIndicatorVisibility = new Setting<string>({
+	dirtyIndicatorVisibility = new Setting({
 		name: 'Show Dirty File Indicators',
 		description: 'Whether to show an indicator that a file is not yet saved.',
 		validValues: [
@@ -495,7 +495,7 @@ export default class Settings extends ObjectStore {
 	})
 	
 	// Links
-	linkAutocompleteForm = new Setting<'short' | 'full'>({
+	linkAutocompleteForm = new Setting({
 		name: 'Link Autocomplete',
 		description: 'How wikilinks will autocomplete.',
 		defaultValue: 'short',
@@ -519,7 +519,7 @@ export default class Settings extends ObjectStore {
 		defaultValue: false
 	})
 
-	startupBehavior = new Setting<'restore' | 'select'>({
+	startupBehavior = new Setting({
 		name: 'Startup Behavior',
 		description: 'What windows Tangent opens on startup.',
 		validValues: [
@@ -605,7 +605,7 @@ export default class Settings extends ObjectStore {
 		defaultValue: true
 	})
 
-	filenameSpellCheck = new Setting<'never'|'editing'|'always'>({
+	filenameSpellCheck = new Setting({
 		name: 'Spell Check Filenames',
 		description: 'When and how Tangent should use spell check in filenames.',
 		validValues: [
@@ -628,7 +628,7 @@ export default class Settings extends ObjectStore {
 		defaultValue: 'editing'
 	})
 
-	contentSpellCheck = new Setting<'never'|'editing'|'always'>({
+	contentSpellCheck = new Setting({
 		name: 'Spell Check Content',
 		description: 'When and how Tangent should use spell check in note content.',
 		validValues: [
