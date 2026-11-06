@@ -221,7 +221,7 @@ function toggleItem(item) {
 					<PopUpButton name={multiItemDisplay($setting, effectiveValueList)} buttonClass="grow">
 						{#snippet menu()}
 							{#each effectiveValueList as item}
-								<label>
+								<label class="aligned-switch-item">
 									<input onclick={() => toggleItem(item)} type="checkbox" checked={($setting as SettingArrayType).includes(getValue(item))} />
 									<span>{getDisplayName(item) || 'Default'}</span>
 								</label>
@@ -402,6 +402,13 @@ button.reset {
 	&:disabled {
 		visibility: hidden;
 	}
+}
+
+.aligned-switch-item {
+	display: flex;
+	gap: 16px;
+	margin: 4px 0;
+	align-items: center;
 }
 
 </style>
