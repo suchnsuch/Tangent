@@ -3,7 +3,7 @@ import { Tangent, Workspace } from '..'
 import { NoteViewState } from '../nodeViewStates'
 import type { CommandContext, CommandOptions } from './Command'
 import WorkspaceCommand from './WorkspaceCommand'
-import { setLinePrefix, shiftGroup, toggleInlineFormat, toggleLink, toggleWikiLink } from 'app/views/editors/NoteEditor/editorActions'
+import { setLinePrefix, shiftGroup, toggleInlineFormat, toggleInlineHighlightFormat, toggleLink, toggleWikiLink } from 'app/views/editors/NoteEditor/editorActions'
 import type { EditorRange } from 'typewriter-editor'
 import MarkdownEditor from 'app/views/editors/NoteEditor/MarkdownEditor'
 import type { HrefFormedLink } from 'common/indexing/indexTypes'
@@ -117,6 +117,16 @@ export class InlineFormatCommand extends NoteEditorCommand {
 
 	getName() {
 		return `Toggle ${this.label}`
+	}
+}
+
+export class InlineHighlightCommand  extends InlineFormatCommand {
+	execute(context?: InlineFormatCommandContext): void {
+		const targets = this.getTargets(context)
+		  if (!targets) return
+		const { editor, selection } = targets
+
+		toggleInlineHighlightFormat(editor, selection, this.formattingCharacters())
 	}
 }
 
