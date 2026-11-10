@@ -9,7 +9,9 @@ import Watcher from 'watcher'
 
 import { mapIterator, type PromiseStarter } from '@such-n-such/core'
 
-import { loadTreeFromPath } from './files'
+import ignore, { type Ignore } from 'ignore'
+
+import { loadTreeFromPath, type PathPredicate } from './files'
 import { DirectoryStoreAddResult, forAllNodes, mapTree, moveTree, shallowCopyTreeNodeWithoutChildren, type TreeChange, type TreeChangeMovedItem, type TreeNode, validatePath } from 'common/trees'
 import { type HrefFormedLink, IndexData, type IndexDataUpdate, StructureType } from '../common/indexing/indexTypes'
 import Folder from './Folder'
@@ -53,6 +55,7 @@ const fileLog = Logger.get('workspace.files')
 export default class Workspace {
 
 	static readonly TANGENT_DIRECTORY = '.tangent'
+	static readonly IGNORE_FILE = '.tangentignore'
 
 	state: WorkspaceState
 	contentsStore: IndexTreeStore<Folder, TagTreeNode>
@@ -73,7 +76,11 @@ export default class Workspace {
 	private virtualFileHrefSet = new Set<string>()
 	private useIOQueue = false
 
-	constructor(root: TreeNode) {
+	/** Filters paths according to the workspace's `.tangentignore` file */
+	private readonly pathPredicate: PathPredicate
+
+	constructor(root: TreeNode, pathPredicate?: PathPredicate) {
+		this.pathPredicate = pathPredicate
 		this.state = new WorkspaceState()
 		this.state.setupObservables()
 
@@ -191,13 +198,16 @@ export default class Workspace {
 			return null
 		}
 
+		// Load ignore rules before any other workspace processing
+		const pathPredicate = await this.loadIgnorePredicate(filepath)
+
 		// Initialize file structure now before loading in the tree
 		log.info(`Loading workspace at ${filepath}`)
 		userFacingErrors.push(... await migrate(filepath, defaultsFolder))
 
 		let root: TreeNode = null
 		try {
-			root = await loadTreeFromPath(filepath)
+			root = await loadTreeFromPath(filepath, pathPredicate)
 		}
 		catch (e) {
 			log.error('Was unable to load tree from', filepath, e)
@@ -207,7 +217,7 @@ export default class Workspace {
 		// TODO: load store workspace settings
 		let workspace: Workspace = null
 		try {
-			workspace = new Workspace(root)
+			workspace = new Workspace(root, pathPredicate)
 		}
 		catch (e) {
 			log.error('Initializing the workspace from tree failed', e)
@@ -253,6 +263,37 @@ export default class Workspace {
 		}
 
 		return workspace
+	}
+
+	/**
+	 * Loads and builds the `.tangentignore` file at the root of the workspace, if it exists.
+	 */
+	private static async loadIgnorePredicate(rootPath: string): Promise<PathPredicate> {
+		const ignorePath = path.join(rootPath, this.IGNORE_FILE)
+		let rules: Ignore = null
+		try {
+			const contents = await fs.promises.readFile(ignorePath, 'utf8')
+			rules = ignore().add(contents)
+			log.info(`Loaded ignore rules from "${ignorePath}"`)
+		}
+		catch (err) {
+			if (err?.code !== 'ENOENT') {
+				log.error(`Could not read "${ignorePath}". No paths will be ignored.`, err)
+			}
+			return undefined
+		}
+
+		return (filepath: string, stats: fs.Stats) => {
+			let relative = path.relative(rootPath, filepath)
+
+			// The root itself and anything outside of it cannot be ignored
+			if (!relative || relative.startsWith('..') || path.isAbsolute(relative)) return true
+			
+			// `ignore` expects posix-style relative paths, with a trailing slash for directories
+			relative = relative.split(path.sep).join('/')
+			if (stats.isDirectory()) relative += '/'
+			return !rules.ignores(relative)
+		}
 	}
 
 	async close() {
@@ -960,7 +1001,7 @@ export default class Workspace {
 		const originalPath = filepath
 		const realpath = await this.tryGetRealPath(filepath)
 
-		const newTree = await loadTreeFromPath(realpath)
+		const newTree = await loadTreeFromPath(realpath, this.pathPredicate)
 		if (newTree === null) {
 			// Parsing failed, this realpath no longer exists
 			ioLog.info(chalk.red('Node Removed'), chalk.grey(realpath))

@@ -52,6 +52,7 @@
     "electron-updater": "^6.1.4",
     "fast-equals": "^6.0.3",
     "font-list": "^2.1.0",
+    "ignore": "^7.0.14",
     "js-logger": "^1.6.1",
     "link-preview-js": "^5.0.0",
     "media-chrome": "^4.12.0",
