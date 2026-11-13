@@ -900,13 +900,11 @@ function onNoteKeydown(event: KeyboardEventWithShortcut) {
 	}
 	function selectionIndex(event: KeyboardEventWithShortcut, wannaGoDown: boolean) {
 		const currentSelection = editor.doc.selection
-		const len = currentSelection[1] - currentSelection[0]
 		if (event.shiftKey){
 			// when extending a selection, the moving end is the focus (index 1)
 			// regardless of direction, because selection is stored as [anchor, focus]
 			return 1
 		}
-		// no shift: single cursor, both ends equal; either index is fine
 		if (wannaGoDown) return 1
 		else return 0
 	}
