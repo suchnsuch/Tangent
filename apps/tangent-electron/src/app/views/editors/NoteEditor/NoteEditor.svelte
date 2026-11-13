@@ -975,7 +975,6 @@ function onNoteKeydown(event: KeyboardEventWithShortcut) {
 		}
 	}
 
-	console.log(editor.doc.selection)
 }
 
 function onHeaderKeyExit(event: KeyboardEvent) {
