@@ -157,6 +157,7 @@ let selectEndEnabled = true
 let isEditorMouseDown = false
 let mouseDownX = 0
 let mouseDownY = 0
+let maxCursorStartOffset = $state(0)
 
 let note = $derived(noteState.note)
 
@@ -517,6 +518,14 @@ function updateAnnotations(annotations: Annotation[], index=0) {
 	}
 
 	ignoreNextAnnotationUpdate = false
+}
+
+function onUpdateSelection() {
+	const selection = editor.doc.selection
+	if (selection){
+		const at = selection[0]
+		maxCursorStartOffset = at - editor.doc.getLineRange(at)[0]
+	}
 }
 
 export function saveFile() {
@@ -919,7 +928,7 @@ function onNoteKeydown(event: KeyboardEventWithShortcut) {
 			? Math.min(currentLineRange[1]+1, end) 
 			: Math.max(currentLineRange[0]-1, 0)
 		const newLineRange = editor.doc.getLineRange(newLinePosCandidate)
-		const candidateAnchor = clamp(newLineRange[0] + currentLineOffset, 0, newLineRange[1])
+		const candidateAnchor = clamp(newLineRange[0] + Math.max(currentLineOffset, maxCursorStartOffset), 0, newLineRange[1]-1)
 		const newAnchor = candidateAnchor === currentAnchor ? (wannaGoDown ? end : 0) : candidateAnchor
 
 		if (event.shiftKey){
@@ -933,7 +942,9 @@ function onNoteKeydown(event: KeyboardEventWithShortcut) {
 		event.preventDefault()
 	}
 
-	if (event.modShortcut.endsWith('ArrowUp')) {
+	
+
+	if (event.modShortcut === 'ArrowUp' || event.modShortcut === 'Shift+ArrowUp') {
 		const selection = editor.doc.selection
 		if (selection) {
 			if (selection[0] === 0 && selection[1] === 0) {
@@ -951,10 +962,12 @@ function onNoteKeydown(event: KeyboardEventWithShortcut) {
 			}
 			else {
 				mutateSelection(event, false)
+				return
 			}
 		}
 	}
-	if (event.modShortcut.endsWith('ArrowDown')) {
+	
+	if (event.modShortcut === 'ArrowDown' || event.modShortcut === 'Shift+ArrowDown') {
 		const selection = editor.doc.selection
 		const end = editor.doc.length - 1
 
@@ -966,9 +979,19 @@ function onNoteKeydown(event: KeyboardEventWithShortcut) {
 			}
 			else {
 				mutateSelection(event, true)
+				return
 			}
 		}
 	}
+
+	// if (event.modShortcut.endsWith('ArrowLeft')) {
+	// 	onUpdateSelection()
+	// }
+	// if (event.modShortcut.endsWith('ArrowRight')) {
+	// 	onUpdateSelection()
+	// }
+
+	onUpdateSelection()
 
 }
 
@@ -981,6 +1004,7 @@ function onHeaderKeyExit(event: KeyboardEvent) {
 	if (event.key === 'ArrowDown') {
 		event.preventDefault()
 		editor.select(0)
+		onUpdateSelection()
 		return
 	}
 	if (event.key === 'ArrowUp') {
@@ -1025,6 +1049,7 @@ function onEditorFocus() {
 	// focus shifts with the keyboard to restore selection state.
 	if (noteState.selection.value && !isEditorMouseDown) {
 		editor?.select(noteState.selection.value)
+		onUpdateSelection()
 	}
 }
 
@@ -1396,10 +1421,12 @@ function selectFromVerticalPosition(event?: MouseEvent) {
 			if (rect.bottom > event.clientY) {
 				if (rect.left >= event.clientX) {
 					editor.select(range[0])
+					onUpdateSelection()
 					return
 				}
 				if (rect.right <= event.clientX) {
 					editor.select(range[1] - 1)
+					onUpdateSelection()
 					return
 				}
 			}
