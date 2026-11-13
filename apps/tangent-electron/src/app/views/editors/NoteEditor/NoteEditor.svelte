@@ -900,14 +900,15 @@ function onNoteKeydown(event: KeyboardEventWithShortcut) {
 		noteState.setAnnotations([])
 		return
 	}
-
 	function chooseCursorInd(event: KeyboardEventWithShortcut, wannaGoDown: boolean) {
 		const currentSelection = editor.doc.selection
-		let len = currentSelection[1] - currentSelection[0]
+		const len = currentSelection[1] - currentSelection[0]
 		if (event.shiftKey){
-			if (len > 0) return 0
-			else return 1
+			// when extending a selection, the moving end is the focus (index 1)
+			// regardless of direction, because selection is stored as [anchor, focus]
+			return 1
 		}
+		// no shift: single cursor, both ends equal; either index is fine
 		if (wannaGoDown) return 1
 		else return 0
 	}
@@ -926,16 +927,15 @@ function onNoteKeydown(event: KeyboardEventWithShortcut) {
 		const candidateAnchor = clamp(newLineRange[0] + currentLineOffset, 0, newLineRange[1])
 		const newAnchor = candidateAnchor === currentAnchor ? (wannaGoDown ? end : 0) : candidateAnchor
 
-
 		if (event.shiftKey){
-			editor.select(wannaGoDown ? [currentSelection[0], newAnchor] : [newAnchor, currentSelection[1]])
+			// preserve the fixed end (index 0) and move the focus end (index 1)
+			editor.select([currentSelection[0], newAnchor])
 		}
 		else {
 			editor.select([newAnchor,newAnchor])
 		}
 
 		event.preventDefault()
-
 	}
 
 	if (event.modShortcut.endsWith('ArrowUp')) {
