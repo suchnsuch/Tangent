@@ -62,6 +62,8 @@ import TemplateTokenTooltip from './TemplateTokenTooltip.svelte'
 import TemplateTokenAutocompleter from '../autocomplete/TemplateTokenAutocompleter'
 import TemplateTokenAutocompleteMenu from '../autocomplete/TemplateTokenAutocompleteMenu.svelte'
 import type { NodeViewProps } from 'app/views/node-views/nodeView'
+  import { clamp } from 'common/utils';
+  import { expandSection } from 'common/markdownModel/sections';
 
 // Technically, this just needs to exist _somewhere_. Putting it here because of the svelte dependency
 // Force the use of the variable so that it is included in the bundle
@@ -890,6 +892,7 @@ function resumeFocus(arg?) {
 }
 
 function onNoteKeydown(event: KeyboardEventWithShortcut) {
+	console.log(event.modShortcut)
 	if (event.defaultPrevented) return
 
 	if (event.modShortcut === 'Escape' && $annotations.length) {
@@ -898,30 +901,81 @@ function onNoteKeydown(event: KeyboardEventWithShortcut) {
 		return
 	}
 
-	if (event.modShortcut === 'ArrowUp') {
+	function chooseCursorInd(event: KeyboardEventWithShortcut, wannaGoDown: boolean) {
+		const currentSelection = editor.doc.selection
+		let len = currentSelection[1] - currentSelection[0]
+		if (event.shiftKey){
+			if (len > 0) return 0
+			else return 1
+		}
+		if (wannaGoDown) return 1
+		else return 0
+	}
+
+	function mutateSelection(event: KeyboardEventWithShortcut, wannaGoDown: boolean) {
+		const end = editor.doc.length - 1
+		const currentSelection = editor.doc.selection
+		const anchorInd = chooseCursorInd(event, wannaGoDown)
+		const currentAnchor = currentSelection[anchorInd]
+		const currentLineRange = editor.doc.getLineRange(currentAnchor)
+		const currentLineOffset = currentAnchor - currentLineRange[0]
+		const newLinePosCandidate = wannaGoDown 
+			? Math.min(currentLineRange[1]+1, end) 
+			: Math.max(currentLineRange[0]-1, 0)
+		const newLineRange = editor.doc.getLineRange(newLinePosCandidate)
+		const candidateAnchor = clamp(newLineRange[0] + currentLineOffset, 0, newLineRange[1])
+		const newAnchor = candidateAnchor === currentAnchor ? (wannaGoDown ? end : 0) : candidateAnchor
+
+
+		if (event.shiftKey){
+			editor.select(wannaGoDown ? [currentSelection[0], newAnchor] : [newAnchor, currentSelection[1]])
+		}
+		else {
+			editor.select([newAnchor,newAnchor])
+		}
+
+		event.preventDefault()
+
+	}
+
+	if (event.modShortcut.endsWith('ArrowUp')) {
 		const selection = editor.doc.selection
-		if (selection && selection[0] === 0 && selection[1] === 0) {
-			if (headerEditElement) {
-				document.getSelection().selectAllChildren(headerEditElement)
-				setScrollTo({
-					container,
-					target: headerEditElement,
-					// Extra bit to scroll to the top of a normal editor, but not in a feed
-					marginY: { start: effectiveExtraTop + 50, end: 0 }
-				})
+		if (selection) {
+			if (selection[0] === 0 && selection[1] === 0) {
+				if (headerEditElement) {
+					document.getSelection().selectAllChildren(headerEditElement)
+					setScrollTo({
+						container,
+						target: headerEditElement,
+						// Extra bit to scroll to the top of a normal editor, but not in a feed
+						marginY: { start: effectiveExtraTop + 50, end: 0 }
+					})
+				}
+				event.preventDefault()
+				return
 			}
-			event.preventDefault()
-			return
+			else {
+				mutateSelection(event, false)
+			}
 		}
 	}
-	if (event.modShortcut === 'ArrowDown') {
+	if (event.modShortcut.endsWith('ArrowDown')) {
 		const selection = editor.doc.selection
 		const end = editor.doc.length - 1
-		if (selection && selection[0] === end && selection[1] === end) {
-			if (onKeyboardExit) onKeyboardExit(event)
-			return
+
+		if (selection){
+			
+			if (selection[0] === end && selection[1] === end) {
+				if (onKeyboardExit) onKeyboardExit(event)
+					return
+			}
+			else {
+				mutateSelection(event, true)
+			}
 		}
 	}
+
+	console.log(editor.doc.selection)
 }
 
 function onHeaderKeyExit(event: KeyboardEvent) {
