@@ -898,7 +898,7 @@ function onNoteKeydown(event: KeyboardEventWithShortcut) {
 		noteState.setAnnotations([])
 		return
 	}
-	function chooseCursorInd(event: KeyboardEventWithShortcut, wannaGoDown: boolean) {
+	function selectionIndex(event: KeyboardEventWithShortcut, wannaGoDown: boolean) {
 		const currentSelection = editor.doc.selection
 		const len = currentSelection[1] - currentSelection[0]
 		if (event.shiftKey){
@@ -914,8 +914,8 @@ function onNoteKeydown(event: KeyboardEventWithShortcut) {
 	function mutateSelection(event: KeyboardEventWithShortcut, wannaGoDown: boolean) {
 		const end = editor.doc.length - 1
 		const currentSelection = editor.doc.selection
-		const anchorInd = chooseCursorInd(event, wannaGoDown)
-		const currentAnchor = currentSelection[anchorInd]
+		const anchorIndex = selectionIndex(event, wannaGoDown)
+		const currentAnchor = currentSelection[anchorIndex]
 		const currentLineRange = editor.doc.getLineRange(currentAnchor)
 		const currentLineOffset = currentAnchor - currentLineRange[0]
 		const newLinePosCandidate = wannaGoDown 
