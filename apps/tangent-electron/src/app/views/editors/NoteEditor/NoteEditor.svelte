@@ -62,6 +62,7 @@ import TemplateTokenTooltip from './TemplateTokenTooltip.svelte'
 import TemplateTokenAutocompleter from '../autocomplete/TemplateTokenAutocompleter'
 import TemplateTokenAutocompleteMenu from '../autocomplete/TemplateTokenAutocompleteMenu.svelte'
 import type { NodeViewProps } from 'app/views/node-views/nodeView'
+import { clamp } from 'common/utils'
 
 // Technically, this just needs to exist _somewhere_. Putting it here because of the svelte dependency
 // Force the use of the variable so that it is included in the bundle
@@ -156,6 +157,7 @@ let selectEndEnabled = true
 let isEditorMouseDown = false
 let mouseDownX = 0
 let mouseDownY = 0
+let maxCursorStartOffset = $state(0)
 
 let note = $derived(noteState.note)
 
@@ -516,6 +518,14 @@ function updateAnnotations(annotations: Annotation[], index=0) {
 	}
 
 	ignoreNextAnnotationUpdate = false
+}
+
+function onUpdateSelection() {
+	const selection = editor.doc.selection
+	if (selection){
+		const at = selection[0]
+		maxCursorStartOffset = at - editor.doc.getLineRange(at)[0]
+	}
 }
 
 export function saveFile() {
@@ -889,6 +899,42 @@ function resumeFocus(arg?) {
 	}
 }
 
+function selectionIndex(event: KeyboardEventWithShortcut, wannaGoDown: boolean) {
+	const selection = editor.doc.selection
+	// when extending a selection, the moving end is the focus (index 1)
+	// regardless of direction, because selection is stored as [anchor, focus]
+	if (event.shiftKey) return 1
+	// just released  the shift
+	else if (selection && wannaGoDown) return selection[0] < selection[1] ? 1 : 0
+	else if (selection && !wannaGoDown) return selection[0] < selection[1] ? 0 : 1
+	// simple cursor
+	else if (wannaGoDown) return 1
+	else return 0
+}
+
+function mutateSelection(event: KeyboardEventWithShortcut, wannaGoDown: boolean) {
+	const end = editor.doc.length - 1
+	const currentSelection = editor.doc.selection
+	const anchorIndex = selectionIndex(event, wannaGoDown)
+	const currentAnchor = currentSelection[anchorIndex]
+	const currentLineRange = editor.doc.getLineRange(currentAnchor)
+	const currentLineOffset = currentAnchor - currentLineRange[0]
+	const newLinePosCandidate = wannaGoDown 
+		? Math.min(currentLineRange[1]+1, end) 
+		: Math.max(currentLineRange[0]-1, 0)
+	const newLineRange = editor.doc.getLineRange(newLinePosCandidate)
+	const candidateAnchor = clamp(newLineRange[0] + Math.max(currentLineOffset, maxCursorStartOffset), 0, newLineRange[1]-1)
+	const newAnchor = candidateAnchor === currentAnchor ? (wannaGoDown ? end : 0) : candidateAnchor
+
+	if (event.shiftKey){
+		// preserve the fixed end (index 0) and move the focus end (index 1)
+		editor.select([currentSelection[0], newAnchor])
+	}
+	else {
+		editor.select([newAnchor,newAnchor])
+	}
+}
+	
 function onNoteKeydown(event: KeyboardEventWithShortcut) {
 	if (event.defaultPrevented) return
 
@@ -898,30 +944,49 @@ function onNoteKeydown(event: KeyboardEventWithShortcut) {
 		return
 	}
 
-	if (event.modShortcut === 'ArrowUp') {
+	if (event.modShortcut === 'ArrowUp' || event.modShortcut === 'Shift+ArrowUp') {
 		const selection = editor.doc.selection
-		if (selection && selection[0] === 0 && selection[1] === 0) {
-			if (headerEditElement) {
-				document.getSelection().selectAllChildren(headerEditElement)
-				setScrollTo({
-					container,
-					target: headerEditElement,
-					// Extra bit to scroll to the top of a normal editor, but not in a feed
-					marginY: { start: effectiveExtraTop + 50, end: 0 }
-				})
+		if (selection) {
+			if (selection[0] === 0 && selection[1] === 0) {
+				if (headerEditElement) {
+					document.getSelection().selectAllChildren(headerEditElement)
+					setScrollTo({
+						container,
+						target: headerEditElement,
+						// Extra bit to scroll to the top of a normal editor, but not in a feed
+						marginY: { start: effectiveExtraTop + 50, end: 0 }
+					})
+				}
+				event.preventDefault()
+				return
 			}
-			event.preventDefault()
-			return
+			else {
+				mutateSelection(event, false)
+				event.preventDefault()
+				return
+			}
 		}
 	}
-	if (event.modShortcut === 'ArrowDown') {
+	
+	if (event.modShortcut === 'ArrowDown' || event.modShortcut === 'Shift+ArrowDown') {
 		const selection = editor.doc.selection
 		const end = editor.doc.length - 1
-		if (selection && selection[0] === end && selection[1] === end) {
-			if (onKeyboardExit) onKeyboardExit(event)
-			return
+
+		if (selection){
+			
+			if (selection[0] === end && selection[1] === end) {
+				if (onKeyboardExit) onKeyboardExit(event)
+					return
+			}
+			else {
+				mutateSelection(event, true)
+				event.preventDefault()
+				return
+			}
 		}
 	}
+
+	onUpdateSelection()
 }
 
 function onHeaderKeyExit(event: KeyboardEvent) {
@@ -933,6 +998,7 @@ function onHeaderKeyExit(event: KeyboardEvent) {
 	if (event.key === 'ArrowDown') {
 		event.preventDefault()
 		editor.select(0)
+		onUpdateSelection()
 		return
 	}
 	if (event.key === 'ArrowUp') {
@@ -977,6 +1043,7 @@ function onEditorFocus() {
 	// focus shifts with the keyboard to restore selection state.
 	if (noteState.selection.value && !isEditorMouseDown) {
 		editor?.select(noteState.selection.value)
+		onUpdateSelection()
 	}
 }
 
@@ -1348,10 +1415,12 @@ function selectFromVerticalPosition(event?: MouseEvent) {
 			if (rect.bottom > event.clientY) {
 				if (rect.left >= event.clientX) {
 					editor.select(range[0])
+					onUpdateSelection()
 					return
 				}
 				if (rect.right <= event.clientX) {
 					editor.select(range[1] - 1)
+					onUpdateSelection()
 					return
 				}
 			}
