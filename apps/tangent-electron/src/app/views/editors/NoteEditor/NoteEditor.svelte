@@ -899,6 +899,42 @@ function resumeFocus(arg?) {
 	}
 }
 
+function selectionIndex(event: KeyboardEventWithShortcut, wannaGoDown: boolean) {
+	const selection = editor.doc.selection
+	// when extending a selection, the moving end is the focus (index 1)
+	// regardless of direction, because selection is stored as [anchor, focus]
+	if (event.shiftKey) return 1
+	// just released  the shift
+	else if (selection && wannaGoDown) return selection[0] < selection[1] ? 1 : 0
+	else if (selection && !wannaGoDown) return selection[0] < selection[1] ? 0 : 1
+	// simple cursor
+	else if (wannaGoDown) return 1
+	else return 0
+}
+
+function mutateSelection(event: KeyboardEventWithShortcut, wannaGoDown: boolean) {
+	const end = editor.doc.length - 1
+	const currentSelection = editor.doc.selection
+	const anchorIndex = selectionIndex(event, wannaGoDown)
+	const currentAnchor = currentSelection[anchorIndex]
+	const currentLineRange = editor.doc.getLineRange(currentAnchor)
+	const currentLineOffset = currentAnchor - currentLineRange[0]
+	const newLinePosCandidate = wannaGoDown 
+		? Math.min(currentLineRange[1]+1, end) 
+		: Math.max(currentLineRange[0]-1, 0)
+	const newLineRange = editor.doc.getLineRange(newLinePosCandidate)
+	const candidateAnchor = clamp(newLineRange[0] + Math.max(currentLineOffset, maxCursorStartOffset), 0, newLineRange[1]-1)
+	const newAnchor = candidateAnchor === currentAnchor ? (wannaGoDown ? end : 0) : candidateAnchor
+
+	if (event.shiftKey){
+		// preserve the fixed end (index 0) and move the focus end (index 1)
+		editor.select([currentSelection[0], newAnchor])
+	}
+	else {
+		editor.select([newAnchor,newAnchor])
+	}
+}
+	
 function onNoteKeydown(event: KeyboardEventWithShortcut) {
 	if (event.defaultPrevented) return
 
@@ -907,42 +943,6 @@ function onNoteKeydown(event: KeyboardEventWithShortcut) {
 		noteState.setAnnotations([])
 		return
 	}
-	function selectionIndex(event: KeyboardEventWithShortcut, wannaGoDown: boolean) {
-		const currentSelection = editor.doc.selection
-		// when extending a selection, the moving end is the focus (index 1)
-		// regardless of direction, because selection is stored as [anchor, focus]
-		if (event.shiftKey) return 1
-		// no selection, single cursor
-		else if (wannaGoDown) return 1
-		else return 0
-	}
-
-	function mutateSelection(event: KeyboardEventWithShortcut, wannaGoDown: boolean) {
-		const end = editor.doc.length - 1
-		const currentSelection = editor.doc.selection
-		const anchorIndex = selectionIndex(event, wannaGoDown)
-		const currentAnchor = currentSelection[anchorIndex]
-		const currentLineRange = editor.doc.getLineRange(currentAnchor)
-		const currentLineOffset = currentAnchor - currentLineRange[0]
-		const newLinePosCandidate = wannaGoDown 
-			? Math.min(currentLineRange[1]+1, end) 
-			: Math.max(currentLineRange[0]-1, 0)
-		const newLineRange = editor.doc.getLineRange(newLinePosCandidate)
-		const candidateAnchor = clamp(newLineRange[0] + Math.max(currentLineOffset, maxCursorStartOffset), 0, newLineRange[1]-1)
-		const newAnchor = candidateAnchor === currentAnchor ? (wannaGoDown ? end : 0) : candidateAnchor
-
-		if (event.shiftKey){
-			// preserve the fixed end (index 0) and move the focus end (index 1)
-			editor.select([currentSelection[0], newAnchor])
-		}
-		else {
-			editor.select([newAnchor,newAnchor])
-		}
-
-		event.preventDefault()
-	}
-
-	
 
 	if (event.modShortcut === 'ArrowUp' || event.modShortcut === 'Shift+ArrowUp') {
 		const selection = editor.doc.selection
@@ -962,7 +962,7 @@ function onNoteKeydown(event: KeyboardEventWithShortcut) {
 			}
 			else {
 				mutateSelection(event, false)
-				return
+				event.preventDefault()
 			}
 		}
 	}
@@ -979,20 +979,12 @@ function onNoteKeydown(event: KeyboardEventWithShortcut) {
 			}
 			else {
 				mutateSelection(event, true)
-				return
+				event.preventDefault()
 			}
 		}
 	}
 
-	// if (event.modShortcut.endsWith('ArrowLeft')) {
-	// 	onUpdateSelection()
-	// }
-	// if (event.modShortcut.endsWith('ArrowRight')) {
-	// 	onUpdateSelection()
-	// }
-
 	onUpdateSelection()
-
 }
 
 function onHeaderKeyExit(event: KeyboardEvent) {
