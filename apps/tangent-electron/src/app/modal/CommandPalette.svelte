@@ -16,6 +16,8 @@ import { getNode, getPreview, sortReferences, type TreeNodeReference } from 'com
 import QueryResultItemSummary from 'app/views/summaries/QueryResultItemSummary.svelte'
 import { shortcutFromEvent, shortcutHtmlString, shortcutsDisplayString, shortcutsHtmlString } from 'app/utils/shortcuts'
 import ShowCommandPaletteCommand from 'app/model/commands/ShowCommandPalette'
+import { safeHeaderLine } from 'common/markdownModel/header'	
+import { IndexData } from 'common/indexing/indexTypes'
 
 let workspace = getContext('workspace') as Workspace
 
@@ -40,8 +42,9 @@ function getPlaceholder(text: string) {
 	}
 	switch (text) {
 		case '#':
-		case '# ':
 			return 'Search for a tag'
+		case '# ':
+			return 'Search outline'
 		case '>':
 		case '> ':
 			return 'Run a command'
@@ -57,6 +60,7 @@ interface Option {
 	ref?: TreeNodeReference
 	action?: PaletteAction
 	match?: SearchMatchResult
+	id?: string
 }
 
 let commandActions: PaletteAction[] = null
@@ -88,7 +92,7 @@ function tagNodeFilter(node: TreeNode) {
 }
 
 function getInputMode(text: string) {
-	let mode: 'file' | 'command' | 'search' | 'tag' = 'file'
+	let mode: 'file' | 'command' | 'search' | 'tag' | 'outline' = 'file'
 
 	if (text.startsWith('>')) {
 		text = text.substring(1)
@@ -97,6 +101,11 @@ function getInputMode(text: string) {
 	else if (text.startsWith('?')) {
 		text = text.substring(1)
 		mode = 'search'
+	}
+	else if (text.startsWith('# ')) {
+		// Drop the tag leader
+		text = text.substring(1)
+		mode = 'outline'
 	}
 	else if (text.startsWith('#')) {
 		// Drop the tag leader
@@ -262,6 +271,30 @@ function updateOptions(input: string) {
 
 			options = annotatedActions
 		break
+
+		case 'outline':
+			options = []
+			const viewState = workspace.viewState.tangent.getCurrentViewState()
+
+			if (viewState.node && viewState.node.meta) {
+				const searchMatcher = buildFuzzySegementMatcher(text)
+
+				for (const h of IndexData.headers(viewState.node.meta)) {
+					const match = h.text.match(searchMatcher)
+					if (match) {
+						options.push({
+							node: viewState.node,
+							match: {
+								...match,
+								type: 'header',
+								input: "#".repeat(h.level) + ' ' + safeHeaderLine(h.text)
+							},
+							id: safeHeaderLine(h.text) + h.start,
+						})
+					}
+				}
+			}
+		break
 	}
 
 	if (options.length === 0) {
@@ -384,6 +417,9 @@ function optionID(option: Option) {
 	}
 	if (option.ref) {
 		return option.ref
+	}
+	if (option.id) {
+		return option.id
 	}
 	else {
 		return option.node
