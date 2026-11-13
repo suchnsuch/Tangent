@@ -963,6 +963,7 @@ function onNoteKeydown(event: KeyboardEventWithShortcut) {
 			else {
 				mutateSelection(event, false)
 				event.preventDefault()
+				return
 			}
 		}
 	}
@@ -980,6 +981,7 @@ function onNoteKeydown(event: KeyboardEventWithShortcut) {
 			else {
 				mutateSelection(event, true)
 				event.preventDefault()
+				return
 			}
 		}
 	}
