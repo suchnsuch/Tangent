@@ -62,8 +62,7 @@ import TemplateTokenTooltip from './TemplateTokenTooltip.svelte'
 import TemplateTokenAutocompleter from '../autocomplete/TemplateTokenAutocompleter'
 import TemplateTokenAutocompleteMenu from '../autocomplete/TemplateTokenAutocompleteMenu.svelte'
 import type { NodeViewProps } from 'app/views/node-views/nodeView'
-  import { clamp } from 'common/utils';
-  import { expandSection } from 'common/markdownModel/sections';
+import { clamp } from 'common/utils'
 
 // Technically, this just needs to exist _somewhere_. Putting it here because of the svelte dependency
 // Force the use of the variable so that it is included in the bundle
@@ -892,7 +891,6 @@ function resumeFocus(arg?) {
 }
 
 function onNoteKeydown(event: KeyboardEventWithShortcut) {
-	console.log(event.modShortcut)
 	if (event.defaultPrevented) return
 
 	if (event.modShortcut === 'Escape' && $annotations.length) {
