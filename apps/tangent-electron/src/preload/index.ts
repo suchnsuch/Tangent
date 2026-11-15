@@ -192,6 +192,9 @@ const bridge: WindowApi = {
 		openPath(path) {
 			ipcRenderer.invoke('openPath', path)
 		},
+		uploadAttachment(workspacePath) {
+			return ipcRenderer.invoke("uploadAttachment", workspacePath);
+		},
 	},
 	edit: {
 		nativeAction(action) {

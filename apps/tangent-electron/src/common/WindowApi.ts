@@ -107,6 +107,8 @@ export default interface WindowAPI {
 		showInFileBrowser(path: string)
 		/** Open a path in the default format */
 		openPath(path: string)
+
+		uploadAttachment(workspacePath: string): Promise<string[]>
 	}
 
 	edit: {
