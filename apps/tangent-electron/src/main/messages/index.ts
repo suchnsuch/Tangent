@@ -576,72 +576,69 @@ async function readClipboardImage() {
 	return null
 }
 
-
 // workspacepath is workspace root path
 ipcMain.handle(
-  "uploadAttachment",
-  async (event, workspacePath: string): Promise<string[]> => {
-    console.log("uploading Attachment");
+	"addAttachment",
+	async (event, workspacePath: string): Promise<string[]> => {
+	console.log("adding Attachment");
 
-    try {
-      const attachmentPaths: string[] = [];
+	try {
+    	const attachmentPaths: string[] = [];
 
-      let filepaths: string[] = [];
-      let windowHandle = getWindowHandle(event.sender);
-      if (windowHandle) {
-        let result = await dialog.showOpenDialog(windowHandle.window, {
-          buttonLabel: "Select File",
-          defaultPath: app.getPath("documents"),
-          title: "Add File",
-          message: "Select a file that will be added inline.",
-          properties: ["openFile", "multiSelections", "createDirectory"],
-        });
-        if (!result.canceled && result.filePaths.length > 0) {
-          filepaths = result.filePaths;
-        }
-      }
+		let filepaths: string[] = [];
+		let windowHandle = getWindowHandle(event.sender);
+		if (windowHandle) {
+			let result = await dialog.showOpenDialog(windowHandle.window, {
+				buttonLabel: "Select File",
+				defaultPath: app.getPath("documents"),
+				title: "Add File",
+				message: "Select a file that will be added inline.",
+				properties: ["openFile", "multiSelections", "createDirectory"],
+			});
+			if (!result.canceled && result.filePaths.length > 0) {
+				filepaths = result.filePaths;
+			}
+		}
 
-      for (let filepath of filepaths) {
-        const fileContents = fs.readFileSync(filepath);
+		for (let filepath of filepaths) {
 
-        const pasteLocationPath = getSettings().defaultPasteLocation.value;
-        const targetDirectory =
-          pasteLocationPath.length > 0
-            ? `${workspacePath}/${pasteLocationPath}`
-            : workspacePath;
+			const pasteLocationPath = getSettings().defaultPasteLocation.value;
+			const targetDirectory =
+				pasteLocationPath.length > 0
+				? `${workspacePath}/${pasteLocationPath}`
+				: workspacePath;
 
-        const filenameext = path.extname(filepath);
-        const filenameNoExt = path.basename(filepath, filenameext);
+			const filenameext = path.extname(filepath);
+			const filenameNoExt = path.basename(filepath, filenameext);
 
-        const filename = fillDateFormat(
-          `${filenameNoExt}_%YYYY%-%MM%-%DD%-%HH%.%mm%.%ss%.${filenameext}`,
-          new Date()
-        );
+			const filename = fillDateFormat(
+				`${filenameNoExt}_%YYYY%-%MM%-%DD%-%HH%.%mm%.%ss%.${filenameext}`,
+				new Date()
+			);
 
-        const attachmentPath = `${targetDirectory}/${filename}`;
+			const attachmentPath = `${targetDirectory}/${filename}`;
 
-        const directory = path.dirname(attachmentPath);
-        fs.promises
-          .mkdir(directory, { recursive: true })
-          .then(() => {
-            return fs.promises.writeFile(attachmentPath, fileContents);
-          })
-          .catch((error) => {
-            log.error("Could not copy file to attachment folder", error);
-          })
-          .finally(() => {
-            console.log("done uploading them");
-          });
+			const directory = path.dirname(attachmentPath);
+			fs.promises
+				.mkdir(directory, { recursive: true })
+				.then(() => {
+					return fs.promises.copyFile(filepath,attachmentPath)
+				})
+				.catch((error) => {
+					log.error("Could not copy file to attachment folder", error);
+				})
+				.finally(() => {
+					console.log("done uploading them");
+				});
 
-        attachmentPaths.push(attachmentPath);
-      }
+			attachmentPaths.push(attachmentPath);
+		}
 
-      return attachmentPaths;
-    } catch (error) {
-      log.error("Could not read files", error);
-    }
-  }
-);
+		return attachmentPaths;
+	} catch (error) {
+		log.error("Could not read files", error);
+	}
+})
 
 ipcMain.handle('saveImageFromClipboard', async (event, contextPath) => {
 	try {

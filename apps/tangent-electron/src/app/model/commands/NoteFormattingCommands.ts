@@ -11,7 +11,7 @@ import { getLineFormattingPrefix } from 'common/markdownModel/line'
 import { derived } from 'svelte/store'
 import { subscribeUntil } from "common/stores";
 import { handleIsNode } from "../NodeHandle";
-import { pathBasename, pathDirname, pathRelative } from "common/utils";
+import paths from 'common/paths'
 
 function getNoteView(tangent: Tangent) {
 	const view = tangent.getCurrentViewState()
@@ -230,109 +230,104 @@ export class ToggleMDLinkCommand extends NoteEditorCommand {
 	}
 }
 
-
-
 interface NoteLinePrefixCommandOptions extends CommandOptions {
 	label: string
 	tooltip: string
 	prefix: string
 }
 
-export class addAttachmentCommand extends NoteEditorCommand {
-  label: string;
-  tooltip: string;
-  prefix: string;
+export class AddAttachmentCommand extends NoteEditorCommand {
 
-  constructor(workspace: Workspace, options: NoteLinePrefixCommandOptions) {
-    super(workspace, options);
-    this.label = options.label;
-    this.tooltip = options.tooltip;
-  }
+	constructor(workspace: Workspace) {
+    	super(workspace, {shortcut: "Mod+Shift+Y"});
+	}
 
-  async execute(context?: NoteEditorCommandContext): Promise<void> {
-    const targets = this.getTargets(context);
-    if (!targets) return;
-    const { editor, selection } = targets;
+	async execute(context?: NoteEditorCommandContext): Promise<void> {
+		const targets = this.getTargets(context);
+		if (!targets) return;
+		const { editor, selection } = targets;
 
-    const currentPath = pathDirname(editor.mainModule.getNotePath());
+		const currentPath = paths.dirname(editor.mainModule.getNotePath());
 
-    let [start, end] = normalizeRange(selection);
+		let [start, end] = normalizeRange(selection);
 
-    const workspaceDirectory = this.workspace.directoryStore._files.path;
+		const workspaceDirectory = this.workspace.directoryStore._files.path;
 
-    const attachmentPaths =
-      await this.workspace.api.file.uploadAttachment(workspaceDirectory);
+		const attachmentPaths =
+			await this.workspace.api.file.addAttachment(workspaceDirectory);
 
-    for (let attachmentPath of attachmentPaths) {
-      if (attachmentPath === null) {
-        console.log("attachment path is null");
-        return;
-      }
+		for (let attachmentPath of attachmentPaths) {
+			if (attachmentPath === null) {
+				console.log("attachment path is null");
+				return;
+			}
 
-      subscribeUntil(
-        this.workspace.getHandle(attachmentPath),
-        (value) => {
-          if (handleIsNode(value)) {
-            const workspacePath = this.workspace.directoryStore.getPathToItem(
-              value,
-              {
-                length: "short",
-                includeExtension: true,
-              }
-            );
+			subscribeUntil(
+			this.workspace.getHandle(attachmentPath),
+			(value) => {
+				if (handleIsNode(value)) {
+					const workspacePath = this.workspace.directoryStore.getPathToItem(
+						value,
+						{
+							length: "short",
+							includeExtension: true,
+						}
+					);
 
-            const workspaceFilename = pathBasename(workspacePath);
-            const relativeWorkspacePath = pathRelative(
-              currentPath,
-              attachmentPath
-            );
+					
+					// const workspaceFilename = pathBasename(workspacePath);
+					const workspaceFilename = paths.basename(workspacePath)
+					// const relativeWorkspacePath = pathRelative(
+					const relativeWorkspacePath = paths.relative(
+						currentPath,
+						attachmentPath
+					);
 
-            const change = editor.change;
-            if (start !== end) {
-              change.delete([start, end]);
-            }
+					const change = editor.change;
+					if (start !== end) {
+						change.delete([start, end]);
+					}
 
-            // replacing wikilinks by standark links for this
-            const insertion = `[${workspaceFilename}](${relativeWorkspacePath})`;
+					// replacing wikilinks by standark links for this
+					const insertion = `[${workspaceFilename}](${relativeWorkspacePath})`;
 
-            change.insert(start, insertion + "\n");
-            const moveCursorUnits = insertion.length + 1;
-            change.select(start + moveCursorUnits);
-            start += moveCursorUnits;
-            end += moveCursorUnits;
-            change.apply();
-            return true;
-          }
-          return false;
-        },
-        5000
-      );
-    }
-  }
+					change.insert(start, insertion + "\n");
+					const moveCursorUnits = insertion.length + 1;
+					change.select(start + moveCursorUnits);
+					start += moveCursorUnits;
+					end += moveCursorUnits;
+					change.apply();
+					return true;
+				}
+				return false;
+			},
+			5000);
+		}
+	}
 
-  getChecked(context?: NoteEditorCommandContext): boolean | null {
-    const targets = this.getTargets(context);
-    if (!targets) return;
-    const { editor, selection } = targets;
-    const lines = editor.doc.getLinesAt(selection);
-    return lines.every((line) => getLineFormattingPrefix(line) === this.prefix);
-  }
+	getChecked(context?: NoteEditorCommandContext): boolean | null {
+		const targets = this.getTargets(context);
+		if (!targets) return;
+		const { editor, selection } = targets;
+		const lines = editor.doc.getLinesAt(selection);
+		return lines.every((line) => getLineFormattingPrefix(line) === "");
+	}
 
-  getName() {
-    return this.label;
-  }
+	getName() {
+		return "Add Attachment";
+	}
 
-  getLabel(context?: NoteEditorCommandContext) {
-    return this.label;
-  }
+	getLabel(context?: NoteEditorCommandContext) {
+		return this.getName();
+	}
 
-  getTooltip(context?: NoteEditorCommandContext) {
-    return this.tooltip;
-  }
+	getTooltip(context?: NoteEditorCommandContext) {
+		return "Add attachments to the current file";
+	}
 
-  getDefaultPaletteName() {
-    return this.getName();
-  }
+	getDefaultPaletteName() {
+		return this.getName();
+	}
 }
 
 

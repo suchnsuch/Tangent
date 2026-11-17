@@ -32,7 +32,7 @@ import ShowAllChildMapNodesCommand from './ShowAllChildMapNodes'
 import ShowPreviousSessionCommand from './ShowPreviousSession'
 import DuplicateNodeCommand from './DuplicateNode'
 import { CollapseAllSectionsCommand, CollapseCurrentSectionCommand } from './CollapseSectionCommands'
-import {addAttachmentCommand,InlineFormatCommand, NoteLinePrefixCommand, SearchNoteCommand, ShiftNoteGroupCommand, ToggleMDLinkCommand as ToggleMarkdownLinkCommand, ToggleWikiLinkCommand } from './NoteFormattingCommands'
+import { AddAttachmentCommand, InlineFormatCommand, NoteLinePrefixCommand, SearchNoteCommand, ShiftNoteGroupCommand, ToggleMDLinkCommand as ToggleMarkdownLinkCommand, ToggleWikiLinkCommand } from './NoteFormattingCommands'
 import { isMac } from 'common/platform'
 import { NativeCommand } from './NativeCommand'
 import { OpenDocumentationCommand } from './OpenDocumentation'
@@ -75,12 +75,7 @@ function createAllCommands(workspace: Workspace) {
 
 		openWorkspace: new OpenWorkspaceCommand(workspace),
 
-		 uploadAttachment: new addAttachmentCommand(workspace, {
-			shortcut: "Mod+Shift+U",
-			label: "Upload Attachment",
-			tooltip: "Add attachments to the current file",
-			prefix: "",
-			}),
+		addAttachment: new AddAttachmentCommand(workspace),
 
 		toggleLeftSidebar: new ToggleSidebarCommand(workspace),
 		openPreferences: new OpenPreferencesCommand(workspace),

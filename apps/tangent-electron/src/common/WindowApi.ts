@@ -108,7 +108,7 @@ export default interface WindowAPI {
 		/** Open a path in the default format */
 		openPath(path: string)
 
-		uploadAttachment(workspacePath: string): Promise<string[]>
+		addAttachment(workspacePath: string): Promise<string[]>
 	}
 
 	edit: {
