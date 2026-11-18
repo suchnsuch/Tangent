@@ -13,6 +13,8 @@ export let layout: 'fill' | 'auto' = 'fill'
 export let extraTop = 0
 export let extraBottom = 0
 
+export let onViewReady: () => void = null
+
 let container: HTMLElement
 
 let zoom = state.zoom
@@ -114,6 +116,10 @@ function onContextMenu(event: MouseEvent) {
 	appendContextTemplate(event, menu)
 }
 
+function onImageLoaded(event: Event) {
+	if (onViewReady) onViewReady()
+}
+
 </script>
 
 <!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
@@ -134,6 +140,8 @@ function onContextMenu(event: MouseEvent) {
 		class:dragging
 		src={$file.cacheBustPath} alt={state.node.name}
 		style={`transform: scale(${$zoom}) translate(${$panX}px, ${$panY}px);`}
+		on:load={onImageLoaded}
+		on:error={onImageLoaded}
 		on:mousedown={mouseDown}/>
 	{#if isTransformed || isHoveringControls}
 		<div class="controls" transition:fly={{ y: 100 }}
