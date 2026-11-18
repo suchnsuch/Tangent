@@ -1147,17 +1147,23 @@ function onContextMenu(event: MouseEvent) {
 
 			if (typeof resolution === 'string') {
 				// Will need to handle this with the native system
-				menu.push({
-					label: `Open "${linkInfo.href}"`,
-					accelerator: 'CommandOrControl+Enter',
-					toolTip: 'Opens the linked item in the default app',
-					click: () => {
-						if (onNavigate) onNavigate({
-							link: linkInfo,
-							origin: note
-						})
+				menu.push(
+					{
+						label: `Open "${linkInfo.href}"`,
+						accelerator: 'CommandOrControl+Enter',
+						toolTip: 'Opens the linked item in the default app',
+						click: () => {
+							if (onNavigate) onNavigate({
+								link: linkInfo,
+								origin: note
+							})
+						}
+					},
+					{
+						command: workspace.commands.openInFileBrowser,
+						commandContext: { target: resolution }
 					}
-				})
+				)
 			}
 			else if (!Array.isArray(resolution)) {
 				// Tangent knows what this is
@@ -1226,6 +1232,20 @@ function onContextMenu(event: MouseEvent) {
 						})
 					}
 				}
+
+				menu.push(
+					{ type: 'separator' },
+					{
+						label: 'Open in Default Application',
+						click() {
+							workspace.api.file.openPath(resolution.path)
+						}
+					},
+					{
+						command: workspace.commands.openInFileBrowser,
+						commandContext: { target: resolution }
+					}
+				)
 			}
 		}
 		else if (linkState === 'untracked') {
