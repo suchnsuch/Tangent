@@ -19,6 +19,8 @@ import './urlData'
 import { FileSaveResult } from 'main/File'
 import { ClipboardItem } from 'electron'
 import { getSettings } from '../settings'
+import { escape } from 'querystring'
+import { constants } from 'fs/promises'
 
 const log = Logger.get('messages')
 
@@ -579,11 +581,62 @@ async function readClipboardImage() {
 // workspacepath is workspace root path
 ipcMain.handle(
 	"addAttachment",
-	async (event, workspacePath: string): Promise<string[]> => {
+	async (event, workspacePath: string): Promise<{ogName: string, attachmentPath: string}[]> => {
 	console.log("adding Attachment");
 
+	// const fileExists=async(path)=>{
+	// 	try{
+
+	// 		await fs.promises.access(path,constants.F_OK)
+	// 		return true
+	// 	}
+	// 	catch(err){
+	// 		// console.log('err: ',err)
+	// 		return false
+	// 	}
+	// }
+
+	// for numbered label
+	// const safeFilePath=async(filenameWithoutExt : string,fullFilePath: string)=>{
+	// 	if(await fileExists(fullFilePath) ){
+	// 		const filenameRegex = /^.+_([0-9]+)$/
+	// 		let newFilenameWithoutExt=""
+	// 		console.log('filenameWithoutExt: ',filenameWithoutExt)
+	// 		if(filenameRegex.test(filenameWithoutExt) ){
+	// 			const numberedLabel = filenameRegex.exec(filenameWithoutExt)[1]
+	// 			const numberedLabelToInt = parseInt(numberedLabel)
+
+	// 			console.log('numberedLabelToInt: ',numberedLabelToInt)
+
+				
+
+	// 			newFilenameWithoutExt = filenameWithoutExt.replace(/_[0-9]+$/,`_${numberedLabelToInt+1}`)
+
+	// 			console.log('newFilenameWithoutExt: ',newFilenameWithoutExt)
+				
+	// 		}
+	// 		else{
+	// 			newFilenameWithoutExt=filenameWithoutExt+"_1"
+	// 		}
+
+	// 		return newFilenameWithoutExt
+	// 	}
+
+	// 	return filenameWithoutExt
+	// }
+
+	const generateRandomNummericString=(length: number)=>{
+		const characters="0123456789"
+		let result = '';
+		const charactersLength = characters.length;
+		for (let i = 0; i < length; i++) {
+			result += characters.charAt(Math.floor(Math.random() * charactersLength));
+		}
+		return result;
+	}
+
 	try {
-    	const attachmentPaths: string[] = [];
+    	const attachmentPaths: {ogName: string, attachmentPath: string}[] = [];
 
 		let filepaths: string[] = [];
 		let windowHandle = getWindowHandle(event.sender);
@@ -609,12 +662,18 @@ ipcMain.handle(
 				: workspacePath;
 
 			const filenameext = path.extname(filepath);
+			
 			const filenameNoExt = path.basename(filepath, filenameext);
 
-			const filename = fillDateFormat(
-				`${filenameNoExt}_%YYYY%-%MM%-%DD%-%HH%.%mm%.%ss%.${filenameext}`,
+			console.log('filenameNoExt: ',filenameNoExt ,'and', filenameext)
+
+			const originalFilename =`${filenameNoExt}${filenameext}`
+
+			const isTimestampSelected = getSettings().attachedFilenameFormat.value==="timestamp"
+			const filename = isTimestampSelected? fillDateFormat(
+				`${filenameNoExt}_%YYYY%-%MM%-%DD%-%HH%.%mm%.%ss%${filenameext}`,
 				new Date()
-			);
+			): `${filenameNoExt}_${generateRandomNummericString(10)}${filenameext}` ;
 
 			const attachmentPath = `${targetDirectory}/${filename}`;
 
@@ -624,14 +683,15 @@ ipcMain.handle(
 				.then(() => {
 					return fs.promises.copyFile(filepath,attachmentPath)
 				})
+				.then(()=>{
+					console.log("done uploading them");
+				})
 				.catch((error) => {
 					log.error("Could not copy file to attachment folder", error);
 				})
-				.finally(() => {
-					console.log("done uploading them");
-				});
 
-			attachmentPaths.push(attachmentPath);
+			// attachmentPaths.push(attachmentPath);
+			attachmentPaths.push({ogName: originalFilename, attachmentPath});
 		}
 
 		return attachmentPaths;

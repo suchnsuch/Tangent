@@ -256,7 +256,8 @@ export class AddAttachmentCommand extends NoteEditorCommand {
 		const attachmentPaths =
 			await this.workspace.api.file.addAttachment(workspaceDirectory);
 
-		for (let attachmentPath of attachmentPaths) {
+		for (let attachmentPathObj of attachmentPaths) {
+			const {ogName, attachmentPath}= attachmentPathObj
 			if (attachmentPath === null) {
 				console.log("attachment path is null");
 				return;
@@ -289,7 +290,8 @@ export class AddAttachmentCommand extends NoteEditorCommand {
 					}
 
 					// replacing wikilinks by standark links for this
-					const insertion = `[${workspaceFilename}](${relativeWorkspacePath})`;
+					// const insertion = `[${workspaceFilename}](${relativeWorkspacePath})`;
+					const insertion = `[${ogName}](${relativeWorkspacePath})`;
 
 					change.insert(start, insertion + "\n");
 					const moveCursorUnits = insertion.length + 1;
