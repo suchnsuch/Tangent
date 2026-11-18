@@ -505,7 +505,7 @@ export function getMediaCustomizationsFromText(text: string): MediaCustomization
 	let result: MediaCustomizations = {}
 
 	for (let part of text.split(/\s+/).map(p => p.trim())) {
-		const match = part.match(/((\d+)(x(\d+))?)|((left)|(right))/i)
+		const match = part.match(/^((\d+)(x(\d+))?)$|^((left)|(right))$/i)
 		if (match) {
 			if (match[2]) {
 				const width = parseInt(match[1])

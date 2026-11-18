@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
 import { StructureType } from 'common/indexing/indexTypes'
-import { createContentIdMatcher, linkTextFromLink, matchMarkdownLink, matchWikiLink } from './links'
+import { createContentIdMatcher, getMediaCustomizationsFromText, linkTextFromLink, matchMarkdownLink, matchWikiLink } from './links'
 import { safeHeaderLine } from './header'
 
 describe('Wiki Links', () => {
@@ -418,5 +418,23 @@ describe('Content ID Matching', () => {
 
 	it('Can select ids with parenthesis', () => {
 		expect('My (Parenthetical) Header'.match(createContentIdMatcher('My (Parenthetical) Header'))).toBeTruthy()
+	})
+})
+
+describe('Link Text Media Customizations', () => {
+	it('Can pull a number as a width', () => {
+		expect(getMediaCustomizationsFromText('45')).toEqual({ width: 45 })
+		expect(getMediaCustomizationsFromText(' 45 ')).toEqual({ width: 45 })
+	})
+	it('Can pull two numbers as a width and height', () => {
+		expect(getMediaCustomizationsFromText('50x60')).toEqual({ width: 50, height: 60 })
+	})
+	it('Can pull a left/right float', () => {
+		expect(getMediaCustomizationsFromText('left')).toEqual({ float: 'left' })
+		expect(getMediaCustomizationsFromText('right')).toEqual({ float: 'right' })
+	})
+
+	it('Does not pull numbers from complex text', () => {
+		expect(getMediaCustomizationsFromText('3050-60-10')).toEqual({})
 	})
 })
