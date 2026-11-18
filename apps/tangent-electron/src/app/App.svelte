@@ -148,7 +148,7 @@ $: {
 		style += `--scrollBarWidth: ${size}px;`
 	}
 
-	document.body.style.cssText = style
+	document.documentElement.style.cssText = style
 }
 
 window.addEventListener('beforeunload', () => {
