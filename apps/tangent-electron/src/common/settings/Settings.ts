@@ -470,12 +470,6 @@ export default class Settings extends ObjectStore {
 		name: 'Attached filename format',
 		description: 'Whether to use timestamp or number labels for filename.',
 		validValues: [
-			// {
-			// 	value: 'numberedLabel',
-			// 	displayName: 'Numbered label',
-			// 	description: 'Numbered label will be appended if duplicates are found'
-
-			// },
 			{
 				value: 'randomNumbers',
 				displayName: 'Random Number',

@@ -274,11 +274,7 @@ export class AddAttachmentCommand extends NoteEditorCommand {
 							includeExtension: true,
 						}
 					);
-
 					
-					// const workspaceFilename = pathBasename(workspacePath);
-					const workspaceFilename = paths.basename(workspacePath)
-					// const relativeWorkspacePath = pathRelative(
 					const relativeWorkspacePath = paths.relative(
 						currentPath,
 						attachmentPath
@@ -289,8 +285,7 @@ export class AddAttachmentCommand extends NoteEditorCommand {
 						change.delete([start, end]);
 					}
 
-					// replacing wikilinks by standark links for this
-					// const insertion = `[${workspaceFilename}](${relativeWorkspacePath})`;
+					// replacing wikilinks by standark links for this				
 					const insertion = `[${ogName}](${relativeWorkspacePath})`;
 
 					change.insert(start, insertion + "\n");

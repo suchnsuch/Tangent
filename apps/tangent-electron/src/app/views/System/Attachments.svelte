@@ -25,7 +25,6 @@ let settings = workspace.settings
 		<div class="settingsGroup">
 		<SettingView setting={settings.attachedFilenameFormat} />
 		<p class="value-details explanation">
-			<!-- If numbered label is selected and filename is "data.txt" then during duplicates it will be in format "data_1.txt", "data_2.txt",etc -->
 			If Random Number is selected and filename is "data.txt" then during duplicates it will be in format "data_1675675489.txt", "data_2947355435.txt",etc
 		</p>
 		<p class="value-details explanation">

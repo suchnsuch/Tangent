@@ -19,8 +19,6 @@ import './urlData'
 import { FileSaveResult } from 'main/File'
 import { ClipboardItem } from 'electron'
 import { getSettings } from '../settings'
-import { escape } from 'querystring'
-import { constants } from 'fs/promises'
 
 const log = Logger.get('messages')
 
@@ -584,47 +582,6 @@ ipcMain.handle(
 	async (event, workspacePath: string): Promise<{ogName: string, attachmentPath: string}[]> => {
 	console.log("adding Attachment");
 
-	// const fileExists=async(path)=>{
-	// 	try{
-
-	// 		await fs.promises.access(path,constants.F_OK)
-	// 		return true
-	// 	}
-	// 	catch(err){
-	// 		// console.log('err: ',err)
-	// 		return false
-	// 	}
-	// }
-
-	// for numbered label
-	// const safeFilePath=async(filenameWithoutExt : string,fullFilePath: string)=>{
-	// 	if(await fileExists(fullFilePath) ){
-	// 		const filenameRegex = /^.+_([0-9]+)$/
-	// 		let newFilenameWithoutExt=""
-	// 		console.log('filenameWithoutExt: ',filenameWithoutExt)
-	// 		if(filenameRegex.test(filenameWithoutExt) ){
-	// 			const numberedLabel = filenameRegex.exec(filenameWithoutExt)[1]
-	// 			const numberedLabelToInt = parseInt(numberedLabel)
-
-	// 			console.log('numberedLabelToInt: ',numberedLabelToInt)
-
-				
-
-	// 			newFilenameWithoutExt = filenameWithoutExt.replace(/_[0-9]+$/,`_${numberedLabelToInt+1}`)
-
-	// 			console.log('newFilenameWithoutExt: ',newFilenameWithoutExt)
-				
-	// 		}
-	// 		else{
-	// 			newFilenameWithoutExt=filenameWithoutExt+"_1"
-	// 		}
-
-	// 		return newFilenameWithoutExt
-	// 	}
-
-	// 	return filenameWithoutExt
-	// }
-
 	const generateRandomNummericString=(length: number)=>{
 		const characters="0123456789"
 		let result = '';
@@ -690,7 +647,6 @@ ipcMain.handle(
 					log.error("Could not copy file to attachment folder", error);
 				})
 
-			// attachmentPaths.push(attachmentPath);
 			attachmentPaths.push({ogName: originalFilename, attachmentPath});
 		}
 
