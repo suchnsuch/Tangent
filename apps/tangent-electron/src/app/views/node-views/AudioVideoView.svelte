@@ -40,7 +40,11 @@ function updatePlayback(this: HTMLAudioElement | HTMLVideoElement, event: Event)
 }
 
 function setPlayback(this: HTMLAudioElement | HTMLVideoElement, event: Event) {
-	this.currentTime = playbackPosition.value
+	try {
+		this.currentTime = playbackPosition.value
+	} catch (err) {
+		
+	}
 }
 
 function onMediaContext(event: MouseEvent) {
