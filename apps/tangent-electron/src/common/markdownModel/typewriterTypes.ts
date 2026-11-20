@@ -26,6 +26,9 @@ function getHideableFormatClass(attributes, baseClass = '') {
 	if (attributes.end) {
 		className += ' end'
 	}
+	if (attributes.token) {
+		className += ` token-${attributes.token}`
+	}
 	if (attributes.revealed) {
 		className += ' revealed'
 	}
