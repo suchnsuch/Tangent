@@ -112,7 +112,6 @@ function updateShowCreateFromHover(event: MouseEvent) {
 	style:--noteBackgroundColor="var(--backgroundColor)"
 	bind:this={container}
 
-	tabindex="-1"
 	use:arrowNavigate={{
 		containerSelector: '.lazy-list-items',
 		scrollTime: 100,
