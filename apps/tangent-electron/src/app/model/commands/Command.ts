@@ -101,7 +101,7 @@ type CommandHandlerOptions = {
 
 export function createCommandHandler(commands: Command[], options?: CommandHandlerOptions) {
 	return (event: KeyboardEvent) => {
-		if (event.defaultPrevented) return
+		// if (event.defaultPrevented) return
 		if ((options?.restrictForInput ?? true) && !eventIsShortcutable(event)) return
 
 		const shortcut = shortcutFromEvent(event)
