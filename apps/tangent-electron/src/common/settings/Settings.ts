@@ -466,6 +466,24 @@ export default class Settings extends ObjectStore {
 		form: 'folder'
 	})
 
+	attachedFilenameFormat = new Setting({
+		name: 'Attached filename format',
+		description: 'Whether to use timestamp or number labels for filename.',
+		validValues: [
+			{
+				value: 'randomNumbers',
+				displayName: 'Random Number',
+				description: 'Random number will be appended if duplicates are found'
+
+			},
+			{
+				value: 'timestamp',
+				displayName: 'Timestamp',
+				description: 'Timestamp will be appended at end of filename'
+			}
+		]
+	})
+
 	// Files
 	dirtyIndicatorVisibility = new Setting({
 		name: 'Show Dirty File Indicators',

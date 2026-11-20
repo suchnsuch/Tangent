@@ -22,4 +22,14 @@ let settings = workspace.settings
 			The <code>$filename</code> token can be used to inject the name of the file that the attachment is being pasted into.
 		</p>
 	</div>
+		<div class="settingsGroup">
+		<SettingView setting={settings.attachedFilenameFormat} />
+		<p class="value-details explanation">
+			If Random Number is selected and filename is "data.txt" then during duplicates it will be in format "data_1675675489.txt", "data_2947355435.txt",etc
+		</p>
+		<p class="value-details explanation">
+			If Timestamp is selected and filename is "data.txt" then it will be in format "data_2025-11-26-15-45-50.txt"
+		</p>
+		
+	</div>
 </main>

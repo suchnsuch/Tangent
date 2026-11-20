@@ -107,6 +107,8 @@ export default interface WindowAPI {
 		showInFileBrowser(path: string)
 		/** Open a path in the default format */
 		openPath(path: string)
+		/** Returns atatchment paths object after selecting multiple files from file picker */
+		addAttachment(workspacePath: string): Promise<{ogName: string, attachmentPath: string}[]>
 	}
 
 	edit: {
