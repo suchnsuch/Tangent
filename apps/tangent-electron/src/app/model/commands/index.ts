@@ -32,7 +32,7 @@ import ShowAllChildMapNodesCommand from './ShowAllChildMapNodes'
 import ShowPreviousSessionCommand from './ShowPreviousSession'
 import DuplicateNodeCommand from './DuplicateNode'
 import { CollapseAllSectionsCommand, CollapseCurrentSectionCommand } from './CollapseSectionCommands'
-import { InlineFormatCommand, NoteLinePrefixCommand, SearchNoteCommand, ShiftNoteGroupCommand, ToggleMDLinkCommand as ToggleMarkdownLinkCommand, ToggleWikiLinkCommand } from './NoteFormattingCommands'
+import { InlineFormatCommand, InlineHighlightCommand, NoteLinePrefixCommand, SearchNoteCommand, ShiftNoteGroupCommand, ToggleMDLinkCommand as ToggleMarkdownLinkCommand, ToggleWikiLinkCommand } from './NoteFormattingCommands'
 import { isMac } from 'common/platform'
 import { NativeCommand } from './NativeCommand'
 import { OpenDocumentationCommand } from './OpenDocumentation'
@@ -63,7 +63,7 @@ function createAllCommands(workspace: Workspace) {
 		const descriptor = highlightEmojiToClassDescriptor(marker) ?? ''
 		const [color, kind] = descriptor.split(' ')
 		const massagedKind = massageKind(kind)
-		return new InlineFormatCommand(workspace, {
+		return new InlineHighlightCommand(workspace, {
 			label: toTitleCase(`${marker} ${massagedKind} ${color} Highlight`),
 			tooltip: `Toggle whether the selected text has a ${massagedKind} ${color} highlight.`,
 			formattingCharacters: () => marker,
@@ -265,12 +265,12 @@ function createAllCommands(workspace: Workspace) {
 			formattingCharacters: () => workspace.settings?.italicsCharacters.value ?? '_',
 			attributePredicate: attr => attr?.italic
 		}),
-		toggleHighlight: new InlineFormatCommand(workspace, {
+		toggleHighlight: new InlineHighlightCommand(workspace, {
 			label: 'Highlight',
 			tooltip: 'Toggles whether the selected text is highlighted.',
 			shortcut: 'Mod+=',
 			formattingCharacters: () => '==',
-			attributePredicate: attr => attr?.highlight
+			attributePredicate: attr => attr?.highlight == '=='
 		}),
 		toggleCircleGrayHighlight: toggleColorfulHighlightGenerator('⚪'),
 		toggleSquareGrayHighlight: toggleColorfulHighlightGenerator('⬜'),
