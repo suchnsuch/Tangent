@@ -67,6 +67,20 @@ onMount(() => {
 })
 
 let waitingOn: TreeNodeOrReference | Set<TreeNodeOrReference>
+let waitingTimeout: any = null
+function waitOn(item: TreeNodeOrReference) {
+	if (waitingOn instanceof Set) {
+		waitingOn.add(item)
+	}
+	else {
+		waitingOn = item
+	}
+
+	if (waitingTimeout) clearTimeout(waitingTimeout)
+	waitingTimeout = setTimeout(() => {
+		console.warn('Waited 5 seconds for', item)
+	}, 5000);
+}
 function updateWaitingOn(item: TreeNodeOrReference) {
 	if (waitingOn instanceof Set) {
 		waitingOn.delete(item)
@@ -78,10 +92,12 @@ function updateWaitingOn(item: TreeNodeOrReference) {
 					state.focus(feedContainer)
 				}
 			})
+			if (waitingTimeout) clearTimeout(waitingTimeout)
 		}
 	}
 	else if (waitingOn === item) {
 		waitingOn = null
+		if (waitingTimeout) clearTimeout(waitingTimeout)
 	}
 }
 
@@ -270,7 +286,7 @@ function loadNextIfAppropriate() {
 			let [start, end] = feedRange
 			if (end < $items.length - 1) {
 				$lastItem = $items[end + 1]
-				waitingOn = $lastItem
+				waitOn($lastItem)
 			}
 		}
 	}
