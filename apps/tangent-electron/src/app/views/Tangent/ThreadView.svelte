@@ -17,6 +17,7 @@ import ThreadViewVerticalTitleBar from './ThreadViewVerticalTitleBar.svelte'
 import type { NodeViewState } from 'app/model/nodeViewStates'
 import SvgIcon from '../smart-icons/SVGIcon.svelte'
 import { wait } from '@such-n-such/core'
+    import { isAutoFocusLocked } from 'app/utils/focus';
 
 // TODO: These should be based on settings values
 const collapsedWidth = 32
@@ -150,7 +151,7 @@ function scrollToCurrent(state: NodeViewState, _c?, minWidth = trueMinWidth) {
 	// Apply Focus
 	const nodeContainer = container.children[lensIndex]
 	if (!nodeContainer.contains(document.activeElement)) {
-		if (state?.focus) {
+		if (!isAutoFocusLocked() && state?.focus) {
 			state.focus(nodeContainer as HTMLElement)
 		}
 	}

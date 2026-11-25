@@ -37,3 +37,17 @@ export function focusLayer(node: HTMLElement, layer: string) {
 		}
 	}
 }
+
+let autoFocusLock = 0
+
+export function takeAutoFocusLock() {
+	autoFocusLock++
+}
+
+export function releaseAutoFocusLock() {
+	autoFocusLock--
+}
+
+export function isAutoFocusLocked() {
+	return autoFocusLock > 0
+}

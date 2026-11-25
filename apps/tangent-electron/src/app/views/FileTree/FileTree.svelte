@@ -18,6 +18,7 @@ import { queryFileType } from 'common/dataTypes/QueryInfo'
 import NodeIcon from '../smart-icons/NodeIcon.svelte'
 import NodeTooltip from '../node-views/NodeTooltip.svelte'
 import { EmbedFile } from 'app/model'
+import { releaseAutoFocusLock, takeAutoFocusLock } from 'app/utils/focus'
 
 let workspace = getContext('workspace') as Workspace
 
@@ -35,6 +36,7 @@ let focusedItem: TreeNode = null
 
 $: {
 	if (renameElement) {
+		takeAutoFocusLock()
 		renameElement.focus()
 		getSelection().selectAllChildren(renameElement)
 	}
@@ -246,6 +248,7 @@ function onRenameKeydown(event: KeyboardEvent) {
 
 function onRenameBlur(event: Event) {
 	renameTarget = null
+	releaseAutoFocusLock()
 }
 
 function showFileType(item: TreeNode) {
