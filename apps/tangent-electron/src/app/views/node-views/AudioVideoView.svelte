@@ -7,6 +7,7 @@ import { EmbedType } from 'common/embedding'
 
 import { appendContextTemplate, type ContextMenuConstructorOptions } from 'app/model/menus'
 import { loadMediaChrome } from 'app/shim/media-chrome'
+import type { NodeViewProps } from './nodeView'
 
 const workspace = getContext('workspace') as Workspace
 const {
@@ -19,14 +20,12 @@ let {
 
 	layout = 'fill',
 	extraTop = 0,
-	extraBottom = 0
-} : {
+	extraBottom = 0,
+
+	onViewReady
+} : NodeViewProps & {
 	state: AudioVideoViewState
 	editable: boolean
-
-	layout: 'fill' | 'auto'
-	extraTop: number
-	extraBottom: number
 } = $props()
 
 // svelte-ignore non_reactive_update
@@ -34,6 +33,17 @@ let mediaElement: HTMLAudioElement | HTMLVideoElement = null
 
 let playbackPosition = $derived(state?.playbackPosition)
 let embedType = $derived(state?.file?.embedType)
+
+async function load() {
+	try {
+		await loadMediaChrome()
+	}
+	catch (e) {
+		console.log(e)
+	}
+
+	if (onViewReady) onViewReady()
+}
 
 function updatePlayback(this: HTMLAudioElement | HTMLVideoElement, event: Event) {
 	playbackPosition.set(this.currentTime)
@@ -84,7 +94,7 @@ function onMediaContext(event: MouseEvent) {
 		{editable}
 	/>
 	<article>
-		{#await loadMediaChrome()}
+		{#await load()}
 			…
 		{:then _} 
 			<!-- svelte-ignore a11y_no_static_element_interactions -->
