@@ -22,8 +22,11 @@ export let layout: 'fill' | 'auto' = 'fill'
 export let extraTop: number = 0
 export let extraBottom: number = 0
 
+export let onViewReady: () => void = null
+
 $: targetPage = state.targetPage
 
+let resizeContainer: HTMLElement
 let container: HTMLDivElement
 let viewerElement: HTMLDivElement
 
@@ -45,8 +48,9 @@ function onWheel(event: WheelEvent) {
 	
 		viewer.updateScale({ drawingDelay, scaleFactor: newZoom/oldZoom, origin: relativeCursorPos })
 		$zoom = parseFloat(viewer._currentScaleValue)
+		if (layout === 'auto') matchSize()
 	}
-	else {
+	else if (layout === 'fill') {
 		event.preventDefault()
 		const dx = event.deltaX * (1 / $zoom)
 		const dy = event.deltaY * (1 / $zoom)
@@ -104,6 +108,8 @@ function setZoom(zoomValue: number | 'auto') {
 		})
 	}
 	$zoom = viewer.currentScale
+
+	if (layout === 'auto') matchSize()
 }
 
 function onZoomSet() {
@@ -130,6 +136,9 @@ async function doPDF() {
 	viewer.setDocument(pdf)
 
 	onResize(null)
+	//if (layout === 'auto') matchSize()
+
+	if (onViewReady) onViewReady()
 }
 
 onDestroy(() => {
@@ -187,6 +196,13 @@ function onResize(resizeEntries: ResizeObserverEntry[]) {
 	}
 }
 
+function matchSize() {
+	if (resizeContainer && viewerElement) {
+		const rect = viewerElement.getBoundingClientRect()
+		resizeContainer.style.height = rect.height + 'px'
+	}
+}
+
 function onClick(event: MouseEvent) {
 	if (event.target instanceof HTMLAnchorElement) {
 		// Redirect links to the default application
@@ -219,7 +235,7 @@ function onClick(event: MouseEvent) {
 		{editable}
 	/>
 
-	<article use:resizeObserver={onResize}>
+	<article use:resizeObserver={layout === 'fill' ? onResize : null} bind:this={resizeContainer}>
 		<div class={["container pdfViewer", { canPan, 'panning': isPanning }]} bind:this={container}>
 			<!-- svelte-ignore a11y-click-events-have-key-events -->
 			<!-- svelte-ignore a11y-no-static-element-interactions -->
@@ -262,9 +278,13 @@ article {
 		position: absolute;
 		inset: 0;
 
-		overflow-y: visible;
-		overflow-x: auto;
+		min-height: 400px;
 
+		.layout-fill & {
+			overflow-y: visible;
+			overflow-x: auto;
+		}
+		
 		-webkit-user-select: text;
 		user-select: text;
 
