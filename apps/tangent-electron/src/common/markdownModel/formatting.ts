@@ -52,8 +52,7 @@ export function parseEmphasis(char: string, parser: NoteParser): boolean {
 	}
 	else if (!isOpen && rightTouchingText) {
 		parser.commitSpan(null, -count+1)
-
-		builder.addOpenFormat(formatString, boldAndInlineFormatting(count))
+		builder.addOpenFormat(formatString, {...boldAndInlineFormatting(count), token: {'*': 'star', '_': 'underline'}[char]})
 		parser.commitSpan(startAttributes)
 	}
 	return true
