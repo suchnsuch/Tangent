@@ -18,6 +18,7 @@ import './themes'
 import './urlData'
 import { FileSaveResult } from 'main/File'
 import { ClipboardItem } from 'electron'
+import { getSettings } from '../settings'
 
 const log = Logger.get('messages')
 
@@ -574,6 +575,86 @@ async function readClipboardImage() {
 	}
 	return null
 }
+
+// workspacepath is workspace root path
+ipcMain.handle(
+	"addAttachment",
+	async (event, workspacePath: string): Promise<{ogName: string, attachmentPath: string}[]> => {
+	console.log("adding Attachment");
+
+	const generateRandomNummericString=(length: number)=>{
+		const characters="0123456789"
+		let result = '';
+		const charactersLength = characters.length;
+		for (let i = 0; i < length; i++) {
+			result += characters.charAt(Math.floor(Math.random() * charactersLength));
+		}
+		return result;
+	}
+
+	try {
+    	const attachmentPaths: {ogName: string, attachmentPath: string}[] = [];
+
+		let filepaths: string[] = [];
+		let windowHandle = getWindowHandle(event.sender);
+		if (windowHandle) {
+			let result = await dialog.showOpenDialog(windowHandle.window, {
+				buttonLabel: "Select File",
+				defaultPath: app.getPath("documents"),
+				title: "Add File",
+				message: "Select a file that will be added inline.",
+				properties: ["openFile", "multiSelections", "createDirectory"],
+			});
+			if (!result.canceled && result.filePaths.length > 0) {
+				filepaths = result.filePaths;
+			}
+		}
+
+		for (let filepath of filepaths) {
+
+			const pasteLocationPath = getSettings().defaultPasteLocation.value;
+			const targetDirectory =
+				pasteLocationPath.length > 0
+				? `${workspacePath}/${pasteLocationPath}`
+				: workspacePath;
+
+			const filenameext = path.extname(filepath);
+			
+			const filenameNoExt = path.basename(filepath, filenameext);
+
+			console.log('filenameNoExt: ',filenameNoExt ,'and', filenameext)
+
+			const originalFilename =`${filenameNoExt}${filenameext}`
+
+			const isTimestampSelected = getSettings().attachedFilenameFormat.value==="timestamp"
+			const filename = isTimestampSelected? fillDateFormat(
+				`${filenameNoExt}_%YYYY%-%MM%-%DD%-%HH%.%mm%.%ss%${filenameext}`,
+				new Date()
+			): `${filenameNoExt}_${generateRandomNummericString(10)}${filenameext}` ;
+
+			const attachmentPath = `${targetDirectory}/${filename}`;
+
+			const directory = path.dirname(attachmentPath);
+			fs.promises
+				.mkdir(directory, { recursive: true })
+				.then(() => {
+					return fs.promises.copyFile(filepath,attachmentPath)
+				})
+				.then(()=>{
+					console.log("done uploading them");
+				})
+				.catch((error) => {
+					log.error("Could not copy file to attachment folder", error);
+				})
+
+			attachmentPaths.push({ogName: originalFilename, attachmentPath});
+		}
+
+		return attachmentPaths;
+	} catch (error) {
+		log.error("Could not read files", error);
+	}
+})
 
 ipcMain.handle('saveImageFromClipboard', async (event, contextPath) => {
 	try {

@@ -4,11 +4,14 @@ import { NoteViewState } from '../nodeViewStates'
 import type { CommandContext, CommandOptions } from './Command'
 import WorkspaceCommand from './WorkspaceCommand'
 import { setLinePrefix, shiftGroup, toggleInlineFormat, toggleLink, toggleWikiLink } from 'app/views/editors/NoteEditor/editorActions'
-import type { EditorRange } from 'typewriter-editor'
+import { normalizeRange, type EditorRange } from 'typewriter-editor'
 import MarkdownEditor from 'app/views/editors/NoteEditor/MarkdownEditor'
 import type { HrefFormedLink } from 'common/indexing/indexTypes'
 import { getLineFormattingPrefix } from 'common/markdownModel/line'
 import { derived } from 'svelte/store'
+import { subscribeUntil } from "common/stores";
+import { handleIsNode } from "../NodeHandle";
+import paths from 'common/paths'
 
 function getNoteView(tangent: Tangent) {
 	const view = tangent.getCurrentViewState()
@@ -232,6 +235,98 @@ interface NoteLinePrefixCommandOptions extends CommandOptions {
 	tooltip: string
 	prefix: string
 }
+
+export class AddAttachmentCommand extends NoteEditorCommand {
+
+	constructor(workspace: Workspace) {
+    	super(workspace, {shortcut: "Mod+Shift+Y"});
+	}
+
+	async execute(context?: NoteEditorCommandContext): Promise<void> {
+		const targets = this.getTargets(context);
+		if (!targets) return;
+		const { editor, selection } = targets;
+
+		const currentPath = paths.dirname(editor.mainModule.getNotePath());
+
+		let [start, end] = normalizeRange(selection);
+
+		const workspaceDirectory = this.workspace.directoryStore._files.path;
+
+		const attachmentPaths =
+			await this.workspace.api.file.addAttachment(workspaceDirectory);
+
+		for (let attachmentPathObj of attachmentPaths) {
+			const {ogName, attachmentPath}= attachmentPathObj
+			if (attachmentPath === null) {
+				console.log("attachment path is null");
+				return;
+			}
+
+			subscribeUntil(
+			this.workspace.getHandle(attachmentPath),
+			(value) => {
+				if (handleIsNode(value)) {
+					const workspacePath = this.workspace.directoryStore.getPathToItem(
+						value,
+						{
+							length: "short",
+							includeExtension: true,
+						}
+					);
+					
+					const relativeWorkspacePath = paths.relative(
+						currentPath,
+						attachmentPath
+					);
+
+					const change = editor.change;
+					if (start !== end) {
+						change.delete([start, end]);
+					}
+
+					// replacing wikilinks by standark links for this				
+					const insertion = `[${ogName}](${relativeWorkspacePath})`;
+
+					change.insert(start, insertion + "\n");
+					const moveCursorUnits = insertion.length + 1;
+					change.select(start + moveCursorUnits);
+					start += moveCursorUnits;
+					end += moveCursorUnits;
+					change.apply();
+					return true;
+				}
+				return false;
+			},
+			5000);
+		}
+	}
+
+	getChecked(context?: NoteEditorCommandContext): boolean | null {
+		const targets = this.getTargets(context);
+		if (!targets) return;
+		const { editor, selection } = targets;
+		const lines = editor.doc.getLinesAt(selection);
+		return lines.every((line) => getLineFormattingPrefix(line) === "");
+	}
+
+	getName() {
+		return "Add Attachment";
+	}
+
+	getLabel(context?: NoteEditorCommandContext) {
+		return this.getName();
+	}
+
+	getTooltip(context?: NoteEditorCommandContext) {
+		return "Add attachments to the current file";
+	}
+
+	getDefaultPaletteName() {
+		return this.getName();
+	}
+}
+
 
 export class NoteLinePrefixCommand extends NoteEditorCommand {
 	label: string
