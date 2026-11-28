@@ -76,21 +76,23 @@ function findAnscestors(node: TreeNode, names: string[]): TreeNode[] {
 export class FocusSidebarItem extends WorkspaceCommand {
 	execute(): void {
 		// XXX what if the sidebar is in tag view instead of folder view?
-
+		
+		
 		const currentNode = this.workspace.viewState.tangent.currentNode.value
 		if (!currentNode) return
 		const directoryView = this.workspace.viewState.directoryView
 		const relPath = this.workspace.directoryStore.pathToRelativePath(currentNode.path)
-		if (relPath){
-			const segments = segment(relPath)
-			const folders = findAnscestors(directoryView.root, segments.slice(0, -1))
-			
-			for (const folder of folders) {
-				if (!directoryView.isItemOpen(folder)){
-					directoryView.toggleOpen(folder)
-				}
+		if (!relPath) return
+		const segments = segment(relPath)
+		const folders = findAnscestors(directoryView.root, segments.slice(0, -1))
+		
+		for (const folder of folders) {
+			if (!directoryView.isItemOpen(folder)){
+				directoryView.toggleOpen(folder)
 			}
 		}
+
+		// XXX move scroll of sidebar to see the note item
 	}
 
 	getLabel() {
