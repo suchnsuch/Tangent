@@ -2,6 +2,7 @@ import type { TreeNode } from 'common/trees'
 import { Workspace } from '..'
 import type { CommandContext, CommandOptions } from './Command'
 import WorkspaceCommand from './WorkspaceCommand'
+import { segment } from 'common/paths'
 
 export interface SidebarCommandContext extends CommandContext {
 	currentItem: TreeNode
@@ -57,5 +58,43 @@ export class DeleteSidebarItem extends SidebarCommand {
 
 	getLabel(context?: CommandContext) {
 		return 'Delete Sidebar Item'
+	}
+}
+
+function findAnscestors(node: TreeNode, names: string[]) {
+  const path = []
+
+  for (const name of names) {
+    node = node?.children?.find(c => c.name === name)
+    if (!node) return null // just a safe guard
+    path.push(node)
+  }
+  
+  return path
+}
+
+export class FocusSidebarItem extends WorkspaceCommand {
+	execute(): void {
+		// XXX what if the sidebar is in tag view instead of folder view?
+		
+		const currentNode = this.workspace.viewState.tangent.currentNode.value
+		if (!currentNode) return
+		const directoryView = this.workspace.viewState.directoryView
+		const relPath = this.workspace.directoryStore.pathToRelativePath(currentNode.path)
+		if (!relPath) return
+		const segments = segment(relPath)
+		const folders = findAnscestors(directoryView.root, segments.slice(0, -1))
+		if (!folders) return
+		for (const folder of folders) {
+			if (!directoryView.isItemOpen(folder)){
+				directoryView.toggleOpen(folder)
+			}
+		}
+		
+		// XXX move scroll of sidebar to see the note item
+	}
+
+	getLabel() {
+		return 'Focus Sidebar Item'
 	}
 }
