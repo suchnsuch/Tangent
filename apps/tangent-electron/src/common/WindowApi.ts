@@ -46,7 +46,7 @@ export default interface WindowAPI {
 	onMessage(handler: (message: UserMessage) => void)
 
 	window: {
-		close()
+		close(options?: { ifNotOnly?: boolean })
 		toggleMaximize()
 		minimize()
 		create()

@@ -128,6 +128,9 @@ ipcMain.handle('window', (event, message, param) => {
 	if (browserWindow) {
 		switch (message) {
 			case 'close':
+				if (param?.ifNotOnly && BrowserWindow.getAllWindows().length <= 1) {
+					break
+				}
 				browserWindow.close()
 				break
 			case 'toggleMaximize':

@@ -81,8 +81,8 @@ const bridge: WindowApi = {
 	},
 
 	window: {
-		close() {
-			ipcRenderer.invoke('window', 'close')
+		close(options?: { ifNotOnly?: boolean }) {
+			ipcRenderer.invoke('window', 'close', options)
 		},
 		minimize() {
 			ipcRenderer.invoke('window', 'minimize')
