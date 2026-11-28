@@ -46,7 +46,15 @@ function forgetWorkspace(workspacePath: string) {
 function openDocumentation() {
 	api.documentation.open('Getting Started')
 }
+
+function onKeyDown(event: KeyboardEvent) {
+	if (event.key === 'Escape' && !event.defaultPrevented) {
+		api.window.close({ ifNotOnly: true })
+	}
+}
 </script>
+
+<svelte:window onkeydown={onKeyDown} />
 
 <WindowBar></WindowBar>
 <main>
