@@ -2,7 +2,6 @@ import type { TreeNode } from 'common/trees'
 import { Workspace } from '..'
 import type { CommandContext, CommandOptions } from './Command'
 import WorkspaceCommand from './WorkspaceCommand'
-import { CopyRelativePathCommand } from './CopyPath'
 import { segment } from 'common/paths'
 
 export interface SidebarCommandContext extends CommandContext {
