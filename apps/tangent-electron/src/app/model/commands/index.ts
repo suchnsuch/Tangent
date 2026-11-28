@@ -36,7 +36,7 @@ import { InlineFormatCommand, NoteLinePrefixCommand, SearchNoteCommand, ShiftNot
 import { isMac } from 'common/platform'
 import { NativeCommand } from './NativeCommand'
 import { OpenDocumentationCommand } from './OpenDocumentation'
-import { DeleteSidebarItem, RenameSidebarItem } from './SidebarCommands'
+import { DeleteSidebarItem, FocusSidebarItem, RenameSidebarItem } from './SidebarCommands'
 import { CopyFileToClipboardCommand, UpdateFileFromClipboardCommand } from './CopyFileToClipboard'
 import { OpenDetailsCommand } from './DetailCommands'
 import { OpenPaneSettingsCommand } from './PaneSettingsCommands'
@@ -206,6 +206,7 @@ function createAllCommands(workspace: Workspace) {
 			shortcut: isMac ? 'Mod+R' : 'F2'
 		}),
 		deleteSidebarItem: new DeleteSidebarItem(workspace, { shortcut: 'Mod+Backspace' }),
+		focusSidebarItem: new FocusSidebarItem(workspace, { shortcut: 'Mod+J' }),
 
 
 		// Maps
