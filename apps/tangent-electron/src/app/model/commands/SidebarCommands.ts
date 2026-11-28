@@ -61,7 +61,7 @@ export class DeleteSidebarItem extends SidebarCommand {
 	}
 }
 
-function findAnscestors(node: TreeNode, names: string[]) {
+function findAnscestors(node: TreeNode, names: string[]): TreeNode[] {
   const path = []
 
   for (const name of names) {
