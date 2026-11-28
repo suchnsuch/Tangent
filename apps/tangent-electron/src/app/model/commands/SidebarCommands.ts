@@ -61,12 +61,12 @@ export class DeleteSidebarItem extends SidebarCommand {
 	}
 }
 
-function findAnscestors(node: TreeNode, names: string[]): TreeNode[] {
+function findAnscestors(node: TreeNode, names: string[]) {
   const path = []
 
   for (const name of names) {
     node = node?.children?.find(c => c.name === name)
-    if (!node) return null
+    if (!node) return null // just a safe guard
     path.push(node)
   }
   
@@ -77,7 +77,6 @@ export class FocusSidebarItem extends WorkspaceCommand {
 	execute(): void {
 		// XXX what if the sidebar is in tag view instead of folder view?
 		
-		
 		const currentNode = this.workspace.viewState.tangent.currentNode.value
 		if (!currentNode) return
 		const directoryView = this.workspace.viewState.directoryView
@@ -85,13 +84,13 @@ export class FocusSidebarItem extends WorkspaceCommand {
 		if (!relPath) return
 		const segments = segment(relPath)
 		const folders = findAnscestors(directoryView.root, segments.slice(0, -1))
-		
+		if (!folders) return
 		for (const folder of folders) {
 			if (!directoryView.isItemOpen(folder)){
 				directoryView.toggleOpen(folder)
 			}
 		}
-
+		
 		// XXX move scroll of sidebar to see the note item
 	}
 
